@@ -1,0 +1,16 @@
+[
+  {
+    "name":"Model X",
+    "tag":"Pro",
+    "image":"images/modelx.jpg",
+    "voltage":"48V",
+    "capacity":"20Ah",
+    "range":"120 km",
+    "weight":"8 kg",
+    "cooling":"Passive",
+    "bms":"Smart v2",
+    "application":"Scooters, Delivery Fleets",
+    "datasheet":"datasheets/modelx.pdf",
+    "description":"High-energy pack..."
+  }
+]
