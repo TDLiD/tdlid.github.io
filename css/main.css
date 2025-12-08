@@ -1,12 +1,32 @@
+/* --------------------------------------------
+   GLOBAL VARIABLE: Header logo/subtitle controls
+   -------------------------------------------- */
+:root {
+    --header-logo-font-size: 8.2rem;       /* 상단 TDLiD 크기 */
+    --header-logo-font-weight: 900;        /* 상단 TDLiD 두께 */
+
+    --header-subtitle-font-size: 1.92rem;  /* "TDL ENERGY INDONESIA" 크기 */
+    --header-subtitle-font-weight: 800;    /* 두께 */
+}
+
 /* 기존 내용은 그대로 (파일 상단에서 유지) */
 /* 아래는 새로 추가 / 덮어쓰기 되는 스타일 섹션입니다 */
 
 /* CTA primary/secondary */
-.cta-primary { background: linear-gradient(90deg, #06b6d4, #7c3aed); color: #020617; }
-.cta-secondary { background: transparent; border: 1px solid rgba(255,255,255,0.06); color: #e6eef8; }
+.cta-primary { 
+    background: linear-gradient(90deg, #06b6d4, #7c3aed); 
+    color: #020617; 
+}
+.cta-secondary { 
+    background: transparent; 
+    border: 1px solid rgba(255,255,255,0.06); 
+    color: #e6eef8; 
+}
 
 /* Sticky CTA bar visibility */
-#stickyCTABar.hidden { display: none; }
+#stickyCTABar.hidden { 
+    display: none; 
+}
 
 /* Modal base */
 #compareModal, #quoteModal {
@@ -29,117 +49,158 @@
     text-align: left;
 }
 
-/* Product card tweaks (wow) already present; ensure button spacing */
+/* Product card tweaks */
 .product-datasheet {
     display: inline-block;
     margin-right: 8px;
     font-size: 0.85rem;
 }
 
-/* Small screens: sticky CTA bar hidden, WA button always visible */
+/* Mobile tweaks */
 @media (max-width: 768px) {
-    #stickyCTABar { display: none !important; }
-    .hero-content { padding: 2rem 1rem; }
+    #stickyCTABar { 
+        display: none !important; 
+    }
+    .hero-content { 
+        padding: 2rem 1rem; 
+    }
 }
 
-/* Focus / accessibility */
+/* Focus */
 button:focus, a:focus, input:focus, textarea:focus {
     outline: 3px solid rgba(34,211,238,0.18);
     outline-offset: 2px;
 }
 
-/* ensure hero text entrance (already added earlier but reinforced) */
-.hero-logo-gradient,
+/* Hero text animation */
 .hero-slogan-gradient,
-#heroIntroText { animation: heroTextIn 1s ease forwards; opacity: 0; transform: translateY(24px); }
+#heroIntroText { 
+    animation: heroTextIn 1s ease forwards; 
+    opacity: 0; 
+    transform: translateY(24px); 
+}
 .hero-slogan-gradient { animation-delay: .25s; }
 #heroIntroText { animation-delay: .5s; }
 
-@keyframes heroTextIn { to { opacity: 1; transform: translateY(0); } }
+@keyframes heroTextIn { 
+    to { opacity: 1; transform: translateY(0); } 
+}
 
-/* small utility for logos row */
+/* Logos row */
 #trust img { object-fit: contain; }
 
-/* product grid image optimization (explicit) */
-#productGrid img { width:100%; height:auto; display:block; }
+/* product grid optimization */
+#productGrid img { 
+    width: 100%; 
+    height: auto; 
+    display: block; 
+}
 
-/* ensure video and hero layout remain */
-.hero-section { position: relative; min-height: 100vh; display:flex; justify-content:center; align-items:center; padding-top:96px; overflow:hidden; }
-.hero-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; filter: brightness(0.45) blur(1.6px); transform: scale(1.05); }
-.hero-content { position:relative; z-index:2; padding:2.5rem; border-radius:20px; background:rgba(0,0,0,0.28); backdrop-filter: blur(14px); }
+/* Hero layout */
+.hero-section { 
+    position: relative; 
+    min-height: 100vh; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    padding-top: 96px; 
+    overflow: hidden; 
+}
+.hero-video { 
+    position: absolute; 
+    inset: 0; 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    z-index: 0; 
+    filter: brightness(0.45) blur(1.6px); 
+    transform: scale(1.05); 
+}
+.hero-content { 
+    position: relative; 
+    z-index: 2; 
+    padding: 2.5rem; 
+    border-radius: 20px; 
+    background: rgba(0,0,0,0.28); 
+    backdrop-filter: blur(14px); 
+}
 
-/* WhatsApp button */
+/* WA btn */
 #waBtn { transition: transform .12s ease; }
 #waBtn:active { transform: scale(.98); }
 
-/* small helper for file link */
-a.fileLink { color: #86efac; text-decoration: underline; }
+/* file link helper */
+a.fileLink { 
+    color: #86efac; 
+    text-decoration: underline; 
+}
 
-/* subtle animation for product cards (already exists) */
-#productGrid > div { transition: transform .45s cubic-bezier(.19,1,.22,1), box-shadow .45s; }
+/* Product cards */
+#productGrid > div { 
+    transition: transform .45s cubic-bezier(.19,1,.22,1), box-shadow .45s; 
+}
 
-/* ensure compare modal higher z */
+/* Modals */
 #compareModal { z-index: 9999; }
 #quoteModal { z-index: 10000; }
 
-/* ✅ HERO MAIN LOGO – TDLiD (Dark Blue → Bright → Deep Green) */
+/* ============================================
+   HERO MAIN LOGO — TDLiD (NO MORE CARBON 동일 스타일)
+   ============================================ */
 .hero-logo-gradient {
     font-family: "Arial Black", "Impact", "Segoe UI Black", sans-serif;
-    font-size: clamp(5.8rem, 11vw, 9.2rem);
-    font-weight: 900;
-    letter-spacing: 0.12em;
-    line-height: 1;
+    font-size: var(--header-logo-font-size);   /* <<<<<<<<< 핵심 변경 */
+    font-weight: var(--header-logo-font-weight); /* <<<<<< 핵심 변경 */
+    letter-spacing: 0.38em;
     text-align: center;
+    line-height: 1;
 
-    /* ✅ 왼쪽 Dark Blue → 중앙 밝아짐 → 오른쪽 진한 녹색 */
-background: linear-gradient(
-    90deg,
-    #0a1f44,   /* Dark Navy Blue */
-    #1e40af,   /* Deep Blue */
-    #22d3ee,   /* Bright Cyan */
-    #4ade80,   /* Bright Green */
-    #00140c        /* ✅ Most Dark Green */
-);
+    background: linear-gradient(
+        90deg,
+        #0a1f44,
+        #1e40af,
+        #22d3ee,
+        #4ade80,
+        #00140c
+    );
 
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
 
-    /* ✅ 고급 네온 광원 보정 */
-    filter: drop-shadow(0 0 26px rgba(34, 211, 238, 0.35));
+    filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.35));
     text-shadow:
-        0 0 22px rgba(30, 64, 175, 0.45),
-        0 0 42px rgba(20, 83, 45, 0.35);
+        0 0 16px rgba(37, 99, 235, 0.35),
+        0 0 32px rgba(134, 239, 172, 0.22);
 
-    margin-bottom: 32px;
+    margin-bottom: 18px;
 }
 
-
-/* ✅ HERO SUB SLOGAN – NO MORE CARBON (TDLiD 1/2 Size) */
+/* ============================================
+   HERO SUB SLOGAN — NO MORE CARBON
+   ============================================ */
 .hero-slogan-gradient {
     font-family: "Arial Black", "Impact", "Segoe UI Black", sans-serif;
-    font-size: clamp(1.9rem, 2.5vw, 2.6rem);  /* ✅ TDLiD의 정확히 1/2 비율 */
+    font-size: clamp(1.9rem, 2.5vw, 2.6rem);
     font-weight: 900;
     letter-spacing: 0.38em;
     text-align: center;
 
-    /* ✅ TDLiD와 동일한 그라데이션 */
-background: linear-gradient(
-    90deg,
-    #0a1f44,   /* Dark Navy Blue */
-    #1e40af,   /* Deep Blue */
-    #22d3ee,   /* Bright Cyan */
-    #4ade80,   /* Bright Green */
-    #00140c        /* ✅ Most Dark Green */
-);
+    background: linear-gradient(
+        90deg,
+        #0a1f44,
+        #1e40af,
+        #22d3ee,
+        #4ade80,
+        #00140c
+    );
 
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
 
-    /* ✅ 네온 효과는 살짝 절제 */
     filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.35));
     text-shadow:
         0 0 16px rgba(37, 99, 235, 0.35),
@@ -149,52 +210,100 @@ background: linear-gradient(
     margin-bottom: 64px;
 }
 
-/* ✅ 헤더 로고 크기 조절 */
+/* ============================================
+   HEADER SUBTITLE — "TDL ENERGY INDONESIA"
+   ============================================ */
+.header-subtitle {
+    font-size: var(--header-subtitle-font-size);       /* <<<<<< 추가됨 */
+    font-weight: var(--header-subtitle-font-weight);   /* <<<<<< 추가됨 */
+    color: #e5e7eb;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: block;
+    margin-top: 4px;
+}
+
+
+.animated-logo-text { /* <--- 변경: .header-subtitle 대신 이 클래스를 사용하도록 수정 */
+    font-size: var(--header-subtitle-font-size);
+    font-weight: var(--header-subtitle-font-weight);
+    color: #e5e7eb;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: block;
+    margin-top: 4px;
+}
+
+/* (기존 .header-subtitle 정의는 삭제하거나 주석 처리합니다.) */
+
+/* Header logo image */
 .header-logo {
-    height: 40px;     /* ← 이 값으로 크기 조절 */
+    height: 70px;
     width: auto;
 }
 
-/* ✅ HERO 설명 문구 폰트 사이즈 최적화 */
-.hero-description {
-    font-family: "Pretendard", system-ui, sans-serif;
-    font-size: clamp(1.15rem, 1.6vw, 1.35rem);  /* ✅ 반응형 자동 조절 */
-    font-weight: 400;
-    line-height: 1.7;
-    color: #e5e7eb;
-    text-align: center;
-    max-width: 720px;
-    margin: 0 auto 40px;
-    letter-spacing: 0.01em;
-}
-
-/* ✅ 마우스 원형 라이트 */
-#cursorLight {
-    position: fixed;
-    width: 260px;
-    height: 260px;
-    border-radius: 50%;
-    pointer-events: none;
-    background: radial-gradient(
-        circle,
-        rgba(0, 255, 200, 0.18) 0%,
-        rgba(0, 180, 255, 0.12) 35%,
-        rgba(0, 0, 0, 0) 70%
-    );
-    filter: blur(8px);
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-    mix-blend-mode: screen;
-}
-
-/* ✅ 원 안에 들어오면 텍스트 컬러 반전 */
+/* hover invert effect */
 .invert-on-hover {
     position: relative;
     transition: color 0.2s ease;
 }
-
 .invert-active {
     color: #000 !important;
     mix-blend-mode: difference;
 }
+
+/* Hero 섹션 소개 텍스트 폰트 크기 조정 */
+#heroIntroText {
+    font-size: 1.5rem; /* 원하는 크기로 변경 */
+    line-height: 1.6;
+}
+
+#cursor-spot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999999;
+
+    /* 부드러운 은은한 반전 효과 */
+    backdrop-filter: invert(1) brightness(1.1);
+    -webkit-backdrop-filter: invert(0.20) brightness(1.05);
+
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.25s ease, width 0.2s ease, height 0.2s ease;
+}
+
+
+body:hover #cursor-spotlight {
+    opacity: 1;
+}
+
+/* hover 시 spotlight 확대 */
+[data-spotlight]:hover ~ #cursor-spotlight {
+    width: 230px;
+    height: 230px;
+}
+
+
+
+
+/* ===== HEADER TITLE CONTROL (force override) ===== */
+
+.animated-logo-text {
+    font-size: var(--header-subtitle-font-size, 2rem) !important;
+    font-weight: var(--header-subtitle-font-weight, 700) !important;
+    display: inline-flex;
+    gap: 2px;
+}
+
+/* 알파벳 별 색상 */
+.animated-logo-text span:nth-child(1) { color: #3b82f6; } /* T - 파란색 */
+.animated-logo-text span:nth-child(2) { color: #38bdf8; } /* D - 하늘색 */
+.animated-logo-text span:nth-child(3) { color: #22d3ee; } /* L */
+.animated-logo-text span:nth-child(4) { color: #2dd4bf; } /* space or E */
+.animated-logo-text span:last-child   { color: #4ade80; } /* 마지막 글자 D - 밝은 녹색 */
 

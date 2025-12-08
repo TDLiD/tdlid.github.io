@@ -92,16 +92,28 @@ function initProductInteractions() {
 /* Quote modal helpers */
 function openQuoteModal(productName = '') {
     const modal = qs('#quoteModal');
-    if (!modal) return;
-    modal.classList.add('show');
+    const form = qs('#quoteForm'); // 폼 리셋을 위해 form 객체 추가
+    
+    if (!modal || !form) return;
+
+    // ✅ 수정: CSS에 정의된 대로 'show' 클래스를 추가하여 모달을 표시
+    modal.classList.add('show'); 
+    
     const input = qs('#quoteForm input[name="product"]') || qs('#quoteProduct');
     if (input) input.value = productName || '';
+    
+    // 폼 초기화
+    form.reset(); 
 }
+
 function closeQuoteModal() {
     const modal = qs('#quoteModal');
     if (!modal) return;
+    
+    // ✅ 수정: 'show' 클래스를 제거하여 모달을 숨김
     modal.classList.remove('show');
 }
+
 
 /* Compare table show/hide */
 function initCompareUI() {
@@ -165,32 +177,294 @@ function initStickyCTA() {
     }, { passive: true });
 }
 
-/* quote form submit */
-function initQuoteForm() {
-    const form = qs('#quoteForm');
-    if (!form) return;
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const data = new FormData(form);
-        // For demo: show toast and close modal
-        showToast('Quote request submitted — our sales team will contact you.');
-        closeQuoteModal();
-        form.reset();
-    });
+// js/main.js 파일 (initQuoteForm 함수)
 
-    qs('#quoteCancel')?.addEventListener('click', closeQuoteModal);
+/* NEW — Quote Form Handler */
+function initQuoteForm() {
+    const quoteModal = qs('#quoteModal');
+    const heroBtn = qs('#heroRequestQuote');
+    const quoteCancelBtn = qs('#quoteCancel');
+
+    if (!quoteModal) return;
+
+    // 1. Hero 섹션 버튼 클릭 핸들러 (전역 openQuoteModal 호출)
+    if (heroBtn) {
+        heroBtn.addEventListener('click', () => openQuoteModal('General Inquiry'));
+    }
+
+    // 2. 닫기 버튼 핸들러 (전역 closeQuoteModal 호출)
+    if (quoteCancelBtn) {
+        quoteCancelBtn.addEventListener('click', closeQuoteModal);
+    }
+
+    // 3. 모달 외부 클릭 시 닫기 (전역 closeQuoteModal 호출)
+    quoteModal.addEventListener('click', (e) => {
+        if (e.target === quoteModal) {
+            closeQuoteModal();
+        }
+    });
+    
+    // 폼 제출 처리는 Formspree가 담당하므로, JS에서는 이벤트 리스너를 제거합니다.
 }
+
 
 /* contact form */
 function initContactForm() {
     const form = qs('#contactForm');
     if (!form) return;
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        showToast('문의가 접수되었습니다. 담당자가 곧 연락드립니다.');
-        form.reset();
+
+}
+
+/* ✅ 자동 그라데이션 애니메이션 제어 함수 */
+function toggleLogoGradientAnimation(shouldPause = null) {
+    const logoText = document.querySelector('.animated-logo-text');
+    if (!logoText) return;
+
+    if (shouldPause === true) {
+        // 애니메이션 정지 (off)
+        logoText.classList.add('paused');
+        console.log('Logo Gradient Paused.');
+    } else if (shouldPause === false) {
+        // 애니메이션 재개 (on)
+        logoText.classList.remove('paused');
+        console.log('Logo Gradient Running.');
+    } else {
+        // 현재 상태를 반전
+        logoText.classList.toggle('paused');
+        console.log('Logo Gradient Toggled.');
+    }
+}
+
+/* ----------------------------------------------
+   CURSOR SPOTLIGHT — 완전 신규 버전
+---------------------------------------------- */
+
+(function () {
+    const spotlight = document.getElementById("cursor-spotlight");
+
+    if (!spotlight) return;
+
+    let mouseX = 0;
+    let mouseY = 0;
+
+    // 마우스 위치 추적
+    window.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        spotlight.style.left = mouseX + "px";
+        spotlight.style.top = mouseY + "px";
+    });
+
+    // 마우스 떠났을 때 숨김
+    window.addEventListener("mouseleave", () => {
+        spotlight.style.opacity = "0";
+    });
+
+    // 다시 들어오면 표시
+    window.addEventListener("mouseenter", () => {
+        spotlight.style.opacity = "1";
+    });
+
+})();
+
+function showToast(message, type = "info") {
+    const toast = document.createElement("div");
+    toast.className =
+        `fixed bottom-6 right-6 px-4 py-3 rounded-xl shadow-xl text-white z-[9999] 
+        ${type === "success" ? "bg-green-600" : 
+           type === "error"   ? "bg-red-600"   : 
+                                "bg-gray-800"}`;
+
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add("opacity-0", "transition-opacity");
+    }, 2300);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 2800);
+}
+
+/* NEW — CSV Download Utility (for Download Sample Quote button) */
+function generateAndDownloadCsv(data, filename = 'data.csv', fields) {
+    if (!data || data.length === 0) {
+        showToast('No product data available for download.', 'error');
+        return;
+    }
+
+    // Define fields (headers)
+    const headers = fields || Object.keys(data[0]);
+
+    // Format CSV content
+    const headerCsv = headers.join(',');
+    
+    const rowsCsv = data.map(row => {
+        return headers.map(fieldName => {
+            let value = row[fieldName] || '-';
+            if (typeof value === 'object' && value !== null) {
+                value = JSON.stringify(value);
+            }
+            // CSV escaping
+            value = String(value).replace(/"/g, '""');
+            return `"${value}"`;
+        }).join(',');
+    }).join('\n');
+
+    const csvContent = headerCsv + '\n' + rowsCsv;
+
+    // Trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast('Sample quote data downloaded successfully.', 'success');
+}
+
+/* NEW — Download Quote CSV Button Handler */
+function initDownloadQuoteCsv() {
+    const btn = qs('#downloadQuoteCsv');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+        // data_loader.js에서 전역에 저장한 제품 목록을 사용
+        const products = window.__NG_products || [];
+        
+        // CSV에 포함할 필드 정의 (필요에 따라 조정 가능)
+        const fields = [
+            'name', 'voltage', 'capacity', 'range', 'weight', 'bms', 'datasheet'
+        ];
+
+        generateAndDownloadCsv(products, 'TDL-Product-Specs-Sample.csv', fields);
     });
 }
+
+/* NEW — Product Data Loader */
+// products.json 파일을 비동기로 불러와 전역 변수에 저장합니다.
+async function loadProductData() {
+    // 🚨 파일 경로가 'products.json'이라고 가정합니다. 파일이 다른 곳에 있다면 경로를 수정하세요.
+    const productDataUrl = 'products.json'; 
+
+    try {
+        const response = await fetch(productDataUrl);
+        if (!response.ok) {
+            // 파일을 찾을 수 없거나 로드에 실패하면 오류 발생
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const products = await response.json();
+        
+        // ✅ 핵심: 전역 변수에 데이터 할당
+        window.__NG_products = products; 
+        
+        console.log(`[Data Loaded] ${products.length} products loaded into window.__NG_products`);
+        
+        // 데이터 로드 성공 후, 제품 데이터에 의존하는 UI를 초기화합니다.
+        // 기존 DOMContentLoaded에서 호출하던 함수들입니다.
+        initProductInteractions(); 
+        initCompareUI(); 
+
+    } catch (error) {
+        console.error('Failed to load product data:', error);
+        // showToast 함수가 있다면 에러 메시지를 사용자에게 표시할 수 있습니다.
+        // if (typeof showToast === 'function') {
+        //     showToast('제품 데이터를 로드하는 데 실패했습니다.', 'error');
+        // }
+    }
+}
+
+// js/main.js에 아래 함수를 추가합니다.
+
+/* NEW — Product Gallery (PDF Viewer Style) */
+function initProductGallery() {
+    const container = qs('#galleryImageContainer');
+    const prevBtn = qs('#galleryPrevBtn');
+    const nextBtn = qs('#galleryNextBtn');
+    const statusSpan = qs('#galleryStatus');
+    
+    if (!container || !prevBtn || !nextBtn || !statusSpan) return;
+
+// 🚨 [수정 1] 총 페이지 수를 32로 변경합니다.
+    const totalPages = 32; 
+    
+    // 🚨 [수정 2] 파일 경로 접두사를 'data/products/image-'로 유지합니다.
+    const pathPrefix = 'data/products/image-'; 
+    
+    let currentPage = 1;
+    let autoSlideInterval;
+    const slideDuration = 3000; // 8초마다 자동 전환
+
+    // 🚨 [수정 3] 이미지 파일명 형식 로직을 'image-1.png' 형식으로 변경합니다.
+    const getImagePath = (page) => {
+        // 기존의 .padStart(3, '0') 코드를 제거하여 패딩을 없앱니다.
+        // ex: image-1.png, image-10.png
+        return `${pathPrefix}${page}.png`; 
+    };
+
+    // 이미지 표시 함수
+    const updateGallery = () => {
+        // 이미지를 동적으로 생성/업데이트
+        container.innerHTML = `<img src="${getImagePath(currentPage)}" alt="Product Page ${currentPage}" class="w-full h-full object-contain transition-opacity duration-500">`;
+        
+        // 상태 텍스트 업데이트
+        statusSpan.textContent = `Page ${currentPage} / ${totalPages}`;
+        
+        // 버튼 활성화/비활성화
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+        prevBtn.classList.toggle('opacity-50', prevBtn.disabled);
+        nextBtn.classList.toggle('opacity-50', nextBtn.disabled);
+    };
+
+    // 페이지 이동 로직
+    const changePage = (step) => {
+        let newPage = currentPage + step;
+        if (newPage < 1) newPage = totalPages; // 순환 설정 (선택 사항)
+        else if (newPage > totalPages) newPage = 1; // 순환 설정 (선택 사항)
+        
+        // 순환을 원하지 않는다면:
+        // if (newPage >= 1 && newPage <= totalPages) { 
+        //     currentPage = newPage;
+        //     updateGallery();
+        // }
+        
+        currentPage = newPage;
+        updateGallery();
+    };
+
+    // 자동 슬라이드 시작/재설정
+    const startAutoSlide = () => {
+        clearInterval(autoSlideInterval);
+        autoSlideInterval = setInterval(() => {
+            changePage(1);
+        }, slideDuration);
+    };
+    
+    // 이벤트 리스너 설정
+    prevBtn.addEventListener('click', () => {
+        changePage(-1);
+        startAutoSlide(); // 수동 클릭 후 자동 전환 재시작
+    });
+    nextBtn.addEventListener('click', () => {
+        changePage(1);
+        startAutoSlide(); // 수동 클릭 후 자동 전환 재시작
+    });
+    
+    // 초기화
+    updateGallery();
+    startAutoSlide();
+}
+
+
 
 /* init all */
 document.addEventListener('DOMContentLoaded', () => {
@@ -199,13 +473,24 @@ document.addEventListener('DOMContentLoaded', () => {
     try { initHeroParallax(); } catch(e){}
     try { initMouseGlow(); } catch(e){}
     try { initSmoothAnchors(); } catch(e){}
-    // new interactions
-    initProductInteractions();
-    initCompareUI();
+    
+    // 1. 제품 데이터 로드 시작 (비동기)
+    // 이 함수 내부에서 initProductInteractions()와 initCompareUI()가 호출됩니다.
+    loadProductData(); 
+    
+    // 2. 데이터 로드와 관계없이 즉시 실행 가능한 기능들
+    // 🚨 기존의 initProductInteractions()와 initCompareUI() 호출은 제거해야 합니다.
+    // initProductInteractions(); // 👈 제거 (loadProductData 안으로 이동)
+    // initCompareUI();          // 👈 제거 (loadProductData 안으로 이동)
+    
+// ✅ 신규 갤러리 기능 초기화
+    initProductGallery();
+
     initStickyCTA();
     initQuoteForm();
     initContactForm();
-
+    initDownloadQuoteCsv();
+    
     // show sticky CTA immediately on tall screens
     setTimeout(()=>{ const bar = qs('#stickyCTABar'); if(bar) bar.classList.add('hidden'); }, 200);
 });
@@ -217,9 +502,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cursorLight = document.getElementById("cursorLight");
 });
 
-const invertTargets = document.querySelectorAll(
-    "h1, h2, h3, p, a, span, .hero-logo-gradient, .hero-slogan-gradient"
-);
+
 
 document.addEventListener("mousemove", (e) => {
     if (!cursorLight) return;
@@ -230,17 +513,20 @@ document.addEventListener("mousemove", (e) => {
     cursorLight.style.left = `${x}px`;
     cursorLight.style.top = `${y}px`;
 
-    invertTargets.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const distance = Math.hypot(centerX - x, centerY - y);
+});
 
-        if (distance < 140) {
-            el.classList.add("invert-active");
-        } else {
-            el.classList.remove("invert-active");
-        }
+document.addEventListener("DOMContentLoaded", () => {
+    const spot = document.getElementById("cursor-spot");
+    if (!spot) return;
+
+    window.addEventListener("mousemove", (e) => {
+        spot.style.opacity = "1";
+        spot.style.left = `${e.clientX}px`;
+        spot.style.top = `${e.clientY}px`;
+    });
+
+    window.addEventListener("mouseleave", () => {
+        spot.style.opacity = "0";
     });
 });
 

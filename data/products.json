@@ -1,0 +1,44 @@
+[
+  {
+    "name":"Model X",
+    "tag":"Pro",
+    "image":"data/products/product1.png",
+    "voltage":"48V",
+    "capacity":"20Ah",
+    "range":"120 km",
+    "weight":"8 kg",
+    "cooling":"Passive",
+    "bms":"Smart v2",
+    "application":"Scooters, Delivery Fleets",
+    "datasheet":"datasheets/modelx.pdf",
+    "description":"High-energy pack optimized for urban fleets and high-demand scooter usage. Excellent balance of cost and performance."
+  },
+  {
+    "name":"Model R",
+    "tag":"Racing",
+    "image":"images/modelr.jpg",
+    "voltage":"72V",
+    "capacity":"30Ah",
+    "range":"150 km (est.)",
+    "weight":"12 kg",
+    "cooling":"Active Air",
+    "bms":"Smart v3 (Race)",
+    "application":"High-Performance, Racing",
+    "datasheet":"datasheets/modelr.pdf",
+    "description":"Extreme power density and superior thermal management for racing and high-speed applications. Features advanced active cooling."
+  },
+  {
+    "name":"Model E",
+    "tag":"Eco",
+    "image":"images/modele.jpg",
+    "voltage":"48V",
+    "capacity":"15Ah",
+    "range":"90 km",
+    "weight":"6 kg",
+    "cooling":"Passive",
+    "bms":"Standard v1",
+    "application":"Standard Scooters, City Use",
+    "datasheet":"datasheets/modele.pdf",
+    "description":"Economical and lightweight battery pack for standard urban commuting. Reliable performance at an entry-level price point."
+  }
+]

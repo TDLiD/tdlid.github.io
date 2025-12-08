@@ -54,10 +54,13 @@
 
 <header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-        <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide">
-            <img src="images/appIcon.png" alt="TDL Energy Logo" class="header-logo object-contain">
-            TDL ENERGY INDONESIA
+        
+        <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide"> 
+            <img src="images/logo.png" alt="TDL Energy Logo" class="header-logo object-contain"> 
+            <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
         </h1>
+
+
         <nav class="hidden md:flex gap-8 text-sm text-neutral-300">
             <a href="#about" class="hover:text-white">About</a>
             <a href="#products" class="hover:text-white">Products</a>
@@ -71,7 +74,7 @@
 <!-- Sticky CTA bar (visible on scroll) -->
 <div id="stickyCTABar" class="hidden md:flex items-center justify-between gap-4 fixed bottom-6 left-6 right-6 z-60 p-3 rounded-full bg-black/50 backdrop-blur border border-neutral-800 shadow-lg">
     <div class="flex items-center gap-3">
-        <img src="images/appIcon.png" alt="TDLiD" class="h-10 w-auto object-contain">
+        <img src="images/logo.png" alt="TDLiD" class="h-10 w-auto object-contain">
         <div>
             <div class="text-sm font-semibold">Need a battery pack quote?</div>
             <div class="text-xs text-neutral-400">Fast response for fleets & OEMs</div>
@@ -86,7 +89,7 @@
 <section class="hero-section px-6">
     <!-- ✅ Video background: preload metadata, poster fallback, playsinline -->
     <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="images/hero-poster.jpg">
-        <source src="videos/battery7.mp4" type="video/mp4">
+        <source src="videos/battery5.mp4" type="video/mp4">
         <!-- fallback image for very old browsers -->
     </video>
 
@@ -96,15 +99,25 @@
         <p class="hero-slogan-gradient">NO MORE CARBON</p>
 
         <p id="heroIntroText" class="hero-description">
-            TDLiD provides high-density lithium battery packs optimized for electric motorcycles, scooters and delivery fleets. ISO-certified manufacturing and smart BMS ensure safety and longevity.
+            TDLiD is an Indonesian corporation established by  Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
         </p>
 
 
         <!-- CTA group -->
-        <div class="flex gap-4 justify-center">
-            <a id="heroRequestQuote" href="#requestQuote" class="cta-primary px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-neutral-900 font-semibold">Request Quote</a>
-            <a href="/catalog.pdf" class="cta-secondary px-6 py-3 rounded-xl border border-neutral-700 text-neutral-100">Download Catalog</a>
-        </div>
+        <div class="flex gap-4 justify-center items-center mt-20">
+    <a id="heroRequestQuote" href="#contact" class="cta-primary px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-neutral-900 font-semibold">
+    Request Quote
+</a>
+    <a 
+        href="data/catalog/TEI-Catalog-2-25.pdf" 
+        class="px-6 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-100" 
+        download="TEI-Catalog-2-25.pdf" 
+        target="_blank"
+    >
+        Download Catalog
+    </a>
+</div>
+
 
         <!-- quick trust badges -->
         <div class="flex gap-4 items-center justify-center mt-8">
@@ -120,42 +133,46 @@
     <div class="max-w-7xl mx-auto text-center">
         <h3 class="text-2xl font-bold mb-6">Trusted by fleets & partners</h3>
         <div class="flex flex-wrap items-center justify-center gap-8">
-            <img src="images/logo-client1.png" alt="Client 1" class="h-12" loading="lazy">
-            <img src="images/logo-client2.png" alt="Client 2" class="h-12" loading="lazy">
-            <img src="images/logo-client3.png" alt="Client 3" class="h-12" loading="lazy">
-            <img src="images/logo-client4.png" alt="Client 4" class="h-12" loading="lazy">
+            <img src="images/DAVIGO.png" alt="Client 1" class="h-12" loading="lazy">
+            <img src="images/GESITS.png" alt="Client 2" class="h-12" loading="lazy">
+            <img src="images/ALESSA.png" alt="Client 3" class="h-12" loading="lazy">
         </div>
-        <p class="text-neutral-400 mt-6 max-w-3xl mx-auto">Case Study: 120 scooter fleet upgraded to TDLiD Model X — 35% longer range and 22% lower operating cost.</p>
+        <p class="text-neutral-400 mt-6 max-w-3xl mx-auto"> From Indonesia to the World </p>
     </div>
 </section>
 
 <!-- PRODUCTS -->
 <section id="products" class="py-16 px-6">
     <div class="max-w-7xl mx-auto">
+
         <div class="flex items-center justify-between mb-8">
-            <h3 class="text-3xl font-bold">Battery Pack Lineup</h3>
-            <div class="flex gap-3">
-                <button id="openCompare" class="px-3 py-2 rounded-lg border border-neutral-700">Compare Models</button>
-                <a href="/catalog.pdf" class="px-3 py-2 rounded-lg border border-neutral-700">Download Catalog</a>
-            </div>
-        </div>
-
-        <div id="productGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
-            <!-- product cards injected by JS (data_loader.js) -->
-        </div>
-
-        <!-- Comparison modal (hidden by default) -->
-        <div id="compareModal" class="fixed inset-0 z-70 hidden items-center justify-center">
-            <div class="absolute inset-0 bg-black/60"></div>
-            <div class="relative max-w-5xl w-full bg-neutral-900 rounded-2xl p-6 z-80">
-                <button id="closeCompare" class="absolute right-4 top-4">✕</button>
-                <h4 class="text-xl font-bold mb-4">Model Comparison</h4>
-                <div id="compareTableContainer" class="overflow-auto">
-                    <!-- dynamically filled -->
-                </div>
-            </div>
-        </div>
+    <h3 class="text-3xl font-bold">Battery Pack Lineup</h3>
+    <div class="flex gap-3">
+        <button id="openCompare" class="px-3 py-2 rounded-lg border border-neutral-700">Compare Models</button>
+        <a href="data/catalog/TEI-Catalog-2-25.pdf" class="px-3 py-2 rounded-lg border border-neutral-700" download="TEI-Catalog-2-25.pdf">
+            Download Catalog
+        </a>
     </div>
+</div>
+
+
+       <div id="productGallery" class="relative w-full max-w-4xl mx-auto my-12 p-6 bg-neutral-900 rounded-xl shadow-2xl">
+    <div id="galleryImageContainer" class="aspect-[4/3] bg-neutral-800 rounded-lg overflow-hidden flex items-center justify-center">
+        </div>
+
+    <div class="flex justify-between items-center mt-4">
+        <button id="galleryPrevBtn" class="px-4 py-2 bg-neutral-700 text-white rounded-lg hover:bg-neutral-600 transition">
+            &lt; Previous Page
+        </button>
+        <span id="galleryStatus" class="text-neutral-400 font-semibold">
+            Page 1 / 23
+        </span>
+        <button id="galleryNextBtn" class="px-4 py-2 bg-neutral-700 text-white rounded-lg hover:bg-neutral-600 transition">
+            Next Page &gt;
+        </button>
+    </div>
+</div>
+
 </section>
 
 <!-- TECHNOLOGY & CASES -->
@@ -183,19 +200,22 @@
 <section id="contact" class="py-16 px-6 bg-neutral-900">
     <div class="max-w-4xl mx-auto">
         <h3 class="text-3xl font-bold mb-6">Request a Quote</h3>
-        <form id="contactForm" class="grid grid-cols-1 gap-4">
-            <input type="text" name="company" placeholder="Company / Name" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" required>
-            <input type="email" name="email" placeholder="Email" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" required>
-            <input type="tel" name="phone" placeholder="Phone / WhatsApp" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700">
-            <select name="model" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700">
-                <option value="">Select Model (Optional)</option>
-            </select>
-            <textarea name="notes" rows="4" placeholder="Notes (use case, quantity)" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700"></textarea>
-            <div class="flex gap-3">
-                <button type="submit" class="px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-neutral-900 font-semibold">Send Request</button>
-                <button type="button" id="downloadQuoteCsv" class="px-6 py-3 rounded-xl border border-neutral-700">Download Sample Quote</button>
-            </div>
-        </form>
+
+        <form id="contactForm" method="POST" action="https://formspree.io/f/mdkqddlz" class="grid grid-cols-1 gap-4">
+    <input type="text" name="company" placeholder="Company / Name" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" required autocomplete="organization">
+    <input type="email" name="email" placeholder="Email" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" required autocomplete="email">
+    <input type="tel" name="phone" placeholder="Phone / WhatsApp" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" autocomplete="tel">
+    <select name="model" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" autocomplete="off">
+        <option value="">Select Model (Optional)</option>
+        </select>
+    <textarea name="notes" rows="4" placeholder="Notes (use case, quantity)" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" autocomplete="off"></textarea>
+    <div class="flex gap-3">
+        <button type="submit" class="px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-neutral-900 font-semibold">Send Request</button>
+        <button type="button" id="downloadQuoteCsv" class="px-6 py-3 rounded-xl border border-neutral-700">Download Sample Quote</button>
+    </div>
+</form>
+
+
     </div>
 </section>
 
@@ -204,12 +224,13 @@
 </footer>
 
 <!-- Request Quote Modal (triggered from product card) -->
-<div id="quoteModal" class="fixed inset-0 z-80 hidden items-center justify-center">
-    <div class="absolute inset-0 bg-black/60"></div>
-    <div class="relative max-w-3xl w-full bg-neutral-900 rounded-2xl p-6 z-90">
-        <button id="closeQuoteModal" class="absolute right-4 top-4">✕</button>
-        <h4 class="text-xl font-bold mb-4">Request a Quote</h4>
-        <form id="quoteForm" class="grid gap-3">
+
+<div id="quoteModal" class="modal-base z-80">
+    <div class="bg-neutral-900 border border-neutral-700 p-8 rounded-2xl w-full max-w-lg shadow-2xl relative">
+        <h3 class="text-2xl font-bold mb-4">Request a Quote</h3>
+        <p class="text-neutral-400 mb-6">Please provide details for a customized quotation.</p>
+
+        <form id="quoteForm" method="POST" action="https://formspree.io/f/mdkqddlz" class="grid gap-3">
             <input name="company" placeholder="Company / Name" class="p-3 rounded-xl bg-neutral-800 border border-neutral-700" required>
             <input name="email" placeholder="Email" class="p-3 rounded-xl bg-neutral-800 border border-neutral-700" required>
             <input name="phone" placeholder="Phone / WhatsApp" class="p-3 rounded-xl bg-neutral-800 border border-neutral-700">
@@ -223,15 +244,17 @@
     </div>
 </div>
 
+
 <!-- WhatsApp quick contact (mobile & desktop) -->
-<a id="waBtn" href="https://wa.me/628123456789?text=Hello%20TDLiD%2C%20I%20need%20a%20quote" class="fixed bottom-6 right-6 z-60 p-3 rounded-full bg-green-500 shadow-lg" target="_blank" rel="noreferrer">
+<a id="waBtn" href="https://wa.me/821077140910?text=Hello%20TDLiD%2C%20I%20need%20a%20quote" class="fixed bottom-6 right-6 z-60 p-3 rounded-full bg-green-500 shadow-lg" target="_blank" rel="noreferrer">
     <img src="images/wa-icon.svg" alt="WhatsApp" class="h-6 w-6">
 </a>
-<div id="cursorLight"></div>
 
 <script src="js/data_loader.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/main.js"></script>
+
+<div id="cursor-spot"></div>
 
 </body>
 </html>
