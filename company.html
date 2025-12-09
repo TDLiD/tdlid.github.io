@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Company — TDL Energy Indonesia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/main.css"> <style>
+        body {
+            background:#020617;
+            color:#e5e7eb;
+            /* news.html과 동일한 폰트 적용을 위해 main.css에 Pretendard가 정의되어 있다고 가정 */
+            font-family: 'Pretendard', sans-serif; 
+        }
+
+        /* Spotlight background */
+        .company-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 50% 30%, rgba(34,211,238,.12), transparent 60%),
+                radial-gradient(circle at 20% 70%, rgba(124,58,237,.08), transparent 60%);
+            pointer-events:none;
+            z-index:0;
+        }
+
+        /* 3 Image Stage */
+.image-stage {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.image-card {
+    position: relative;
+    border-radius: 1.5rem;
+    overflow: visible;    /* 🔥 가장 중요 */
+    border: 1px solid rgba(255,255,255,.08);
+    background: #020617;
+    cursor: pointer;
+    display: flex;
+    align-items: center;      /* 세로 중앙 */
+    justify-content: center;  /* 가로 중앙 */
+}
+
+.image-card img {
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+    transition: transform 0.6s ease;
+    transform-origin: center center;
+    position: relative;
+    z-index: 1;
+    border-radius: 1.5rem;  /* ✅ 추가 */
+}
+
+/* hover 시 진짜 원본 사이즈로 확장 */
+.image-card.hover-expand:hover img {
+    transform: scale(1.6);       /* "원본 크기처럼" 풀어줌 */
+    z-index: 99;
+}
+
+
+        .image-overlay{
+            position:absolute;
+            inset:0;
+            background:linear-gradient(to top, rgba(0,0,0,.75), transparent 60%);
+            opacity:.0;
+            transition:.4s ease;
+        }
+        .image-card:hover .image-overlay {
+            opacity:1;
+        }
+
+        /* Floating text */
+        .float-in {
+            animation: floatIn 1s ease both;
+        }
+        @keyframes floatIn {
+            from {opacity:0;transform:translateY(50px)}
+            to {opacity:1;transform:translateY(0)}
+        }
+
+        /* 뉴스/인덱스 페이지의 로고 디자인을 모방하기 위한 스타일 (main.css에 로고 관련 클래스가 정의되어 있다고 가정) */
+        .header-logo-container {
+            display: flex;
+            align-items: center; /* 세로 중앙 정렬 */
+            gap: 12px;
+        }
+        .header-logo-text {
+            /* news.html의 'TDLiD NO MORE CARBON' 이미지 로고 부분 */
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        /* news.html의 'TDL ENERGY INDONESIA' 텍스트를 위한 스타일 */
+        .header-nav-text {
+            font-size: 1.1rem; /* news.html의 글자 크기를 모방 */
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #e5e7eb;
+            text-transform: uppercase;
+        }
+        
+    </style>
+</head>
+
+<body class="relative">
+
+<header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4"> 
+        <h1 class="header-logo-container"> 
+            <img src="images/logo.png" alt="TDLiD Logo" class="header-logo object-contain">
+            
+            <span class="header-nav-text">TDL ENERGY INDONESIA</span>
+            </h1>
+
+        <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="company.html" class="nav-link text-white font-bold">Company</a>
+            <a href="index.html#products" class="nav-link">Products</a>
+            <a href="news.html" class="nav-link">News</a>
+            <a href="index.html#contact" class="nav-link">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<main class="relative z-10 pt-32 pb-24 max-w-7xl mx-auto px-6">
+    <div class="company-bg"></div>
+
+    <div class="text-center mb-20 float-in">
+        <h1 class="text-8xl font-black tracking-wide hero-slogan-gradient">
+            TDLiD
+        </h1>
+        <p class="mt-6 text-neutral-400 text-xl max-w-2xl mx-auto">
+            Designing the Energy Infrastructure of Tomorrow
+        </p>
+    </div>
+
+<section class="mb-32">
+  <div class="image-stage">
+
+    <div class="image-card hover-expand">
+      <img src="images/company1.png" alt="">
+    </div>
+
+    <div class="image-card hover-expand">
+      <img src="images/company2.png" alt="">
+    </div>
+
+    <div class="image-card hover-expand">
+      <img src="images/company3.png" alt="">
+    </div>
+
+  </div>
+</section>
+
+
+    <section class="max-w-4xl mx-auto space-y-16 text-lg text-center">
+
+        <div class="float-in">
+            <h2 class="text-4xl font-bold text-cyan-400 mb-6">Who We Are</h2>
+            <p>
+                <b>TDL Energy Indonesia</b>is an Indonesian corporation established by Enchem Group, 
+with the objective of providing electric motorcycle services and
+renewable energy-related businesses in Indonesia.
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+
+            <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-cyan-400/40 transition">
+                <h3 class="text-xl font-bold text-cyan-300 mb-4">MISSION</h3>
+                <p class="text-neutral-300">
+                    “NO MORE CARBON”  
+                    Deliver the best products and services to our customers.<br>Promote leadership consistently.<br>Create and Innovate value
+
+                </p>
+            </div>
+
+            <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-purple-400/40 transition">
+                <h3 class="text-xl font-bold text-purple-300 mb-4">TECHNOLOGY</h3>
+                <p class="text-neutral-300">
+                    High-density lithium battery and AI-based BMS technology
+                </p>
+            </div>
+
+            <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-blue-400/40 transition">
+                <h3 class="text-xl font-bold text-blue-300 mb-4">VISION</h3>
+                <p class="text-neutral-300">
+                    To provide EV motors and batteries that enhance lifestyles and contribute to a better environment.
+
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+</main>
+
+<div id="cursor-layer">
+    <div id="cursor-spot"></div>
+</div>
+
+<script src="main.js"></script>
+
+</body>
+</html>

@@ -58,20 +58,17 @@
 <header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
   <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
 
-    <!-- LOGO -->
     <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide">
         <img src="images/logo.png" alt="TDL Energy Logo" class="header-logo object-contain"> 
         <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
     </h1>
 
-    <!-- DESKTOP MENU -->
     <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
 
         <a href="#products" class="nav-link">Products</a>
         <a href="#solution" class="nav-link">Solutions</a>
         <a href="#technology" class="nav-link">Technology</a>
 
-        <!-- Resources Dropdown -->
         <div class="relative group">
             <button class="nav-link flex items-center gap-1">
                 Resources
@@ -85,15 +82,13 @@
             </div>
         </div>
 
-        <a href="#about" class="nav-link">Company</a>
+        <a href="company.html" class="nav-link">Company</a>
 
-        <!-- CTA -->
         <a href="#contact" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold">
             Request Quote
         </a>
     </nav>
 
-    <!-- Mobile Button -->
     <button id="mobileMenuBtn" class="md:hidden text-2xl">☰</button>
 
   </div>
@@ -118,7 +113,7 @@
 
 <section class="hero-section px-6">
     <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="images/hero-poster.jpg">
-        <source src="videos/battery7.mp4" type="video/mp4">
+        <source src="videos/battery5.mp4" type="video/mp4">
         </video>
 
     <div class="hero-content max-w-4xl w-full text-center">
@@ -293,7 +288,6 @@
     </div>
 </section>
 
-<!-- Mobile Fullscreen Menu -->
 <div id="mobileMenu" class="fixed inset-0 z-[9999] hidden bg-black/95 text-white">
     <div class="flex justify-between items-center px-6 py-5 border-b border-neutral-800">
         <div class="text-lg font-bold">Menu</div>
@@ -304,7 +298,8 @@
         <a href="#products" class="mobile-nav">Products</a>
         <a href="#solution" class="mobile-nav">Solutions</a>
         <a href="#technology" class="mobile-nav">Technology</a>
-        <a href="#about" class="mobile-nav">Company</a>
+        
+        <a href="company.html" class="mobile-nav">Company</a>
 
         <div class="mt-6 pt-6 border-t border-neutral-800 text-base space-y-3">
             <a href="news.html" class="block text-neutral-300">News</a>
@@ -363,7 +358,6 @@
 <script src="js/news.js"></script>
 <script src="js/main.js"></script>
 
-<div id="cursor-spot"></div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -413,6 +407,10 @@
         });
     });
 </script>
+
+<div id="cursor-layer">
+    <div id="cursor-spot"></div>
+</div>
 
 
 </body>
