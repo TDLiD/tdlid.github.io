@@ -120,7 +120,7 @@ button:focus, a:focus, input:focus, textarea:focus {
     justify-content: center; 
     align-items: center; 
     padding-top: 96px; 
-    overflow: hidden; 
+    overflow: visible !important;
 }
 .hero-video { 
     position: absolute; 
@@ -131,6 +131,8 @@ button:focus, a:focus, input:focus, textarea:focus {
     z-index: 0; 
     filter: brightness(0.45) blur(1.6px); 
     transform: scale(1.05); 
+    pointer-events: none;
+
 }
 .hero-content { 
     position: relative; 
@@ -139,6 +141,8 @@ button:focus, a:focus, input:focus, textarea:focus {
     border-radius: 20px; 
     background: rgba(0,0,0,0.28); 
     backdrop-filter: blur(14px); 
+    pointer-events: none;
+
 }
 
 /* WA btn */
@@ -274,36 +278,6 @@ a.fileLink {
     line-height: 1.6;
 }
 
-#cursor-spot {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 999999;
-
-    /* 부드러운 은은한 반전 효과 */
-    backdrop-filter: invert(1) brightness(1.1);
-    -webkit-backdrop-filter: invert(0.20) brightness(1.05);
-
-    opacity: 0;
-    transform: translate(-50%, -50%);
-    transition: opacity 0.25s ease, width 0.2s ease, height 0.2s ease;
-}
-
-
-body:hover #cursor-spotlight {
-    opacity: 1;
-}
-
-/* hover 시 spotlight 확대 */
-[data-spotlight]:hover ~ #cursor-spotlight {
-    width: 230px;
-    height: 230px;
-}
-
 
 
 
@@ -355,3 +329,42 @@ body:hover #cursor-spotlight {
     to   { opacity: 1; transform: scale(1); }
 }
 
+/* ================================
+   CURSOR SPOTLIGHT EFFECT
+================================ */
+#cursor-spotlight {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+
+    background: radial-gradient(
+        circle at center,
+        rgba(34,211,238,0.18) 0%,
+        rgba(34,211,238,0.12) 25%,
+        rgba(34,211,238,0.06) 45%,
+        rgba(34,211,238,0.02) 60%,
+        rgba(0,0,0,0) 70%
+    );
+
+    filter: blur(25px);
+    transform: translate(-50%, -50%);
+    transition: transform 0.04s linear;
+    mix-blend-mode: screen; /* 밝기 반전 느낌 */
+}
+
+/* 모든 이미지 확대 효과 */
+/* 기본 상태: 원본 크기 유지 */
+.zoom-hover img {
+    transition: transform 1.2s ease;
+    transform: scale(1);
+}
+
+/* hover 시에만 확대 */
+.zoom-hover:hover img {
+    transform: scale(1.25);
+}
