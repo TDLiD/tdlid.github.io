@@ -26,6 +26,28 @@
         section {
             scroll-margin-top: 100px;
         }
+
+/* 🌟 배경, 테두리, 블러 효과 및 가상 요소를 모두 강제로 제거 🌟 */
+        .hero-content, 
+        .hero-content::before, 
+        .hero-content::after {
+            background: transparent !important; /* 배경색/이미지 제거 */
+            background-color: transparent !important; /* 배경색을 확실히 투명하게 설정 */
+            border: none !important; /* 테두리 제거 */
+            box-shadow: none !important; /* 그림자 제거 */
+            backdrop-filter: none !important; /* 블러 효과 제거 (가장 유력한 원인 중 하나) */
+        }
+        /* 콘텐츠 영역의 패딩을 0으로 설정하여 배경 영역 최소화 */
+        .hero-content {
+            padding: 0 !important; 
+        }
+        /* 가상 요소가 배경을 가지고 있다면 내용 자체를 제거 */
+        .hero-content::before, 
+        .hero-content::after {
+            content: none !important;
+        }
+/* 🌟 배경, 테두리, 블러 효과 및 가상 요소를 모두 강제로 제거 🌟 */
+
     </style>
     
     <script type="application/ld+json">
