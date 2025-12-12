@@ -139,10 +139,9 @@ button:focus, a:focus, input:focus, textarea:focus {
     z-index: 2; 
     padding: 2.5rem; 
     border-radius: 20px; 
-    background: rgba(0,0,0,0.28); 
-    backdrop-filter: blur(14px); 
+    background: transparent; /* 수정: 배경색 제거 */
+    backdrop-filter: none;   /* 수정: 블러 효과 제거 */
     pointer-events: none;
-
 }
 
 /* WA btn */
@@ -367,4 +366,53 @@ a.fileLink {
 /* hover 시에만 확대 */
 .zoom-hover:hover img {
     transform: scale(1.25);
+}
+
+#imageModal .modal-content-cert {
+    width: 90%; /* 모바일 대응 */
+    max-width: 1000px; /* 데스크톱 최대 사이즈 */
+}
+
+
+
+
+/* 🌟 FIX: Re-enable interaction for certification images inside the non-interactive .hero-content */
+.interactive-certs {
+    pointer-events: auto; /* .hero-content의 'pointer-events: none;'를 재정의하여 클릭 이벤트 활성화 */
+}
+
+.cert-link {
+    cursor: pointer; /* 마우스 오버 시 손바닥 모양 커서 표시 */
+}
+
+/* ============================================
+   FIX: Image Modal Fixed Positioning Override
+   ============================================ */
+#imageModal {
+    /* HTML에 fixed inset-0가 있지만, 혹시 모를 간섭을 방지 */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* main.css 파일의 가장 아래나 적절한 위치에 추가 */
+
+/* 인증 이미지 확대 효과를 위한 컨테이너 스타일 */
+.cert-zoom-wrapper {
+    /* h-20 크기를 기준으로 이미지의 확대가 다른 요소에 영향을 주지 않도록 숨김 처리 */
+    overflow: hidden; 
+    display: inline-block; /* flex 아이템이므로 block 대신 inline-block 사용 */
+    cursor: pointer;
+    border-radius: 0.5rem; /* 이미지의 둥근 모서리(Tailwind의 rounded-lg 등)에 맞게 설정 (선택 사항) */
+}
+
+/* 마우스 오버 시 이미지 확대 */
+.cert-zoom-wrapper:hover img {
+    /* transform-transition-duration-300 (Tailwind)에 따라 0.3초 동안 부드럽게 1.1배 확대 */
+    transform: scale(1.1); 
 }
