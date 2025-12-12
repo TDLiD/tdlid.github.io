@@ -323,7 +323,7 @@ function initDownloadQuoteCsv() {
 // products.json 파일을 비동기로 불러와 전역 변수에 저장합니다.
 async function loadProductData() {
     // 🚨 파일 경로가 'products.json'이라고 가정합니다. 파일이 다른 곳에 있다면 경로를 수정하세요.
-    const productDataUrl = 'products.json'; 
+    const productDataUrl = 'data/products.json'; 
 
     try {
         const response = await fetch(productDataUrl);
@@ -631,3 +631,4 @@ document.addEventListener('DOMContentLoaded', () => {
 /* expose */
 window.__NG = window.__NG || {};
 window.__NG.showToast = showToast;
+
