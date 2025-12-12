@@ -26,28 +26,6 @@
         section {
             scroll-margin-top: 100px;
         }
-
-/* 🌟 배경, 테두리, 블러 효과 및 가상 요소를 모두 강제로 제거 🌟 */
-        .hero-content, 
-        .hero-content::before, 
-        .hero-content::after {
-            background: transparent !important; /* 배경색/이미지 제거 */
-            background-color: transparent !important; /* 배경색을 확실히 투명하게 설정 */
-            border: none !important; /* 테두리 제거 */
-            box-shadow: none !important; /* 그림자 제거 */
-            backdrop-filter: none !important; /* 블러 효과 제거 (가장 유력한 원인 중 하나) */
-        }
-        /* 콘텐츠 영역의 패딩을 0으로 설정하여 배경 영역 최소화 */
-        .hero-content {
-            padding: 0 !important; 
-        }
-        /* 가상 요소가 배경을 가지고 있다면 내용 자체를 제거 */
-        .hero-content::before, 
-        .hero-content::after {
-            content: none !important;
-        }
-/* 🌟 배경, 테두리, 블러 효과 및 가상 요소를 모두 강제로 제거 🌟 */
-
     </style>
     
     <script type="application/ld+json">
@@ -56,7 +34,7 @@
       "@type":"Organization",
       "name":"TDL Energy Indonesia",
       "url":"https://yourdomain.example",
-      "logo":"https://yourdomain.example/images/logo.png",
+      "logo":"https://yourdomain.example/images/skull-1.jpg",
       "sameAs":["https://www.linkedin.com/","https://www.facebook.com/"]
     }
     </script>
@@ -78,36 +56,34 @@
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
 
 <header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
-  <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
 
-<a href="index.html" class="block">
-    <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide">
-        <img src="images/logo.png" alt="TDL Energy Logo" class="header-logo object-contain"> 
-        <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
-    </h1>
-</a>
+        <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide">
+            <img src="images/logo/logo.png" alt="TDL Energy Logo" class="header-logo object-contain"> 
+            <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
+        </h1>
 
-<nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
-    <a href="index.html" class="nav-link">Home</a>
-    <a href="#products" class="nav-link">Products</a>
-    <a href="#technology" class="nav-link">Technology</a>
-    <a href="#solution" class="nav-link">Solutions</a>
-    <a href="company.html" class="nav-link">Company</a>
-    <a href="news.html" class="nav-link">News</a>
-    <a href="#contact" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold">
-        Request Quote
-    </a>
-</nav>
+        <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="#products" class="nav-link">Products</a>
+            <a href="#technology" class="nav-link">Technology</a>
+            <a href="#solution" class="nav-link">Solutions</a>
+            <a href="company.html" class="nav-link">Company</a>
+            <a href="news.html" class="nav-link">News</a>
+            <a href="#contact" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold">
+                Request Quote
+            </a>
+        </nav>
 
-    <button id="mobileMenuBtn" class="md:hidden text-2xl">☰</button>
+        <button id="mobileMenuBtn" class="md:hidden text-2xl">☰</button>
 
-  </div>
+    </div>
 </header>
 
 
 <div id="stickyCTABar" class="hidden md:flex items-center justify-between gap-4 fixed bottom-6 left-6 right-6 z-60 p-3 rounded-full bg-black/50 backdrop-blur border border-neutral-800 shadow-lg">
     <div class="flex items-center gap-3">
-        <img src="images/logo.png" alt="TDLiD" class="h-10 w-auto object-contain">
+        <img src="images/logo/logo.png" alt="TDLiD" class="h-10 w-auto object-contain">
         <div>
             <div class="text-sm font-semibold">Need a battery pack quote?</div>
             <div class="text-xs text-neutral-400">Fast response for fleets & OEMs</div>
@@ -120,11 +96,10 @@
 </div>
 
 
-
 <section class="hero-section px-6">
-    <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="images/hero-poster.jpg">
+    <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="images/skull-1.jpg">
         <source src="videos/battery17.mp4" type="video/mp4">
-        </video>
+    </video>
 
     <div class="hero-content max-w-4xl w-full text-center">
         <h1 class="hero-logo-gradient">TDLiD</h1>
@@ -136,25 +111,47 @@
 
 
         <div class="flex gap-4 justify-center items-center mt-20">
-    <a id="heroRequestQuote" href="#contact" class="cta-primary px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-neutral-900 font-semibold">
-    Request Quote
-</a>
-    <a 
-        href="data/catalog/TEI-Catalog-2-25.pdf" 
-        class="px-6 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-100" 
-        download="TEI-Catalog-2-25.pdf" 
-        target="_blank"
-    >
-        Download Catalog
-    </a>
-</div>
-
-
-        <div class="flex gap-4 items-center justify-center mt-8">
-            <img src="images/cert-iso.svg" alt="ISO 9001" class="h-10" loading="lazy">
-            <img src="images/cert-iso14001.svg" alt="ISO 14001" class="h-10" loading="lazy">
-            <img src="images/cert-iec.svg" alt="IEC" class="h-10" loading="lazy">
+            <a id="heroRequestQuote" href="#contact" class="cta-primary px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-neutral-900 font-semibold">
+                Request Quote
+            </a>
+            <a 
+                href="data/catalog/TEI-Catalog-2-25.pdf" 
+                class="px-6 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-100" 
+                download="TEI-Catalog-2-25.pdf" 
+                target="_blank"
+            >
+                Download Catalog
+            </a>
         </div>
+
+
+<div class="flex gap-4 items-center justify-center mt-8 interactive-certs">
+                            <img src="images/certification/certificate-bg.png" alt="CE-EMC-TEST" class="h-20 transition-transform duration-300" loading="lazy">
+
+            <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CE-EMC-TEST.jpg">
+                <img src="images/certification/CE-EMC-TEST.jpg" alt="CE-EMC-TEST" class="h-20 transition-transform duration-300" loading="lazy">
+            </a>
+            <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CB-TEST.jpg">
+                <img src="images/certification/CB-TEST.jpg" alt="CB-TEST" class="h-20 transition-transform duration-300" loading="lazy">
+            </a>
+            <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/EMC-COMPLIANCE.jpg">
+                <img src="images/certification/EMC-COMPLIANCE.jpg" alt="EMC-COMPLIANCE" class="h-20 transition-transform duration-300" loading="lazy">
+            </a>
+            <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/IEC-62619.jpg">
+                <img src="images/certification/IEC-62619.jpg" alt="IEC-62619" class="h-20 transition-transform duration-300" loading="lazy">
+            </a>
+            <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Material-Safety.jpg">
+                <img src="images/certification/Material-Safety.jpg" alt="Material-Safety" class="h-20 transition-transform duration-300" loading="lazy">
+            </a>
+            <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/UN38.3.jpg">
+                <img src="images/certification/UN38.3.jpg" alt="Material-Safety" class="h-20 transition-transform duration-300" loading="lazy">
+            </a>
+            <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Dangerous-Goods.jpg">
+                <img src="images/certification/Dangerous-Goods.jpg" alt="Material-Safety" class="h-20 transition-transform duration-300" loading="lazy">
+            </a>
+
+        </div>
+
     </div>
 </section>
 
@@ -174,54 +171,70 @@
     <div class="max-w-7xl mx-auto">
 
         <div class="flex items-center justify-between mb-8">
-    <h3 class="text-3xl font-bold">Battery Pack Lineup</h3>
-    <div class="flex gap-3">
-        <button id="openCompare" class="px-3 py-2 rounded-lg border border-neutral-700">Compare Models</button>
-        <a href="data/catalog/TEI-Catalog-2-25.pdf" class="px-3 py-2 rounded-lg border border-neutral-700" download="TEI-Catalog-2-25.pdf">
-            Download Catalog
-        </a>
-    </div>
-</div>
-
-
-       <div id="productGallery" class="relative w-full max-w-4xl mx-auto my-12 p-6 bg-neutral-900 rounded-xl shadow-2xl">
-    <div id="galleryImageContainer" class="aspect-[4/3] bg-neutral-800 rounded-lg overflow-hidden flex items-center justify-center">
+            <h3 class="text-3xl font-bold">TDLiD Products</h3>
+            <div class="flex gap-3">
+                <button id="openCompare" class="px-3 py-2 rounded-lg border border-neutral-700">Compare Models</button>
+                <a href="data/catalog/TEI-Catalog-2-25.pdf" class="px-3 py-2 rounded-lg border border-neutral-700" download="TEI-Catalog-2-25.pdf">
+                    Download Catalog
+                </a>
+            </div>
         </div>
 
-    <div class="flex justify-between items-center mt-4">
-        <button id="galleryPrevBtn" class="px-4 py-2 bg-neutral-700 text-white rounded-lg hover:bg-neutral-600 transition">
-            &lt; Previous Page
-        </button>
-        <span id="galleryStatus" class="text-neutral-400 font-semibold">
-            Page 1 / 23
-        </span>
-        <button id="galleryNextBtn" class="px-4 py-2 bg-neutral-700 text-white rounded-lg hover:bg-neutral-600 transition">
-            Next Page &gt;
-        </button>
+
+        <div id="productGallery" class="relative w-full max-w-4xl mx-auto my-12 p-6 bg-neutral-900 rounded-xl shadow-2xl">
+            <div id="galleryImageContainer" class="aspect-[4/3] bg-neutral-800 rounded-lg overflow-hidden flex items-center justify-center">
+            </div>
+
+            <div class="flex justify-between items-center mt-4">
+                <button id="galleryPrevBtn" class="px-4 py-2 bg-neutral-700 text-white rounded-lg hover:bg-neutral-600 transition">
+                    &lt; Previous Page
+                </button>
+                <span id="galleryStatus" class="text-neutral-400 font-semibold">
+                    Page 1 / 23
+                </span>
+                <button id="galleryNextBtn" class="px-4 py-2 bg-neutral-700 text-white rounded-lg hover:bg-neutral-600 transition">
+                    Next Page &gt;
+                </button>
+            </div>
+        </div>
     </div>
-</div>
+</section>
+
 
 <section id="technology" class="py-16 px-6">
     <div class="max-w-6xl mx-auto">
         <h3 class="text-3xl font-bold mb-10">Core Technology</h3>
         <div class="grid md:grid-cols-3 gap-10">
-            <div class="p-8 border border-neutral-800 rounded-2xl">
-                
-                <a href="#" id="openBatteryDetail" data-detail-src="images/battery1_detail.png">
-                    <img src="images/battery1.png" alt="Smart BMS Image" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
-                </a>
-                
+
+            <div class="p-8 border border-neutral-800 rounded-2xl">                
+                <a href="#" id="openBatteryDetail" data-detail-src="images/technology/72V20A-1.png">
+                    <img src="images/technology/72V20A.png" alt="Smart BMS Image" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>                
                 <h4 class="font-semibold mb-4">72V 20Ah</h4>
                 <p class="text-neutral-400">LG NCM, high-voltage, decent-range lithium pack for electric scooters and fleets.</p>
             </div>
+
             <div class="p-8 border border-neutral-800 rounded-2xl">
-                <h4 class="font-semibold mb-4">Thermal Management</h4>
-                <p class="text-neutral-400">Advanced cooling for stable performance in hot climates.</p>
+                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-2.png">
+                    <img src="images/technology/72V20A-2.png" alt="Smart BMS Image" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>
+                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-3.png">
+                    <img src="images/technology/72V20A-3.png" alt="Smart BMS Image" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>
+                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-4.png">
+                    <img src="images/technology/72V20A-4.png" alt="Smart BMS Image" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>
             </div>
-            <div class="p-8 border border-neutral-800 rounded-2xl">
-                <h4 class="font-semibold mb-4">High Energy Density</h4>
-                <p class="text-neutral-400">Lighter packs with longer riding range — ideal for fleets.</p>
+
+            <div class="p-8 border border-neutral-800 rounded-2xl">                
+                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-5.png">
+                    <img src="images/technology/72V20A-5.png" alt="Smart BMS Image" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>
+                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-6.png">
+                    <img src="images/technology/72V20A-6.png" alt="Smart BMS Image" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>                
             </div>
+
         </div>
     </div>
 </section>
@@ -229,70 +242,96 @@
 <section id="solution" class="py-16 px-6">
     <div class="max-w-6xl mx-auto">
         <h3 class="text-3xl font-bold mb-10">Custom Solutions</h3>
-        <div class="grid md:grid-cols-3 gap-10">
-           
-            <div class="p-8 border border-neutral-800 rounded-2xl">
-                <a href="#" id="openSolutionDetail" data-detail-src="images/solution1_detail.png">
-                    <img 
-                        src="images/solution1.png" 
-                        alt="Delivery Fleets Solution" 
-                        class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" 
-                        loading="lazy"
-                    >
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"> 
+
+
+
+            <div class="p-4 border border-neutral-800 rounded-xl">
+                <h4 class="font-semibold mb-2 text-sm">A. EV Motorcycle Conversion Business</h4>
+
+                <a href="#" id="openSolutionDetail" data-detail-src="images/solutions/solution1.png">
+                    <img src="images/solutions/solution1.png" alt="Delivery Fleets Solution" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
                 </a>
-                <h4 class="font-semibold mb-4">Financing & Leasing</h4>
-                <p class="text-neutral-400">TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles for commercial fleets.</p>
+                <a href="#" id="openSolutionDetail" data-detail-src="images/solutions/solution1-1.png">
+                    <img src="images/solutions/solution1-1.png" alt="Delivery Fleets Solution" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>
+                <p class="text-neutral-400 text-xs">TDLID supplies electric motorcycle conversion kits and battery packs to local
+governments and universities in Indonesia.</p>
             </div>
 
-            <div class="p-8 border border-neutral-800 rounded-2xl">
-                <a href="#" data-detail-src="images/solution2_detail.png">
-                    <img 
-                        src="images/solution2.png" 
-                        alt="Battery Recycling Solution" 
-                        class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" 
-                        loading="lazy"
-                    >
+
+
+            <div class="p-4 border border-neutral-800 rounded-xl">
+                <h4 class="font-semibold mb-2 text-sm">B. Employee Ownership Program</h4>
+
+                <a href="#" id="openSolutionDetail" data-detail-src="images/solutions/solution2.png">
+                    <img src="images/solutions/solution2.png" alt="Delivery Fleets Solution" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
                 </a>
-                <h4 class="font-semibold mb-4">Battery Recycling</h4>
-                <p class="text-neutral-400">TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries, while providing a business model that can achieve true zero carbon in the electric motorcycle ecosystem.
-</p>
+                <a href="#" id="openSolutionDetail" data-detail-src="images/solutions/solution2-1.png">
+                    <img src="images/solutions/solution2-1.png" alt="Delivery Fleets Solution" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>
+                <p class="text-neutral-400 text-xs">TDLiD provides electric motorcycles to 4.5 million Indonesian civil servants and state-owned enterprise employees.</p>
             </div>
 
-            <div class="p-8 border border-neutral-800 rounded-2xl">
-                <a href="#" data-detail-src="images/solution1_detail.png">
-                    <img 
-                        src="images/solution1.png" 
-                        alt="B2B Custom Pack" 
-                        class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" 
-                        loading="lazy"
-                    >
+
+            <div class="p-4 border border-neutral-800 rounded-xl">
+                <h4 class="font-semibold mb-2 text-sm">C. Lease and Rental</h4>
+
+                <a href="#" id="openSolutionDetail" data-detail-src="images/solutions/solution3.png">
+                    <img src="images/solutions/solution3.png" alt="Delivery Fleets Solution" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
                 </a>
-                <h4 class="font-semibold mb-4">B2B Custom Pack & Design</h4>
-                <p class="text-neutral-400">Customized battery pack design and manufacturing for OEM and B2B partners, optimized for specific motorcycle models and performance requirements.</p>
+                <a href="#" id="openSolutionDetail" data-detail-src="images/solutions/solution3-1.png">
+                    <img src="images/solutions/solution3-1.png" alt="Delivery Fleets Solution" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>
+                <p class="text-neutral-400 text-xs">TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles.</p>
             </div>
 
+            <div class="p-4 border border-neutral-800 rounded-xl">
+                <h4 class="font-semibold mb-2 text-sm">D. Solar home charging</h4>
+
+                <a href="#" id="openSolutionDetail" data-detail-src="images/solutions/solution4.png">
+                    <img src="images/solutions/solution4.png" alt="Delivery Fleets Solution" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>
+                <a href="#" id="openSolutionDetail" data-detail-src="images/solutions/solution4-1.png">
+                    <img src="images/solutions/solution4-1.png" alt="Delivery Fleets Solution" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>
+                <p class="text-neutral-400 text-xs">TDLiD offers solar power generation systems that can be utilized by individual households and small businesses to achieve true carbon zero in Indonesia's EV ecosystem.</p>
+            </div>
+
+            <div class="p-4 border border-neutral-800 rounded-xl">
+                <h4 class="font-semibold mb-2 text-sm">E. Battery Recycling</h4>
+
+                <a href="#" id="openSolutionDetail" data-detail-src="images/solutions/solution5.png">
+                    <img src="images/solutions/solution5.png" alt="Delivery Fleets Solution" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>
+                <a href="#" id="openSolutionDetail" data-detail-src="images/solutions/solution5-1.png">
+                    <img src="images/solutions/solution5-1.png" alt="Delivery Fleets Solution" class="w-full h-auto mb-4 rounded-lg hover:opacity-80 transition-opacity cursor-pointer" loading="lazy">
+                </a>
+                <p class="text-neutral-400 text-xs">TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries, while providing a business model that can achieve true zero carbon in the electric motorcycle ecosystem.</p>
+            </div>
 
         </div>
     </div>
 </section>
+
 
 <section id="contact" class="py-16 px-6 bg-neutral-900">
     <div class="max-w-4xl mx-auto">
         <h3 class="text-3xl font-bold mb-6">Request a Quote</h3>
 
         <form id="contactForm" method="POST" action="https://formspree.io/f/mdkqddlz" class="grid grid-cols-1 gap-4">
-    <input type="text" name="company" placeholder="Company / Name" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" required autocomplete="organization">
-    <input type="email" name="email" placeholder="Email" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" required autocomplete="email">
-    <input type="tel" name="phone" placeholder="Phone / WhatsApp" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" autocomplete="tel">
-    <select name="model" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" autocomplete="off">
-        <option value="">Select Model (Optional)</option>
-        </select>
-    <textarea name="notes" rows="4" placeholder="Notes (use case, quantity)" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" autocomplete="off"></textarea>
-    <div class="flex gap-3">
-        <button type="submit" class="px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-neutral-900 font-semibold">Send Request</button>
-        <button type="button" id="downloadQuoteCsv" class="px-6 py-3 rounded-xl border border-neutral-700">Download Sample Quote</button>
-    </div>
-</form>
+            <input type="text" name="company" placeholder="Company / Name" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" required autocomplete="organization">
+            <input type="email" name="email" placeholder="Email" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" required autocomplete="email">
+            <input type="tel" name="phone" placeholder="Phone / WhatsApp" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" autocomplete="tel">
+            <select name="model" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" autocomplete="off">
+                <option value="">Select Model (Optional)</option>
+            </select>
+            <textarea name="notes" rows="4" placeholder="Notes (use case, quantity)" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700" autocomplete="off"></textarea>
+            <div class="flex gap-3">
+                <button type="submit" class="px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-neutral-900 font-semibold">Send Request</button>
+                <button type="button" id="downloadQuoteCsv" class="px-6 py-3 rounded-xl border border-neutral-700">Download Sample Quote</button>
+            </div>
+        </form>
 
 
     </div>
@@ -322,7 +361,6 @@
         </a>
     </nav>
 </div>
-
 
 
 <footer class="py-10 px-6 text-center text-neutral-500 border-t border-neutral-800">
@@ -360,7 +398,7 @@
 
 
 <a id="waBtn" href="https://wa.me/821077140910?text=Hello%20TDLiD%2C%20I%20need%20a%20quote" class="fixed bottom-6 right-6 z-60 p-3 rounded-full bg-green-500 shadow-lg" target="_blank" rel="noreferrer">
-    <img src="images/wa-icon.svg" alt="WhatsApp" class="h-6 w-6">
+    <img src="images/logo/logo.png" alt="WhatsApp" class="h-6 w-6">
 </a>
 
 <script src="js/data_loader.js"></script>
@@ -373,10 +411,11 @@
     document.addEventListener('DOMContentLoaded', () => {
         // 기존 'Technology' 섹션의 배터리 이미지 버튼
         const openBatteryBtn = document.getElementById('openBatteryDetail'); 
-        
-        // 🌟 수정된 부분: 'Solution' 섹션 내의 data-detail-src 속성을 가진 모든 링크를 선택
-        // 이렇게 하면 모든 솔루션 항목에 이벤트가 바인딩됩니다.
+        // 'Solution' 섹션 내의 data-detail-src 속성을 가진 모든 링크
         const solutionLinks = document.querySelectorAll('#solution a[data-detail-src]'); 
+        
+        // 🌟 새로 추가된 부분: 인증 이미지 링크들을 모두 선택
+        const certLinks = document.querySelectorAll('.cert-link'); 
 
         const modal = document.getElementById('imageModal');
         const closeBtn = document.getElementById('closeImageModal');
@@ -384,12 +423,12 @@
 
         // 모달을 여는 공통 핸들러 함수
         const openModalHandler = (e) => {
-            e.preventDefault(); // <a> 태그의 기본 동작(페이지 이동) 방지
-            const detailSrc = e.currentTarget.getAttribute('data-detail-src');
+            e.preventDefault(); 
+            // data-detail-src 또는 data-original-src를 읽어옵니다.
+            const detailSrc = e.currentTarget.getAttribute('data-detail-src') || e.currentTarget.getAttribute('data-original-src');
             
-            detailImage.src = detailSrc; // 이미지 소스 설정
+            detailImage.src = detailSrc; 
             modal.classList.remove('hidden');
-            modal.classList.add('show');
         };
         
         // 'Technology' 버튼에 이벤트 리스너 연결
@@ -397,14 +436,18 @@
             openBatteryBtn.addEventListener('click', openModalHandler);
         }
 
-        // 🌟 수정된 부분: solutionLinks 컬렉션의 모든 요소에 이벤트 리스너 연결
+        // 'Solution' 링크들에 이벤트 리스너 연결
         solutionLinks.forEach(link => {
             link.addEventListener('click', openModalHandler);
         });
         
+        // 🌟 새로 추가된 부분: 인증 이미지 링크들에 이벤트 리스너 연결
+        certLinks.forEach(link => {
+            link.addEventListener('click', openModalHandler);
+        });
+
         const closeModal = () => {
             modal.classList.add('hidden');
-            modal.classList.remove('show');
         };
 
         closeBtn.addEventListener('click', closeModal);
@@ -417,6 +460,7 @@
         });
     });
 </script>
+
 
 <div id="cursor-layer">
     <div id="cursor-spot"></div>

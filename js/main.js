@@ -11,6 +11,8 @@ const qsa = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 /* For brevity, paste your existing earlier functions (pageIntro, initHeroParallax, initMouseGlow, showToast, initProductModalBase etc.)
    and then replace / append the following new utilities and event wiring. */
 
+
+
 /* NEW — Product detail + Quote / Compare handling (safe DOM ops) */
 function initProductInteractions() {
     const grid = qs('#productGrid');
@@ -235,38 +237,6 @@ function toggleLogoGradientAnimation(shouldPause = null) {
     }
 }
 
-/* ----------------------------------------------
-   CURSOR SPOTLIGHT — 완전 신규 버전
----------------------------------------------- */
-
-(function () {
-    const spotlight = document.getElementById("cursor-spotlight");
-
-    if (!spotlight) return;
-
-    let mouseX = 0;
-    let mouseY = 0;
-
-    // 마우스 위치 추적
-    window.addEventListener("mousemove", (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-
-        spotlight.style.left = mouseX + "px";
-        spotlight.style.top = mouseY + "px";
-    });
-
-    // 마우스 떠났을 때 숨김
-    window.addEventListener("mouseleave", () => {
-        spotlight.style.opacity = "0";
-    });
-
-    // 다시 들어오면 표시
-    window.addEventListener("mouseenter", () => {
-        spotlight.style.opacity = "1";
-    });
-
-})();
 
 function showToast(message, type = "info") {
     const toast = document.createElement("div");
@@ -492,46 +462,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initDownloadQuoteCsv();
 
 // ✨ NEW: 뉴스 모달 초기화
-    initNewsModal();
+   // initNewsModal();
     
     // show sticky CTA immediately on tall screens
     setTimeout(()=>{ const bar = qs('#stickyCTABar'); if(bar) bar.classList.add('hidden'); }, 200);
 });
 
-/* ✅ 마우스 스포트라이트 + 텍스트 반전 효과 */
-let cursorLight = null;
 
-document.addEventListener("DOMContentLoaded", () => {
-    cursorLight = document.getElementById("cursorLight");
-});
-
-
-
-document.addEventListener("mousemove", (e) => {
-    if (!cursorLight) return;
-
-    const x = e.clientX;
-    const y = e.clientY;
-
-    cursorLight.style.left = `${x}px`;
-    cursorLight.style.top = `${y}px`;
-
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    const spot = document.getElementById("cursor-spot");
-    if (!spot) return;
-
-    window.addEventListener("mousemove", (e) => {
-        spot.style.opacity = "1";
-        spot.style.left = `${e.clientX}px`;
-        spot.style.top = `${e.clientY}px`;
-    });
-
-    window.addEventListener("mouseleave", () => {
-        spot.style.opacity = "0";
-    });
-});
 
 // ===== Mobile Menu Logic =====
 document.addEventListener('DOMContentLoaded', () => {
@@ -557,6 +494,138 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
+/* ================================
+   CURSOR SPOTLIGHT SCRIPT
+================================ */
+document.addEventListener("DOMContentLoaded", () => {
+    const spotlight = document.getElementById("cursor-spotlight");
+    if (!spotlight) return;
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    document.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        spotlight.style.left = mouseX + "px";
+        spotlight.style.top  = mouseY + "px";
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const cards = document.querySelectorAll(".image-card");
+    const firstImg = document.querySelector(".image-card img");
+
+    if (!firstImg) return;
+
+    function syncHeights() {
+        const h = firstImg.naturalHeight * (firstImg.clientWidth / firstImg.naturalWidth);
+
+        cards.forEach(card => {
+            card.style.height = h + "px";
+        });
+    }
+
+    // 이미지 로드 완료 후 실행
+    if (firstImg.complete) {
+        syncHeights();
+    } else {
+        firstImg.onload = syncHeights;
+    }
+
+    // 리사이즈 대응
+    window.addEventListener("resize", syncHeights);
+});
+
+/* ============================================================
+   IMAGE POPUP (TECHNOLOGY + SOLUTION 공통)
+   ============================================================ */
+
+function initImagePopup() {
+
+    // 팝업 생성 (한번만)
+    let popup = document.getElementById('imagePopup');
+    if (!popup) {
+        popup = document.createElement('div');
+        popup.id = 'imagePopup';
+        popup.style.cssText = `
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.85);
+            z-index: 999999;
+            padding: 20px;
+        `;
+        popup.innerHTML = `
+            <div id="popupContent" style="display:flex; gap:20px; max-width:95%; max-height:95%;"></div>
+            <button id="popupClose" style="
+                position:absolute;
+                top:20px; right:25px;
+                font-size:30px;
+                background:none; border:none;
+                color:white;
+                cursor:pointer;
+            ">✕</button>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    const popupContent = popup.querySelector('#popupContent');
+    const popupClose   = popup.querySelector('#popupClose');
+
+    /* 공통 클릭 로직 */
+    function openPopup(srcList) {
+        popupContent.innerHTML = '';
+
+        srcList.forEach(src => {
+            const img = document.createElement('img');
+            img.src = src.trim();
+            img.style.maxWidth = '48%';
+            img.style.maxHeight = '90vh';
+            img.style.objectFit = 'contain';
+            popupContent.appendChild(img);
+        });
+
+        popup.style.display = 'flex';
+    }
+
+    function closePopup() {
+        popup.style.display = 'none';
+    }
+
+    popupClose.addEventListener('click', closePopup);
+    popup.addEventListener('click', e => {
+        if (e.target === popup) closePopup();
+    });
+
+    /* Technology 섹션 */
+    document.querySelectorAll('.openBatteryDetail').forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            const srcs = btn.dataset.detailSrc.split(',');
+            openPopup(srcs);
+        });
+    });
+
+    /* Solutions 섹션 */
+    document.querySelectorAll('.openSolutionDetail').forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            const srcs = btn.dataset.detailSrc.split(',');
+            openPopup(srcs);
+        });
+    });
+}
+
+/* DOMContentLoaded 안에 추가 */
+document.addEventListener('DOMContentLoaded', () => {
+    initImagePopup();
+});
 
 
 /* expose */
