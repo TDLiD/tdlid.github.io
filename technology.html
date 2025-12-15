@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Technology | TDLiD</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/main.css">
+</head>
+
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
+
+<header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+
+        <!-- 🔥 INDEX.HTML 과 동일한 로고 구조 -->
+        <a href="index.html" class="block">
+            <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide">
+                <img src="images/logo/logo.png" alt="TDL Energy Logo" class="header-logo object-contain">
+                <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
+            </h1>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="products.html" class="nav-link">Products</a>
+            <a href="technology.html" class="nav-link text-white font-bold">Technology</a>
+            <a href="solutions.html" class="nav-link">Solutions</a>
+            <a href="company.html" class="nav-link">Company</a>
+            <a href="news.html" class="nav-link">News</a>
+        </nav>
+
+    </div>
+</header>
+
+<!-- Add padding to account for the fixed header space -->
+<section id="technology" class="flex-grow pt-24 pb-16 px-6">
+    <div class="max-w-6xl mx-auto">
+        <h3 class="text-3xl font-bold mb-10">Core Technology</h3>
+
+        <div class="grid md:grid-cols-3 gap-10">
+
+            <div class="p-8 border border-neutral-800 rounded-2xl">
+                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-1.png">
+                    <img src="images/technology/72V20A.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer">
+                </a>
+                <h4 class="font-semibold mb-4">72V 20Ah</h4>
+                <p class="text-neutral-400">
+                    LG NCM, high-voltage, decent-range lithium pack for electric scooters and fleets.
+                </p>
+            </div>
+
+            <div class="p-8 border border-neutral-800 rounded-2xl">
+                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-2.png">
+                    <img src="images/technology/72V20A-2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
+                </a>
+                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-3.png">
+                    <img src="images/technology/72V20A-3.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
+                </a>
+                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-4.png">
+                    <img src="images/technology/72V20A-4.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
+                </a>
+            </div>
+
+            <div class="p-8 border border-neutral-800 rounded-2xl">
+                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-5.png">
+                    <img src="images/technology/72V20A-5.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
+                </a>
+                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-6.png">
+                    <img src="images/technology/72V20A-6.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Minimized footer padding -->
+<footer class="py-4 text-center text-neutral-500 border-t border-neutral-800">
+    © 2025 TDL Energy Indonesia
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

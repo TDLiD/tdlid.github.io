@@ -7,6 +7,7 @@
 
     --header-subtitle-font-size: 1.50rem;  /* "TDL ENERGY INDONESIA" 크기 */
     --header-subtitle-font-weight: 800;    /* 두께 */
+
 }
 
 /* 기존 내용은 그대로 (파일 상단에서 유지) */
@@ -112,16 +113,15 @@ button:focus, a:focus, input:focus, textarea:focus {
     display: block; 
 }
 
-/* Hero layout */
-.hero-section { 
-    position: relative; 
-    min-height: 100vh; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    padding-top: 96px; 
-    overflow: visible !important;
+.hero-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;     /* 🔥 핵심: 세로 중앙 */
+    padding-top: 0;          /* 기존 padding-top 제거 */
 }
+
 .hero-video { 
     position: absolute; 
     inset: 0; 
@@ -137,11 +137,14 @@ button:focus, a:focus, input:focus, textarea:focus {
 .hero-content { 
     position: relative; 
     z-index: 2; 
-    padding: 2.5rem; 
+    padding: 2.5rem 2.5rem 0; /* 👈 하단 패딩(2.5rem)을 0으로 줄입니다. */
     border-radius: 20px; 
     background: transparent; /* 수정: 배경색 제거 */
     backdrop-filter: none;   /* 수정: 블러 효과 제거 */
     pointer-events: none;
+/* 👈 이 줄을 추가합니다. */
+    text-align: center;     /* 텍스트 중앙 */
+
 }
 
 /* WA btn */
@@ -400,19 +403,82 @@ a.fileLink {
 }
 
 
-/* main.css 파일의 가장 아래나 적절한 위치에 추가 */
 
 /* 인증 이미지 확대 효과를 위한 컨테이너 스타일 */
 .cert-zoom-wrapper {
-    /* h-20 크기를 기준으로 이미지의 확대가 다른 요소에 영향을 주지 않도록 숨김 처리 */
-    overflow: hidden; 
-    display: inline-block; /* flex 아이템이므로 block 대신 inline-block 사용 */
-    cursor: pointer;
-    border-radius: 0.5rem; /* 이미지의 둥근 모서리(Tailwind의 rounded-lg 등)에 맞게 설정 (선택 사항) */
+    /* h-20 크기를 기준으로 이미지의 확대가 다른 요소에 영향을 주지 않도록 숨김 처리 */
+    overflow: visible;  /* 👈 hidden을 visible로 변경 */
+    display: inline-block; 
+    cursor: pointer;
+    border-radius: 0.5rem; 
+    position: relative; /* 👈 z-index를 위해 position 설정 */
+    z-index: 1; /* 기본 z-index */
+    transition: z-index 0s 0.3s; /* 호버 종료 후 z-index가 바로 낮아지도록 transition 추가 */
+}
+
+/* 마우스 오버 시 컨테이너의 z-index를 높여서 이미지가 다른 요소 위에 표시되게 함 */
+.cert-zoom-wrapper:hover {
+    z-index: 10; 
+    transition: z-index 0s; /* 호버 시 z-index를 바로 높임 */
 }
 
 /* 마우스 오버 시 이미지 확대 */
 .cert-zoom-wrapper:hover img {
-    /* transform-transition-duration-300 (Tailwind)에 따라 0.3초 동안 부드럽게 1.1배 확대 */
-    transform: scale(1.1); 
+    /* transform-transition-duration-300 (Tailwind)에 따라 0.3초 동안 부드럽게 1.1배 확대 */
+    transform: scale(1.1); 
 }
+
+.image-stage {
+    position: relative;
+    overflow: visible !important;
+}
+
+.image-card {
+    position: relative;
+    overflow: visible !important;
+    z-index: 1;
+}
+
+.image-card:hover {
+    z-index: 999;
+}
+
+.image-card img {
+    transition: transform 0.6s ease;
+}
+
+.image-card:hover img {
+    transform: scale(1.6);
+}
+
+/* main.css 파일 하단에 추가 */
+
+/* main.css 파일 수정 */
+
+footer {
+    padding: 1rem 0;  /* 세로 공간을 최소화 (기존 padding 10rem에서 1rem로 줄임) */
+}
+
+/* 전체 페이지를 flexbox로 설정하고 세로로 정렬 */
+body {
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    min-height: 100vh; /* 뷰포트 높이의 최소 100%를 차지 */
+}
+
+/* 본문 콘텐츠가 남은 공간을 차지하도록 flex-grow를 적용 */
+section {
+    flex-grow: 1; /* 본문 영역이 남은 세로 공간을 차지하도록 설정 */
+}
+
+/* 기존 hero-section, footer의 padding을 수정하여 본문이 늘어나게 만듬 */
+.hero-section {
+    padding-bottom: 4rem; /* 기존 padding보다 좁게 설정하여 공간 확보 */
+}
+
+footer {
+    padding: 1rem 0;  /* 세로 공간 최소화 */
+}
+
+
+
