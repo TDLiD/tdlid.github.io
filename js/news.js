@@ -35,20 +35,27 @@ async function loadNewsData(newsListElement) {
         }
         
 // 데이터 렌더링
-        // 🚨 목록 번호 (i+1)와 날짜 표시를 위한 템플릿 수정
+        // 🚨 최종 수정 템플릿 (반응형 줄바꿈):
+        // 1. <a> 태그에 flex-col과 md:flex-row를 적용하여 창 너비에 따라 세로/가로 정렬 전환
+        // 2. 제목에서 whitespace-nowrap을 제거하여 줄바꿈 허용 (세로 길이 확장)
+        // 3. Source/Date는 좁은 화면에서 제목 아래로 이동하고, 넓은 화면에서 오른쪽으로 자동 이동
         newsListElement.innerHTML = newsData.map((item, index) => `
             <a href="${item.url}" target="_blank" rel="noopener noreferrer" 
-               class="p-6 bg-neutral-900 border border-neutral-800 rounded-xl flex items-start gap-4 transition-colors hover:bg-cyan-500/10 hover:border-cyan-500">
+               class="py-3 px-4 md:py-4 md:px-6 bg-neutral-900 border border-neutral-800 rounded-xl 
+                      flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 
+                      transition-colors hover:bg-cyan-500/10 hover:border-cyan-500 w-full">
                 
-                <div class="text-xl font-bold text-cyan-500 w-8 flex-shrink-0">${index + 1}.</div>
-                
-                <div class="flex-grow flex flex-col gap-1">
-                    <div class="text-xl font-semibold text-white mb-1">${item.title}</div>
-                    <div class="text-sm text-neutral-400">Source: ${item.source}</div>
+                <div class="flex items-start flex-grow min-w-0 w-full md:w-auto">
+                    <div class="text-base md:text-xl font-bold text-cyan-500 flex-shrink-0 w-6 md:w-8 pt-0.5">${index + 1}.</div>
+                    
+                    <div class="text-base md:text-xl font-semibold text-white ml-2">
+                        ${item.title}
+                    </div>
                 </div>
 
-                <div class="text-sm text-neutral-500 text-right flex-shrink-0 w-24 md:w-32 pt-1">
-                    ${item.publishedDate}
+                <div class="flex-shrink-0 text-left md:text-right w-full md:w-auto md:ml-auto ml-8 md:ml-0">
+                    <span class="text-xs md:text-sm text-neutral-400 whitespace-nowrap">Source: ${item.source}</span>
+                    <span class="text-xs md:text-sm text-neutral-500 font-medium pl-3 whitespace-nowrap">| ${item.publishedDate}</span>
                 </div>
             </a>
         `).join('');

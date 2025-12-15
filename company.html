@@ -36,26 +36,28 @@
 
         /* 3 Image Stage */
         .image-stage {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
+            /* REMOVED: display: grid; */
+            /* REMOVED: grid-template-columns: repeat(3, 1fr); */
+            /* REMOVED: gap: 2rem; */
             position: relative;
             z-index: 1;
         }
         .image-card {
             position: relative;
             border-radius: 1.5rem;
-            overflow: visible;
+            /* overflow: visible; <-- 이 속성이 hover 시 이미지 확장 문제를 일으킬 수 있어 visible은 유지 */
+            overflow: hidden; /* 이미지 카드의 모서리 라운딩이 제대로 적용되도록 변경 */
             border: 1px solid rgba(255,255,255,.08);
             background: #020617;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 200px; /* 이미지가 사라지는 현상 방지를 위해 최소 높이 지정 */
         }
         .image-card img {
             max-height: 100%;
-            width: auto;
+            width: 100%; /* 너비를 100%로 설정하여 가로 영역을 채움 */
             height: auto;
             display: block;
             transition: transform 0.6s ease;
@@ -134,7 +136,7 @@
 <main class="relative z-10 pt-32 pb-24 max-w-7xl mx-auto px-6">
     <div class="company-bg"></div>
 
-    <div class="text-center mb-20 float-in">
+    <div class="text-center mb-10 float-in">
         <h1 class="text-8xl font-black tracking-wide hero-slogan-gradient">
             TDLiD
         </h1>
@@ -143,8 +145,8 @@
         </p>
     </div>
 
-<section class="mb-32">
-    <div class="image-stage">
+<section class="mb-16">
+    <div class="image-stage grid grid-cols-1 gap-8 md:grid-cols-3">
         <div class="image-card hover-expand">
             <img src="images/company1.png" alt="">
         </div>
@@ -158,15 +160,9 @@
 </section>
 
 
-    <section class="max-w-4xl mx-auto space-y-16 text-lg text-center">
-
+    <section class="max-w-7xl mx-auto space-y-16 text-lg text-center">
         <div class="float-in">
             <h2 class="text-4xl font-bold text-cyan-400 mb-6">Who We Are</h2>
-            <p>
-                <b>TDL Energy Indonesia</b>is an Indonesian corporation established by Enchem Group, 
-with the objective of providing electric motorcycle services and
-renewable energy-related businesses in Indonesia.
-            </p>
         </div>
 
         <div class="grid md:grid-cols-3 gap-8">
@@ -174,8 +170,7 @@ renewable energy-related businesses in Indonesia.
             <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-cyan-400/40 transition">
                 <h3 class="text-xl font-bold text-cyan-300 mb-4">MISSION</h3>
                 <p class="text-neutral-300">
-                    “NO MORE CARBON”  
-                    Deliver the best products and services to our customers.<br>Promote leadership consistently.<br>Create and Innovate value
+                    “NO MORE CARBON” <br>Deliver the best products and services to our customers.<br>Promote leadership consistently.<br>Create and Innovate value
 
                 </p>
             </div>
@@ -207,5 +202,4 @@ renewable energy-related businesses in Indonesia.
 <script src="js/main.js"></script>
 
 </body>
-
 </html>
