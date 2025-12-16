@@ -6,6 +6,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="css/main.css">
+
+<style>
+    /* 이미지 컨테이너 크기 조정 및 하단 여백 추가 */
+    #solution .p-4 {
+        padding: 24px;
+        /* 각 카드의 크기를 키움 */
+        min-height: 350px;
+    }
+
+/* 화면 크기가 커지면 3개 열로 설정 */
+@media (min-width: 768px) {
+    #solution .grid {
+        grid-template-columns: repeat(3, 1fr); /* 3열로 변경 */
+    }
+}
+
+/* 화면 크기가 더 커지면 5개 열로 설정 */
+@media (min-width: 1024px) {
+    #solution .grid {
+        grid-template-columns: repeat(5, 1fr); /* 5개 열로 변경 */
+    }
+}
+
+    /* 카드 하단 여백 추가 */
+    #solution {
+        padding-bottom: 50px; /* 하단 여백 추가 */
+    }
+
+/* 기본 화면 크기에서는 2개 열로 설정 */
+#solution .grid {
+    grid-template-columns: repeat(2, 1fr); /* 기본적으로 2열로 배치 */
+    gap: 24px; /* 각 항목 사이의 간격을 늘림 */
+}
+
+</style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
@@ -55,10 +90,11 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             <div class="p-4 border border-neutral-800 rounded-xl">
                 <h4 class="font-semibold mb-2 text-sm">A. EV Motorcycle Conversion Business</h4>
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution1.png">
+
+                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution1.png" data-detail-text="TDLID supplies electric motorcycle conversion kits and battery packs to local governments and universities in Indonesia.">
                     <img src="images/solutions/solution1.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
                 </a>
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution1-1.png">
+                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution1-1.png" data-detail-text="TDLID supplies electric motorcycle conversion kits and battery packs to local governments and universities in Indonesia.">
                     <img src="images/solutions/solution1-1.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
                 </a>
                 <p class="text-neutral-400 text-xs">
@@ -66,75 +102,67 @@
                 </p>
             </div>
 
-       <div class="p-4 border border-neutral-800 rounded-xl">
+            <div class="p-4 border border-neutral-800 rounded-xl">
                 <h4 class="font-semibold mb-2 text-sm">B. Employee Ownership Program</h4>
 
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution2.png">
-                    <img src="images/solutions/solution2.png"
-                         class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
+                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution2.png" data-detail-text="TDLID is the initiator of this Program. TDLID announced the 'Employee Ownership Program' with GESITS and MOTORIZ on April 30, 2024.">
+                    <img src="images/solutions/solution2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
                 </a>
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution2-1.png">
-                    <img src="images/solutions/solution2-1.png"
-                         class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
+                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution2-1.png" data-detail-text="TDLID is the initiator of this Program. TDLID announced the 'Employee Ownership Program' with GESITS and MOTORIZ on April 30, 2024.">
+                    <img src="images/solutions/solution2-1.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
                 </a>
                 <p class="text-neutral-400 text-xs">
-                    TDLiD provides electric motorcycles to 4.5 million Indonesian civil servants
-                    and state-owned enterprise employees.
+                    TDLID is the initiator of this Program. TDLID announced the 'Employee Ownership Program' with GESITS and MOTORIZ on April 30, 2024.
                 </p>
             </div>
 
-            <div class="p-4 border border-neutral-800 rounded-xl">
-                <h4 class="font-semibold mb-2 text-sm">C. Lease and Rental</h4>
+<div class="p-4 border border-neutral-800 rounded-xl">
+    <h4 class="font-semibold mb-2 text-sm">C. Lease and Rental</h4>
 
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution3.png">
-                    <img src="images/solutions/solution3.png"
-                         class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-                </a>
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution3-1.png">
-                    <img src="images/solutions/solution3-1.png"
-                         class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-                </a>
-                <p class="text-neutral-400 text-xs">
-                    TDLiD offers leasing and rental financing solutions to accelerate the adoption
-                    of electric motorcycles.
-                </p>
-            </div>
+    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution3.png" data-detail-text="TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles.">
+        <img src="images/solutions/solution3.png"
+             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
+    </a>
+    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution3-1.png" data-detail-text="TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles.">
+        <img src="images/solutions/solution3-1.png"
+             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
+    </a>
+    <p class="text-neutral-400 text-xs">
+        TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles.
+    </p>
+</div>
 
-            <div class="p-4 border border-neutral-800 rounded-xl">
-                <h4 class="font-semibold mb-2 text-sm">D. Solar home charging</h4>
+<div class="p-4 border border-neutral-800 rounded-xl">
+    <h4 class="font-semibold mb-2 text-sm">D. Solar home charging</h4>
 
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution4.png">
-                    <img src="images/solutions/solution4.png"
-                         class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-                </a>
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution4-1.png">
-                    <img src="images/solutions/solution4-1.png"
-                         class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-                </a>
-                <p class="text-neutral-400 text-xs">
-                    TDLiD offers solar power generation systems that can be utilized by individual
-                    households and small businesses to achieve true carbon zero in Indonesia's EV ecosystem.
-                </p>
-            </div>
+    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution4.png" data-detail-text="TDLiD offers solar power generation systems that can be utilized by individual households and small businesses to achieve true carbon zero in Indonesia's EV ecosystem.">
+        <img src="images/solutions/solution4.png"
+             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
+    </a>
+    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution4-1.png" data-detail-text="TDLiD offers solar power generation systems that can be utilized by individual households and small businesses to achieve true carbon zero in Indonesia's EV ecosystem.">
+        <img src="images/solutions/solution4-1.png"
+             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
+    </a>
+    <p class="text-neutral-400 text-xs">
+        TDLiD offers solar power generation systems that can be utilized by individual households and small businesses to achieve true carbon zero in Indonesia's EV ecosystem.
+    </p>
+</div>
 
-            <div class="p-4 border border-neutral-800 rounded-xl">
-                <h4 class="font-semibold mb-2 text-sm">E. Battery Recycling</h4>
+<div class="p-4 border border-neutral-800 rounded-xl">
+    <h4 class="font-semibold mb-2 text-sm">E. Battery Recycling</h4>
 
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution5.png">
-                    <img src="images/solutions/solution5.png"
-                         class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-                </a>
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution5-1.png">
-                    <img src="images/solutions/solution5-1.png"
-                         class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-                </a>
-                <p class="text-neutral-400 text-xs">
-                    TDLiD contributes to building a virtuous cycle ecosystem for raw materials
-                    of Indonesian nickel and recycled batteries, while providing a business model
-                    that can achieve true zero carbon in the electric motorcycle ecosystem.
-                </p>
-            </div>
-
+    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution5.png" data-detail-text="TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries, while providing a business model that can achieve true zero carbon in the electric motorcycle ecosystem.">
+        <img src="images/solutions/solution5.png"
+             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
+    </a>
+    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution5-1.png" data-detail-text="TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries, while providing a business model that can achieve true zero carbon in the electric motorcycle ecosystem.">
+        <img src="images/solutions/solution5-1.png"
+             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
+    </a>
+    <p class="text-neutral-400 text-xs">
+        TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries, while providing a business model that can achieve true zero carbon in the electric motorcycle ecosystem.
+    </p>
+</div>
 
         </div>
     </div>
@@ -144,6 +172,48 @@
     © 2025 TDL Energy Indonesia
 </footer>
 
-<script src="js/main.js"></script>
+<script>
+    // 팝업 처리 스크립트
+    document.querySelectorAll('.openSolutionDetail').forEach(item => {
+        item.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            // 이미지와 텍스트 가져오기
+            const imageSrc = item.getAttribute('data-detail-src');
+            const textContent = item.getAttribute('data-detail-text');
+
+            // 팝업 창 생성
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.zIndex = '1000';
+
+            // 팝업 내용
+            modal.innerHTML = `
+                <div style="background: #fff; padding: 20px; border-radius: 10px; max-width: 66%; text-align: center;">
+                    <img src="${imageSrc}" alt="Solution Detail" style="max-width: 100%; max-height: 500px; object-fit: contain; border-radius: 10px;">
+                    <p style="margin-top: 20px; font-size: 16px; color: #333;">${textContent}</p>
+                    <button style="margin-top: 20px; padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+                </div>
+            `;
+
+            // 팝업 닫기 버튼 기능
+            modal.querySelector('button').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+
+            // 팝업 추가
+            document.body.appendChild(modal);
+        });
+    });
+</script>
+
 </body>
 </html>

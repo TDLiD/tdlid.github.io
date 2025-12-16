@@ -55,35 +55,48 @@
         <div class="grid md:grid-cols-3 gap-10">
 
             <div class="p-8 border border-neutral-800 rounded-2xl">
-                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-1.png">
-                    <img src="images/technology/72V20A.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer">
-                </a>
+                <img src="images/technology/72V20A.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer openBatteryDetail" data-detail-src="images/technology/72V20A-1.png" data-detail-text="TDLiD 72V 20Ah rechargeable lithium-ion battery has the following specifications: Capacity: 72V / 20Ah with LG NMC cells (Model: INR21700M50LT), configured in a 20S4P pack. Nominal Voltage: 73.8V; Nominal Capacity: 19.72Ah; Standard Charging Voltage: 83V. Charging Time: Approximately 3 hours with a recommended charging current of 5A.">
                 <h4 class="font-semibold mb-4">72V 20Ah</h4>
                 <p class="text-neutral-400">
-                    LG NCM, high-voltage, decent-range lithium pack for electric scooters and fleets.
+                    TDLiD 72V 20Ah rechargeable lithium-ion battery has the following specifications:
+                    Capacity: 72V / 20Ah with LG NMC cells (Model: INR21700M50LT), configured in a 20S4P pack.
+                    Nominal Voltage: 73.8V; Nominal Capacity: 19.72Ah; Standard Charging Voltage: 83V.
+                    Charging Time: Approximately 3 hours with a recommended charging current of 5A.
                 </p>
             </div>
 
             <div class="p-8 border border-neutral-800 rounded-2xl">
-                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-2.png">
-                    <img src="images/technology/72V20A-2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
-                </a>
-                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-3.png">
-                    <img src="images/technology/72V20A-3.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
-                </a>
-                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-4.png">
-                    <img src="images/technology/72V20A-4.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
-                </a>
-            </div>
+                <img src="images/technology/72V20A-2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer openBatteryDetail" data-detail-src="images/technology/72V20A-2.png" data-detail-text="The TDLiD 72V 20Ah battery is designed with LG NMC cells and configured in a 20S4P arrangement, offering a nominal voltage of 73.8V. Standard charging time is approximately 3 hours.">
+                <img src="images/technology/72V20A-3.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer openBatteryDetail" data-detail-src="images/technology/72V20A-3.png" data-detail-text="Charging time: 3 hours, driving range: 50-60km, with optimal performance across diverse temperatures.">
 
-            <div class="p-8 border border-neutral-800 rounded-2xl">
                 <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-5.png">
                     <img src="images/technology/72V20A-5.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
                 </a>
                 <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-6.png">
                     <img src="images/technology/72V20A-6.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
                 </a>
+
             </div>
+
+
+            <div class="p-8 border border-neutral-800 rounded-2xl">
+
+<!-- 첫 번째 이미지 (웹페이지에서 보이는 이미지, 세로 크기 350px 유지) -->
+<img src="images/technology/YEDEA-1.png" 
+     class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer openBatteryDetail"
+     data-detail-src="images/technology/YEDEA-1.png"
+     data-detail-text="The TDLiD 72V 20Ah battery pack, equipped with high-performance LG NMC cells (Model: INR21700M50LT), is configured in a 20S4P arrangement, offering a nominal voltage of 73.8V and a capacity of 19.72Ah. This advanced battery pack supports a charging time of approximately 3 hours with a standard charging current of 5A, providing an impressive driving range of 50-60km."
+     style="height: 350px; object-fit: cover;"> <!-- 웹페이지에서는 세로 350px 유지 -->
+
+
+    <!-- 두 번째 이미지 -->
+    <img src="images/technology/72V5A-charger-2.png" 
+         class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer openBatteryDetail"
+         data-detail-src="images/technology/72V5A-charger-2.png"
+         data-detail-text="The TDLiD 72V-20Ah battery pack utilizes high-performance LG NMC cells (INR21700M50LT) in a 20S4P configuration, offering a nominal voltage of 73.8V and a capacity of 19.72Ah. It supports fast charging with a standard current of 5A, completing a full charge in approximately 3 hours. This advanced battery system ensures a range of 50-60km and operates efficiently across a wide temperature range from -20°C to +55°C for discharge, and 0°C to +45°C for charging. The TDLiD 72V-5A lithium battery charger is designed to pair seamlessly with this battery pack, providing optimal charging performance with a recommended current of 5A. This combination enhances overall energy efficiency and durability for electric vehicles and systems."
+         style="height: 220px; object-fit: cover;">
+</div>
+  
 
         </div>
     </div>
@@ -93,6 +106,53 @@
     © 2025 TDL Energy Indonesia
 </footer>
 
-<script src="js/main.js"></script>
+<!-- 팝업 이미지 영역 -->
+<div id="popupImage" class="popup-container">
+    <img id="popupImg" src="" class="popup-image" />
+</div>
+
+<script>
+    // 팝업 처리 스크립트
+    document.querySelectorAll('.openBatteryDetail').forEach(item => {
+        item.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            // 이미지와 텍스트 가져오기
+            const imageSrc = item.getAttribute('data-detail-src');
+            const textContent = item.getAttribute('data-detail-text');
+
+            // 팝업 창 생성
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.zIndex = '1000';
+
+            // 팝업 내용
+            modal.innerHTML = `
+                <div style="background: #fff; padding: 20px; border-radius: 10px; max-width: 66%; text-align: center;">
+                    <img src="${imageSrc}" alt="Battery Detail" style="max-width: 100%; max-height: 500px; object-fit: contain; border-radius: 10px;"> <!-- 팝업창에서 이미지 세로 크기 조정 -->
+                    <p style="margin-top: 20px; font-size: 16px; color: #333;">${textContent}</p>
+                    <button style="margin-top: 20px; padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+                </div>
+            `;
+
+            // 팝업 닫기 버튼 기능
+            modal.querySelector('button').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+
+            // 팝업 추가
+            document.body.appendChild(modal);
+        });
+    });
+</script>
+
 </body>
 </html>
