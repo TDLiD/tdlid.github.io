@@ -12,19 +12,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        .contact-form-container {
-            /* 헤더 공간 확보 및 최소 높이 설정 */
-            min-height: calc(100vh - 120px); /* 푸터 공간을 고려하여 높이 설정 */
-            display: flex;
-            align-items: center; /* 수직 중앙 정렬 */
-            justify-content: center; /* 수평 중앙 정렬 */
-        }
-        .form-card {
-            max-width: 500px;
-            width: 100%;
-        }
-    </style>
+<style>
+    .contact-form-container {
+        /* 헤더 공간 확보 및 최소 높이 설정 */
+        min-height: calc(100vh - 120px); /* 푸터 공간을 고려하여 높이 설정 */
+        display: flex;
+        align-items: flex-start; /* 상단 정렬 (이전 요청에서 수정됨) */
+        justify-content: center; /* 수평 중앙 정렬 */
+    }
+    .form-card {
+        /* ---------------------------------
+        [수정] max-width를 500px에서 640px로 늘림 
+        max-width: 500px; 
+        ---------------------------------
+        */
+        max-width: 700px; 
+        width: 100%;
+    }
+</style>
+
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
@@ -45,7 +51,7 @@
             <a href="solutions.html" class="nav-link">Solutions</a>
             <a href="company.html" class="nav-link">Company</a>
             <a href="news.html" class="nav-link">News</a>
-            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold font-bold text-cyan-500">
+            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold">
                 Request Quote
             </a>
         </nav>
