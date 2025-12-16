@@ -8,42 +8,79 @@
 <link rel="stylesheet" href="css/main.css">
 
 <style>
-    /* 이미지 컨테이너 크기 조정 및 하단 여백 추가 */
-    #solution .p-4 {
-        padding: 24px;
-        /* 각 카드의 크기를 키움 */
-        min-height: 350px;
+    /* 팝업 모달 스타일 */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    .modal-content {
+        background: #171717; /* Dark background */
+        color: #ddd;
+        padding: 30px;
+        border-radius: 12px;
+        max-width: 90%;
+        max-height: 90%;
+        text-align: center;
+        border: 1px solid #333;
+    }
+    .modal-image {
+        max-width: 100%;
+        max-height: 80vh; /* 화면 높이에 맞춰 조정 */
+        object-fit: contain;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        cursor: zoom-out;
+    }
+    .modal-close-btn {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #06b6d4; /* cyan-500 */
+        color: black;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .modal-close-btn:hover {
+        background-color: #0891b2; /* cyan-600 */
     }
 
-/* 화면 크기가 커지면 3개 열로 설정 */
-@media (min-width: 768px) {
-    #solution .grid {
-        grid-template-columns: repeat(3, 1fr); /* 3열로 변경 */
+    /* Stack Container 스타일: 가로 스크롤 허용 */
+    #stackContainer::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera 숨김 */
     }
-}
-
-/* 화면 크기가 더 커지면 5개 열로 설정 */
-@media (min-width: 1024px) {
-    #solution .grid {
-        grid-template-columns: repeat(5, 1fr); /* 5개 열로 변경 */
-    }
-}
-
-    /* 카드 하단 여백 추가 */
-    #solution {
-        padding-bottom: 50px; /* 하단 여백 추가 */
+    #stackContainer {
+        -ms-overflow-style: none; /* IE, Edge 숨김 */
+        scrollbar-width: none; /* Firefox 숨김 */
     }
 
-/* 기본 화면 크기에서는 2개 열로 설정 */
-#solution .grid {
-    grid-template-columns: repeat(2, 1fr); /* 기본적으로 2열로 배치 */
-    gap: 24px; /* 각 항목 사이의 간격을 늘림 */
-}
-
+    /* 포커스 영역의 제목 및 설명 스타일 */
+    #focusArea h4 {
+        font-size: 1.5rem; /* Large title in focus area */
+    }
+    #focusArea p {
+        font-size: 1rem;
+    }
+    
+    /* 포커스 영역 이미지 스타일 */
+    .focus-image-container img {
+        height: auto; /* 고정 높이 설정 */
+        object-fit: contain; /* (선택 사항) 이미지가 잘리지 않게 조정되며, 필요 시 여백 발생 */
+        cursor: pointer;
+    }
 </style>
 </head>
 
-<body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
 <header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
@@ -83,135 +120,144 @@
     </div>
 </header>
 
-<section id="solution" class="pt-32 pb-24 px-6 flex-grow">
+<main class="flex-grow pt-32 pb-10 px-6">
     <div class="max-w-6xl mx-auto">
         <h3 class="text-3xl font-bold mb-10">Custom Solutions</h3>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            <div class="p-4 border border-neutral-800 rounded-xl">
-                <h4 class="font-semibold mb-2 text-sm">A. EV Motorcycle Conversion Business</h4>
-
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution1.png" data-detail-text="TDLID supplies electric motorcycle conversion kits and battery packs to local governments and universities in Indonesia.">
-                    <img src="images/solutions/solution1.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-                </a>
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution1-1.png" data-detail-text="TDLID supplies electric motorcycle conversion kits and battery packs to local governments and universities in Indonesia.">
-                    <img src="images/solutions/solution1-1.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-                </a>
-                <p class="text-neutral-400 text-xs">
-                    TDLID supplies electric motorcycle conversion kits and battery packs to local governments and universities in Indonesia.
-                </p>
-            </div>
-
-            <div class="p-4 border border-neutral-800 rounded-xl">
-                <h4 class="font-semibold mb-2 text-sm">B. Employee Ownership Program</h4>
-
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution2.png" data-detail-text="TDLID is the initiator of this Program. TDLID announced the 'Employee Ownership Program' with GESITS and MOTORIZ on April 30, 2024.">
-                    <img src="images/solutions/solution2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-                </a>
-                <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution2-1.png" data-detail-text="TDLID is the initiator of this Program. TDLID announced the 'Employee Ownership Program' with GESITS and MOTORIZ on April 30, 2024.">
-                    <img src="images/solutions/solution2-1.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-                </a>
-                <p class="text-neutral-400 text-xs">
-                    TDLID is the initiator of this Program. TDLID announced the 'Employee Ownership Program' with GESITS and MOTORIZ on April 30, 2024.
-                </p>
-            </div>
-
-<div class="p-4 border border-neutral-800 rounded-xl">
-    <h4 class="font-semibold mb-2 text-sm">C. Lease and Rental</h4>
-
-    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution3.png" data-detail-text="TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles.">
-        <img src="images/solutions/solution3.png"
-             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-    </a>
-    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution3-1.png" data-detail-text="TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles.">
-        <img src="images/solutions/solution3-1.png"
-             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-    </a>
-    <p class="text-neutral-400 text-xs">
-        TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles.
-    </p>
-</div>
-
-<div class="p-4 border border-neutral-800 rounded-xl">
-    <h4 class="font-semibold mb-2 text-sm">D. Solar home charging</h4>
-
-    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution4.png" data-detail-text="TDLiD offers solar power generation systems that can be utilized by individual households and small businesses to achieve true carbon zero in Indonesia's EV ecosystem.">
-        <img src="images/solutions/solution4.png"
-             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-    </a>
-    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution4-1.png" data-detail-text="TDLiD offers solar power generation systems that can be utilized by individual households and small businesses to achieve true carbon zero in Indonesia's EV ecosystem.">
-        <img src="images/solutions/solution4-1.png"
-             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-    </a>
-    <p class="text-neutral-400 text-xs">
-        TDLiD offers solar power generation systems that can be utilized by individual households and small businesses to achieve true carbon zero in Indonesia's EV ecosystem.
-    </p>
-</div>
-
-<div class="p-4 border border-neutral-800 rounded-xl">
-    <h4 class="font-semibold mb-2 text-sm">E. Battery Recycling</h4>
-
-    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution5.png" data-detail-text="TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries, while providing a business model that can achieve true zero carbon in the electric motorcycle ecosystem.">
-        <img src="images/solutions/solution5.png"
-             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-    </a>
-    <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution5-1.png" data-detail-text="TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries, while providing a business model that can achieve true zero carbon in the electric motorcycle ecosystem.">
-        <img src="images/solutions/solution5-1.png"
-             class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer" loading="lazy">
-    </a>
-    <p class="text-neutral-400 text-xs">
-        TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries, while providing a business model that can achieve true zero carbon in the electric motorcycle ecosystem.
-    </p>
-</div>
-
+        <div id="focusArea" class="mb-8 p-6 bg-neutral-900 rounded-xl border border-cyan-500/30 transition-all duration-500 shadow-xl">
+            <p class="text-center text-neutral-500 py-10">Select a solution below to view details.</p>
         </div>
-    </div>
-</section>
 
-<footer class="py-4 text-center text-neutral-500 border-t border-neutral-800">
-    © 2025 TDL Energy Indonesia
+        <div id="stackContainer" class="flex gap-4 overflow-x-auto pb-4 justify-center">
+            </div>
+    </div>
+</main>
+
+
+<footer class="py-4 px-6 text-center text-neutral-500 border-t border-neutral-800">
+    © 2025 TDL Energy Indonesia. All rights reserved.
 </footer>
 
 <script>
-    // 팝업 처리 스크립트
-    document.querySelectorAll('.openSolutionDetail').forEach(item => {
-        item.addEventListener('click', function(event) {
-            event.preventDefault();
+    // ----------------------------------------------------
+    // 1. 솔루션 데이터 정의
+    // ----------------------------------------------------
+    const solutionsData = [
+        { id: 'A', title: 'A. EV Motorcycle Conversion Business', desc: 'TDLID supplies electric motorcycle conversion kits and battery packs to local governments and universities in Indonesia.', images: ['images/solutions/solution1.png', 'images/solutions/solution1-1.png'] },
+        { id: 'B', title: 'B. Employee Ownership Program', desc: 'TDLID is the initiator of this Program. TDLID announced the \'Employee Ownership Program\' with GESITS and MOTORIZ on April 30, 2024.', images: ['images/solutions/solution2.png', 'images/solutions/solution2-1.png'] },
+        { id: 'C', title: 'C. Lease and Rental', desc: 'TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles.', images: ['images/solutions/solution3.png', 'images/solutions/solution3-1.png'] },
+        { id: 'D', title: 'D. Solar home charging', desc: 'TDLiD offers solar power generation systems that can be utilized by individual households and small businesses to achieve true carbon zero in Indonesia\'s EV ecosystem.', images: ['images/solutions/solution4.png', 'images/solutions/solution4-1.png'] },
+        { id: 'E', title: 'E. Battery Recycling', desc: 'TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries, while providing a business model that can achieve true zero carbon in the electric motorcycle ecosystem.', images: ['images/solutions/solution5.png', 'images/solutions/solution5-1.png'] }
+    ];
 
-            // 이미지와 텍스트 가져오기
-            const imageSrc = item.getAttribute('data-detail-src');
-            const textContent = item.getAttribute('data-detail-text');
+    const focusArea = document.getElementById('focusArea');
+    const stackContainer = document.getElementById('stackContainer');
+    let currentFocusId = null;
 
-            // 팝업 창 생성
-            const modal = document.createElement('div');
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-            modal.style.display = 'flex';
-            modal.style.justifyContent = 'center';
-            modal.style.alignItems = 'center';
-            modal.style.zIndex = '1000';
+    // ----------------------------------------------------
+    // 2. 팝업 창 함수
+    // ----------------------------------------------------
+    function openSolutionPopup(imageSrc, textContent) {
+        const modal = document.createElement('div');
+        modal.classList.add('modal-backdrop');
 
-            // 팝업 내용
-            modal.innerHTML = `
-                <div style="background: #fff; padding: 20px; border-radius: 10px; max-width: 66%; text-align: center;">
-                    <img src="${imageSrc}" alt="Solution Detail" style="max-width: 100%; max-height: 500px; object-fit: contain; border-radius: 10px;">
-                    <p style="margin-top: 20px; font-size: 16px; color: #333;">${textContent}</p>
-                    <button style="margin-top: 20px; padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
-                </div>
-            `;
+        modal.innerHTML = `
+            <div class="modal-content">
+                <img src="${imageSrc}" alt="Solution Detail" class="modal-image">
+                <p style="margin-top: 10px; font-size: 16px;">${textContent}</p>
+                <button class="modal-close-btn">Close</button>
+            </div>
+        `;
 
-            // 팝업 닫기 버튼 기능
-            modal.querySelector('button').addEventListener('click', function() {
-                document.body.removeChild(modal);
-            });
-
-            // 팝업 추가
-            document.body.appendChild(modal);
+        modal.querySelector('.modal-close-btn').addEventListener('click', () => {
+            document.body.removeChild(modal);
         });
+        
+        // 배경 클릭 시 닫기
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
+
+        document.body.appendChild(modal);
+    }
+
+    // ----------------------------------------------------
+    // 3. 포커스 영역 렌더링 함수
+    // ----------------------------------------------------
+    function renderFocusArea(solution) {
+        currentFocusId = solution.id;
+        
+        const imageHTML = solution.images.map(src => `
+            <a href="#" class="openSolutionDetail focus-image-container w-full" 
+               data-detail-src="${src}" 
+               data-detail-text="${solution.desc}"
+               onclick="openSolutionPopup('${src}', '${solution.desc.replace(/'/g, "\\'")}')"
+            >
+                <img src="${src}" class="w-full rounded-lg hover:ring-2 ring-cyan-500/50 transition" loading="lazy">
+            </a>
+        `).join('');
+
+        focusArea.innerHTML = `
+            <h4 class="font-bold text-cyan-400 mb-4">${solution.title}</h4>
+            
+            <div class="flex flex-col md:flex-row gap-6 mb-6 justify-center">
+                ${imageHTML}
+            </div>
+
+            <p class="text-neutral-300 text-center">${solution.desc}</p>
+        `;
+    }
+
+    // ----------------------------------------------------
+    // 4. 스택 컨테이너 렌더링 함수
+    // ----------------------------------------------------
+    function renderStackContainer() {
+        // 현재 포커스 아이템을 제외한 나머지 아이템 필터링
+        const stackItems = solutionsData.filter(s => s.id !== currentFocusId);
+        
+        stackContainer.innerHTML = stackItems.map(s => `
+            <div 
+                id="stack-item-${s.id}" 
+                class="stack-item p-4 bg-neutral-900 border border-neutral-800 rounded-xl cursor-pointer hover:border-cyan-500/50 transition-all duration-300 flex-shrink-0 w-32 md:w-48 text-center"
+                data-solution-id="${s.id}"
+                onclick="selectSolution('${s.id}')"
+            >
+                <h5 class="font-semibold text-xs mb-2 text-neutral-300">${s.title}</h5>
+                <img src="${s.images[0]}" class="w-full h-16 object-cover rounded-lg opacity-70 transition-opacity" loading="lazy">
+            </div>
+        `).join('');
+    }
+
+    // ----------------------------------------------------
+    // 5. 솔루션 선택 및 스왑 함수
+    // ----------------------------------------------------
+    function selectSolution(id) {
+        const newSolution = solutionsData.find(s => s.id === id);
+        if (!newSolution) return;
+
+        renderFocusArea(newSolution);
+        renderStackContainer();
+        
+        // 부드러운 스크롤 (Focus Area로 이동)
+        focusArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ----------------------------------------------------
+    // 초기화: 첫 번째 솔루션을 기본으로 표시
+    // ----------------------------------------------------
+    if (solutionsData.length > 0) {
+        // 첫 번째 항목을 포커스 영역에 표시
+        renderFocusArea(solutionsData[0]);
+        // 나머지 항목을 스택 컨테이너에 표시
+        renderStackContainer();
+    }
+    
+    // 모바일 메뉴 토글 (기존 로직 유지)
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+        document.getElementById('mobileMenu').classList.toggle('hidden');
+        document.getElementById('mobileMenu').classList.toggle('flex');
     });
 </script>
 

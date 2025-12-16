@@ -6,20 +6,138 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="css/main.css">
+
+<style>
+    /* 팝업 모달 스타일 (Solutions.html 기반 다크 테마) */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    .modal-content {
+        background: #171717; /* Dark background */
+        color: #ddd;
+        padding: 30px;
+        border-radius: 12px;
+        max-width: 90%;
+        max-height: 90%;
+        text-align: center;
+        border: 1px solid #333;
+    }
+    .modal-image {
+        max-width: 100%;
+        max-height: 80vh; 
+        object-fit: contain;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        cursor: zoom-out;
+    }
+    .modal-close-btn {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #06b6d4; /* cyan-500 */
+        color: black;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .modal-close-btn:hover {
+        background-color: #0891b2; /* cyan-600 */
+    }
+
+    /* 🌟 3D 원형 회전 캐러셀 CSS 🌟 */
+    
+    /* 1. Scene 설정 (원근감 부여) */
+    #technologyContainer {
+        perspective: 1000px; /* 3D 효과의 깊이감 */
+        width: 650px; /* 캐러셀이 차지할 공간 */
+        height: 450px; /* 캐러셀이 차지할 공간 */
+        margin: 180px auto;
+        position: relative;
+    }
+
+
+
+    /* 2. Carousel 회전 컨테이너 */
+    #carousel {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        transform-style: preserve-3d; /* 자식 요소의 3D 변형 유지 */
+        transition: transform 0.6s ease-out; /* 정지 시 부드러운 전환 */
+    }
+
+    /* 3. 개별 카드 스타일 */
+    .tech-card {
+        position: absolute;
+        width: 600px; /* 카드 자체의 너비 */
+        height: 400px; /* 카드 자체의 높이 */
+        padding: 2rem;
+        border: 1px solid #333;
+        border-radius: 1rem;
+        background-color: #171717;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        transition: transform 0.6s, opacity 0.6s, border-color 0.6s;
+        text-align: center;
+        overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
+        cursor: pointer;
+        
+        /* 초기에 3개의 카드를 120도 간격으로 배치 (350px는 반지름) */
+        /* 이 transform 값은 JS에 의해 덮어씌워질 수 있습니다. */
+    }
+
+    /* 카드 위치 설정 (360도 / 3개 = 120도 간격) */
+    #card-A { transform: rotateY(0deg) translateZ(350px); }
+    #card-B { transform: rotateY(120deg) translateZ(350px); }
+    #card-C { transform: rotateY(240deg) translateZ(350px); }
+
+    /* 4. 선택된 카드 스타일 (중앙에 멈췄을 때) */
+    .tech-card.is-selected {
+        border-color: #06b6d4; /* cyan-500 강조 */
+        box-shadow: 0 0 30px rgba(6, 182, 212, 0.5); /* Glowing effect */
+    }
+    
+    /* 5. 비활성화된 이미지/링크 처리 (회전 중 또는 비선택 상태) */
+    .tech-card img {
+        height: auto !important;
+        max-height: 40%; 
+        object-fit: contain !important;
+        margin: 0 auto 1rem;
+        transition: opacity 0.3s;
+    }
+    
+    /* 비선택 상태에서는 이미지 클릭을 막고 흐릿하게 */
+    .tech-card:not(.is-selected) .tech-card-image,
+    .tech-card:not(.is-selected) a.openBatteryDetail img {
+        pointer-events: none;
+        cursor: default;
+        opacity: 0.6;
+    }
+
+
+
+</style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
 <header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-
         <a href="index.html" class="block">
             <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide">
                 <img src="images/logo/logo.png" alt="TDL Energy Logo" class="header-logo object-contain">
                 <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
             </h1>
         </a>
-
         <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
             <a href="index.html" class="nav-link">Home</a>
             <a href="products.html" class="nav-link">Products</a>
@@ -31,10 +149,8 @@
                 Request Quote
             </a>
         </nav>
-        
         <button id="mobileMenuBtn" class="md:hidden">☰</button>
     </div>
-
     <div id="mobileMenu" class="hidden md:hidden fixed top-16 right-6 bg-neutral-900 p-6 rounded-2xl shadow-xl border border-neutral-800 z-50 flex-col gap-4 text-white text-base">
         <a href="index.html" class="nav-link-mobile">Home</a>
         <a href="products.html" class="nav-link-mobile">Products</a>
@@ -48,108 +164,187 @@
     </div>
 </header>
 
-<section id="technology" class="pt-32 pb-24 px-6 flex-grow">
+<section id="technology" class="pt-40 pb-24 px-6 flex-grow"> <!-- pt-32 -> pt-40으로 수정 -->
     <div class="max-w-6xl mx-auto">
-        <h3 class="text-3xl font-bold mb-10">Core Technology</h3>
-
-        <div class="grid md:grid-cols-3 gap-10">
-
-            <div class="p-8 border border-neutral-800 rounded-2xl">
-                <img src="images/technology/72V20A.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer openBatteryDetail" data-detail-src="images/technology/72V20A-1.png" data-detail-text="TDLiD 72V 20Ah rechargeable lithium-ion battery has the following specifications: Capacity: 72V / 20Ah with LG NMC cells (Model: INR21700M50LT), configured in a 20S4P pack. Nominal Voltage: 73.8V; Nominal Capacity: 19.72Ah; Standard Charging Voltage: 83V. Charging Time: Approximately 3 hours with a recommended charging current of 5A.">
-                <h4 class="font-semibold mb-4">72V 20Ah</h4>
-                <p class="text-neutral-400">
-                    TDLiD 72V 20Ah rechargeable lithium-ion battery has the following specifications:
-                    Capacity: 72V / 20Ah with LG NMC cells (Model: INR21700M50LT), configured in a 20S4P pack.
-                    Nominal Voltage: 73.8V; Nominal Capacity: 19.72Ah; Standard Charging Voltage: 83V.
-                    Charging Time: Approximately 3 hours with a recommended charging current of 5A.
-                </p>
+        <h3 class="text-3xl font-bold mb-10 text-center">Core Technology Carousel</h3>
+        <div id="technologyContainer">
+            <div id="carousel">
+                <div id="card-A" data-card-id="A" data-index="0" class="tech-card">
+                    <img src="images/technology/72V20A.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V20A-1.png" data-detail-text="TDLiD 72V 20Ah rechargeable lithium-ion battery has the following specifications: Capacity: 72V / 20Ah with LG NMC cells (Model: INR21700M50LT), configured in a 20S4P pack. Nominal Voltage: 73.8V; Nominal Capacity: 19.72Ah; Standard Charging Voltage: 83V. Charging Time: Approximately 3 hours with a recommended charging current of 5A.">
+                    <h4 class="font-semibold mb-4">72V 20Ah (Main View)</h4>
+                    <p class="text-neutral-400">
+                        Capacity: 72V / 20Ah (20S4P), Nominal Voltage: 73.8V. Charging Time: Approx. 3 hours.
+                    </p>
+                </div>
+                <div id="card-B" data-card-id="B" data-index="1" class="tech-card">
+                    <img src="images/technology/72V20A-2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V20A-2.png" data-detail-text="The TDLiD 72V 20Ah battery is designed with LG NMC cells and configured in a 20S4P arrangement, offering a nominal voltage of 73.8V. Standard charging time is approximately 3 hours.">
+                    <img src="images/technology/72V20A-3.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V20A-3.png" data-detail-text="Charging time: 3 hours, driving range: 50-60km, with optimal performance across diverse temperatures.">
+                    <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-5.png" data-detail-text="72V 20Ah Battery detailed view: System architecture diagram.">
+                        <img src="images/technology/72V20A-5.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image">
+                    </a>
+                    <h4 class="font-semibold mb-4 text-center">Battery detailed image</h4>
+                    <p class="text-neutral-400 text-center">Click to see other views.</p>
+                </div>
+                <div id="card-C" data-card-id="C" data-index="2" class="tech-card">
+                    <img src="images/technology/YEDEA-1.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/YEDEA-1.png" data-detail-text="The TDLiD 72V 20Ah battery pack, configured in a 20S4P arrangement, offering a nominal voltage of 73.8V and a capacity of 19.72Ah.">
+                    <img src="images/technology/72V5A-charger-2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V5A-charger-2.png" data-detail-text="The TDLiD 72V-5A lithium battery charger is designed to pair seamlessly with this battery pack, providing optimal charging performance.">
+                    <h4 class="font-semibold mb-4 text-center">Charger and vehicle integration</h4>
+                    <p class="text-neutral-400 text-center">Image of the charger and battery system integrated into the vehicle..</p>
+                </div>
             </div>
-
-            <div class="p-8 border border-neutral-800 rounded-2xl">
-                <img src="images/technology/72V20A-2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer openBatteryDetail" data-detail-src="images/technology/72V20A-2.png" data-detail-text="The TDLiD 72V 20Ah battery is designed with LG NMC cells and configured in a 20S4P arrangement, offering a nominal voltage of 73.8V. Standard charging time is approximately 3 hours.">
-                <img src="images/technology/72V20A-3.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer openBatteryDetail" data-detail-src="images/technology/72V20A-3.png" data-detail-text="Charging time: 3 hours, driving range: 50-60km, with optimal performance across diverse temperatures.">
-
-                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-5.png">
-                    <img src="images/technology/72V20A-5.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
-                </a>
-                <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-6.png">
-                    <img src="images/technology/72V20A-6.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition">
-                </a>
-
-            </div>
-
-
-            <div class="p-8 border border-neutral-800 rounded-2xl">
-
-<!-- 첫 번째 이미지 (웹페이지에서 보이는 이미지, 세로 크기 350px 유지) -->
-<img src="images/technology/YEDEA-1.png" 
-     class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer openBatteryDetail"
-     data-detail-src="images/technology/YEDEA-1.png"
-     data-detail-text="The TDLiD 72V 20Ah battery pack, equipped with high-performance LG NMC cells (Model: INR21700M50LT), is configured in a 20S4P arrangement, offering a nominal voltage of 73.8V and a capacity of 19.72Ah. This advanced battery pack supports a charging time of approximately 3 hours with a standard charging current of 5A, providing an impressive driving range of 50-60km."
-     style="height: 350px; object-fit: cover;"> <!-- 웹페이지에서는 세로 350px 유지 -->
-
-
-    <!-- 두 번째 이미지 -->
-    <img src="images/technology/72V5A-charger-2.png" 
-         class="w-full mb-4 rounded-lg hover:opacity-80 transition cursor-pointer openBatteryDetail"
-         data-detail-src="images/technology/72V5A-charger-2.png"
-         data-detail-text="The TDLiD 72V-20Ah battery pack utilizes high-performance LG NMC cells (INR21700M50LT) in a 20S4P configuration, offering a nominal voltage of 73.8V and a capacity of 19.72Ah. It supports fast charging with a standard current of 5A, completing a full charge in approximately 3 hours. This advanced battery system ensures a range of 50-60km and operates efficiently across a wide temperature range from -20°C to +55°C for discharge, and 0°C to +45°C for charging. The TDLiD 72V-5A lithium battery charger is designed to pair seamlessly with this battery pack, providing optimal charging performance with a recommended current of 5A. This combination enhances overall energy efficiency and durability for electric vehicles and systems."
-         style="height: 220px; object-fit: cover;">
-</div>
-  
-
         </div>
+
     </div>
 </section>
 
-<footer class="py-4 text-center text-neutral-500 border-t border-neutral-800">
-    © 2025 TDL Energy Indonesia
+
+<footer class="py-10 px-6 text-center text-neutral-500 border-t border-neutral-800">
+    © 2025 TDL Energy Indonesia. All rights reserved.
 </footer>
 
-<!-- 팝업 이미지 영역 -->
-<div id="popupImage" class="popup-container">
-    <img id="popupImg" src="" class="popup-image" />
-</div>
-
 <script>
-    // 팝업 처리 스크립트
-    document.querySelectorAll('.openBatteryDetail').forEach(item => {
-        item.addEventListener('click', function(event) {
-            event.preventDefault();
+    let rotationInterval;
+    let currentRotationY = 0; // 캐러셀의 현재 회전 각도
+    const ROTATION_SPEED = 0.2; // 초당 회전 속도 (작을수록 느림)
+    const FRAME_RATE = 1000 / 60; // 60fps
+    const CARD_COUNT = 3;
+    const ANGLE_STEP = 360 / CARD_COUNT; // 120도 간격
+    let isPaused = false;
+    
+    // ----------------------------------------------------
+    // 1. 팝업 창 함수 (Solutions.html과 동일한 다크 테마)
+    // ----------------------------------------------------
+    function openSolutionPopup(imageSrc, textContent) {
+        const modal = document.createElement('div');
+        modal.classList.add('modal-backdrop');
 
-            // 이미지와 텍스트 가져오기
-            const imageSrc = item.getAttribute('data-detail-src');
-            const textContent = item.getAttribute('data-detail-text');
+        modal.innerHTML = `
+            <div class="modal-content">
+                <img src="${imageSrc}" alt="Detail Image" class="modal-image">
+                <p class="text-neutral-300" style="margin-top: 10px; font-size: 16px;">${textContent}</p>
+                <button class="modal-close-btn">Close</button>
+            </div>
+        `;
 
-            // 팝업 창 생성
-            const modal = document.createElement('div');
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-            modal.style.display = 'flex';
-            modal.style.justifyContent = 'center';
-            modal.style.alignItems = 'center';
-            modal.style.zIndex = '1000';
-
-            // 팝업 내용
-            modal.innerHTML = `
-                <div style="background: #fff; padding: 20px; border-radius: 10px; max-width: 66%; text-align: center;">
-                    <img src="${imageSrc}" alt="Battery Detail" style="max-width: 100%; max-height: 500px; object-fit: contain; border-radius: 10px;"> <!-- 팝업창에서 이미지 세로 크기 조정 -->
-                    <p style="margin-top: 20px; font-size: 16px; color: #333;">${textContent}</p>
-                    <button style="margin-top: 20px; padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
-                </div>
-            `;
-
-            // 팝업 닫기 버튼 기능
-            modal.querySelector('button').addEventListener('click', function() {
+        modal.querySelector('.modal-close-btn').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
                 document.body.removeChild(modal);
-            });
+            }
+        });
 
-            // 팝업 추가
-            document.body.appendChild(modal);
+        document.body.appendChild(modal);
+    }
+
+    // ----------------------------------------------------
+    // 2. 자동 회전 시작 함수
+    // ----------------------------------------------------
+    function startRotation() {
+        const carousel = document.getElementById('carousel');
+        const cards = document.querySelectorAll('.tech-card');
+        
+        // 선택 상태 제거 및 회전 간격 설정
+        cards.forEach(c => c.classList.remove('is-selected'));
+        carousel.style.transition = 'none'; // 회전 중에는 부드러운 전환 효과 제거
+        isPaused = false;
+        
+        if (rotationInterval) clearInterval(rotationInterval);
+
+        rotationInterval = setInterval(() => {
+            // currentRotationY를 증가시키고, 캐러셀 전체를 역방향으로 회전 (시계 방향)
+            currentRotationY = (currentRotationY + ROTATION_SPEED) % 360;
+            carousel.style.transform = `rotateY(-${currentRotationY}deg)`;
+        }, FRAME_RATE);
+    }
+
+    // ----------------------------------------------------
+    // 3. 회전 정지 및 카드 중앙 정렬 함수
+    // ----------------------------------------------------
+    function stopAndCenterCard(clickedCard, clickedIndex) {
+        if (rotationInterval) {
+            clearInterval(rotationInterval);
+            rotationInterval = null;
+            isPaused = true;
+        }
+        
+        const carousel = document.getElementById('carousel');
+        const cards = document.querySelectorAll('.tech-card');
+
+        // 기존 선택 해제
+        cards.forEach(c => c.classList.remove('is-selected'));
+
+        // 1. 클릭된 카드를 정면(0도)으로 가져오기 위한 목표 회전 각도 계산
+        // 카드의 초기 각도는 0, 120, 240도 입니다.
+        const targetCardAngle = clickedIndex * ANGLE_STEP; 
+        
+        // 최종 캐러셀 회전 각도: 클릭된 카드의 초기 각도를 0도로 맞추는 값
+        // 예: B(120도)를 클릭하면, 캐러셀은 120도 역회전(rotateY(-120deg))해야 B의 초기 위치가 정면으로 옵니다.
+        let finalRotation = -targetCardAngle;
+        
+        // 여기에 현재 회전 중이던 각도(currentRotationY)의 오차를 보정합니다.
+        // 현재 캐러셀의 회전은 -currentRotationY가 적용 중입니다.
+        // 따라서 최종 정지 각도는 (finalRotation - (currentRotationY % ANENT_STEP))이어야 하지만, 
+        // JS에서 currentRotationY가 지속적으로 업데이트되므로, 가장 가까운 targetRotation으로 맞춰주는 것이 부드럽습니다.
+        
+        // 가장 가까운 120도의 배수를 찾아 부드럽게 정렬 (옵션)
+        // finalRotation은 0, -120, -240 중 하나로 설정하여 정면으로 향하게 함
+
+        // 2. 부드러운 전환 효과 적용 후 최종 각도 적용
+        carousel.style.transition = 'transform 0.6s ease-out';
+        carousel.style.transform = `rotateY(${finalRotation}deg)`;
+        
+        // 3. 클릭된 카드 선택 상태 표시
+        clickedCard.classList.add('is-selected');
+
+        // 4. 다음 회전을 위해 currentRotationY 업데이트 (선택된 카드를 0도로 간주)
+        currentRotationY = -finalRotation; 
+    }
+
+    // ----------------------------------------------------
+    // 4. 초기화 및 이벤트 리스너 부착
+    // ----------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+        const carousel = document.getElementById('carousel');
+        const cards = document.querySelectorAll('.tech-card');
+
+        // 자동 회전 시작
+        startRotation(); 
+
+        cards.forEach((card, index) => {
+            card.addEventListener('click', function(event) {
+                const cardIndex = parseInt(this.getAttribute('data-index'));
+
+                // 1. 이미지 클릭 (팝업 실행)
+                if (event.target.closest('.tech-card-image') || event.target.closest('a.openBatteryDetail')) {
+                    if (card.classList.contains('is-selected')) {
+                        const link = event.target.closest('a') || event.target;
+                        const imageSrc = link.getAttribute('data-detail-src') || event.target.getAttribute('src');
+                        const textContent = link.getAttribute('data-detail-text') || 'No description available.';
+                        openSolutionPopup(imageSrc, textContent);
+                        event.stopPropagation(); // 팝업 후 회전/정지 로직 방지
+                        return;
+                    }
+                    return; // 비선택 카드 이미지 클릭 무시
+                }
+                
+                // 2. 카드 배경 클릭 (정지/선택/재개 로직)
+                if (card.classList.contains('is-selected')) {
+                    // 이미 선택된 카드를 다시 클릭 -> 회전 재개
+                    startRotation();
+                } else {
+                    // 회전 중이거나 다른 카드를 클릭 -> 정지 및 해당 카드 중앙 정렬
+                    stopAndCenterCard(card, cardIndex);
+                }
+            });
+        });
+
+        // 모바일 메뉴 토글 (기존 로직 유지)
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+            document.getElementById('mobileMenu').classList.toggle('flex');
         });
     });
 </script>
