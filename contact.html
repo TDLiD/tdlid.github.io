@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Request Quote | TDL Energy Indonesia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/main.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        .contact-form-container {
+            /* 헤더 공간 확보 및 최소 높이 설정 */
+            min-height: calc(100vh - 120px); /* 푸터 공간을 고려하여 높이 설정 */
+            display: flex;
+            align-items: center; /* 수직 중앙 정렬 */
+            justify-content: center; /* 수평 중앙 정렬 */
+        }
+        .form-card {
+            max-width: 500px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
+
+<header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+        <a href="index.html" class="block">
+            <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide"> 
+                <img src="images/logo/logo.png" alt="TDL Energy Logo" class="header-logo object-contain"> 
+                <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
+            </h1>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="products.html" class="nav-link">Products</a>
+            <a href="technology.html" class="nav-link">Technology</a>
+            <a href="solutions.html" class="nav-link">Solutions</a>
+            <a href="company.html" class="nav-link">Company</a>
+            <a href="news.html" class="nav-link">News</a>
+            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold font-bold text-cyan-500">
+                Request Quote
+            </a>
+        </nav>
+
+        <button id="mobileMenuBtn" class="md:hidden">☰</button>
+    </div>
+
+    <div id="mobileMenu" class="hidden md:hidden fixed top-16 right-6 bg-neutral-900 p-6 rounded-2xl shadow-xl border border-neutral-800 z-50 flex-col gap-4 text-white text-base">
+        <a href="index.html" class="nav-link-mobile">Home</a>
+        <a href="products.html" class="nav-link-mobile">Products</a>
+        <a href="technology.html" class="nav-link-mobile">Technology</a>
+        <a href="solutions.html" class="nav-link-mobile">Solutions</a>
+        <a href="company.html" class="nav-link-mobile">Company</a>
+        <a href="news.html" class="nav-link-mobile">News</a>
+        <a href="contact.html" class="nav-link-mobile mt-2 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold text-center font-bold text-cyan-500">
+            Request Quote
+        </a>
+    </div>
+</header>
+
+<main class="pt-32 pb-10 px-6 contact-form-container">
+    <div class="form-card bg-neutral-900 border border-neutral-700 p-8 rounded-2xl shadow-2xl relative mt-16 md:mt-0">
+        <h2 class="text-3xl font-bold mb-2">Request a Quote</h2>
+        <p class="text-neutral-400 mb-6">
+            Please provide details for a customized quotation. Our team will contact you shortly.
+        </p>
+
+        <form id="quoteForm" method="POST" action="https://formspree.io/f/mdkqddlz" class="grid gap-4">
+            <input name="company" placeholder="Company / Name" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required>
+            <input name="email" type="email" placeholder="Email Address" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required>
+            <input name="phone" placeholder="Phone / WhatsApp (Optional)" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition">
+
+            <select name="product" id="quoteProductSelect" class="p-4 rounded-xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition">
+                <option value="">-- Select Product / Service (Optional) --</option>
+                <option value="72V 20Ah Battery Pack">72V 20Ah Battery Pack</option>
+                <option value="EV Conversion Kit">EV Conversion Kit</option>
+                <option value="Solar Home Charging Solution">Solar Home Charging Solution</option>
+                <option value="Battery Recycling Program">Battery Recycling Program</option>
+                <option value="Other / General Inquiry">Other / General Inquiry</option>
+            </select>
+
+            <textarea name="details" rows="6" placeholder="Project details, required quantity, use-case, delivery location, etc." class="p-4 rounded-xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition"></textarea>
+          
+            <button type="submit" class="w-full mt-4 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold transition">
+                Submit Request
+            </button>
+        </form>
+
+        <p id="formStatus" class="mt-4 text-center text-sm text-neutral-400"></p>
+    </div>
+</main>
+
+<footer class="py-10 px-6 text-center text-neutral-500 border-t border-neutral-800">
+    © 2025 TDL Energy Indonesia. All rights reserved.
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+    // 폼 제출 후 상태 메시지 표시를 위한 간단한 스크립트 (Formspree 사용 가정)
+    const form = document.getElementById('quoteForm');
+    const formStatus = document.getElementById('formStatus');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        formStatus.textContent = 'Sending...';
+        
+        const response = await fetch(form.action, {
+            method: form.method,
+            body: new FormData(form),
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            formStatus.textContent = '✅ Your request has been successfully submitted! We will contact you soon.';
+            formStatus.classList.remove('text-red-500');
+            formStatus.classList.add('text-green-500');
+            form.reset();
+        } else {
+            formStatus.textContent = '❌ Failed to send request. Please try again or email us directly.';
+            formStatus.classList.remove('text-green-500');
+            formStatus.classList.add('text-red-500');
+        }
+    });
+
+    // 모바일 메뉴 토글 (main.js가 없는 경우를 대비하여 추가)
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+        document.getElementById('mobileMenu').classList.toggle('hidden');
+        document.getElementById('mobileMenu').classList.toggle('flex');
+    });
+</script>
+
+</body>
+</html>
