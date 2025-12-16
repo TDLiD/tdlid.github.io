@@ -13,7 +13,6 @@
 <header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
 
-        <!-- 🔥 INDEX.HTML 과 동일한 로고 구조 -->
         <a href="index.html" class="block">
             <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide">
                 <img src="images/logo/logo.png" alt="TDL Energy Logo" class="header-logo object-contain">
@@ -28,8 +27,24 @@
             <a href="solutions.html" class="nav-link text-white font-bold">Solutions</a>
             <a href="company.html" class="nav-link">Company</a>
             <a href="news.html" class="nav-link">News</a>
+            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold">
+                Request Quote
+            </a>
         </nav>
 
+        <button id="mobileMenuBtn" class="md:hidden">☰</button>
+    </div>
+
+    <div id="mobileMenu" class="hidden md:hidden fixed top-16 right-6 bg-neutral-900 p-6 rounded-2xl shadow-xl border border-neutral-800 z-50 flex-col gap-4 text-white text-base">
+        <a href="index.html" class="nav-link-mobile">Home</a>
+        <a href="products.html" class="nav-link-mobile">Products</a>
+        <a href="technology.html" class="nav-link-mobile">Technology</a>
+        <a href="solutions.html" class="nav-link-mobile font-bold text-cyan-500">Solutions</a>
+        <a href="company.html" class="nav-link-mobile">Company</a>
+        <a href="news.html" class="nav-link-mobile">News</a>
+        <a href="contact.html" class="nav-link-mobile mt-2 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold text-center">
+            Request Quote
+        </a>
     </div>
 </header>
 
@@ -38,7 +53,6 @@
         <h3 class="text-3xl font-bold mb-10">Custom Solutions</h3>
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            <!-- Solution Cards (Repeat as in your code) -->
             <div class="p-4 border border-neutral-800 rounded-xl">
                 <h4 class="font-semibold mb-2 text-sm">A. EV Motorcycle Conversion Business</h4>
                 <a href="#" class="openSolutionDetail" data-detail-src="images/solutions/solution1.png">

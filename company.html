@@ -16,13 +16,9 @@
             --header-subtitle-font-size: 1.50rem;  /* "TDL ENERGY INDONESIA" 크기 */
             --header-subtitle-font-weight: 800;    /* 두께 */
         }
-
-        body {
-            background:#020617;
-            color:#e5e7eb;
-            font-family: 'Pretendard', sans-serif; 
-        }
-
+        
+        /* 기존 body 스타일 제거됨 */
+        
         /* Spotlight background */
         .company-bg {
             position: absolute;
@@ -94,26 +90,26 @@
     </style>
 </head>
 
-<body class="relative"> 
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative"> 
 
 <header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4"> 
 
         <a href="index.html" class="block">
-    <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide"> 
-        <img src="images/logo/logo.png" alt="TDL Energy Logo" class="header-logo object-contain"> 
-        <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
-    </h1>
-</a>
+            <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide"> 
+                <img src="images/logo/logo.png" alt="TDL Energy Logo" class="header-logo object-contain"> 
+                <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
+            </h1>
+        </a>
 
         <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
             <a href="index.html" class="nav-link">Home</a>
-            <a href="index.html#products" class="nav-link">Products</a>
-            <a href="index.html#technology" class="nav-link">Technology</a>
-            <a href="index.html#solution" class="nav-link">Solutions</a>
+            <a href="products.html" class="nav-link">Products</a>
+            <a href="technology.html" class="nav-link">Technology</a>
+            <a href="solutions.html" class="nav-link">Solutions</a>
             <a href="company.html" class="nav-link text-white font-bold">Company</a> 
             <a href="news.html" class="nav-link">News</a>
-            <a href="index.html#contact" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold">
+            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold">
                 Request Quote
             </a>
         </nav>
@@ -123,16 +119,17 @@
     
     <div id="mobileMenu" class="hidden md:hidden fixed top-16 right-6 bg-neutral-900 p-6 rounded-2xl shadow-xl border border-neutral-800 z-50 flex-col gap-4 text-white text-base">
         <a href="index.html" class="nav-link-mobile">Home</a>
-        <a href="index.html#products" class="nav-link-mobile">Products</a>
-        <a href="index.html#technology" class="nav-link-mobile">Technology</a>
-        <a href="index.html#solution" class="nav-link-mobile">Solutions</a>
+        <a href="products.html" class="nav-link-mobile">Products</a>
+        <a href="technology.html" class="nav-link-mobile">Technology</a>
+        <a href="solutions.html" class="nav-link-mobile">Solutions</a>
         <a href="company.html" class="nav-link-mobile text-cyan-500 font-bold">Company</a>
         <a href="news.html" class="nav-link-mobile">News</a>
-        <a href="index.html#contact" class="nav-link-mobile mt-2 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold text-center">
+        <a href="contact.html" class="nav-link-mobile mt-2 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold text-center">
             Request Quote
         </a>
     </div>
 </header>
+
 <main class="relative z-10 pt-32 pb-24 max-w-7xl mx-auto px-6">
     <div class="company-bg"></div>
 
