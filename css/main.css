@@ -480,5 +480,29 @@ footer {
     padding: 1rem 0;  /* 세로 공간 최소화 */
 }
 
+/* 팝업 창 */
+.popup-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 70%; /* 팝업 세로 크기 제한 */
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;  /* 팝업 기본적으로 숨김 */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 1000;
+}
+
+/* 팝업 이미지 */
+.popup-image {
+    max-height: 100%;  /* 팝업 창 내에서 이미지 세로 크기 조정 */
+    width: auto;  /* 비율에 맞게 이미지 가로 크기 자동 조정 */
+    object-fit: contain; /* 이미지 비율 유지 */
+}
+
 
 
