@@ -73,10 +73,17 @@
     
     /* 포커스 영역 이미지 스타일 */
     .focus-image-container img {
-        height: auto; /* 고정 높이 설정 */
-        object-fit: contain; /* (선택 사항) 이미지가 잘리지 않게 조정되며, 필요 시 여백 발생 */
+        height: auto;
+        object-fit: contain;
         cursor: pointer;
     }
+
+    /* 🌟 [수정] 애니메이션 시간을 0.3s로 변경 🌟 */
+    .transition-animation {
+        transition: transform 1.0s ease-in-out, opacity 1.0s ease-in-out, box-shadow 1.0s;
+        /* box-shadow를 추가하여 파도처럼 부풀어 오르는 효과를 줍니다. */
+    }
+
 </style>
 </head>
 
@@ -129,7 +136,7 @@
         </div>
 
         <div id="stackContainer" class="flex gap-4 overflow-x-auto pb-4 justify-center">
-            </div>
+        </div>
     </div>
 </main>
 
@@ -153,6 +160,7 @@
     const focusArea = document.getElementById('focusArea');
     const stackContainer = document.getElementById('stackContainer');
     let currentFocusId = null;
+    let isAnimating = false;
 
     // ----------------------------------------------------
     // 2. 팝업 창 함수
@@ -173,7 +181,6 @@
             document.body.removeChild(modal);
         });
         
-        // 배경 클릭 시 닫기
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 document.body.removeChild(modal);
@@ -191,9 +198,9 @@
         
         const imageHTML = solution.images.map(src => `
             <a href="#" class="openSolutionDetail focus-image-container w-full" 
-               data-detail-src="${src}" 
-               data-detail-text="${solution.desc}"
-               onclick="openSolutionPopup('${src}', '${solution.desc.replace(/'/g, "\\'")}')"
+                data-detail-src="${src}" 
+                data-detail-text="${solution.desc}"
+                onclick="openSolutionPopup('${src}', '${solution.desc.replace(/'/g, "\\'")}')"
             >
                 <img src="${src}" class="w-full rounded-lg hover:ring-2 ring-cyan-500/50 transition" loading="lazy">
             </a>
@@ -214,7 +221,6 @@
     // 4. 스택 컨테이너 렌더링 함수
     // ----------------------------------------------------
     function renderStackContainer() {
-        // 현재 포커스 아이템을 제외한 나머지 아이템 필터링
         const stackItems = solutionsData.filter(s => s.id !== currentFocusId);
         
         stackContainer.innerHTML = stackItems.map(s => `
@@ -231,26 +237,88 @@
     }
 
     // ----------------------------------------------------
-    // 5. 솔루션 선택 및 스왑 함수
+    // 5. 솔루션 선택 및 애니메이션 이동 함수
     // ----------------------------------------------------
     function selectSolution(id) {
-        const newSolution = solutionsData.find(s => s.id === id);
-        if (!newSolution) return;
+        if (isAnimating) return;
+        isAnimating = true;
 
-        renderFocusArea(newSolution);
-        renderStackContainer();
+        const newSolution = solutionsData.find(s => s.id === id);
+        if (!newSolution) {
+            isAnimating = false;
+            return;
+        }
+
+        const clickedElement = document.getElementById(`stack-item-${id}`);
+        if (!clickedElement) {
+            isAnimating = false;
+            return;
+        }
+
+        // 1. 클릭된 요소의 현재 위치와 크기 측정
+        const startRect = clickedElement.getBoundingClientRect();
         
-        // 부드러운 스크롤 (Focus Area로 이동)
-        focusArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // 2. 스크롤 위치를 포함한 포커스 영역의 최종 위치 계산
+        const focusAreaRect = focusArea.getBoundingClientRect();
+        const targetScrollY = focusAreaRect.top + window.scrollY - 100; // 헤더 공간 확보 (100px 정도)
+
+        // 3. 애니메이션을 위해 클릭된 요소를 복제하고 DOM에 추가
+        const clonedElement = clickedElement.cloneNode(true);
+        clonedElement.classList.add('transition-animation');
+        clonedElement.style.position = 'fixed';
+        clonedElement.style.top = `${startRect.top}px`;
+        clonedElement.style.left = `${startRect.left}px`;
+        clonedElement.style.width = `${startRect.width}px`;
+        clonedElement.style.height = `${startRect.height}px`;
+        clonedElement.style.margin = '0';
+        clonedElement.style.zIndex = '10000';
+        
+        // 복제된 요소가 기존 요소를 덮도록 기존 요소는 잠시 숨김
+        clickedElement.style.opacity = '0'; 
+
+        document.body.appendChild(clonedElement);
+
+        // 4. 강제 리플로우 (CSS 변경 사항을 즉시 적용하여 애니메이션 시작점 설정)
+        void clonedElement.offsetWidth; 
+
+        // 5. 최종 목적지 위치 계산 및 애니메이션 시작
+        // 상단 focusArea의 중앙으로 이동
+        const targetX = focusAreaRect.left + focusAreaRect.width / 2 - startRect.width / 2;
+        const targetY = 150; // 최종적으로 화면 상단에서 150px 위치 (헤더 아래)
+
+        clonedElement.style.transform = `
+            translate(${targetX - startRect.left}px, ${targetY - startRect.top}px) 
+            scale(1.2) /* 파도처럼 부풀어 오르는 효과 */
+        `;
+        clonedElement.style.opacity = '0'; // 최종적으로 사라지도록 설정
+        clonedElement.style.boxShadow = '0 0 40px rgba(56, 189, 248, 0.5)'; // 청록색 그림자 효과
+
+        // 6. 스크롤 이동 시작
+        window.scrollTo({
+            top: targetScrollY,
+            behavior: 'smooth'
+        });
+
+        // 7. 애니메이션이 끝난 후 (0.3초 후) 최종 업데이트 수행
+        setTimeout(() => {
+            // 상단 영역 내용 업데이트
+            renderFocusArea(newSolution); 
+            // 스택 컨테이너 재렌더링 (이동된 아이템 숨김)
+            renderStackContainer(); 
+            // 복제된 요소 제거
+            document.body.removeChild(clonedElement); 
+            // 원래 요소 다시 보이게 처리
+            clickedElement.style.opacity = '';
+            
+            isAnimating = false;
+        }, 1000); // 👈 수정된 속도 (밀리초)
     }
 
     // ----------------------------------------------------
     // 초기화: 첫 번째 솔루션을 기본으로 표시
     // ----------------------------------------------------
     if (solutionsData.length > 0) {
-        // 첫 번째 항목을 포커스 영역에 표시
         renderFocusArea(solutionsData[0]);
-        // 나머지 항목을 스택 컨테이너에 표시
         renderStackContainer();
     }
     
