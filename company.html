@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Company Profile | TDL Energy Indonesia</title> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/main.css">
+    
+    <style>
+        /* 🌟 로고 크기 통일화를 위한 :root 변수 (유지) 🌟 */
+        :root {
+            --header-logo-font-size: 8.2rem;       /* 상단 TDLiD 크기 */
+            --header-logo-font-weight: 900;        /* 상단 TDLiD 두께 */
+            --header-subtitle-font-size: 1.50rem;  /* "TDL ENERGY INDONESIA" 크기 */
+            --header-subtitle-font-weight: 800;    /* 두께 */
+        }
+        
+        /* 기존 body 스타일 제거됨 */
+        
+        /* Spotlight background */
+        .company-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 50% 30%, rgba(34,211,238,.12), transparent 60%),
+                radial-gradient(circle at 20% 70%, rgba(124,58,237,.08), transparent 60%);
+            pointer-events:none;
+            z-index:0;
+        }
+
+        /* 3 Image Stage */
+        .image-stage {
+            /* REMOVED: display: grid; */
+            /* REMOVED: grid-template-columns: repeat(3, 1fr); */
+            /* REMOVED: gap: 2rem; */
+            position: relative;
+            z-index: 1;
+        }
+        .image-card {
+            position: relative;
+            border-radius: 1.5rem;
+            /* overflow: visible; <-- 이 속성이 hover 시 이미지 확장 문제를 일으킬 수 있어 visible은 유지 */
+            overflow: hidden; /* 이미지 카드의 모서리 라운딩이 제대로 적용되도록 변경 */
+            border: 1px solid rgba(255,255,255,.08);
+            background: #020617;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px; /* 이미지가 사라지는 현상 방지를 위해 최소 높이 지정 */
+        }
+        .image-card img {
+            max-height: 100%;
+            width: 100%; /* 너비를 100%로 설정하여 가로 영역을 채움 */
+            height: auto;
+            display: block;
+            transition: transform 0.6s ease;
+            transform-origin: center center;
+            position: relative;
+            z-index: 1;
+            border-radius: 1.5rem;
+        }
+        /* hover 시 진짜 원본 사이즈로 확장 */
+        .image-card.hover-expand:hover img {
+            transform: scale(1.6);
+            z-index: 99;
+        }
+
+        .image-overlay{
+            position:absolute;
+            inset:0;
+            background:linear-gradient(to top, rgba(0,0,0,.75), transparent 60%);
+            opacity:.0;
+            transition:.4s ease;
+        }
+        .image-card:hover .image-overlay {
+            opacity:1;
+        }
+
+        /* Floating text */
+        .float-in {
+            animation: floatIn 1s ease both;
+        }
+        @keyframes floatIn {
+            from {opacity:0;transform:translateY(50px)}
+            to {opacity:1;transform:translateY(0)}
+        }
+    </style>
+</head>
+
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative"> 
+
+<header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4"> 
+
+        <a href="index.html" class="block">
+            <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide"> 
+                <img src="images/logo/logo.png" alt="TDL Energy Logo" class="header-logo object-contain"> 
+                <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
+            </h1>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="products.html" class="nav-link">Products</a>
+            <a href="technology.html" class="nav-link">Technology</a>
+            <a href="solutions.html" class="nav-link">Solutions</a>
+            <a href="company.html" class="nav-link text-white font-bold">Company</a> 
+            <a href="news.html" class="nav-link">News</a>
+            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold">
+                Request Quote
+            </a>
+        </nav>
+        
+        <button id="mobileMenuBtn" class="md:hidden">☰</button>
+    </div>
+    
+    <div id="mobileMenu" class="hidden md:hidden fixed top-16 right-6 bg-neutral-900 p-6 rounded-2xl shadow-xl border border-neutral-800 z-50 flex-col gap-4 text-white text-base">
+        <a href="index.html" class="nav-link-mobile">Home</a>
+        <a href="products.html" class="nav-link-mobile">Products</a>
+        <a href="technology.html" class="nav-link-mobile">Technology</a>
+        <a href="solutions.html" class="nav-link-mobile">Solutions</a>
+        <a href="company.html" class="nav-link-mobile text-cyan-500 font-bold">Company</a>
+        <a href="news.html" class="nav-link-mobile">News</a>
+        <a href="contact.html" class="nav-link-mobile mt-2 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold text-center">
+            Request Quote
+        </a>
+    </div>
+</header>
+
+<main class="relative z-10 pt-32 pb-24 max-w-7xl mx-auto px-6">
+    <div class="company-bg"></div>
+
+    <div class="text-center mb-10 float-in">
+        <h1 class="text-4xl font-black tracking-wide hero-slogan-gradient">
+            Designing the Energy Infrastructure of Tomorrow
+        </h1>
+    </div>
+
+
+<section class="mb-16">
+<div class="image-stage flex flex-col md:flex-row gap-8 justify-center">
+    <div class="image-card hover-expand">
+        <img src="images/company1.png">
+    </div>
+    <div class="image-card hover-expand">
+        <img src="images/company2.png">
+    </div>
+    <div class="image-card hover-expand">
+        <img src="images/company3.png">
+    </div>
+</div>
+</section>
+
+
+    <section class="max-w-7xl mx-auto space-y-16 text-lg text-center">
+        <div class="float-in">
+            <h2 class="text-4xl font-bold text-cyan-400 mb-6">Who We Are</h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+
+            <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-cyan-400/40 transition">
+                <h3 class="text-xl font-bold text-cyan-300 mb-4">MISSION</h3>
+                <p class="text-neutral-300">
+                    “NO MORE CARBON” <br>Deliver the best products and services to our customers.<br>Promote leadership consistently.<br>Create and Innovate value
+
+                </p>
+            </div>
+
+            <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-purple-400/40 transition">
+                <h3 class="text-xl font-bold text-purple-300 mb-4">TECHNOLOGY</h3>
+                <p class="text-neutral-300">
+                    High-density lithium battery and AI-based BMS technology
+                </p>
+            </div>
+
+            <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-blue-400/40 transition">
+                <h3 class="text-xl font-bold text-blue-300 mb-4">VISION</h3>
+                <p class="text-neutral-300">
+                    To provide EV motors and batteries that enhance lifestyles and contribute to a better environment.
+
+                </p>
+            </div>
+        </div>
+    </section>
+
+
+</main>
+
+<div id="cursor-layer">
+    <div id="cursor-spot"></div>
+</div>
+
+<script src="js/main.js"></script>
+
+</body>
+</html>

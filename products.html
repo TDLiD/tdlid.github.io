@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="TDLiD - High-density lithium battery packs for electric motorcycles.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/main.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 애니메이션을 위해 transition 속성을 미리 정의 */
+        #productContentWrapper {
+            transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+        }
+
+        /* 제품 이미지 컨테이너 내부에 이미지를 중앙 정렬 */
+        #galleryImageContainer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* 이미지가 넘치는 것을 방지 */
+        }
+        #galleryImageContainer img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+    </style>
+</head>
+
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
+
+<audio id="bgm" src="mp3/Caribbean.mp3" autoplay loop muted></audio>
+
+<header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+        <a href="index.html" class="flex items-center gap-3 text-xl font-bold">
+            <img src="images/logo/logo.png" class="header-logo">
+            <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
+        </a>
+
+        <nav class="hidden md:flex gap-10 text-sm text-neutral-300">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="products.html" class="nav-link font-bold text-cyan-500">Products</a>
+            <a href="technology.html" class="nav-link">Technology</a>
+            <a href="solutions.html" class="nav-link">Solutions</a>
+            <a href="company.html" class="nav-link">Company</a>
+            <a href="news.html" class="nav-link">News</a>
+            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold">Request Quote</a>
+        </nav>
+
+        <button id="mobileMenuBtn" class="md:hidden text-2xl">☰</button>
+    </div>
+
+    <div id="mobileMenu" class="hidden md:hidden fixed top-16 right-6 bg-neutral-900 p-6 rounded-2xl shadow-xl border border-neutral-800 z-50 flex-col gap-4 text-white text-base">
+        <a href="index.html" class="nav-link-mobile">Home</a>
+        <a href="products.html" class="nav-link-mobile font-bold text-cyan-500">Products</a>
+        <a href="technology.html" class="nav-link-mobile">Technology</a>
+        <a href="solutions.html" class="nav-link-mobile">Solutions</a>
+        <a href="company.html" class="nav-link-mobile">Company</a>
+        <a href="news.html" class="nav-link-mobile">News</a>
+        <a href="contact.html" class="nav-link-mobile mt-2 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold text-center">
+            Request Quote
+        </a>
+    </div>
+</header>
+
+<section class="pt-48 px-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-3xl font-bold">TDLiD Products</h3>
+            <div class="flex gap-3">
+                <a href="data/catalog/comparison.pdf" target="_blank" class="px-3 py-2 rounded-lg bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform">
+                    Compare Models
+                </a>
+                <a href="data/catalog/tei-catalog-2025.pdf" target="_blank" class="px-3 py-2 rounded-lg bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform">
+                    View Catalog
+                </a>
+            </div>
+        </div>
+
+        <div id="productGallery" class="max-w-3xl mx-auto p-6 bg-neutral-900 rounded-xl">
+            <div id="productContentWrapper">
+                <div id="galleryImageContainer" class="aspect-[16/9] bg-neutral-800 rounded-lg p-4">
+                    </div>
+                <p id="productDescription" class="text-center text-neutral-400 mt-4 h-12 flex items-center justify-center">
+                    Select a battery pack below.
+                </p>
+            </div>
+            
+            <div class="flex justify-between mt-4">
+                <button id="galleryPrevBtn" class="px-4 py-2 bg-neutral-700 rounded hover:bg-neutral-600 transition">Prev</button>
+                <span id="galleryStatus" class="text-neutral-400">Page 0 / 0</span>
+                <button id="galleryNextBtn" class="px-4 py-2 bg-neutral-700 rounded hover:bg-neutral-600 transition">Next</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="py-4 text-center text-neutral-500 border-t border-neutral-800">
+    © 2025 TDL Energy Indonesia
+</footer>
+
+<script>
+    // ----------------------------------------------------
+    // 1. 제품 데이터 🌟 [수정] 모든 desc를 영문으로 업데이트 🌟
+    // ----------------------------------------------------
+    const productsData = [
+        { id: 1, name: 'TDLiD Product 1', spec: 'Product Spec for Image 1', image: 'images/products/image-1.png', desc: 'Detailed description for TDLiD product image 1.' },
+        { id: 2, name: 'TDLiD Product 2', spec: 'Product Spec for Image 2', image: 'images/products/image-2.png', desc: 'Detailed description for TDLiD product image 2.' },
+        { id: 3, name: 'TDLiD Product 3', spec: 'Product Spec for Image 3', image: 'images/products/image-3.png', desc: 'Detailed description for TDLiD product image 3.' },
+        { id: 4, name: 'TDLiD Product 4', spec: 'Product Spec for Image 4', image: 'images/products/image-4.png', desc: 'Detailed description for TDLiD product image 4.' },
+        { id: 5, name: 'TDLiD Product 5', spec: 'Product Spec for Image 5', image: 'images/products/image-5.png', desc: 'Detailed description for TDLiD product image 5.' },
+        { id: 6, name: 'TDLiD Product 6', spec: 'Product Spec for Image 6', image: 'images/products/image-6.png', desc: 'Detailed description for TDLiD product image 6.' },
+        { id: 7, name: 'TDLiD Product 7', spec: 'Product Spec for Image 7', image: 'images/products/image-7.png', desc: 'Detailed description for TDLiD product image 7.' },
+        { id: 8, name: 'TDLiD Product 8', spec: 'Product Spec for Image 8', image: 'images/products/image-8.png', desc: 'Detailed description for TDLiD product image 8.' },
+        { id: 9, name: 'TDLiD Product 9', spec: 'Product Spec for Image 9', image: 'images/products/image-9.png', desc: 'Detailed description for TDLiD product image 9.' },
+        { id: 10, name: 'TDLiD Product 10', spec: 'Product Spec for Image 10', image: 'images/products/image-10.png', desc: 'Detailed description for TDLiD product image 10.' },
+        { id: 11, name: 'TDLiD Product 11', spec: 'Product Spec for Image 11', image: 'images/products/image-11.png', desc: 'Detailed description for TDLiD product image 11.' },
+        { id: 12, name: 'TDLiD Product 12', spec: 'Product Spec for Image 12', image: 'images/products/image-12.png', desc: 'Detailed description for TDLiD product image 12.' },
+        { id: 13, name: 'TDLiD Product 13', spec: 'Product Spec for Image 13', image: 'images/products/image-13.png', desc: 'Detailed description for TDLiD product image 13.' },
+        { id: 14, name: 'TDLiD Product 14', spec: 'Product Spec for Image 14', image: 'images/products/image-14.png', desc: 'Detailed description for TDLiD product image 14.' },
+        { id: 15, name: 'TDLiD Product 15', spec: 'Product Spec for Image 15', image: 'images/products/image-15.png', desc: 'Detailed description for TDLiD product image 15.' },
+        { id: 16, name: 'TDLiD Product 16', spec: 'Product Spec for Image 16', image: 'images/products/image-16.png', desc: 'Detailed description for TDLiD product image 16.' },
+        { id: 17, name: 'TDLiD Product 17', spec: 'Product Spec for Image 17', image: 'images/products/image-17.png', desc: 'Detailed description for TDLiD product image 17.' },
+        { id: 18, name: 'TDLiD Product 18', spec: 'Product Spec for Image 18', image: 'images/products/image-18.png', desc: 'Detailed description for TDLiD product image 18.' },
+        { id: 19, name: 'TDLiD Product 19', spec: 'Product Spec for Image 19', image: 'images/products/image-19.png', desc: 'Detailed description for TDLiD product image 19.' },
+        { id: 20, name: 'TDLiD Product 20', spec: 'Product Spec for Image 20', image: 'images/products/image-20.png', desc: 'Detailed description for TDLiD product image 20.' },
+        { id: 21, name: 'TDLiD Product 21', spec: 'Product Spec for Image 21', image: 'images/products/image-21.png', desc: 'Detailed description for TDLiD product image 21.' },
+        { id: 22, name: 'TDLiD Product 22', spec: 'Product Spec for Image 22', image: 'images/products/image-22.png', desc: 'Detailed description for TDLiD product image 22.' },
+        { id: 23, name: 'TDLiD Product 23', spec: 'Product Spec for Image 23', image: 'images/products/image-23.png', desc: 'Detailed description for TDLiD product image 23.' },
+        { id: 24, name: 'TDLiD Product 24', spec: 'Product Spec for Image 24', image: 'images/products/image-24.png', desc: 'Detailed description for TDLiD product image 24.' },
+        { id: 25, name: 'TDLiD Product 25', spec: 'Product Spec for Image 25', image: 'images/products/image-25.png', desc: 'Detailed description for TDLiD product image 25.' },
+        { id: 26, name: 'TDLiD Product 26', spec: 'Product Spec for Image 26', image: 'images/products/image-26.png', desc: 'Detailed description for TDLiD product image 26.' },
+        { id: 27, name: 'TDLiD Product 27', spec: 'Product Spec for Image 27', image: 'images/products/image-27.png', desc: 'Detailed description for TDLiD product image 27.' },
+        { id: 28, name: 'TDLiD Product 28', spec: 'Product Spec for Image 28', image: 'images/products/image-28.png', desc: 'Detailed description for TDLiD product image 28.' },
+        { id: 29, name: 'TDLiD Product 29', spec: 'Product Spec for Image 29', image: 'images/products/image-29.png', desc: 'Detailed description for TDLiD product image 29.' },
+        { id: 30, name: 'TDLiD Product 30', spec: 'Product Spec for Image 30', image: 'images/products/image-30.png', desc: 'Detailed description for TDLiD product image 30.' },
+        { id: 31, name: 'TDLiD Product 31', spec: 'Product Spec for Image 31', image: 'images/products/image-31.png', desc: 'Detailed description for TDLiD product image 31.' },
+        { id: 32, name: 'TDLiD Product 32', spec: 'Product Spec for Image 32', image: 'images/products/image-32.png', desc: 'Detailed description for TDLiD product image 32.' }
+    ];
+
+    // ----------------------------------------------------
+    // 2. DOM 요소 및 상태 변수
+    // ----------------------------------------------------
+    const productContentWrapper = document.getElementById('productContentWrapper');
+    const galleryImageContainer = document.getElementById('galleryImageContainer');
+    const productDescription = document.getElementById('productDescription');
+    const galleryStatus = document.getElementById('galleryStatus');
+    const galleryPrevBtn = document.getElementById('galleryPrevBtn');
+    const galleryNextBtn = document.getElementById('galleryNextBtn');
+
+    let currentProductIndex = 0;
+    let isAnimating = false;
+    
+    // 🌟 자동 전환 타이머 관련 변수 및 애니메이션 설정 🌟
+    let autoChangeInterval;
+    const AUTO_CHANGE_TIME = 3000; // 3초
+    const transitionDuration = 800; // 0.8s (슬라이드/페이드 속도)
+    const slideDistance = 100; // 100px 왼쪽으로 슬라이드
+
+    // ----------------------------------------------------
+    // 3. 렌더링 함수
+    // ----------------------------------------------------
+    function renderProduct(product, index) {
+        // 이미지 및 설명을 업데이트합니다.
+        galleryImageContainer.innerHTML = `
+            <img src="${product.image}" alt="${product.name} Battery Pack" loading="eager" class="max-h-full">
+        `;
+        productDescription.textContent = product.desc;
+        
+        // 상태 표시줄을 업데이트합니다.
+        galleryStatus.textContent = `Page ${index + 1} / ${productsData.length}`;
+    }
+
+    // ----------------------------------------------------
+    // 4. 자동 타이머 제어 함수
+    // ----------------------------------------------------
+    function stopAutoChange() {
+        if (autoChangeInterval) {
+            clearInterval(autoChangeInterval);
+            autoChangeInterval = null;
+        }
+    }
+
+    function startAutoChange() {
+        stopAutoChange();
+        
+        autoChangeInterval = setInterval(() => {
+            const nextIndex = (currentProductIndex + 1) % productsData.length;
+            changeProduct(nextIndex, true); // 자동 변경 플래그(true) 전달
+        }, AUTO_CHANGE_TIME);
+    }
+    
+    // ----------------------------------------------------
+    // 5. 제품 변경 및 애니메이션 함수
+    // ----------------------------------------------------
+    function changeProduct(newIndex, isAutomatic = false) {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        if (newIndex < 0) {
+            newIndex = productsData.length - 1;
+        } else if (newIndex >= productsData.length) {
+            newIndex = 0;
+        }
+
+        // 수동 클릭인 경우, 자동 타이머를 멈춥니다.
+        if (!isAutomatic) {
+            stopAutoChange();
+        }
+
+        // 1. 현재 내용을 왼쪽으로 밀면서 페이드 아웃 애니메이션 시작
+        productContentWrapper.style.transition = `transform ${transitionDuration}ms ease-out, opacity ${transitionDuration}ms ease-out`;
+        productContentWrapper.style.transform = `translateX(-${slideDistance}px)`;
+        productContentWrapper.style.opacity = '0';
+        
+        // 2. 애니메이션이 끝난 후 (800ms) 내용 업데이트 및 페이드 인 시작
+        setTimeout(() => {
+            // a. 새로운 인덱스로 업데이트
+            currentProductIndex = newIndex;
+            const newProduct = productsData[currentProductIndex];
+
+            // b. 전환 효과 비활성화 및 위치 초기화 (새로운 내용을 중앙에 렌더링 준비)
+            productContentWrapper.style.transition = 'none';
+            productContentWrapper.style.transform = `translateX(${slideDistance}px)`; // 화면 오른쪽 밖으로 이동
+            
+            // c. 내용 업데이트
+            renderProduct(newProduct, currentProductIndex); 
+            
+            // d. 강제 리플로우 후 페이드 인 시작
+            void productContentWrapper.offsetWidth; // Trigger reflow
+            
+            productContentWrapper.style.transition = `transform ${transitionDuration}ms ease-out, opacity ${transitionDuration}ms ease-out`; // 애니메이션 다시 활성화
+            productContentWrapper.style.transform = 'translateX(0)'; // 중앙으로 슬라이드
+            productContentWrapper.style.opacity = '1';
+
+            isAnimating = false;
+            
+            // 수동 클릭이었다면 타이머를 다시 시작
+            if (!isAutomatic) {
+                startAutoChange();
+            }
+        }, transitionDuration); 
+    }
+
+    // ----------------------------------------------------
+    // 6. 이벤트 리스너
+    // ----------------------------------------------------
+    galleryNextBtn.addEventListener('click', () => {
+        const nextIndex = (currentProductIndex + 1) % productsData.length;
+        changeProduct(nextIndex, false); // 수동 변경 플래그(false) 전달
+    });
+
+    galleryPrevBtn.addEventListener('click', () => {
+        let prevIndex = currentProductIndex - 1;
+        if (prevIndex < 0) {
+            prevIndex = productsData.length - 1;
+        }
+        changeProduct(prevIndex, false); // 수동 변경 플래그(false) 전달
+    });
+
+
+    // ----------------------------------------------------
+    // 7. 초기화
+    // ----------------------------------------------------
+    if (productsData.length > 0) {
+        // 초기 로드 시 애니메이션 없이 첫 번째 제품을 표시
+        renderProduct(productsData[0], 0);
+        
+        // 초기 로드 시 투명도와 위치를 중앙으로 설정
+        productContentWrapper.style.opacity = '1'; 
+        productContentWrapper.style.transform = 'translateX(0)';
+
+        // 🌟 3초 타이머 시작 🌟
+        startAutoChange();
+    }
+
+    // 모바일 메뉴 토글 (기존 로직 유지)
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+        document.getElementById('mobileMenu').classList.toggle('hidden');
+        document.getElementById('mobileMenu').classList.toggle('flex');
+    });
+</script>
+
+</body>
+</html>
