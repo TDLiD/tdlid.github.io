@@ -1,623 +1,322 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Technology | TDLiD</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="css/main.css">
+    <meta charset="UTF-8">
+    <title>Technology | TDLiD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<style>
-    /* 팝업 모달 스타일 (기존 유지) */
-    .modal-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.85);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-    .modal-content {
-        background: #171717;
-        color: #ddd;
-        padding: 30px;
-        border-radius: 12px;
-        max-width: 90%;
-        max-height: 90%;
-        text-align: center;
-        border: 1px solid #333;
-        position: relative; /* 👈 X 버튼의 절대 위치 지정을 위해 추가 */
-    }
-    .modal-image {
-        max-width: 100%;
-        max-height: 80vh; 
-        object-fit: contain;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        cursor: zoom-out;
-    }
-    .modal-close-btn {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #06b6d4;
-        color: black;
-        font-weight: 600;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .modal-close-btn:hover {
-        background-color: #0891b2;
-    }
-    
-    /* 팝업 닫기 "x" 버튼 스타일 추가 */
-    .modal-close-x {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        background: none;
-        border: none;
-        color: #fff;
-        font-size: 24px;
-        font-weight: bold;
-        cursor: pointer;
-        padding: 5px;
-        line-height: 1;
-        transition: color 0.2s;
-        z-index: 1010;
-        opacity: 0.7;
-    }
-    .modal-close-x:hover {
-        color: #06b6d4; /* cyan-500 */
-        opacity: 1;
-    }
+    <style>
+        /* 1. 팝업 모달 스타일 (기존 유지 및 X버튼 보강) */
+        .modal-backdrop {
+            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.9);
+            display: flex; justify-content: center; align-items: center; z-index: 10002;
+        }
+        .modal-content {
+            background: #171717; color: #ddd; padding: 30px; border-radius: 12px;
+            max-width: 90%; max-height: 90%; text-align: center; border: 1px solid #333; position: relative;
+        }
+        .modal-image { max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px; margin-bottom: 20px; }
+        .modal-close-btn { margin-top: 20px; padding: 10px 24px; background: #06b6d4; color: black; font-weight: 600; border-radius: 50px; cursor: pointer; transition: 0.2s; }
+        .modal-close-btn:hover { background: #22d3ee; transform: scale(1.05); }
+        .modal-close-x { position: absolute; top: 15px; right: 20px; color: #fff; font-size: 28px; cursor: pointer; opacity: 0.6; }
+        .modal-close-x:hover { opacity: 1; color: #06b6d4; }
 
-
-    /* 🌟 책 페이지 넘김 캐러셀 CSS - 크기 확대 및 3D 강화 🌟 */
-    
-    /* 1. Scene 설정 (원근감 부여) */
-    #technologyContainer {
-        perspective: 1400px; /* 3D 깊이감 강화 */
-        width: 800px; /* 크기 확대 */
-        height: 650px; /* 크기 확대 */
-        margin: 60px auto;
-        position: relative;
-    }
-
-    /* 2. Carousel 컨테이너 */
-    #carousel {
-        width: 100%;
-        height: 100%;
-        position: relative; 
-        transform-style: preserve-3d;
-        transition: none;
-    }
-
-    /* 3. 개별 카드 스타일 */
-    .tech-card {
-        position: absolute;
-        width: 750px; /* 카드 자체의 너비 확대 */
-        height: 650px; /* 카드 자체의 높이 확대 */
-        top: 0;
-        left: 0;
-        padding: 2.5rem; /* 패딩 확대 */
-        border: 1px solid #333;
-        border-radius: 1rem;
-        background-color: #171717;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        /* 2. 슬라이딩 캐러셀 구조 (사용자 기능 유지) */
+        #technologyContainer {
+            perspective: 1400px; width: 800px; height: 650px; margin: 40px auto; position: relative;
+        }
+        #carousel { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
         
-        /* transform-origin: left center; <- 제거 */
-        transform: translateX(0); /* 👈 수정: 3D 회전 대신 2D 슬라이드 시작 위치 */
-        transition: transform 0.8s ease-out, opacity 0.8s ease-out; /* 👈 수정: 슬라이드/페이드 전환 효과 */
-        
-        opacity: 0; /* 기본적으로 숨김 */
-        pointer-events: none;
-        z-index: 5;
-        text-align: center;
-        overflow-y: auto;
-        cursor: pointer;
-        /* backface-visibility: hidden; <- 제거 */
-    }
-    
-    /* 4. 카드 내부 이미지 가시성 개선 */
-    .tech-card img {
-        height: auto !important;
-        max-height: 45%; /* 카드 높이에 맞게 이미지 최대 높이 조정 */
-        object-fit: contain !important;
-        margin: 0 auto 1.5rem; /* 마진 확대 */
-        transition: opacity 0.3s;
-    }
+        .tech-card {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0; padding: 2.5rem;
+            border: 1px solid #333; border-radius: 1.5rem; background-color: #111;
+            opacity: 0; pointer-events: none; z-index: 5; text-align: center;
+            transition: transform 0.8s ease-out, opacity 0.8s ease-out; /* 슬라이딩 효과 핵심 */
+        }
+        .tech-card.is-active { opacity: 1; pointer-events: auto; z-index: 10; transform: translateX(0); border-color: #06b6d4; box-shadow: 0 0 30px rgba(6, 182, 212, 0.2); }
 
-    /* 활성화된 카드 */
-    .tech-card.is-active {
-        opacity: 1; /* 활성화된 카드는 완전히 보이게 */
-        pointer-events: auto;
-        z-index: 10;
-        transform: translateX(0); /* 👈 수정: 활성화된 카드는 중앙에 위치 */
-        border-color: #06b6d4; 
-        box-shadow: 0 0 30px rgba(6, 182, 212, 0.5); 
-    }
+        /* 3. 개선된 버튼 디자인 (solutions.html 스타일) */
+        .nav-btn { 
+            position: absolute; top: 50%; transform: translateY(-50%); z-index: 30; 
+            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
+            background: rgba(23, 23, 23, 0.8); border: 1px solid #333; border-radius: 50%; 
+            color: #06b6d4; transition: all 0.3s;
+        }
+        .nav-btn:hover { background: #06b6d4; color: #000; border-color: #06b6d4; transform: translateY(-50%) scale(1.1); }
+        #prevBtn { left: -70px; } #nextBtn { right: -70px; }
 
-    /* 버튼 스타일 */
-    .nav-btn {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 30;
-        padding: 10px;
-        background-color: rgba(30, 30, 30, 0.8);
-        border-radius: 50%;
-        transition: background-color 0.3s, color 0.3s;
-    }
-    .nav-btn:hover {
-        background-color: #06b6d4; /* cyan-500 */
-        color: black;
-    }
-    #prevBtn { left: -60px; }
-    #nextBtn { right: -60px; }
+        /* 모바일 대응 */
+        @media (max-width: 1024px) {
+            #technologyContainer { width: 90%; height: auto; min-height: 550px; }
+            #prevBtn { left: 10px; } #nextBtn { right: 10px; }
+            .nav-btn { width: 40px; height: 40px; }
+            .tech-card { padding: 1.5rem; }
+        }
 
-/* technology.html 또는 main.css 파일 내부에 추가 */
-.tech-card-image {
-    max-width: 400px;
-    height: auto; /* 비율 유지를 위해 높이는 자동으로 설정 */
-    display: block; /* 중앙 정렬을 위해 블록 요소로 설정 */
-    margin-left: auto;
-    margin-right: auto; /* 중앙 정렬 */
+.dropdown-link { 
+    padding: 12px 20px; display: block; color: #ccc; 
+    border-bottom: 1px solid #262626; transition: all 0.2s;
+}
+.dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
+.dropdown-quote-btn { 
+    padding: 12px 20px; display: block; background: #22d3ee; 
+    color: #000; font-weight: 600; text-align: center;
 }
 
-
-/* ---------------------------------------------------- */
-/* 🌟 [NEW] 모바일 메뉴 스타일 (공통 안정 구조) 🌟 */
-/* ---------------------------------------------------- */
-.mobile-overlay-menu {
-    height: calc(100vh - 68px);
-    top: 68px;
-    right: 0;
-    position: fixed;
-}
-.overflow-hidden {
-    overflow: hidden;
+/* 수정된 캐러셀 구조 */
+#technologyContainer {
+    perspective: 1400px; 
+    width: 800px; 
+    /* height: 650px; <- 삭제: 고정 높이 대신 내부 콘텐츠에 맞춤 */
+    margin: 40px auto; 
+    position: relative;
 }
 
-.dropdown-link {
-    padding: 12px 20px;
-    text-align: right;
-    font-size: 1.125rem;
-    color: #ccc;
-    transition: background-color 0.2s, color 0.2s;
-    border-bottom: 1px solid #262626;
-}
-.dropdown-link:hover {
-    background-color: #0d383d;
-    color: #38bdf8;
+#carousel { 
+    width: 100%; 
+    position: relative; 
+    transform-style: preserve-3d;
+    display: grid; /* 카드들이 겹쳐 있도록 설정 */
 }
 
-.dropdown-quote-btn {
-    padding: 15px 20px;
+.tech-card {
+    /* position: absolute; <- absolute는 부모 높이를 무시하므로 변경 필요 */
+    grid-area: 1 / 1 / 2 / 2; /* 모든 카드를 동일한 그리드 칸에 겹침 */
+    width: 100%; 
+    height: auto; /* 콘텐츠 길이에 맞게 자동 조절 */
+    padding: 2.5rem;
+    border: 1px solid #333; 
+    border-radius: 1.5rem; 
+    background-color: #111;
+    opacity: 0; 
+    pointer-events: none; 
+    z-index: 5; 
     text-align: center;
-    background-color: #38bdf8;
-    color: #0a0a0a;
-    font-weight: 600;
-    border-radius: 0 0 10px 10px;
-    transition: background-color 0.2s;
-}
-.dropdown-quote-btn:hover {
-    background-color: #67e8f9;
+    transition: transform 0.8s ease-out, opacity 0.8s ease-out;
 }
 
-/* ---------------------------------------------------- */
-/* 🌟 Technology Carousel Responsive Patch 🌟 */
-/* ---------------------------------------------------- */
+/* 활성화된 카드만 높이를 차지하도록 설정 */
+.tech-card.is-active { 
+    position: relative; /* 이 카드만 공간을 차지함 */
+    opacity: 1; 
+    pointer-events: auto; 
+    z-index: 10; 
+    transform: translateX(0); 
+    border-color: #06b6d4; 
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.2); 
+}
+
+/* 모바일 대응 */
 @media (max-width: 1024px) {
-    #technologyContainer {
-        width: 90vw;
-        height: auto;
+    #technologyContainer { 
+        width: 95%; 
+        height: auto; 
+        min-height: auto; /* 최소 높이 해제 */
     }
-
-    .tech-card {
-        width: 100%;
-        height: auto;
-        min-height: 500px;
-    }
-}
-
-@media (max-width: 640px) {
-    #technologyContainer {
-        width: 94vw;
-    }
-
-    .tech-card {
-        padding: 1.5rem;
-        min-height: auto;
-    }
-
-    .nav-btn {
-        top: auto;
-        bottom: -60px;
-        transform: none;
-    }
+    .tech-card { padding: 1.5rem; }
+    #prevBtn { left: -20px; } /* 버튼 위치 살짝 조정 */
+    #nextBtn { right: -20px; }
 }
 
 
-
-</style>
+    </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
-<header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
-    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-        <a href="index.html" class="block">
-            <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide">
-                <img src="images/logo/logo.png" alt="TDL Energy Logo" class="header-logo object-contain">
-                <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
-            </h1>
-        </a>
-        <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="products.html" class="nav-link">Products</a>
-            <a href="technology.html" class="nav-link text-white font-bold">Technology</a>
-            <a href="solutions.html" class="nav-link">Solutions</a>
-            <a href="company.html" class="nav-link">Company</a>
-            <a href="news.html" class="nav-link">News</a>
-            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold">
-                Request Quote
-            </a>
-        </nav>
+<header class="fixed top-0 left-0 w-full z-[10001] bg-neutral-950/90 backdrop-blur-sm border-b border-neutral-800 p-4 flex justify-between items-center">
+    <a href="index.html" class="flex items-center gap-3 text-xl font-bold shrink-0">
+        <img src="images/logo/logo.png" class="h-10 w-auto">
+        <span class="animated-logo-text uppercase">TDL ENERGY INDONESIA</span>
+    </a>
 
-<button id="mobileMenuBtn" aria-expanded="false"
-    class="md:hidden text-2xl text-cyan-400 p-2 border border-cyan-500 rounded-full
-           hover:bg-cyan-500 hover:text-black transition-all duration-300">
-    <span id="menuIcon">☰</span>
-    <span id="closeIcon" class="hidden">✕</span>
-</button>
+    <nav class="relative flex items-center gap-6">
+        <ul class="hidden lg:flex items-center gap-8 text-sm font-light text-neutral-400">
+            <li><a href="index.html" class="hover:text-cyan-400 transition">Home</a></li>
+            <li><a href="products.html" class="hover:text-cyan-400 transition">Products</a></li>
+            <li><a href="technology.html" class="text-cyan-400 font-bold">Technology</a></li>
+            <li><a href="solutions.html" class="hover:text-cyan-400 transition">Solutions</a></li>
+            <li><a href="company.html" class="hover:text-cyan-400 transition">Company</a></li>
+            <li><a href="news.html" class="hover:text-cyan-400 transition">News</a></li>
+            <li><a href="contact.html" class="px-5 py-2 rounded-full bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition">Request Quote</a></li>
+        </ul>
 
-    </div>
+        <button id="menuToggle" class="lg:hidden text-2xl text-cyan-400 w-10 h-10 border border-cyan-500 rounded-full flex items-center justify-center">
+            <span id="menuIcon">☰</span>
+        </button>
 
-
-<div id="mobileMenu"
-     class="fixed left-0 w-full mobile-overlay-menu bg-neutral-950 md:hidden
-            flex-col opacity-0 invisible transition-all duration-300
-            transform translate-x-full border-t border-neutral-800 z-40"
-     role="menu">
-
-    <a href="index.html" class="dropdown-link">Home</a>
-    <a href="products.html" class="dropdown-link">Products</a>
-    <a href="technology.html" class="dropdown-link font-bold text-cyan-500 bg-neutral-900/50">Technology</a>
-    <a href="solutions.html" class="dropdown-link">Solutions</a>
-    <a href="company.html" class="dropdown-link">Company</a>
-    <a href="news.html" class="dropdown-link">News</a>
-    <a href="contact.html" class="dropdown-quote-btn mt-4 rounded-xl">Request Quote</a>
-</div>
-
-
-
+        <div id="mobileDropdown" class="absolute top-full right-0 mt-4 w-56 bg-neutral-900 border border-neutral-700 rounded-xl opacity-0 invisible transition-all duration-300 z-[10002] shadow-2xl overflow-hidden">
+            <a href="index.html" class="dropdown-link">Home</a>
+            <a href="products.html" class="dropdown-link">Products</a>
+            <a href="technology.html" class="dropdown-link text-cyan-400 font-bold">Technology</a>
+            <a href="solutions.html" class="dropdown-link">Solutions</a>
+            <a href="company.html" class="dropdown-link">Company</a>
+            <a href="news.html" class="dropdown-link">News</a>
+            <a href="contact.html" class="dropdown-quote-btn">Request Quote</a>
+        </div>
+    </nav>
 </header>
 
-<section id="technology" class="pt-40 pb-24 px-6 flex-grow">
+<main class="flex-grow pt-44 pb-24 px-6">
     <div class="max-w-6xl mx-auto">
-        <h3 class="text-3xl font-bold mb-10 text-center">Core Technology Carousel</h3>
+        <h3 class="text-4xl font-black tracking-wide hero-slogan-gradient text-center">Core Technology</h3>
+
+        
         <div id="technologyContainer">
-            <button id="prevBtn" class="nav-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            <button id="prevBtn" class="nav-btn" aria-label="Previous">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </button>
 
             <div id="carousel">
-                <div id="card-A" data-card-id="A" data-index="0" class="tech-card is-active">
-                    <img src="images/technology/72V20A.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V20A-1.png" data-detail-text="TDLiD 72V 20Ah rechargeable lithium-ion battery has the following specifications: Capacity: 72V / 20Ah with LG NMC cells (Model: INR21700M50LT), configured in a 20S4P pack. Nominal Voltage: 73.8V; Nominal Capacity: 19.72Ah; Standard Charging Voltage: 83V. Charging Time: Approximately 3 hours with a recommended charging current of 5A.">
-                    <h4 class="font-semibold mb-4">72V 20Ah (Main View)</h4>
-                    <p class="text-neutral-400">
-                        TDLiD 72V 20Ah rechargeable lithium-ion battery has the following specifications: Capacity: 72V / 20Ah with LG NMC cells (Model: INR21700M50LT), configured in a 20S4P pack. Nominal Voltage: 73.8V; Nominal Capacity: 19.72Ah; Standard Charging Voltage: 83V. Charging Time: Approximately 3 hours with a recommended charging current of 5A.
+<div class="tech-card is-active" data-index="0">
+    <img src="images/technology/72V20A.png" 
+         data-popup-src="images/technology/72V20A-1.png"
+         class="mx-auto mb-6 max-h-[450px] object-contain cursor-pointer" 
+         data-detail="TDLiD’s 72V battery system utilizes LG NMC INR21700 cell architecture (20S4P/20S6P), delivering 73.8V nominal output, 19.7Ah–30.4Ah capacity options, fast 3-hour charging, and 50–60km real-world range within a compact 7.7kg form factor.
+Engineered for electric motorcycles and marine e-mobility, the pack supports 13–20A discharge, thermal-adaptive charging safety, and high energy density for commercial-grade EV performance.">
+    <h4 class="text-xl font-bold mb-4 text-cyan-400">72V 20Ah Battery</h4>
+    <p class="text-xl mb-4">Cell Model: LG INR21700M50VT</p>
+</div>
 
+<div class="tech-card" data-index="1">
+    <div class="max-h-[400px] overflow-y-auto pr-2 mb-4 custom-scrollbar">
+        <img src="images/technology/72V20A-2.png" class="mx-auto mb-4 max-h-64 object-contain cursor-pointer" data-detail="">
+        <img src="images/technology/72V20A-3.png" class="mx-auto mb-4 max-h-64 object-contain cursor-pointer" data-detail="">
+        <img src="images/technology/72V20A-5.png" class="mx-auto mb-4 max-h-64 object-contain cursor-pointer" data-detail="em.">
+        <img src="images/technology/72V20A-6.png" class="mx-auto mb-4 max-h-64 object-contain cursor-pointer" data-detail="">
+    </div>
+    <h4 class="text-xl font-bold mb-4 text-cyan-400">Smart Monitoring</h4>
+    <p class="text-xl mb-4 text-white-300">Advanced BMS integration for safety and longevity.</p>
+</div>
 
-                    </p>
-                </div>
-                
-                <div id="card-B" data-card-id="B" data-index="1" class="tech-card">
-                    <img src="images/technology/72V20A-2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V20A-2.png" data-detail-text="The TDLiD 72V 20Ah battery is designed with LG NMC cells and configured in a 20S4P arrangement, offering a nominal voltage of 73.8V. Standard charging time is approximately 3 hours.">
-                    <img src="images/technology/72V20A-3.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V20A-3.png" data-detail-text="Charging time: 3 hours, driving range: 50-60km, with optimal performance across diverse temperatures.">
-                    <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-5.png" data-detail-text="72V 20Ah Battery detailed view: System architecture diagram.">
-                        <img src="images/technology/72V20A-5.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image">
-                    </a>
-                    <a href="#" class="openBatteryDetail" data-detail-src="images/technology/72V20A-6.png" data-detail-text="72V 20Ah Battery detailed view: System architecture diagram.">
-                        <img src="images/technology/72V20A-6.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image">
-                    </a>
-                    <h4 class="font-semibold mb-4 text-center">Battery detailed image</h4>
-                    <p class="text-neutral-400 text-center">Click to see other views.</p>
-                </div>
+<style>
+    /* 스크롤바 스타일 */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+</style>
 
-                
-                <div id="card-C" data-card-id="C" data-index="2" class="tech-card">
-                    <img src="images/technology/YEDEA-1.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/YEDEA-1.png" data-detail-text="The TDLiD 72V 20Ah battery pack, configured in a 20S4P arrangement, offering a nominal voltage of 73.8V and a capacity of 19.72Ah.">
-                    <img src="images/technology/72V5A-charger-2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V5A-charger-2.png" data-detail-text="The TDLiD 72V-5A lithium battery charger is designed to pair seamlessly with this battery pack, providing optimal charging performance.">
-                    <h4 class="font-semibold mb-4 text-center">Charger and vehicle integration</h4>
-                    <p class="text-neutral-400 text-center">Image of the charger and battery system integrated into the vehicle..</p>
+                <div class="tech-card" data-index="2">
+                    <img src="images/technology/YEDEA-1.png" class="mx-auto mb-6 max-h-64 object-contain cursor-pointer" data-detail="The integration of TDLiD’s 72V high-energy-density lithium-ion battery system with YADEA electric motorcycles enables significantly enhanced power delivery, torque response, and real-world riding range through optimized voltage architecture and LG NMC cell chemistry.
+This pairing delivers superior thermal stability, rapid-charge capability, and drivetrain efficiency, positioning YADEA platforms for higher performance, extended duty cycles, and long-term commercial reliability.">
+                    <img src="images/technology/72V5A-charger-2.png" class="mx-auto mb-6 max-h-64 object-contain cursor-pointer" data-detail="The pairing of TDLiD’s 72V-5A smart lithium charger with the 72V-20Ah battery enables optimized charge efficiency, cell balancing accuracy, and extended cycle life through controlled current delivery and thermal-safe charging algorithms.
+This integration supports rapid turnaround charging, stable voltage retention, and reliable performance for daily EV use, reducing downtime while maximizing energy throughput and operational durability..">
+                    <h4 class="text-xl font-bold mb-4 text-cyan-400">EV Integration (Designed for YEDEA and other major EV platforms.)</h4>
                 </div>
             </div>
 
-            <button id="nextBtn" class="nav-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            <button id="nextBtn" class="nav-btn" aria-label="Next">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </button>
         </div>
-
     </div>
-</section>
+</main>
 
-
-<footer class="py-10 px-6 text-center text-neutral-500 border-t border-neutral-800">
+<footer class="py-10 text-center text-neutral-500 border-t border-neutral-900">
     © 2025 TDL Energy Indonesia. All rights reserved.
 </footer>
 
 <script>
-    // ----------------------------------------------------
-    // 1. 팝업 창 함수 (X 버튼 추가)
-    // ----------------------------------------------------
-    function openSolutionPopup(imageSrc, textContent, onCloseCallback) {
-        const modal = document.createElement('div');
-        modal.classList.add('modal-backdrop');
+    // 1. 메뉴 제어 로직 (개선된 버전)
+    const menuToggle = document.getElementById('menuToggle');
+    const dropdown = document.getElementById('mobileDropdown');
+    const menuIcon = document.getElementById('menuIcon');
 
-        modal.innerHTML = `
-            <div class="modal-content">
-                <button class="modal-close-x">X</button> <img src="${imageSrc}" alt="Detail Image" class="modal-image">
-                <p class="text-neutral-300" style="margin-top: 10px; font-size: 16px;">${textContent}</p>
-                <button class="modal-close-btn">Close</button>
-            </div>
-        `;
+    const toggleMenu = (show) => {
+        const isOpening = show !== undefined ? show : dropdown.classList.contains('invisible');
+        dropdown.classList.toggle('opacity-0', !isOpening);
+        dropdown.classList.toggle('invisible', !isOpening);
+        dropdown.classList.toggle('translate-y-2', !isOpening);
+        dropdown.classList.toggle('translate-y-0', isOpening);
+        menuIcon.innerText = isOpening ? '✕' : '☰';
+    };
 
-        const closeModal = () => {
-            document.body.removeChild(modal);
-            if (onCloseCallback) {
-                onCloseCallback();
-            }
-        };
+    menuToggle.onclick = (e) => { e.stopPropagation(); toggleMenu(); };
+    document.onclick = (e) => { if(!dropdown.contains(e.target)) toggleMenu(false); };
 
-        modal.querySelector('.modal-close-btn').addEventListener('click', closeModal);
-        modal.querySelector('.modal-close-x').addEventListener('click', closeModal); // 👈 'X' 버튼 이벤트 리스너 추가
-        
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-
-        document.body.appendChild(modal);
-    }
-
-    // ----------------------------------------------------
-    // 2. 페이지 넘김(3D Flip) 로직 -> 2D Slide/Fade 로직으로 수정
-    // ----------------------------------------------------
+    // 2. 슬라이딩 캐러셀 로직 (기존 기능 유지)
     let currentIndex = 0;
     const cards = document.querySelectorAll('.tech-card');
     const CARD_COUNT = cards.length;
-    const transitionDuration = 800; // CSS transition time (0.8s)
-    const autoFlipInterval = 3000; // 자동 전환 간격 (3초)
     let isAnimating = false;
-    let autoFlipTimer;
+    let autoTimer;
 
-    // 모든 카드를 기본 상태(숨김)로 재설정
-    function resetCards() {
-        cards.forEach(card => {
-            card.classList.remove('is-active');
-            card.style.transition = 'none';
-            card.style.transform = 'translateX(0)';
-            card.style.opacity = '0';
-            card.style.zIndex = '5';
-        });
-    }
-
-    // 새 카드를 보여주는 함수 (페이지 넘김 애니메이션 실행)
     function showCard(newIndex, direction) {
         if (isAnimating) return;
         isAnimating = true;
 
         const oldIndex = currentIndex;
         currentIndex = newIndex;
-        const currentCard = cards[currentIndex];
         const prevCard = cards[oldIndex];
-        
-        const slideDistance = 750; // tech-card width
+        const currentCard = cards[currentIndex];
+        const slideDistance = 800; 
 
-        // 1. 전환 효과 설정 및 Z-index 조정
-        cards.forEach(card => card.style.transition = `transform ${transitionDuration}ms ease-out, opacity ${transitionDuration}ms ease-out`);
-        
-        // Z-index: 이전 페이지(prevCard)가 새 페이지(currentCard)보다 위에 있어야 함
-        prevCard.style.zIndex = '15'; 
+        // 애니메이션 설정
+        prevCard.style.zIndex = '15';
         currentCard.style.zIndex = '10';
-
-        // 2. 새 카드를 준비: 중앙에 위치시키고 opacity는 1로 설정 (prevCard에 의해 가려진 상태)
-        currentCard.style.transform = 'translateX(0)';
         currentCard.style.opacity = '1';
         currentCard.classList.add('is-active');
 
-        // 3. 페이지 넘어가는 애니메이션 시작
         requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                if (direction === 'next') {
-                    // [수정] 다음 페이지로: 이전 카드를 왼쪽으로 밀어내며 (왼쪽 창으로 사라지는 효과) 페이드 아웃
-                    prevCard.style.transform = `translateX(-${slideDistance}px)`;
-                    prevCard.style.opacity = '0';
-                } else { // 'prev'
-                    // [수정] 이전 페이지로: 이전 카드를 오른쪽으로 밀어내며 페이드 아웃
-                    prevCard.style.transform = `translateX(${slideDistance}px)`;
-                    prevCard.style.opacity = '0';
-                }
-                // 새 카드는 중앙에 머무르며 prevCard가 사라지면서 자연스럽게 드러남
-            });
-        });
-
-        // 4. 애니메이션 종료 후 상태 정리
-        setTimeout(() => {
-            // 전환 효과 제거 
-            cards.forEach(card => card.style.transition = 'none'); 
-
-            // 이전 카드 완전히 숨김 및 위치 초기화
-            prevCard.style.opacity = '0'; 
-            prevCard.style.transform = 'translateX(0)'; // 다음 애니메이션을 위해 초기화
-            prevCard.classList.remove('is-active');
-
-            isAnimating = false;
-        }, transitionDuration);
-    }
-    
-    // 다음 페이지로 이동
-    function goToNext() {
-        let newIndex = (currentIndex + 1) % CARD_COUNT;
-        showCard(newIndex, 'next');
-    }
-    
-    // 이전 페이지로 이동
-    function goToPrev() {
-        let newIndex = (currentIndex - 1 + CARD_COUNT) % CARD_COUNT;
-        showCard(newIndex, 'prev');
-    }
-
-    // ----------------------------------------------------
-    // 3. 자동 전환 제어 함수
-    // ----------------------------------------------------
-
-    function startAutoFlip() {
-        stopAutoFlip(); 
-        autoFlipTimer = setInterval(goToNext, autoFlipInterval);
-    }
-    
-    function stopAutoFlip() {
-        if (autoFlipTimer) {
-            clearInterval(autoFlipTimer);
-            autoFlipTimer = null;
-        }
-    }
-
-
-    // ----------------------------------------------------
-    // 4. 초기화 및 이벤트 리스너 부착
-    // ----------------------------------------------------
-    document.addEventListener('DOMContentLoaded', () => {
-        
-        // 1. 초기 카드 표시 및 자동 전환 시작
-        resetCards();
-        cards[0].classList.add('is-active'); 
-        cards[0].style.opacity = '1';
-        cards[0].style.zIndex = '10';
-        
-        startAutoFlip();
-
-        // 2. 버튼 이벤트 리스너 부착 (클릭 시 자동 전환 일시 정지 후 재개)
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        
-        prevBtn.addEventListener('click', () => {
-            stopAutoFlip();
-            goToPrev();
-            // 수동으로 넘긴 후 1초 후에 자동 전환 재개
-            setTimeout(startAutoFlip, 1000); 
-        });
-
-        nextBtn.addEventListener('click', () => {
-            stopAutoFlip();
-            goToNext();
-            // 수동으로 넘긴 후 1초 후에 자동 전환 재개
-            setTimeout(startAutoFlip, 1000);
-        });
-
-        // 3. 카드 클릭 이벤트: 팝업 열기 시 자동 전환 일시 정지
-        cards.forEach(card => {
-            card.addEventListener('click', function(event) {
-                if (this.classList.contains('is-active') && !isAnimating) {
-                    if (event.target.closest('.tech-card-image') || event.target.closest('a.openBatteryDetail')) {
-                        stopAutoFlip(); 
-                        
-                        const link = event.target.closest('a') || event.target;
-                        const imageSrc = link.getAttribute('data-detail-src') || event.target.getAttribute('src');
-                        const textContent = link.getAttribute('data-detail-text') || 'No description available.';
-                        
-                        // 팝업 닫기 콜백 함수를 통해 자동 전환 재개
-                        openSolutionPopup(imageSrc, textContent, startAutoFlip); 
-                        
-                        event.stopPropagation();
-                        return;
-                    }
-                }
-            });
-        });
-        
-        // 4. 모바일 메뉴 토글 (기존 로직 유지)
-        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
-            document.getElementById('mobileMenu').classList.toggle('hidden');
-            document.getElementById('mobileMenu').classList.toggle('flex');
-        });
-    });
-
-
-// ----------------------------------------------------
-// 🌟 [NEW] 모바일 메뉴 공통 안정 구조 제어 로직 🌟
-// ----------------------------------------------------
-const menuBtn = document.getElementById('mobileMenuBtn');
-const dropdown = document.getElementById('mobileMenu');
-const menuIcon = document.getElementById('menuIcon');
-const closeIcon = document.getElementById('closeIcon');
-const allMenuLinks = dropdown.querySelectorAll('a');
-const body = document.body;
-
-const OPEN_CLASSES = ['opacity-100', 'translate-x-0'];
-const CLOSE_CLASSES = ['opacity-0', 'translate-x-full', 'hidden'];
-
-if (menuBtn && dropdown) {
-
-    const openMenu = () => {
-        dropdown.classList.remove(...CLOSE_CLASSES);
-        dropdown.classList.add(...OPEN_CLASSES, 'flex');
-        body.classList.add('overflow-hidden');
-        menuIcon.classList.add('hidden');
-        closeIcon.classList.remove('hidden');
-        menuBtn.setAttribute('aria-expanded', 'true');
-    };
-
-    const closeMenu = () => {
-        dropdown.classList.remove(...OPEN_CLASSES, 'flex');
-        dropdown.classList.add('opacity-0', 'translate-x-full');
-
-        setTimeout(() => {
-            if (dropdown.classList.contains('opacity-0')) {
-                dropdown.classList.add('hidden');
-                body.classList.remove('overflow-hidden');
+            if (direction === 'next') {
+                prevCard.style.transform = `translateX(-${slideDistance}px)`;
+            } else {
+                prevCard.style.transform = `translateX(${slideDistance}px)`;
             }
-        }, 300);
+            prevCard.style.opacity = '0';
+        });
 
-        menuIcon.classList.remove('hidden');
-        closeIcon.classList.add('hidden');
-        menuBtn.setAttribute('aria-expanded', 'false');
-    };
+        setTimeout(() => {
+            prevCard.classList.remove('is-active');
+            prevCard.style.transform = 'translateX(0)';
+            isAnimating = false;
+        }, 800);
+    }
 
-    menuBtn.addEventListener('click', () => {
-        const isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
-        isOpen ? closeMenu() : openMenu();
+    const startAuto = () => { stopAuto(); autoTimer = setInterval(() => showCard((currentIndex + 1) % CARD_COUNT, 'next'), 4000); };
+    const stopAuto = () => clearInterval(autoTimer);
+
+    document.getElementById('prevBtn').onclick = () => { stopAuto(); showCard((currentIndex - 1 + CARD_COUNT) % CARD_COUNT, 'prev'); startAuto(); };
+    document.getElementById('nextBtn').onclick = () => { stopAuto(); showCard((currentIndex + 1) % CARD_COUNT, 'next'); startAuto(); };
+
+// 모든 카드 내의 모든 이미지를 찾아 클릭 이벤트 연결
+cards.forEach(card => {
+    const allImages = card.querySelectorAll('img');
+    
+    allImages.forEach(img => {
+        img.onclick = function() {
+            if (typeof stopAuto === 'function') stopAuto(); // 자동 전환 멈춤
+            
+            // 핵심 수정: data-popup-src 속성이 있으면 사용하고, 없으면 기본 src 사용
+            const popupImgTarget = this.dataset.popupSrc || this.src;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="modal-close-x">✕</span>
+                    <img src="${popupImgTarget}" class="modal-image">
+                    <p class="mt-4 text-neutral-300">${this.dataset.detail || ''}</p>
+                    <button class="modal-close-btn">Close</button>
+                </div>`;
+                
+            const close = () => { 
+                document.body.removeChild(modal); 
+                if (typeof startAuto === 'function') startAuto(); // 팝업 닫으면 다시 시작
+            };
+            
+            modal.querySelector('.modal-close-btn').onclick = close;
+            modal.querySelector('.modal-close-x').onclick = close;
+            modal.onclick = (e) => { if(e.target === modal) close(); };
+            document.body.appendChild(modal);
+        };
     });
+});
 
-    allMenuLinks.forEach(link => {
-        link.addEventListener('click', closeMenu);
-    });
-
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 768 && menuBtn.getAttribute('aria-expanded') === 'true') {
-            closeMenu();
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') {
-            closeMenu();
-            menuBtn.focus();
-        }
-    });
-}
-
-
+    startAuto();
 </script>
-
 </body>
 </html>

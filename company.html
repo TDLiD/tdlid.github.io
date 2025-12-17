@@ -7,14 +7,17 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 🌟 로고 크기 통일화를 위한 :root 변수 (유지) 🌟 */
+        /* 🌟 로고 크기 통일화를 위한 :root 변수 🌟 */
         :root {
-            --header-logo-font-size: 8.2rem;       /* 상단 TDLiD 크기 */
-            --header-logo-font-weight: 900;        /* 상단 TDLiD 두께 */
-            --header-subtitle-font-size: 1.50rem;  /* "TDL ENERGY INDONESIA" 크기 */
-            --header-subtitle-font-weight: 800;    /* 두께 */
+            --header-logo-font-size: 8.2rem;
+            --header-logo-font-weight: 900;
+            --header-subtitle-font-size: 1.50rem;
+            --header-subtitle-font-weight: 800;
         }
         
         /* Spotlight background */
@@ -29,10 +32,7 @@
         }
 
         /* 3 Image Stage */
-        .image-stage {
-            position: relative;
-            z-index: 1;
-        }
+        .image-stage { position: relative; z-index: 1; }
         .image-card {
             position: relative;
             border-radius: 1.5rem;
@@ -46,131 +46,87 @@
             min-height: 200px;
         }
         .image-card img {
-            max-height: 100%;
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: transform 0.6s ease;
-            transform-origin: center center;
-            position: relative;
-            z-index: 1;
-            border-radius: 1.5rem;
+            max-height: 100%; width: 100%; height: auto;
+            display: block; transition: transform 0.6s ease;
+            transform-origin: center center; position: relative;
+            z-index: 1; border-radius: 1.5rem;
         }
-        /* hover 시 진짜 원본 사이즈로 확장 */
-        .image-card.hover-expand:hover img {
-            transform: scale(1.6);
-            z-index: 99;
-        }
+        .image-card.hover-expand:hover img { transform: scale(1.6); z-index: 99; }
 
-        .image-overlay{
-            position:absolute;
-            inset:0;
-            background:linear-gradient(to top, rgba(0,0,0,.75), transparent 60%);
-            opacity:.0;
-            transition:.4s ease;
-        }
-        .image-card:hover .image-overlay {
-            opacity:1;
-        }
-
-        /* Floating text */
-        .float-in {
-            animation: floatIn 1s ease both;
-        }
+        /* Floating text animation */
+        .float-in { animation: floatIn 1s ease both; }
         @keyframes floatIn {
             from {opacity:0;transform:translateY(50px)}
             to {opacity:1;transform:translateY(0)}
         }
         
-        /* ---------------------------------------------------- */
-        /* 🌟 [NEW] 모바일 메뉴 스타일 (index.html과 통일) 🌟 */
-        /* ---------------------------------------------------- */
-        .mobile-overlay-menu {
-            /* Header height is approx 68px (px-6 py-4) */
-            height: calc(100vh - 68px); 
-            top: 68px; /* Set just below the header */
-        }
-        /* [NEW] Scroll lock for body */
-        .overflow-hidden {
-            overflow: hidden;
-        }
-        
+        /* 드롭다운 스타일 (contact/news와 통일) */
         .dropdown-link {
             padding: 12px 20px;
-            text-align: right;
-            font-size: 1.125rem;
+            display: block;
             color: #ccc;
-            transition: background-color 0.2s, color 0.2s;
+            transition: background 0.2s;
             border-bottom: 1px solid #262626;
         }
-
-        .dropdown-link:hover {
-            background-color: #0d383d; 
-            color: #38bdf8;
-        }
-            
+        .dropdown-link:hover { background: #1f2937; color: #22d3ee; }
         .dropdown-quote-btn {
-            padding: 15px 20px;
-            text-align: center;
-            background-color: #38bdf8; 
-            color: #0a0a0a;
+            padding: 12px 20px;
+            display: block;
+            background: #22d3ee;
+            color: #000;
             font-weight: 600;
-            border-radius: 0 0 10px 10px;
-            transition: background-color 0.2s;
-        }
-
-        .dropdown-quote-btn:hover {
-            background-color: #67e8f9;
+            text-align: center;
+            border-radius: 0 0 11px 11px;
         }
     </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative"> 
 
-<header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
-    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4"> 
+<header class="fixed top-0 left-0 w-full z-[10001] bg-neutral-950/90 backdrop-blur-sm border-b border-neutral-800 p-4 flex justify-between items-center">
+    
+    <a href="index.html" class="flex items-center gap-2 md:gap-3 text-xl font-bold shrink-0">
+        <img src="images/logo/logo.png" class="h-8 md:h-10 w-auto">
+        <span class="animated-logo-text text-xs md:text-base whitespace-nowrap">TDL ENERGY INDONESIA</span>
+    </a>
 
-        <a href="index.html" class="block">
-            <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide"> 
-                <img src="images/logo/logo.png" alt="TDL Energy Logo" class="header-logo object-contain"> 
-                <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
-            </h1>
-        </a>
-
-        <div class="flex items-center">
-            
-            <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
-                <a href="index.html" class="nav-link hover:text-cyan-400">Home</a>
-                <a href="products.html" class="nav-link hover:text-cyan-400">Products</a>
-                <a href="technology.html" class="nav-link hover:text-cyan-400">Technology</a>
-                <a href="solutions.html" class="nav-link hover:text-cyan-400">Solutions</a>
-                <a href="company.html" class="nav-link text-cyan-500 font-bold hover:text-cyan-400">Company</a>
-                <a href="news.html" class="nav-link hover:text-cyan-400">News</a>
-                <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold transition">
+    <nav class="relative flex items-center gap-2 md:gap-6">
+        <ul class="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-light whitespace-nowrap">
+            <li><a href="index.html" class="hover:text-cyan-400">Home</a></li>
+            <li><a href="products.html" class="hover:text-cyan-400">Products</a></li>
+            <li><a href="technology.html" class="hover:text-cyan-400">Technology</a></li>
+            <li><a href="solutions.html" class="hover:text-cyan-400">Solutions</a></li>
+            <li><a href="company.html" class="text-cyan-400 font-bold">Company</a></li>
+            <li><a href="news.html" class="hover:text-cyan-400">News</a></li>
+            <li>
+                <a href="contact.html"
+                    class="px-3 py-2 md:px-5 md:py-2 rounded-full bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition text-xs md:text-sm whitespace-nowrap">
                     Request Quote
                 </a>
-            </nav>
-            
-            <button id="mobileMenuBtn" aria-expanded="false" class="md:hidden text-2xl text-cyan-400 p-2 border border-cyan-500 rounded-full hover:bg-cyan-500 hover:text-black transition-all duration-300">
-                <span id="menuIcon">☰</span>
-                <span id="closeIcon" class="hidden">✕</span>
-            </button>
+            </li>
+        </ul>
+
+        <button id="menuToggleBtn"
+            class="lg:hidden text-2xl text-cyan-400 w-10 h-10 flex items-center justify-center border border-cyan-500 rounded-full hover:bg-cyan-500 hover:text-black transition-all duration-300"
+            aria-expanded="false"
+            aria-controls="dropdownMenu">
+            <span id="menuIcon">☰</span>
+        </button>
+
+        <div id="dropdownMenu"
+            class="absolute top-full right-0 mt-4 w-48 bg-neutral-900 border border-neutral-700
+                   rounded-xl shadow-xl flex flex-col opacity-0 invisible translate-y-[-10px]
+                   transition-all duration-300"
+            role="menu">
+            <a href="index.html" class="dropdown-link">Home</a>
+            <a href="products.html" class="dropdown-link">Products</a>
+            <a href="technology.html" class="dropdown-link">Technology</a>
+            <a href="solutions.html" class="dropdown-link">Solutions</a>
+            <a href="company.html" class="dropdown-link text-cyan-400 font-bold">Company</a>
+            <a href="news.html" class="dropdown-link">News</a>
+            <a href="contact.html" class="dropdown-quote-btn">Request Quote</a>
         </div>
-    </div>
-    
-    <div id="mobileMenu" 
-         class="fixed left-0 w-full mobile-overlay-menu bg-neutral-950 md:hidden
-                flex-col opacity-0 invisible transition-all duration-300 transform translate-x-full
-                border-t border-neutral-800 z-40" 
-         role="menu">
-        <a href="index.html" class="dropdown-link">Home</a>
-        <a href="products.html" class="dropdown-link">Products</a>
-        <a href="technology.html" class="dropdown-link">Technology</a>
-        <a href="solutions.html" class="dropdown-link">Solutions</a>
-        <a href="company.html" class="dropdown-link font-bold text-cyan-500 bg-neutral-900/50">Company</a>
-        <a href="news.html" class="dropdown-link">News</a>
-        <a href="contact.html" class="dropdown-quote-btn mt-4 rounded-xl">Request Quote</a>
-    </div>
+    </nav>
 </header>
 
 <main class="relative z-10 pt-32 pb-24 max-w-7xl mx-auto px-6">
@@ -182,21 +138,19 @@
         </h1>
     </div>
 
-
-<section class="mb-16">
-<div class="image-stage flex flex-col md:flex-row gap-8 justify-center">
-    <div class="image-card hover-expand">
-        <img src="images/company1.png">
-    </div>
-    <div class="image-card hover-expand">
-        <img src="images/company2.png">
-    </div>
-    <div class="image-card hover-expand">
-        <img src="images/company3.png">
-    </div>
-</div>
-</section>
-
+    <section class="mb-16">
+        <div class="image-stage flex flex-col md:flex-row gap-8 justify-center">
+            <div class="image-card hover-expand">
+                <img src="images/company1.png">
+            </div>
+            <div class="image-card hover-expand">
+                <img src="images/company2.png">
+            </div>
+            <div class="image-card hover-expand">
+                <img src="images/company3.png">
+            </div>
+        </div>
+    </section>
 
     <section class="max-w-7xl mx-auto space-y-16 text-lg text-center">
         <div class="float-in">
@@ -204,19 +158,17 @@
         </div>
 
         <div class="grid md:grid-cols-3 gap-8">
-
             <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-cyan-400/40 transition">
                 <h3 class="text-xl font-bold text-cyan-300 mb-4">MISSION</h3>
                 <p class="text-neutral-300">
                     “NO MORE CARBON” <br>Deliver the best products and services to our customers.<br>Promote leadership consistently.<br>Create and Innovate value
-
                 </p>
             </div>
 
             <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-purple-400/40 transition">
                 <h3 class="text-xl font-bold text-purple-300 mb-4">TECHNOLOGY</h3>
                 <p class="text-neutral-300">
-                    TDLiD's high-density lithium-ion batteries, combined with an AI-based BMS, optimize performance, improve power and range, and maintain thermal stability and safety. Applied to electric motorcycles, they provide strong acceleration, extended range, and reliable operation under varied conditions.
+                    TDLiD's high-density lithium-ion batteries, combined with an AI-based BMS, optimize performance, improve power and range, and maintain thermal stability and safety.
                 </p>
             </div>
 
@@ -224,100 +176,53 @@
                 <h3 class="text-xl font-bold text-blue-300 mb-4">VISION</h3>
                 <p class="text-neutral-300">
                     To provide EV motors and batteries that enhance lifestyles and contribute to a better environment.
-
                 </p>
             </div>
         </div>
     </section>
-
-
 </main>
 
-<div id="cursor-layer">
-    <div id="cursor-spot"></div>
-</div>
-
-<script src="js/main.js"></script>
+<footer class="py-10 px-6 text-center text-neutral-500 border-t border-neutral-800">
+    © 2025 TDL Energy Indonesia. All rights reserved.
+</footer>
 
 <script>
-    // ----------------------------------------------------
-    // [NEW] 메뉴 제어 로직 (Click / 반응형 안정화) 
-    // ----------------------------------------------------
-
-    const menuBtn = document.getElementById('mobileMenuBtn');
-    const dropdown = document.getElementById('mobileMenu');
-    const menuIcon = document.getElementById('menuIcon');
-    const closeIcon = document.getElementById('closeIcon');
-    const allMenuLinks = dropdown.querySelectorAll('a');
-
-    // Transition classes for smooth open/close
-    const OPEN_CLASSES = ['opacity-100', 'translate-x-0'];
-    const CLOSE_CLASSES = ['opacity-0', 'translate-x-full', 'hidden'];
+document.addEventListener("DOMContentLoaded", function() {
+    const menuBtn = document.getElementById("menuToggleBtn");
+    const dropdown = document.getElementById("dropdownMenu");
+    const menuIcon = document.getElementById("menuIcon");
 
     if (menuBtn && dropdown) {
-        
-        // Function to open the menu
-        const openMenu = () => {
-            dropdown.classList.remove(...CLOSE_CLASSES);
-            dropdown.classList.add(...OPEN_CLASSES, 'flex');
-            document.body.classList.add('overflow-hidden');
-            menuIcon.classList.add('hidden');
-            closeIcon.classList.remove('hidden');
-            menuBtn.setAttribute('aria-expanded', 'true');
-        };
+        menuBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const isOpen = dropdown.classList.contains("opacity-100");
 
-        // Function to close the menu
-        const closeMenu = () => {
-            // Start transition
-            dropdown.classList.remove(...OPEN_CLASSES, 'flex');
-            dropdown.classList.add('opacity-0', 'translate-x-full');
-            
-            // Hide and unlock scroll after transition
-            setTimeout(() => {
-                // Only add 'hidden' if the menu is actually transitioning closed
-                if (dropdown.classList.contains('opacity-0')) {
-                    dropdown.classList.add('hidden'); 
-                    document.body.classList.remove('overflow-hidden');
-                }
-            }, 300); // Wait for transition duration
-
-            menuIcon.classList.remove('hidden');
-            closeIcon.classList.add('hidden');
-            menuBtn.setAttribute('aria-expanded', 'false');
-        };
-
-
-        menuBtn.addEventListener('click', () => {
-            const isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
-            if (isOpen) {
-                closeMenu();
+            if (!isOpen) {
+                dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
+                dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                menuIcon.innerText = "✕";
+                menuBtn.setAttribute("aria-expanded", "true");
             } else {
-                openMenu();
-            }
-        });
-
-        // 메뉴 링크 클릭 시 메뉴 닫기 (UX 개선)
-        allMenuLinks.forEach(link => {
-            link.addEventListener('click', closeMenu);
-        });
-
-        // 화면 크기가 md(768px) 이상으로 변경되면 모바일 메뉴 강제 닫기 (반응형 안정화)
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768 && menuBtn.getAttribute('aria-expanded') === 'true') {
                 closeMenu();
             }
         });
-        
-        // ESC 키로 닫기 (접근성)
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') {
-                closeMenu();
-                menuBtn.focus();
-            }
+
+        function closeMenu() {
+            dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+            dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
+            menuIcon.innerText = "☰";
+            menuBtn.setAttribute("aria-expanded", "false");
+        }
+
+        document.addEventListener("click", (e) => {
+            if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
+        });
+        window.addEventListener("resize", () => {
+            if (window.innerWidth >= 1024) closeMenu();
         });
     }
+});
 </script>
-
 
 </body>
 </html>

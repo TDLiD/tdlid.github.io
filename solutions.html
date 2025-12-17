@@ -1,496 +1,366 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Solutions | TDLiD</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="css/main.css">
+    <meta charset="UTF-8">
+    <title>Solutions | TDLiD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<style>
-    /* 팝업 모달 스타일 */
-    .modal-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.85);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-    .modal-content {
-        background: #171717; /* Dark background */
-        color: #ddd;
-        padding: 30px;
-        border-radius: 12px;
-        max-width: 90%;
-        max-height: 90%;
-        text-align: center;
-        border: 1px solid #333;
-        position: relative; /* 👈 X 버튼의 절대 위치 지정을 위해 추가 */
-    }
-    .modal-image {
-        max-width: 100%;
-        max-height: 80vh; /* 화면 높이에 맞춰 조정 */
-        object-fit: contain;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        cursor: zoom-out;
-    }
-    .modal-close-btn {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #06b6d4; /* cyan-500 */
-        color: black;
-        font-weight: 600;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .modal-close-btn:hover {
-        background-color: #0891b2; /* cyan-600 */
-    }
-    
-    /* 팝업 닫기 "x" 버튼 스타일 추가 */
-    .modal-close-x {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        background: none;
-        border: none;
-        color: #fff;
-        font-size: 24px;
-        font-weight: bold;
-        cursor: pointer;
-        padding: 5px;
-        line-height: 1;
-        transition: color 0.2s;
-        z-index: 1010;
-        opacity: 0.7;
-    }
-    .modal-close-x:hover {
-        color: #06b6d4; /* cyan-500 */
-        opacity: 1;
-    }
+    <style>
+        /* 1. 팝업 모달 스타일 */
+        .modal-backdrop {
+            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.9);
+            display: flex; justify-content: center; align-items: center; z-index: 10002;
+        }
+        .modal-content {
+            background: #171717; color: #ddd; padding: 30px; border-radius: 12px;
+            max-width: 90%; max-height: 90%; text-align: center; border: 1px solid #333; position: relative;
+        }
+        .modal-image { max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px; margin-bottom: 20px; }
+        .modal-close-btn { margin-top: 20px; padding: 10px 24px; background: #06b6d4; color: black; font-weight: 600; border-radius: 50px; cursor: pointer; transition: 0.2s; }
+        .modal-close-x { position: absolute; top: 15px; right: 20px; color: #fff; font-size: 28px; cursor: pointer; opacity: 0.6; }
 
-    /* Stack Container 스타일: 가로 스크롤 허용 */
-    #stackContainer::-webkit-scrollbar {
-        display: none; /* Chrome, Safari, Opera 숨김 */
-    }
-    #stackContainer {
-        -ms-overflow-style: none; /* IE, Edge 숨김 */
-        scrollbar-width: none; /* Firefox 숨김 */
-    }
+        /* 2. 캐러셀 구조 - 기술 페이지와 동일하게 설정 */
+        .carousel-wrapper {
+            position: relative; width: 100%; overflow: hidden; padding: 40px 0;
+        }
 
-    /* 포커스 영역의 제목 및 설명 스타일 */
-    #focusArea h4 {
-        font-size: 1.5rem; /* Large title in focus area */
-    }
-    #focusArea p {
-        font-size: 1rem;
-    }
-    
-    /* 포커스 영역 이미지 스타일 */
-    .focus-image-container img {
-        height: auto;
-        object-fit: contain;
-        cursor: pointer;
-    }
-    
-    /* ---------------------------------------------------- */
-    /* 🌟 [NEW] 모바일 메뉴 스타일 (공통 안정 구조) 🌟 */
-    /* ---------------------------------------------------- */
-    .mobile-overlay-menu {
-        /* Header height is approx 68px (px-6 py-4) */
-        height: calc(100vh - 68px); 
-        top: 68px; /* Set just below the header */
-        right: 0;
-        position: fixed; 
-    }
-    /* [NEW] Scroll lock for body */
-    .overflow-hidden {
-        overflow: hidden;
-    }
+        #solutionsContainer {
+            perspective: 1400px; /* 입체감 부여 */
+            width: 100%; max-width: 850px; height: 650px; margin: 0 auto; position: relative;
+        }
 
-    .dropdown-link {
-        padding: 12px 20px;
-        text-align: right;
-        font-size: 1.125rem;
-        color: #ccc;
-        transition: background-color 0.2s, color 0.2s;
-        border-bottom: 1px solid #262626;
-    }
+        .solution-card {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+            padding: 2.5rem; background-color: #111; border: 1px solid #333; border-radius: 1.5rem;
+            opacity: 0; pointer-events: none; z-index: 5;
+            /* 🌟 핵심: 기술 페이지와 동일한 ease-out 곡선 및 시간 (0.8s) */
+            transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+        }
 
-    .dropdown-link:hover {
-        background-color: #0d383d; 
-        color: #38bdf8;
-    }
-        
-    .dropdown-quote-btn {
-        padding: 15px 20px;
-        text-align: center;
-        background-color: #38bdf8; 
-        color: #0a0a0a;
-        font-weight: 600;
-        border-radius: 0 0 10px 10px;
-        transition: background-color 0.2s;
-    }
+        /* 활성화 상태 */
+        .solution-card.is-active {
+            opacity: 1; pointer-events: auto; z-index: 10;
+            transform: translateX(0);
+            border-color: #06b6d4;
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
+        }
 
-    .dropdown-quote-btn:hover {
-        background-color: #67e8f9;
-    }
+        /* 내비게이션 버튼 */
+        .nav-btn { 
+            position: absolute; top: 50%; transform: translateY(-50%); z-index: 100; 
+            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
+            background: rgba(20, 20, 20, 0.8); border: 1px solid #333; border-radius: 50%; 
+            color: #06b6d4; transition: all 0.3s;
+        }
+        .nav-btn:hover { background: #06b6d4; color: #000; transform: translateY(-50%) scale(1.1); }
+        #prevBtn { left: 40px; } #nextBtn { right: 40px; }
 
-</style>
+        @media (max-width: 1024px) {
+            #solutionsContainer { width: 90%; height: auto; min-height: 550px; }
+            #prevBtn { left: 10px; } #nextBtn { right: 10px; }
+        }
+
+/* 드롭다운 메뉴 세로 리스트 디자인 */
+#dropdownMenu {
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    width: 220px;
+    background-color: #111111; /* 배경색 */
+    border: 1px solid #333;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.dropdown-link { 
+    padding: 14px 20px; 
+    display: block; 
+    color: #cccccc; 
+    font-size: 14px;
+    border-bottom: 1px solid #222; 
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.dropdown-link:hover { 
+    background-color: #1a1a1a; 
+    color: #22d3ee; /* 사이언 색상 */
+}
+
+/* Request Quote 버튼 스타일 */
+.dropdown-quote-btn { 
+    padding: 14px 20px; 
+    display: block; 
+    background-color: #22d3ee; 
+    color: #000; 
+    font-weight: 600; 
+    text-align: center;
+    transition: background 0.2s;
+}
+
+.dropdown-quote-btn:hover {
+    background-color: #06b6d4;
+}
+
+
+/* 2. 캐러셀 구조 수정 */
+.carousel-wrapper {
+    position: relative; width: 100%; overflow: hidden; padding: 40px 0;
+}
+
+#solutionsContainer {
+    perspective: 1400px;
+    width: 100%; max-width: 850px; 
+    /* height: 650px; <- 삭제: 고정 높이 제거 */
+    margin: 0 auto; position: relative;
+    display: grid; /* 카드들을 겹치기 위한 그리드 설정 */
+}
+
+.solution-card {
+    grid-area: 1 / 1 / 2 / 2; /* 모든 카드를 한 위치에 겹침 */
+    width: 100%; 
+    height: auto; /* 콘텐츠에 맞게 높이 조절 */
+    padding: 2.5rem; background-color: #111; border: 1px solid #333; border-radius: 1.5rem;
+    opacity: 0; pointer-events: none; z-index: 5;
+    transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+}
+
+/* 활성화 상태: 높이를 차지하도록 설정 */
+.solution-card.is-active {
+    position: relative; /* absolute 해제 효과: 부모 높이에 영향 줌 */
+    opacity: 1; pointer-events: auto; z-index: 10;
+    transform: translateX(0);
+    border-color: #06b6d4;
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
+}
+
+/* 이미지 반응형 높이 조절 */
+.solution-card img {
+    max-height: 400px; /* 너무 커지는 것 방지 */
+    width: 100%;
+    object-contain: contain;
+}
+
+/* 내비게이션 버튼 (좌우 여백 조정) */
+.nav-btn { 
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 100; 
+    width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
+    background: rgba(20, 20, 20, 0.8); border: 1px solid #333; border-radius: 50%; 
+    color: #06b6d4; transition: all 0.3s;
+}
+
+@media (max-width: 1024px) {
+    #solutionsContainer { width: 95%; height: auto; min-height: auto; }
+    .solution-card { padding: 1.5rem; }
+    .solution-card img { max-height: 250px; } /* 모바일에서 이미지 높이 축소 */
+    #prevBtn { left: 5px; } /* 버튼이 창 밖으로 나가지 않게 조정 */
+    #nextBtn { right: 5px; }
+}
+
+    </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
-<header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
-    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+<header class="fixed top-0 left-0 w-full z-[10001] bg-neutral-950/90 backdrop-blur-sm border-b border-neutral-800 p-4 flex justify-between items-center">
+    <a href="index.html" class="flex items-center gap-3 text-xl font-bold shrink-0">
+        <img src="images/logo/logo.png" class="h-10 w-auto">
+        <span class="animated-logo-text uppercase">TDL ENERGY INDONESIA</span>
+    </a>
 
-        <a href="index.html" class="block">
-            <h1 class="flex items-center gap-3 text-xl font-bold tracking-wide">
-                <img src="images/logo/logo.png" alt="TDL Energy Logo" class="header-logo object-contain">
-                <span class="animated-logo-text">TDL ENERGY INDONESIA</span>
-            </h1>
-        </a>
+    <nav class="relative flex items-center gap-6">
+        <ul class="hidden lg:flex items-center gap-8 text-sm font-light text-neutral-400">
+            <li><a href="index.html" class="hover:text-cyan-400 transition">Home</a></li>
+            <li><a href="products.html" class="hover:text-cyan-400 transition">Products</a></li>
+            <li><a href="technology.html" class="hover:text-cyan-400 transition">Technology</a></li>
+            <li><a href="solutions.html" class="text-cyan-400 font-bold">Solutions</a></li>
+            <li><a href="company.html" class="hover:text-cyan-400 transition">Company</a></li>
+            <li><a href="news.html" class="hover:text-cyan-400 transition">News</a></li>
+            <li><a href="contact.html" class="px-5 py-2 rounded-full bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition">Request Quote</a></li>
+        </ul>
 
-        <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
-            <a href="index.html" class="nav-link hover:text-cyan-400">Home</a>
-            <a href="products.html" class="nav-link hover:text-cyan-400">Products</a>
-            <a href="technology.html" class="nav-link hover:text-cyan-400">Technology</a>
-            <a href="solutions.html" class="nav-link text-white font-bold hover:text-cyan-400">Solutions</a>
-            <a href="company.html" class="nav-link hover:text-cyan-400">Company</a>
-            <a href="news.html" class="nav-link hover:text-cyan-400">News</a>
-            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold transition">
-                Request Quote
-            </a>
-        </nav>
-
-        <button id="mobileMenuBtn" aria-expanded="false" class="md:hidden text-2xl text-cyan-400 p-2 border border-cyan-500 rounded-full hover:bg-cyan-500 hover:text-black transition-all duration-300">
+        <button id="menuToggleBtn" class="lg:hidden text-2xl text-cyan-400 w-10 h-10 border border-cyan-500 rounded-full flex items-center justify-center">
             <span id="menuIcon">☰</span>
-            <span id="closeIcon" class="hidden">✕</span>
         </button>
-    </div>
 
-    <div id="mobileMenu" 
-         class="fixed left-0 w-full mobile-overlay-menu bg-neutral-950 md:hidden
-                flex-col opacity-0 invisible transition-all duration-300 transform translate-x-full
-                border-t border-neutral-800 z-40" 
-         role="menu">
-        <a href="index.html" class="dropdown-link">Home</a>
-        <a href="products.html" class="dropdown-link">Products</a>
-        <a href="technology.html" class="dropdown-link">Technology</a>
-        <a href="solutions.html" class="dropdown-link font-bold text-cyan-500 bg-neutral-900/50">Solutions</a>
-        <a href="company.html" class="dropdown-link">Company</a>
-        <a href="news.html" class="dropdown-link">News</a>
-        <a href="contact.html" class="dropdown-quote-btn mt-4 rounded-xl">Request Quote</a>
-    </div>
+        <div id="dropdownMenu" class="absolute top-full right-0 mt-4 w-56 bg-neutral-900 border border-neutral-700 rounded-xl opacity-0 invisible transition-all duration-300 z-[10002] shadow-2xl overflow-hidden">
+            <a href="index.html" class="dropdown-link">Home</a>
+            <a href="products.html" class="dropdown-link">Products</a>
+            <a href="technology.html" class="dropdown-link">Technology</a>
+            <a href="solutions.html" class="dropdown-link text-cyan-400 font-bold">Solutions</a>
+            <a href="company.html" class="dropdown-link">Company</a>
+            <a href="news.html" class="dropdown-link">News</a>
+            <a href="contact.html" class="dropdown-quote-btn">Request Quote</a>
+        </div>
+    </nav>
 </header>
 
-<main class="flex-grow pt-32 pb-10 px-6">
-    <div class="max-w-6xl mx-auto">
-        <h3 class="text-3xl font-bold mb-10">Custom Solutions</h3>
+<main class="flex-grow pt-44 pb-20">
+    <h3 class="text-4xl font-black tracking-wide hero-slogan-gradient">Custom Solutions</h3>
 
-        <div id="focusArea" class="mb-8 p-6 bg-neutral-900 rounded-xl border border-cyan-500/30 transition-all duration-500 shadow-xl">
-            <p class="text-center text-neutral-500 py-10">Select a solution below to view details.</p>
-        </div>
+    <div class="carousel-wrapper">
+        <button id="prevBtn" class="nav-btn">❮</button>
+        <button id="nextBtn" class="nav-btn">❯</button>
 
-        <div id="stackContainer" class="flex gap-4 overflow-x-auto pb-4 justify-center">
-        </div>
+        <div id="solutionsContainer">
+            </div>
+    </div>
+
+    <div id="stackContainer" class="flex gap-4 overflow-x-auto pb-4 mt-12 justify-center px-6">
     </div>
 </main>
 
-
-<footer class="py-4 px-6 text-center text-neutral-500 border-t border-neutral-800">
+<footer class="py-10 text-center text-neutral-500 border-t border-neutral-900">
     © 2025 TDL Energy Indonesia. All rights reserved.
 </footer>
 
 <script>
-    // ----------------------------------------------------
-    // 1. 솔루션 데이터 정의
-    // ----------------------------------------------------
     const solutionsData = [
         { id: 'A', title: 'A. EV Motorcycle Conversion Business', desc: 'TDLID supplies electric motorcycle conversion kits and battery packs to local governments and universities in Indonesia.', images: ['images/solutions/solution1.png', 'images/solutions/solution1-1.png'] },
         { id: 'B', title: 'B. Employee Ownership Program', desc: 'TDLID is the initiator of this Program. TDLID announced the \'Employee Ownership Program\' with GESITS and MOTORIZ on April 30, 2024.', images: ['images/solutions/solution2.png', 'images/solutions/solution2-1.png'] },
         { id: 'C', title: 'C. Lease and Rental', desc: 'TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles.', images: ['images/solutions/solution3.png', 'images/solutions/solution3-1.png'] },
-        { id: 'D', title: 'D. Solar home charging', desc: 'TDLiD offers solar power generation systems that can be utilized by individual households and small businesses to achieve true carbon zero in Indonesia\'s EV ecosystem.', images: ['images/solutions/solution4.png', 'images/solutions/solution4-1.png'] },
-        { id: 'E', title: 'E. Battery Recycling', desc: 'TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries, while providing a business model that can achieve true zero carbon in the electric motorcycle ecosystem.', images: ['images/solutions/solution5.png', 'images/solutions/solution5-1.png'] }
+        { id: 'D', title: 'D. Solar home charging', desc: 'TDLiD offers solar power generation systems that can be utilized by individual households and small businesses.', images: ['images/solutions/solution4.png', 'images/solutions/solution4-1.png'] },
+        { id: 'E', title: 'E. Battery Recycling', desc: 'TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries.', images: ['images/solutions/solution5.png', 'images/solutions/solution5-1.png'] }
     ];
 
-    const focusArea = document.getElementById('focusArea');
+    let currentIndex = 0;
+    const container = document.getElementById('solutionsContainer');
     const stackContainer = document.getElementById('stackContainer');
-    let currentFocusId = null;
     let isAnimating = false;
-    
-    // 🌟 자동 전환 타이머 관련 변수 🌟
-    let autoChangeInterval;
-    const AUTO_CHANGE_TIME = 3000; // 3초
-    const transitionDuration = 800; // 0.8s (슬라이드/페이드 속도)
-    const slideDistance = 100; // 100px 왼쪽으로 슬라이드
+    let autoTimer;
 
-    // ----------------------------------------------------
-    // 2. 팝업 창 함수 (X 버튼 추가)
-    // ----------------------------------------------------
-    function openSolutionPopup(imageSrc, textContent) {
+    function openPopup(imgSrc, detail) {
+        stopAuto();
         const modal = document.createElement('div');
-        modal.classList.add('modal-backdrop');
-
-        // 👈 모달 내용에 'X' 버튼 추가
-        modal.innerHTML = `
-            <div class="modal-content">
-                <button class="modal-close-x">X</button> 
-                <img src="${imageSrc}" alt="Solution Detail" class="modal-image">
-                <p style="margin-top: 10px; font-size: 16px;">${textContent}</p>
-                <button class="modal-close-btn">Close</button>
-            </div>
-        `;
-
-        const closeModal = () => {
-            document.body.removeChild(modal);
-        };
-        
-        modal.querySelector('.modal-close-btn').addEventListener('click', closeModal);
-        modal.querySelector('.modal-close-x').addEventListener('click', closeModal); // 👈 'X' 버튼 이벤트 리스너 추가
-        
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-
+        modal.className = 'modal-backdrop';
+        modal.innerHTML = `<div class="modal-content"><span class="modal-close-x">✕</span><img src="${imgSrc}" class="modal-image"><p class="mt-4 text-neutral-300">${detail}</p><button class="modal-close-btn">Close</button></div>`;
+        const close = () => { document.body.removeChild(modal); startAuto(); };
+        modal.querySelector('.modal-close-btn').onclick = close;
+        modal.querySelector('.modal-close-x').onclick = close;
+        modal.onclick = (e) => { if(e.target === modal) close(); };
         document.body.appendChild(modal);
     }
 
-    // ----------------------------------------------------
-    // 3. 포커스 영역 렌더링 함수 (생략 없음)
-    // ----------------------------------------------------
-    function renderFocusArea(solution) {
-        currentFocusId = solution.id;
-        
-        const imageHTML = solution.images.map(src => `
-            <a href="#" class="openSolutionDetail focus-image-container w-full" 
-                data-detail-src="${src}" 
-                data-detail-text="${solution.desc}"
-                onclick="event.preventDefault(); openSolutionPopup('${src}', '${solution.desc.replace(/'/g, "\\'")}')"
-            >
-                <img src="${src}" class="w-full rounded-lg hover:ring-2 ring-cyan-500/50 transition" loading="lazy">
-            </a>
-        `).join('');
-
-        focusArea.innerHTML = `
-            <h4 class="font-bold text-cyan-400 mb-4">${solution.title}</h4>
-            
-            <div class="flex flex-col md:flex-row gap-6 mb-6 justify-center">
-                ${imageHTML}
+    function init() {
+        container.innerHTML = solutionsData.map((s, idx) => `
+            <div class="solution-card ${idx === currentIndex ? 'is-active' : ''}" data-index="${idx}">
+                <h4 class="text-2xl font-bold mb-8 text-cyan-400 text-center">${s.title}</h4>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    ${s.images.map(img => `<img src="${img}" class="w-full h-64 object-contain bg-neutral-800/10 rounded-xl cursor-pointer hover:scale-105 transition duration-300" onclick="openPopup('${img}', '${s.desc.replace(/'/g, "\\'")}')">`).join('')}
+                </div>
+                <p class="text-lg text-neutral-300 text-center max-w-2xl mx-auto leading-relaxed">${s.desc}</p>
             </div>
-
-            <p class="text-neutral-300 text-center">${solution.desc}</p>
-        `;
+        `).join('');
+        renderStack();
     }
 
-    // ----------------------------------------------------
-    // 4. 스택 컨테이너 렌더링 함수 (생략 없음)
-    // ----------------------------------------------------
-    function renderStackContainer() {
-        const stackItems = solutionsData.filter(s => s.id !== currentFocusId);
-        
-        stackContainer.innerHTML = stackItems.map(s => `
-            <div 
-                id="stack-item-${s.id}" 
-                class="stack-item p-4 bg-neutral-900 border border-neutral-800 rounded-xl cursor-pointer hover:border-cyan-500/50 transition-all duration-300 flex-shrink-0 w-32 md:w-48 text-center"
-                data-solution-id="${s.id}"
-                onclick="selectSolution('${s.id}', false)"
-            >
-                <h5 class="font-semibold text-xs mb-2 text-neutral-300">${s.title}</h5>
-                <img src="${s.images[0]}" class="w-full h-16 object-cover rounded-lg opacity-70 transition-opacity" loading="lazy">
+function renderStack() {
+        stackContainer.innerHTML = solutionsData.map((s, idx) => `
+            <div class="p-3 bg-neutral-900 border ${idx === currentIndex ? 'border-cyan-500 bg-neutral-800' : 'border-neutral-800'} rounded-xl cursor-pointer w-32 text-center transition-all duration-300" onclick="jumpTo(${idx})">
+                <h5 class="text-[10px] mb-2 ${idx === currentIndex ? 'text-cyan-400' : 'text-neutral-500'} line-clamp-1">${s.title}</h5>
+                <div class="flex flex-col gap-1">
+                    ${s.images.map(img => `
+                        <img src="${img}" class="w-full h-10 object-cover rounded ${idx === currentIndex ? 'opacity-100' : 'opacity-30'} transition-opacity">
+                    `).join('')}
+                </div>
             </div>
         `).join('');
     }
 
-    // ----------------------------------------------------
-    // 5-1. 자동 타이머 제어 함수 🌟 [추가] 🌟
-    // ----------------------------------------------------
-    function stopAutoChange() {
-        if (autoChangeInterval) {
-            clearInterval(autoChangeInterval);
-            autoChangeInterval = null;
-        }
-    }
-
-    function startAutoChange() {
-        stopAutoChange(); // 기존 타이머를 안전하게 정리
-        
-        autoChangeInterval = setInterval(() => {
-            // 현재 솔루션의 인덱스 찾기
-            const currentIndex = solutionsData.findIndex(s => s.id === currentFocusId);
-            
-            // 다음 인덱스 계산 (마지막일 경우 처음으로 순환)
-            const nextIndex = (currentIndex + 1) % solutionsData.length;
-            
-            const nextSolutionId = solutionsData[nextIndex].id;
-
-            // 자동 변경임을 알리는 플래그(true)와 함께 selectSolution 호출
-            selectSolution(nextSolutionId, true);
-            
-        }, AUTO_CHANGE_TIME);
-    }
-    
-    // ----------------------------------------------------
-    // 5-2. 솔루션 선택 및 애니메이션 이동 함수 🌟 [수정] 🌟
-    // ----------------------------------------------------
-    function selectSolution(id, isAutomatic = false) {
-        if (isAnimating) return;
+    // 🌟 기술 페이지 소멸 로직 완벽 이식
+    function showCard(newIndex, direction) {
+        if (isAnimating || newIndex === currentIndex) return;
         isAnimating = true;
+
+        const cards = document.querySelectorAll('.solution-card');
+        const prevCard = cards[currentIndex];
+        const nextCard = cards[newIndex];
+        const slideDistance = 800; // 기술 페이지와 동일한 거리
+
+        // 다음 카드 초기 설정
+        nextCard.style.transition = 'none';
+        nextCard.style.opacity = '0';
+        nextCard.classList.add('is-active');
         
-        const newSolution = solutionsData.find(s => s.id === id);
-        if (!newSolution) {
+        // 브라우저 렌더링 강제 업데이트
+        void nextCard.offsetWidth;
+
+        // 애니메이션 시작
+        nextCard.style.transition = 'transform 0.8s ease-out, opacity 0.8s ease-out';
+        prevCard.style.transition = 'transform 0.8s ease-out, opacity 0.8s ease-out';
+
+        requestAnimationFrame(() => {
+            // 현재 카드는 밀려나며 안개처럼 소멸
+            prevCard.style.transform = `translateX(${direction === 'next' ? -slideDistance : slideDistance}px)`;
+            prevCard.style.opacity = '0';
+            
+            // 새 카드는 중앙으로 안착
+            nextCard.style.transform = 'translateX(0)';
+            nextCard.style.opacity = '1';
+        });
+
+        currentIndex = newIndex;
+        renderStack();
+
+        setTimeout(() => {
+            prevCard.classList.remove('is-active');
+            prevCard.style.transform = 'translateX(0)'; 
             isAnimating = false;
-            // 수동 클릭이었다면 타이머를 재시작해야 할 수도 있지만, ID가 없을 경우 재시작하지 않음
-            return;
-        }
+        }, 800);
+    }
 
-        // 수동 클릭인 경우, 자동 타이머를 멈춥니다.
-        if (!isAutomatic) {
-            stopAutoChange();
-        }
+    function jumpTo(idx) {
+        if (idx === currentIndex) return;
+        stopAuto();
+        showCard(idx, idx > currentIndex ? 'next' : 'prev');
+        startAuto();
+    }
 
-        // 1. 현재 focusArea를 왼쪽으로 밀면서 페이드 아웃 애니메이션 시작
-        focusArea.style.transition = `transform ${transitionDuration}ms ease-out, opacity ${transitionDuration}ms ease-out`;
-        focusArea.style.transform = `translateX(-${slideDistance}px)`;
-        focusArea.style.opacity = '0';
-        
-        // 스크롤을 focusArea 위치로 부드럽게 이동 (자동 전환 시에는 스크롤하지 않도록 조건 추가)
-        if (!isAutomatic) {
-            const focusAreaRect = focusArea.getBoundingClientRect();
-            const targetScrollY = focusAreaRect.top + window.scrollY - 100; 
-            window.scrollTo({
-                top: targetScrollY,
-                behavior: 'smooth'
+    const startAuto = () => { stopAuto(); autoTimer = setInterval(() => showCard((currentIndex + 1) % solutionsData.length, 'next'), 5000); };
+    const stopAuto = () => clearInterval(autoTimer);
+
+    document.getElementById('prevBtn').onclick = () => { stopAuto(); showCard((currentIndex - 1 + solutionsData.length) % solutionsData.length, 'prev'); startAuto(); };
+    document.getElementById('nextBtn').onclick = () => { stopAuto(); showCard((currentIndex + 1) % solutionsData.length, 'next'); startAuto(); };
+
+document.addEventListener("DOMContentLoaded", () => { 
+        init(); 
+        startAuto(); 
+
+        // --- 모바일 메뉴 제어 로직 추가 ---
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const dropdown = document.getElementById("dropdownMenu");
+        const menuIcon = document.getElementById("menuIcon");
+
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isOpen = dropdown.classList.contains("visible");
+                
+                if (isOpen) {
+                    // 메뉴 닫기
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    menuIcon.innerText = "☰";
+                } else {
+                    // 메뉴 열기
+                    dropdown.classList.remove("opacity-0", "invisible");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                    menuIcon.innerText = "✕";
+                }
+            };
+
+            // 바깥 클릭 시 메뉴 닫기
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    menuIcon.innerText = "☰";
+                }
             });
         }
+    });
 
-        // 2. 애니메이션이 끝난 후 (800ms) 내용 업데이트 및 페이드 인 시작
-        setTimeout(() => {
-            // a. 전환 효과 비활성화 및 위치 초기화 (새로운 내용을 중앙에 렌더링 준비)
-            focusArea.style.transition = 'none';
-            focusArea.style.transform = 'translateX(0)'; 
-            
-            // b. 내용 업데이트 (새로운 내용을 중앙에 배치)
-            renderFocusArea(newSolution); 
-            renderStackContainer(); 
-            
-            // c. 강제 리플로우 후 페이드 인 시작
-            void focusArea.offsetWidth; // Trigger reflow for transition to take effect
-            
-            focusArea.style.transition = `opacity ${transitionDuration}ms ease-out`; // 페이드 인만 적용
-            focusArea.style.opacity = '1';
-
-            isAnimating = false;
-            
-            // 수동 클릭이었다면 타이머를 다시 시작
-            if (!isAutomatic) {
-                startAutoChange();
-            }
-        }, transitionDuration); 
-    }
-
-    // ----------------------------------------------------
-    // 6. 초기화
-    // ----------------------------------------------------
-    if (solutionsData.length > 0) {
-        renderFocusArea(solutionsData[0]);
-        renderStackContainer();
-        
-        // 초기 로드 시 focusArea의 투명도를 1로 설정하여 보이도록 함
-        focusArea.style.opacity = '1'; 
-        focusArea.style.transform = 'translateX(0)';
-        
-        // 🌟 3초 타이머 시작 🌟
-        startAutoChange();
-    }
-    
-    // ----------------------------------------------------
-    // 🌟 [NEW] 메뉴 제어 로직 (Click / 반응형 안정화) 🌟 (기존 모바일 메뉴 토글 로직 대체)
-    // ----------------------------------------------------
-
-    const menuBtn = document.getElementById('mobileMenuBtn');
-    const dropdown = document.getElementById('mobileMenu');
-    const menuIcon = document.getElementById('menuIcon');
-    const closeIcon = document.getElementById('closeIcon');
-    const allMenuLinks = dropdown.querySelectorAll('a');
-    const body = document.body; // Use document.body for scroll lock
-
-    // Transition classes for smooth open/close
-    const OPEN_CLASSES = ['opacity-100', 'translate-x-0'];
-    const CLOSE_CLASSES = ['opacity-0', 'translate-x-full', 'hidden'];
-
-    if (menuBtn && dropdown) {
-        
-        // Function to open the menu
-        const openMenu = () => {
-            dropdown.classList.remove(...CLOSE_CLASSES);
-            dropdown.classList.add(...OPEN_CLASSES, 'flex');
-            body.classList.add('overflow-hidden'); // Scroll Lock
-            menuIcon.classList.add('hidden');
-            closeIcon.classList.remove('hidden');
-            menuBtn.setAttribute('aria-expanded', 'true');
-        };
-
-        // Function to close the menu
-        const closeMenu = () => {
-            // Start transition
-            dropdown.classList.remove(...OPEN_CLASSES, 'flex');
-            dropdown.classList.add('opacity-0', 'translate-x-full');
-            
-            // Hide and unlock scroll after transition
-            setTimeout(() => {
-                // 이 클래스가 여전히 존재할 때만 숨기고 스크롤 해제 (이탈 방지)
-                if (dropdown.classList.contains('opacity-0')) {
-                    dropdown.classList.add('hidden'); 
-                    body.classList.remove('overflow-hidden'); // Scroll Unlock
-                }
-            }, 300); // Wait for transition duration
-
-            menuIcon.classList.remove('hidden');
-            closeIcon.classList.add('hidden');
-            menuBtn.setAttribute('aria-expanded', 'false');
-        };
-
-
-        menuBtn.addEventListener('click', () => {
-            const isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
-            if (isOpen) {
-                closeMenu();
-            } else {
-                openMenu();
-            }
-        });
-
-        // 메뉴 링크 클릭 시 메뉴 닫기 (UX 개선)
-        allMenuLinks.forEach(link => {
-            link.addEventListener('click', closeMenu);
-        });
-
-        // 화면 크기가 md(768px) 이상으로 변경되면 모바일 메뉴 강제 닫기 (반응형 안정화)
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768 && menuBtn.getAttribute('aria-expanded') === 'true') {
-                closeMenu();
-            }
-        });
-        
-        // ESC 키로 닫기 (접근성)
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') {
-                closeMenu();
-                menuBtn.focus();
-            }
-        });
-    }
 </script>
 
 </body>

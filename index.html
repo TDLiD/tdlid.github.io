@@ -1,72 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="css/main.css">
+    <meta charset="UTF-8">
+    <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/main.css">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-/* ===== IMAGE MODAL ===== */
-#imageModal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.9);
-    z-index: 10000;
-}
-#modalDetailImage {
-    max-width: 90%;
-    max-height: 90%;
-    object-fit: contain;
-}
-/* 🌟 [수정] 드롭다운 메뉴 스타일 및 컨테이너 🌟 */
-/* 모바일 메뉴 오버레이의 위치와 높이 */
-.mobile-overlay-menu {
-    /* 헤더 높이 약 72px (p-6, py-4 기준)을 제외한 나머지 뷰포트 높이 */
-    height: calc(100vh - 72px); 
-    top: 72px; /* 헤더 바로 아래에 위치 */
-}
-/* 모달/메뉴가 열렸을 때 스크롤 방지 */
-.overflow-hidden {
-    overflow: hidden;
-}
+        /* ===== IMAGE MODAL ===== */
+        #imageModal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.9);
+            z-index: 10000;
+        }
+        #modalDetailImage {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
 
-/* ===== DESKTOP HOVER MENU - 사용하지 않음, 링크 자체에 hover 적용됨 ===== */
+        /* [수정] 드롭다운 스타일 (디자인 통일) */
+        .dropdown-link { 
+            padding: 12px 20px; display: block; color: #ccc; 
+            border-bottom: 1px solid #262626; transition: all 0.2s;
+            text-align: left; /* 정렬 수정 */
+        }
+        .dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
+        .dropdown-quote-btn { 
+            padding: 12px 20px; display: block; background: #22d3ee; 
+            color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; 
+            transition: background 0.2s;
+        }
+        .dropdown-quote-btn:hover { background: #67e8f9; }
 
-/* 드롭다운 메뉴 항목 스타일 */
-.dropdown-link {
-    padding: 12px 20px;
-    text-align: right;
-    font-size: 1.125rem; /* 텍스트 크기 키움 */
-    color: #ccc;
-    transition: background-color 0.2s, color 0.2s;
-    border-bottom: 1px solid #262626; /* 구분선 추가 */
-}
-
-.dropdown-link:hover {
-    background-color: #0d383d; 
-    color: #38bdf8;
-}
-        
-/* 요청 견적 버튼 스타일 */
-.dropdown-quote-btn {
-    padding: 15px 20px; /* 패딩을 늘려 클릭 영역 확보 */
-    text-align: center;
-    background-color: #38bdf8; 
-    color: #0a0a0a;
-    font-weight: 600;
-    border-radius: 0 0 10px 10px; /* 하단 모서리만 둥글게 */
-    transition: background-color 0.2s;
-}
-
-.dropdown-quote-btn:hover {
-    background-color: #67e8f9;
-}
+        /* 데스크톱/모바일 공통 버튼 깨짐 방지 */
+        .whitespace-nowrap { white-space: nowrap !important; }
     </style>
 </head>
 
@@ -74,56 +48,37 @@
 
 <audio id="bgm" src="mp3/Caribbean.mp3" autoplay loop muted></audio>
 
-<header class="fixed top-0 left-0 w-full z-[10001] px-6 py-4 flex justify-between items-center 
-               bg-neutral-950/90 backdrop-blur-sm border-b border-neutral-800 pointer-events-none">
-    
-    <a href="index.html" class="flex items-center gap-3 text-xl font-bold pointer-events-auto">
+<header class="fixed top-0 left-0 w-full z-[10001] bg-neutral-950/90 backdrop-blur-sm border-b border-neutral-800 p-4 flex justify-between items-center">
+    <a href="index.html" class="flex items-center gap-3 text-xl font-bold shrink-0">
         <img src="images/logo/logo.png" class="h-10 w-auto">
-        <span class="animated-logo-text text-sm md:text-base">TDL ENERGY INDONESIA</span>
+        <span class="animated-logo-text uppercase text-sm md:text-base">TDL ENERGY INDONESIA</span>
     </a>
 
-<nav class="menu-container pointer-events-auto relative flex items-center gap-6">
+    <nav class="relative flex items-center gap-6">
+        <ul class="hidden lg:flex items-center gap-8 text-sm font-light">
+            <li><a href="index.html" class="text-cyan-400 font-bold whitespace-nowrap">Home</a></li>
+            <li><a href="products.html" class="hover:text-cyan-400 whitespace-nowrap">Products</a></li>
+            <li><a href="technology.html" class="hover:text-cyan-400 whitespace-nowrap">Technology</a></li>
+            <li><a href="solutions.html" class="hover:text-cyan-400 whitespace-nowrap">Solutions</a></li>
+            <li><a href="company.html" class="hover:text-cyan-400 whitespace-nowrap">Company</a></li>
+            <li><a href="news.html" class="hover:text-cyan-400 whitespace-nowrap">News</a></li>
+            <li><a href="contact.html" class="px-5 py-2 rounded-full bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition whitespace-nowrap">Request Quote</a></li>
+        </ul>
 
-    <button id="menuToggleBtn"
-        class="md:hidden text-3xl text-cyan-400 p-2 border border-cyan-500 rounded-full
-                hover:bg-cyan-500 hover:text-black transition-all duration-300"
-        aria-expanded="false"
-        aria-controls="dropdownMenu"
-        aria-label="Open menu">
-        <span id="menuIcon">☰</span>
-        <span id="closeIcon" class="hidden">✕</span>
-    </button>
+        <button id="menuToggleBtn" class="lg:hidden text-2xl text-cyan-400 w-10 h-10 border border-cyan-500 rounded-full flex items-center justify-center z-[10002]">
+            <span id="menuIcon">☰</span>
+        </button>
 
-    <ul class="hidden md:flex items-center gap-8 text-sm font-light">
-        <li><a href="index.html" class="hover:text-cyan-400 font-bold text-cyan-400">Home</a></li>
-        <li><a href="products.html" class="hover:text-cyan-400">Products</a></li>
-        <li><a href="technology.html" class="hover:text-cyan-400">Technology</a></li>
-        <li><a href="solutions.html" class="hover:text-cyan-400">Solutions</a></li>
-        <li><a href="company.html" class="hover:text-cyan-400">Company</a></li>
-        <li><a href="news.html" class="hover:text-cyan-400">News</a></li>
-        <li>
-            <a href="contact.html"
-               class="px-4 py-2 rounded-full bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition">
-                Request Quote
-            </a>
-        </li>
-    </ul>
-
-    <div id="dropdownMenu"
-         class="fixed left-0 w-full mobile-overlay-menu bg-neutral-950 md:hidden
-                flex-col opacity-0 invisible transition-all duration-300 transform translate-x-full
-                border-t border-neutral-800"
-         role="menu">
-        <a href="index.html" class="dropdown-link font-bold bg-neutral-900/50">Home</a>
-        <a href="products.html" class="dropdown-link">Products</a>
-        <a href="technology.html" class="dropdown-link">Technology</a>
-        <a href="solutions.html" class="dropdown-link">Solutions</a>
-        <a href="company.html" class="dropdown-link">Company</a>
-        <a href="news.html" class="dropdown-link">News</a>
-        <a href="contact.html" class="dropdown-quote-btn mt-4 rounded-xl">Request Quote</a>
-    </div>
-
-</nav>
+        <div id="dropdownMenu" class="absolute top-full right-0 mt-4 w-56 bg-neutral-900 border border-neutral-700 rounded-xl opacity-0 invisible transition-all duration-300 z-[10002] shadow-2xl overflow-hidden">
+            <a href="index.html" class="dropdown-link text-cyan-400 font-bold">Home</a>
+            <a href="products.html" class="dropdown-link">Products</a>
+            <a href="technology.html" class="dropdown-link">Technology</a>
+            <a href="solutions.html" class="dropdown-link">Solutions</a>
+            <a href="company.html" class="dropdown-link">Company</a>
+            <a href="news.html" class="dropdown-link">News</a>
+            <a href="contact.html" class="dropdown-quote-btn">Request Quote</a>
+        </div>
+    </nav>
 </header>
 
 <section class="hero-section pt-0 px-0">
@@ -199,30 +154,29 @@
 
 <script src="js/main.js"></script>
 <script>
-    // 팝업 이미지 열기 기능 (유지)
+    // [기존 유지] 팝업 이미지 열기
     document.querySelectorAll('.cert-link').forEach(link => {
         link.addEventListener('click', function (e) {
             e.preventDefault();
             const imageSrc = e.currentTarget.getAttribute('data-original-src');
             document.getElementById('modalDetailImage').src = imageSrc;
-            
             const modal = document.getElementById('imageModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            document.body.classList.add('overflow-hidden'); // 모달 열릴 때 스크롤 잠금
+            document.body.style.overflow = 'hidden'; 
         });
     });
 
-    // 모달 닫기 기능 (유지)
+    // [기존 유지] 모달 닫기
     document.getElementById('imageModal').addEventListener('click', function (e) {
         if (e.target.id !== 'modalDetailImage') { 
             this.classList.remove('flex');
             this.classList.add('hidden');
-            document.body.classList.remove('overflow-hidden'); // 모달 닫힐 때 스크롤 해제
+            document.body.style.overflow = '';
         }
     });
 
-    // 음악 시작 (유지)
+    // [기존 유지] 음악 시작
     document.addEventListener('click', () => {
         const bgm = document.getElementById('bgm');
         if (bgm && bgm.muted) {
@@ -231,79 +185,38 @@
         }
     }, { once: true });
 
-
     // ----------------------------------------------------
-    // 🌟 [수정] 메뉴 제어 로직 (Click / 반응형 안정화) 🌟
+    // [수정] 메뉴 제어 로직 (solutions.html 방식 적용)
     // ----------------------------------------------------
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const dropdown = document.getElementById("dropdownMenu");
+        const menuIcon = document.getElementById("menuIcon");
 
-    const menuBtn = document.getElementById('menuToggleBtn');
-    const dropdown = document.getElementById('dropdownMenu');
-    const menuIcon = document.getElementById('menuIcon');
-    const closeIcon = document.getElementById('closeIcon');
-    const allMenuLinks = dropdown.querySelectorAll('a');
-
-    const OPEN_CLASSES = ['opacity-100', 'translate-x-0'];
-    const CLOSE_CLASSES = ['opacity-0', 'translate-x-full', 'hidden']; // 'hidden'은 트랜지션 완료 후 추가
-
-    if (menuBtn && dropdown) {
-        
-        const openMenu = () => {
-            dropdown.classList.remove(...CLOSE_CLASSES);
-            dropdown.classList.add(...OPEN_CLASSES, 'flex');
-            document.body.classList.add('overflow-hidden');
-            menuIcon.classList.add('hidden');
-            closeIcon.classList.remove('hidden');
-            menuBtn.setAttribute('aria-expanded', 'true');
-        };
-
-        const closeMenu = () => {
-            // 트랜지션 효과를 위해 먼저 opacity/translate 클래스 제거
-            dropdown.classList.remove(...OPEN_CLASSES, 'flex');
-            dropdown.classList.add('opacity-0', 'translate-x-full'); // 닫힘 시작
+        menuBtn.onclick = (e) => {
+            e.stopPropagation();
+            const isOpen = dropdown.classList.contains("visible");
             
-            // 트랜지션이 끝난 후 hidden과 스크롤 잠금 해제
-            setTimeout(() => {
-                if (dropdown.classList.contains('opacity-0')) {
-                    dropdown.classList.add('hidden'); 
-                    document.body.classList.remove('overflow-hidden');
-                }
-            }, 300); // Tailwind transition duration (300ms)에 맞춤
-
-            menuIcon.classList.remove('hidden');
-            closeIcon.classList.add('hidden');
-            menuBtn.setAttribute('aria-expanded', 'false');
+            if (isOpen) {
+                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                dropdown.classList.add("opacity-0", "invisible");
+                menuIcon.innerText = "☰";
+            } else {
+                dropdown.classList.remove("opacity-0", "invisible");
+                dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                menuIcon.innerText = "✕";
+            }
         };
 
-
-        menuBtn.addEventListener('click', () => {
-            const isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
-            if (isOpen) {
-                closeMenu();
-            } else {
-                openMenu();
+        // 바깥 클릭 시 메뉴 닫기
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                dropdown.classList.add("opacity-0", "invisible");
+                menuIcon.innerText = "☰";
             }
         });
-
-        // 메뉴 링크 클릭 시 메뉴 닫기 (UX 개선)
-        allMenuLinks.forEach(link => {
-            link.addEventListener('click', closeMenu);
-        });
-
-        // ESC 키로 닫기
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') {
-                closeMenu();
-                menuBtn.focus();
-            }
-        });
-
-        // 화면 크기가 md(768px) 이상으로 변경되면 모바일 메뉴 강제 닫기 (반응형 안정화)
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768 && menuBtn.getAttribute('aria-expanded') === 'true') {
-                closeMenu();
-            }
-        });
-    }
+    });
 </script>
 
 </body>
