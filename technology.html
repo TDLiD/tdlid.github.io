@@ -170,6 +170,81 @@
     margin-right: auto; /* 중앙 정렬 */
 }
 
+
+/* ---------------------------------------------------- */
+/* 🌟 [NEW] 모바일 메뉴 스타일 (공통 안정 구조) 🌟 */
+/* ---------------------------------------------------- */
+.mobile-overlay-menu {
+    height: calc(100vh - 68px);
+    top: 68px;
+    right: 0;
+    position: fixed;
+}
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.dropdown-link {
+    padding: 12px 20px;
+    text-align: right;
+    font-size: 1.125rem;
+    color: #ccc;
+    transition: background-color 0.2s, color 0.2s;
+    border-bottom: 1px solid #262626;
+}
+.dropdown-link:hover {
+    background-color: #0d383d;
+    color: #38bdf8;
+}
+
+.dropdown-quote-btn {
+    padding: 15px 20px;
+    text-align: center;
+    background-color: #38bdf8;
+    color: #0a0a0a;
+    font-weight: 600;
+    border-radius: 0 0 10px 10px;
+    transition: background-color 0.2s;
+}
+.dropdown-quote-btn:hover {
+    background-color: #67e8f9;
+}
+
+/* ---------------------------------------------------- */
+/* 🌟 Technology Carousel Responsive Patch 🌟 */
+/* ---------------------------------------------------- */
+@media (max-width: 1024px) {
+    #technologyContainer {
+        width: 90vw;
+        height: auto;
+    }
+
+    .tech-card {
+        width: 100%;
+        height: auto;
+        min-height: 500px;
+    }
+}
+
+@media (max-width: 640px) {
+    #technologyContainer {
+        width: 94vw;
+    }
+
+    .tech-card {
+        padding: 1.5rem;
+        min-height: auto;
+    }
+
+    .nav-btn {
+        top: auto;
+        bottom: -60px;
+        transform: none;
+    }
+}
+
+
+
 </style>
 </head>
 
@@ -194,19 +269,34 @@
                 Request Quote
             </a>
         </nav>
-        <button id="mobileMenuBtn" class="md:hidden">☰</button>
+
+<button id="mobileMenuBtn" aria-expanded="false"
+    class="md:hidden text-2xl text-cyan-400 p-2 border border-cyan-500 rounded-full
+           hover:bg-cyan-500 hover:text-black transition-all duration-300">
+    <span id="menuIcon">☰</span>
+    <span id="closeIcon" class="hidden">✕</span>
+</button>
+
     </div>
-    <div id="mobileMenu" class="hidden md:hidden fixed top-16 right-6 bg-neutral-900 p-6 rounded-2xl shadow-xl border border-neutral-800 z-50 flex-col gap-4 text-white text-base">
-        <a href="index.html" class="nav-link-mobile">Home</a>
-        <a href="products.html" class="nav-link-mobile">Products</a>
-        <a href="technology.html" class="nav-link-mobile font-bold text-cyan-500">Technology</a>
-        <a href="solutions.html" class="nav-link-mobile">Solutions</a>
-        <a href="company.html" class="nav-link-mobile">Company</a>
-        <a href="news.html" class="nav-link-mobile">News</a>
-        <a href="contact.html" class="nav-link-mobile mt-2 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold text-center">
-            Request Quote
-        </a>
-    </div>
+
+
+<div id="mobileMenu"
+     class="fixed left-0 w-full mobile-overlay-menu bg-neutral-950 md:hidden
+            flex-col opacity-0 invisible transition-all duration-300
+            transform translate-x-full border-t border-neutral-800 z-40"
+     role="menu">
+
+    <a href="index.html" class="dropdown-link">Home</a>
+    <a href="products.html" class="dropdown-link">Products</a>
+    <a href="technology.html" class="dropdown-link font-bold text-cyan-500 bg-neutral-900/50">Technology</a>
+    <a href="solutions.html" class="dropdown-link">Solutions</a>
+    <a href="company.html" class="dropdown-link">Company</a>
+    <a href="news.html" class="dropdown-link">News</a>
+    <a href="contact.html" class="dropdown-quote-btn mt-4 rounded-xl">Request Quote</a>
+</div>
+
+
+
 </header>
 
 <section id="technology" class="pt-40 pb-24 px-6 flex-grow">
@@ -461,6 +551,72 @@
             document.getElementById('mobileMenu').classList.toggle('flex');
         });
     });
+
+
+// ----------------------------------------------------
+// 🌟 [NEW] 모바일 메뉴 공통 안정 구조 제어 로직 🌟
+// ----------------------------------------------------
+const menuBtn = document.getElementById('mobileMenuBtn');
+const dropdown = document.getElementById('mobileMenu');
+const menuIcon = document.getElementById('menuIcon');
+const closeIcon = document.getElementById('closeIcon');
+const allMenuLinks = dropdown.querySelectorAll('a');
+const body = document.body;
+
+const OPEN_CLASSES = ['opacity-100', 'translate-x-0'];
+const CLOSE_CLASSES = ['opacity-0', 'translate-x-full', 'hidden'];
+
+if (menuBtn && dropdown) {
+
+    const openMenu = () => {
+        dropdown.classList.remove(...CLOSE_CLASSES);
+        dropdown.classList.add(...OPEN_CLASSES, 'flex');
+        body.classList.add('overflow-hidden');
+        menuIcon.classList.add('hidden');
+        closeIcon.classList.remove('hidden');
+        menuBtn.setAttribute('aria-expanded', 'true');
+    };
+
+    const closeMenu = () => {
+        dropdown.classList.remove(...OPEN_CLASSES, 'flex');
+        dropdown.classList.add('opacity-0', 'translate-x-full');
+
+        setTimeout(() => {
+            if (dropdown.classList.contains('opacity-0')) {
+                dropdown.classList.add('hidden');
+                body.classList.remove('overflow-hidden');
+            }
+        }, 300);
+
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+        menuBtn.setAttribute('aria-expanded', 'false');
+    };
+
+    menuBtn.addEventListener('click', () => {
+        const isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
+        isOpen ? closeMenu() : openMenu();
+    });
+
+    allMenuLinks.forEach(link => {
+        link.addEventListener('click', closeMenu);
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768 && menuBtn.getAttribute('aria-expanded') === 'true') {
+            closeMenu();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') {
+            closeMenu();
+            menuBtn.focus();
+        }
+    });
+}
+
+
 </script>
 
 </body>

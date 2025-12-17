@@ -17,8 +17,6 @@
             --header-subtitle-font-weight: 800;    /* 두께 */
         }
         
-        /* 기존 body 스타일 제거됨 */
-        
         /* Spotlight background */
         .company-bg {
             position: absolute;
@@ -32,28 +30,24 @@
 
         /* 3 Image Stage */
         .image-stage {
-            /* REMOVED: display: grid; */
-            /* REMOVED: grid-template-columns: repeat(3, 1fr); */
-            /* REMOVED: gap: 2rem; */
             position: relative;
             z-index: 1;
         }
         .image-card {
             position: relative;
             border-radius: 1.5rem;
-            /* overflow: visible; <-- 이 속성이 hover 시 이미지 확장 문제를 일으킬 수 있어 visible은 유지 */
-            overflow: hidden; /* 이미지 카드의 모서리 라운딩이 제대로 적용되도록 변경 */
+            overflow: hidden; 
             border: 1px solid rgba(255,255,255,.08);
             background: #020617;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 200px; /* 이미지가 사라지는 현상 방지를 위해 최소 높이 지정 */
+            min-height: 200px;
         }
         .image-card img {
             max-height: 100%;
-            width: 100%; /* 너비를 100%로 설정하여 가로 영역을 채움 */
+            width: 100%;
             height: auto;
             display: block;
             transition: transform 0.6s ease;
@@ -87,6 +81,47 @@
             from {opacity:0;transform:translateY(50px)}
             to {opacity:1;transform:translateY(0)}
         }
+        
+        /* ---------------------------------------------------- */
+        /* 🌟 [NEW] 모바일 메뉴 스타일 (index.html과 통일) 🌟 */
+        /* ---------------------------------------------------- */
+        .mobile-overlay-menu {
+            /* Header height is approx 68px (px-6 py-4) */
+            height: calc(100vh - 68px); 
+            top: 68px; /* Set just below the header */
+        }
+        /* [NEW] Scroll lock for body */
+        .overflow-hidden {
+            overflow: hidden;
+        }
+        
+        .dropdown-link {
+            padding: 12px 20px;
+            text-align: right;
+            font-size: 1.125rem;
+            color: #ccc;
+            transition: background-color 0.2s, color 0.2s;
+            border-bottom: 1px solid #262626;
+        }
+
+        .dropdown-link:hover {
+            background-color: #0d383d; 
+            color: #38bdf8;
+        }
+            
+        .dropdown-quote-btn {
+            padding: 15px 20px;
+            text-align: center;
+            background-color: #38bdf8; 
+            color: #0a0a0a;
+            font-weight: 600;
+            border-radius: 0 0 10px 10px;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-quote-btn:hover {
+            background-color: #67e8f9;
+        }
     </style>
 </head>
 
@@ -102,31 +137,39 @@
             </h1>
         </a>
 
-        <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="products.html" class="nav-link">Products</a>
-            <a href="technology.html" class="nav-link">Technology</a>
-            <a href="solutions.html" class="nav-link">Solutions</a>
-            <a href="company.html" class="nav-link text-white font-bold">Company</a> 
-            <a href="news.html" class="nav-link">News</a>
-            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold">
-                Request Quote
-            </a>
-        </nav>
-        
-        <button id="mobileMenuBtn" class="md:hidden">☰</button>
+        <div class="flex items-center">
+            
+            <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
+                <a href="index.html" class="nav-link hover:text-cyan-400">Home</a>
+                <a href="products.html" class="nav-link hover:text-cyan-400">Products</a>
+                <a href="technology.html" class="nav-link hover:text-cyan-400">Technology</a>
+                <a href="solutions.html" class="nav-link hover:text-cyan-400">Solutions</a>
+                <a href="company.html" class="nav-link text-cyan-500 font-bold hover:text-cyan-400">Company</a>
+                <a href="news.html" class="nav-link hover:text-cyan-400">News</a>
+                <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold transition">
+                    Request Quote
+                </a>
+            </nav>
+            
+            <button id="mobileMenuBtn" aria-expanded="false" class="md:hidden text-2xl text-cyan-400 p-2 border border-cyan-500 rounded-full hover:bg-cyan-500 hover:text-black transition-all duration-300">
+                <span id="menuIcon">☰</span>
+                <span id="closeIcon" class="hidden">✕</span>
+            </button>
+        </div>
     </div>
     
-    <div id="mobileMenu" class="hidden md:hidden fixed top-16 right-6 bg-neutral-900 p-6 rounded-2xl shadow-xl border border-neutral-800 z-50 flex-col gap-4 text-white text-base">
-        <a href="index.html" class="nav-link-mobile">Home</a>
-        <a href="products.html" class="nav-link-mobile">Products</a>
-        <a href="technology.html" class="nav-link-mobile">Technology</a>
-        <a href="solutions.html" class="nav-link-mobile">Solutions</a>
-        <a href="company.html" class="nav-link-mobile text-cyan-500 font-bold">Company</a>
-        <a href="news.html" class="nav-link-mobile">News</a>
-        <a href="contact.html" class="nav-link-mobile mt-2 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold text-center">
-            Request Quote
-        </a>
+    <div id="mobileMenu" 
+         class="fixed left-0 w-full mobile-overlay-menu bg-neutral-950 md:hidden
+                flex-col opacity-0 invisible transition-all duration-300 transform translate-x-full
+                border-t border-neutral-800 z-40" 
+         role="menu">
+        <a href="index.html" class="dropdown-link">Home</a>
+        <a href="products.html" class="dropdown-link">Products</a>
+        <a href="technology.html" class="dropdown-link">Technology</a>
+        <a href="solutions.html" class="dropdown-link">Solutions</a>
+        <a href="company.html" class="dropdown-link font-bold text-cyan-500 bg-neutral-900/50">Company</a>
+        <a href="news.html" class="dropdown-link">News</a>
+        <a href="contact.html" class="dropdown-quote-btn mt-4 rounded-xl">Request Quote</a>
     </div>
 </header>
 
@@ -195,6 +238,86 @@
 </div>
 
 <script src="js/main.js"></script>
+
+<script>
+    // ----------------------------------------------------
+    // [NEW] 메뉴 제어 로직 (Click / 반응형 안정화) 
+    // ----------------------------------------------------
+
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const dropdown = document.getElementById('mobileMenu');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+    const allMenuLinks = dropdown.querySelectorAll('a');
+
+    // Transition classes for smooth open/close
+    const OPEN_CLASSES = ['opacity-100', 'translate-x-0'];
+    const CLOSE_CLASSES = ['opacity-0', 'translate-x-full', 'hidden'];
+
+    if (menuBtn && dropdown) {
+        
+        // Function to open the menu
+        const openMenu = () => {
+            dropdown.classList.remove(...CLOSE_CLASSES);
+            dropdown.classList.add(...OPEN_CLASSES, 'flex');
+            document.body.classList.add('overflow-hidden');
+            menuIcon.classList.add('hidden');
+            closeIcon.classList.remove('hidden');
+            menuBtn.setAttribute('aria-expanded', 'true');
+        };
+
+        // Function to close the menu
+        const closeMenu = () => {
+            // Start transition
+            dropdown.classList.remove(...OPEN_CLASSES, 'flex');
+            dropdown.classList.add('opacity-0', 'translate-x-full');
+            
+            // Hide and unlock scroll after transition
+            setTimeout(() => {
+                // Only add 'hidden' if the menu is actually transitioning closed
+                if (dropdown.classList.contains('opacity-0')) {
+                    dropdown.classList.add('hidden'); 
+                    document.body.classList.remove('overflow-hidden');
+                }
+            }, 300); // Wait for transition duration
+
+            menuIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+            menuBtn.setAttribute('aria-expanded', 'false');
+        };
+
+
+        menuBtn.addEventListener('click', () => {
+            const isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
+            if (isOpen) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        // 메뉴 링크 클릭 시 메뉴 닫기 (UX 개선)
+        allMenuLinks.forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+
+        // 화면 크기가 md(768px) 이상으로 변경되면 모바일 메뉴 강제 닫기 (반응형 안정화)
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768 && menuBtn.getAttribute('aria-expanded') === 'true') {
+                closeMenu();
+            }
+        });
+        
+        // ESC 키로 닫기 (접근성)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') {
+                closeMenu();
+                menuBtn.focus();
+            }
+        });
+    }
+</script>
+
 
 </body>
 </html>

@@ -12,6 +12,50 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* ---------------------------------------------------- */
+    /* 🌟 [NEW] 모바일 메뉴 스타일 (공통 안정 구조) 🌟 */
+    /* ---------------------------------------------------- */
+    .mobile-overlay-menu {
+        /* Header height is approx 68px (px-6 py-4) */
+        height: calc(100vh - 68px); 
+        top: 68px; /* Set just below the header */
+    }
+    /* [NEW] Scroll lock for body */
+    .overflow-hidden {
+        overflow: hidden;
+    }
+
+    .dropdown-link {
+        padding: 12px 20px;
+        text-align: right;
+        font-size: 1.125rem;
+        color: #ccc;
+        transition: background-color 0.2s, color 0.2s;
+        border-bottom: 1px solid #262626;
+    }
+
+    .dropdown-link:hover {
+        background-color: #0d383d; 
+        color: #38bdf8;
+    }
+        
+    .dropdown-quote-btn {
+        padding: 15px 20px;
+        text-align: center;
+        background-color: #38bdf8; 
+        color: #0a0a0a;
+        font-weight: 600;
+        border-radius: 0 0 10px 10px;
+        transition: background-color 0.2s;
+    }
+
+    .dropdown-quote-btn:hover {
+        background-color: #67e8f9;
+    }
+</style>
+
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
@@ -26,32 +70,38 @@
         </a>
 
         <nav class="hidden md:flex items-center gap-10 text-sm text-neutral-300">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="products.html" class="nav-link">Products</a>
-            <a href="technology.html" class="nav-link">Technology</a>
-            <a href="solutions.html" class="nav-link">Solutions</a>
-            <a href="company.html" class="nav-link">Company</a>
-            <a href="news.html" class="nav-link font-bold text-cyan-500">News</a> 
-            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold">
+            <a href="index.html" class="nav-link hover:text-cyan-400">Home</a>
+            <a href="products.html" class="nav-link hover:text-cyan-400">Products</a>
+            <a href="technology.html" class="nav-link hover:text-cyan-400">Technology</a>
+            <a href="solutions.html" class="nav-link hover:text-cyan-400">Solutions</a>
+            <a href="company.html" class="nav-link hover:text-cyan-400">Company</a>
+            <a href="news.html" class="nav-link font-bold text-cyan-500 hover:text-cyan-400">News</a> 
+            <a href="contact.html" class="ml-4 px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold transition">
                 Request Quote
             </a>
         </nav>
 
-        <button id="mobileMenuBtn" class="md:hidden">☰</button>
+        <button id="mobileMenuBtn" aria-expanded="false" class="md:hidden text-2xl text-cyan-400 p-2 border border-cyan-500 rounded-full hover:bg-cyan-500 hover:text-black transition-all duration-300">
+            <span id="menuIcon">☰</span>
+            <span id="closeIcon" class="hidden">✕</span>
+        </button>
     </div>
 
-    <div id="mobileMenu" class="hidden md:hidden fixed top-16 right-6 bg-neutral-900 p-6 rounded-2xl shadow-xl border border-neutral-800 z-50 flex-col gap-4 text-white text-base">
-        <a href="index.html" class="nav-link-mobile">Home</a>
-        <a href="products.html" class="nav-link-mobile">Products</a>
-        <a href="technology.html" class="nav-link-mobile">Technology</a>
-        <a href="solutions.html" class="nav-link-mobile">Solutions</a>
-        <a href="company.html" class="nav-link-mobile">Company</a>
-        <a href="news.html" class="nav-link-mobile font-bold text-cyan-500">News</a>
-        <a href="contact.html" class="nav-link-mobile mt-2 px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold text-center">
-            Request Quote
-        </a>
+    <div id="mobileMenu" 
+         class="fixed left-0 w-full mobile-overlay-menu bg-neutral-950 md:hidden
+                flex-col opacity-0 invisible transition-all duration-300 transform translate-x-full
+                border-t border-neutral-800 z-40" 
+         role="menu">
+        <a href="index.html" class="dropdown-link">Home</a>
+        <a href="products.html" class="dropdown-link">Products</a>
+        <a href="technology.html" class="dropdown-link">Technology</a>
+        <a href="solutions.html" class="dropdown-link">Solutions</a>
+        <a href="company.html" class="dropdown-link">Company</a>
+        <a href="news.html" class="dropdown-link font-bold text-cyan-500 bg-neutral-900/50">News</a>
+        <a href="contact.html" class="dropdown-quote-btn mt-4 rounded-xl">Request Quote</a>
     </div>
 </header>
+
     <section class="py-24 px-6 min-h-screen">
         <div class="max-w-full xl:max-w-7xl mx-auto pt-10 px-6 md:px-12">
             <h2 class="text-4xl font-bold mb-10 text-white">Latest News</h2>
@@ -74,6 +124,85 @@
     </footer>
 
     <script src="js/news.js"></script>
+
+<script>
+    // ----------------------------------------------------
+    // 🌟 [NEW] 메뉴 제어 로직 (Click / 반응형 안정화) 🌟
+    // ----------------------------------------------------
+
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const dropdown = document.getElementById('mobileMenu');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+    const allMenuLinks = dropdown.querySelectorAll('a');
+
+    // Transition classes for smooth open/close
+    const OPEN_CLASSES = ['opacity-100', 'translate-x-0'];
+    const CLOSE_CLASSES = ['opacity-0', 'translate-x-full', 'hidden'];
+
+    if (menuBtn && dropdown) {
+        
+        // Function to open the menu
+        const openMenu = () => {
+            dropdown.classList.remove(...CLOSE_CLASSES);
+            dropdown.classList.add(...OPEN_CLASSES, 'flex');
+            document.body.classList.add('overflow-hidden');
+            menuIcon.classList.add('hidden');
+            closeIcon.classList.remove('hidden');
+            menuBtn.setAttribute('aria-expanded', 'true');
+        };
+
+        // Function to close the menu
+        const closeMenu = () => {
+            // Start transition
+            dropdown.classList.remove(...OPEN_CLASSES, 'flex');
+            dropdown.classList.add('opacity-0', 'translate-x-full');
+            
+            // Hide and unlock scroll after transition
+            setTimeout(() => {
+                if (dropdown.classList.contains('opacity-0')) {
+                    dropdown.classList.add('hidden'); 
+                    document.body.classList.remove('overflow-hidden');
+                }
+            }, 300); // Wait for transition duration
+
+            menuIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+            menuBtn.setAttribute('aria-expanded', 'false');
+        };
+
+
+        menuBtn.addEventListener('click', () => {
+            const isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
+            if (isOpen) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        // 메뉴 링크 클릭 시 메뉴 닫기 (UX 개선)
+        allMenuLinks.forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+
+        // 화면 크기가 md(768px) 이상으로 변경되면 모바일 메뉴 강제 닫기 (반응형 안정화)
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768 && menuBtn.getAttribute('aria-expanded') === 'true') {
+                closeMenu();
+            }
+        });
+        
+        // ESC 키로 닫기 (접근성)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') {
+                closeMenu();
+                menuBtn.focus();
+            }
+        });
+    }
+</script>
+
 
 </body>
 </html>
