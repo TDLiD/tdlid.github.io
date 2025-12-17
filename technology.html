@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="css/main.css">
 
 <style>
-    /* 팝업 모달 스타일 (Solutions.html 기반 다크 테마) */
+    /* 팝업 모달 스타일 (기존 유지) */
     .modal-backdrop {
         position: fixed;
         top: 0;
@@ -22,7 +22,7 @@
         z-index: 1000;
     }
     .modal-content {
-        background: #171717; /* Dark background */
+        background: #171717;
         color: #ddd;
         padding: 30px;
         border-radius: 12px;
@@ -42,7 +42,7 @@
     .modal-close-btn {
         margin-top: 20px;
         padding: 10px 20px;
-        background-color: #06b6d4; /* cyan-500 */
+        background-color: #06b6d4;
         color: black;
         font-weight: 600;
         border: none;
@@ -51,79 +51,91 @@
         transition: background-color 0.2s;
     }
     .modal-close-btn:hover {
-        background-color: #0891b2; /* cyan-600 */
+        background-color: #0891b2;
     }
 
-    /* 🌟 3D 원형 회전 캐러셀 CSS 🌟 */
+    /* 🌟 책 페이지 넘김 캐러셀 CSS - 크기 확대 및 3D 강화 🌟 */
     
     /* 1. Scene 설정 (원근감 부여) */
     #technologyContainer {
-        perspective: 1000px; /* 3D 효과의 깊이감 */
-        width: 650px; /* 캐러셀이 차지할 공간 */
-        height: 450px; /* 캐러셀이 차지할 공간 */
-        margin: 180px auto;
+        perspective: 1400px; /* 3D 깊이감 강화 */
+        width: 800px; /* 크기 확대 */
+        height: 850px; /* 크기 확대 */
+        margin: 60px auto;
         position: relative;
     }
 
-
-
-    /* 2. Carousel 회전 컨테이너 */
+    /* 2. Carousel 컨테이너 */
     #carousel {
         width: 100%;
         height: 100%;
-        position: absolute;
-        transform-style: preserve-3d; /* 자식 요소의 3D 변형 유지 */
-        transition: transform 0.6s ease-out; /* 정지 시 부드러운 전환 */
+        position: relative; 
+        transform-style: preserve-3d;
+        transition: none;
     }
 
     /* 3. 개별 카드 스타일 */
     .tech-card {
         position: absolute;
-        width: 600px; /* 카드 자체의 너비 */
-        height: 400px; /* 카드 자체의 높이 */
-        padding: 2rem;
+        width: 750px; /* 카드 자체의 너비 확대 */
+        height: 800px; /* 카드 자체의 높이 확대 */
+        top: 0;
+        left: 0;
+        padding: 2.5rem; /* 패딩 확대 */
         border: 1px solid #333;
         border-radius: 1rem;
         background-color: #171717;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-        transition: transform 0.6s, opacity 0.6s, border-color 0.6s;
-        text-align: center;
-        overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
-        cursor: pointer;
         
-        /* 초기에 3개의 카드를 120도 간격으로 배치 (350px는 반지름) */
-        /* 이 transform 값은 JS에 의해 덮어씌워질 수 있습니다. */
-    }
-
-    /* 카드 위치 설정 (360도 / 3개 = 120도 간격) */
-    #card-A { transform: rotateY(0deg) translateZ(350px); }
-    #card-B { transform: rotateY(120deg) translateZ(350px); }
-    #card-C { transform: rotateY(240deg) translateZ(350px); }
-
-    /* 4. 선택된 카드 스타일 (중앙에 멈췄을 때) */
-    .tech-card.is-selected {
-        border-color: #06b6d4; /* cyan-500 강조 */
-        box-shadow: 0 0 30px rgba(6, 182, 212, 0.5); /* Glowing effect */
+        /* transform-origin: left center; <- 제거 */
+        transform: translateX(0); /* 👈 수정: 3D 회전 대신 2D 슬라이드 시작 위치 */
+        transition: transform 0.8s ease-out, opacity 0.8s ease-out; /* 👈 수정: 슬라이드/페이드 전환 효과 */
+        
+        opacity: 0; /* 기본적으로 숨김 */
+        pointer-events: none;
+        z-index: 5;
+        text-align: center;
+        overflow-y: auto;
+        cursor: pointer;
+        /* backface-visibility: hidden; <- 제거 */
     }
     
-    /* 5. 비활성화된 이미지/링크 처리 (회전 중 또는 비선택 상태) */
+    /* 4. 카드 내부 이미지 가시성 개선 */
     .tech-card img {
         height: auto !important;
-        max-height: 40%; 
+        max-height: 45%; /* 카드 높이에 맞게 이미지 최대 높이 조정 */
         object-fit: contain !important;
-        margin: 0 auto 1rem;
+        margin: 0 auto 1.5rem; /* 마진 확대 */
         transition: opacity 0.3s;
     }
-    
-    /* 비선택 상태에서는 이미지 클릭을 막고 흐릿하게 */
-    .tech-card:not(.is-selected) .tech-card-image,
-    .tech-card:not(.is-selected) a.openBatteryDetail img {
-        pointer-events: none;
-        cursor: default;
-        opacity: 0.6;
+
+    /* 활성화된 카드 */
+    .tech-card.is-active {
+        opacity: 1; /* 활성화된 카드는 완전히 보이게 */
+        pointer-events: auto;
+        z-index: 10;
+        transform: translateX(0); /* 👈 수정: 활성화된 카드는 중앙에 위치 */
+        border-color: #06b6d4; 
+        box-shadow: 0 0 30px rgba(6, 182, 212, 0.5); 
     }
 
-
+    /* 버튼 스타일 */
+    .nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 30;
+        padding: 10px;
+        background-color: rgba(30, 30, 30, 0.8);
+        border-radius: 50%;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    .nav-btn:hover {
+        background-color: #06b6d4; /* cyan-500 */
+        color: black;
+    }
+    #prevBtn { left: -60px; }
+    #nextBtn { right: -60px; }
 
 </style>
 </head>
@@ -164,18 +176,23 @@
     </div>
 </header>
 
-<section id="technology" class="pt-40 pb-24 px-6 flex-grow"> <!-- pt-32 -> pt-40으로 수정 -->
+<section id="technology" class="pt-40 pb-24 px-6 flex-grow">
     <div class="max-w-6xl mx-auto">
         <h3 class="text-3xl font-bold mb-10 text-center">Core Technology Carousel</h3>
         <div id="technologyContainer">
+            <button id="prevBtn" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+
             <div id="carousel">
-                <div id="card-A" data-card-id="A" data-index="0" class="tech-card">
+                <div id="card-A" data-card-id="A" data-index="0" class="tech-card is-active">
                     <img src="images/technology/72V20A.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V20A-1.png" data-detail-text="TDLiD 72V 20Ah rechargeable lithium-ion battery has the following specifications: Capacity: 72V / 20Ah with LG NMC cells (Model: INR21700M50LT), configured in a 20S4P pack. Nominal Voltage: 73.8V; Nominal Capacity: 19.72Ah; Standard Charging Voltage: 83V. Charging Time: Approximately 3 hours with a recommended charging current of 5A.">
                     <h4 class="font-semibold mb-4">72V 20Ah (Main View)</h4>
                     <p class="text-neutral-400">
                         Capacity: 72V / 20Ah (20S4P), Nominal Voltage: 73.8V. Charging Time: Approx. 3 hours.
                     </p>
                 </div>
+                
                 <div id="card-B" data-card-id="B" data-index="1" class="tech-card">
                     <img src="images/technology/72V20A-2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V20A-2.png" data-detail-text="The TDLiD 72V 20Ah battery is designed with LG NMC cells and configured in a 20S4P arrangement, offering a nominal voltage of 73.8V. Standard charging time is approximately 3 hours.">
                     <img src="images/technology/72V20A-3.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V20A-3.png" data-detail-text="Charging time: 3 hours, driving range: 50-60km, with optimal performance across diverse temperatures.">
@@ -185,6 +202,7 @@
                     <h4 class="font-semibold mb-4 text-center">Battery detailed image</h4>
                     <p class="text-neutral-400 text-center">Click to see other views.</p>
                 </div>
+                
                 <div id="card-C" data-card-id="C" data-index="2" class="tech-card">
                     <img src="images/technology/YEDEA-1.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/YEDEA-1.png" data-detail-text="The TDLiD 72V 20Ah battery pack, configured in a 20S4P arrangement, offering a nominal voltage of 73.8V and a capacity of 19.72Ah.">
                     <img src="images/technology/72V5A-charger-2.png" class="w-full mb-4 rounded-lg hover:opacity-80 transition tech-card-image" data-detail-src="images/technology/72V5A-charger-2.png" data-detail-text="The TDLiD 72V-5A lithium battery charger is designed to pair seamlessly with this battery pack, providing optimal charging performance.">
@@ -192,6 +210,10 @@
                     <p class="text-neutral-400 text-center">Image of the charger and battery system integrated into the vehicle..</p>
                 </div>
             </div>
+
+            <button id="nextBtn" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
         </div>
 
     </div>
@@ -199,22 +221,14 @@
 
 
 <footer class="py-10 px-6 text-center text-neutral-500 border-t border-neutral-800">
-    © 2025 TDL Energy Indonesia. All rights reserved.
+    © 2025 TDL Energy Indonesia. All rights reserved.
 </footer>
 
 <script>
-    let rotationInterval;
-    let currentRotationY = 0; // 캐러셀의 현재 회전 각도
-    const ROTATION_SPEED = 0.2; // 초당 회전 속도 (작을수록 느림)
-    const FRAME_RATE = 1000 / 60; // 60fps
-    const CARD_COUNT = 3;
-    const ANGLE_STEP = 360 / CARD_COUNT; // 120도 간격
-    let isPaused = false;
-    
     // ----------------------------------------------------
-    // 1. 팝업 창 함수 (Solutions.html과 동일한 다크 테마)
+    // 1. 팝업 창 함수 (기존 유지)
     // ----------------------------------------------------
-    function openSolutionPopup(imageSrc, textContent) {
+    function openSolutionPopup(imageSrc, textContent, onCloseCallback) {
         const modal = document.createElement('div');
         modal.classList.add('modal-backdrop');
 
@@ -226,13 +240,18 @@
             </div>
         `;
 
-        modal.querySelector('.modal-close-btn').addEventListener('click', () => {
+        const closeModal = () => {
             document.body.removeChild(modal);
-        });
+            if (onCloseCallback) {
+                onCloseCallback();
+            }
+        };
+
+        modal.querySelector('.modal-close-btn').addEventListener('click', closeModal);
         
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
-                document.body.removeChild(modal);
+                closeModal();
             }
         });
 
@@ -240,108 +259,163 @@
     }
 
     // ----------------------------------------------------
-    // 2. 자동 회전 시작 함수
+    // 2. 페이지 넘김(3D Flip) 로직 -> 2D Slide/Fade 로직으로 수정
     // ----------------------------------------------------
-    function startRotation() {
-        const carousel = document.getElementById('carousel');
-        const cards = document.querySelectorAll('.tech-card');
-        
-        // 선택 상태 제거 및 회전 간격 설정
-        cards.forEach(c => c.classList.remove('is-selected'));
-        carousel.style.transition = 'none'; // 회전 중에는 부드러운 전환 효과 제거
-        isPaused = false;
-        
-        if (rotationInterval) clearInterval(rotationInterval);
+    let currentIndex = 0;
+    const cards = document.querySelectorAll('.tech-card');
+    const CARD_COUNT = cards.length;
+    const transitionDuration = 800; // CSS transition time (0.8s)
+    const autoFlipInterval = 3000; // 자동 전환 간격 (3초)
+    let isAnimating = false;
+    let autoFlipTimer;
 
-        rotationInterval = setInterval(() => {
-            // currentRotationY를 증가시키고, 캐러셀 전체를 역방향으로 회전 (시계 방향)
-            currentRotationY = (currentRotationY + ROTATION_SPEED) % 360;
-            carousel.style.transform = `rotateY(-${currentRotationY}deg)`;
-        }, FRAME_RATE);
+    // 모든 카드를 기본 상태(숨김)로 재설정
+    function resetCards() {
+        cards.forEach(card => {
+            card.classList.remove('is-active');
+            card.style.transition = 'none';
+            card.style.transform = 'translateX(0)';
+            card.style.opacity = '0';
+            card.style.zIndex = '5';
+        });
+    }
+
+    // 새 카드를 보여주는 함수 (페이지 넘김 애니메이션 실행)
+    function showCard(newIndex, direction) {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        const oldIndex = currentIndex;
+        currentIndex = newIndex;
+        const currentCard = cards[currentIndex];
+        const prevCard = cards[oldIndex];
+        
+        const slideDistance = 750; // tech-card width
+
+        // 1. 전환 효과 설정 및 Z-index 조정
+        cards.forEach(card => card.style.transition = `transform ${transitionDuration}ms ease-out, opacity ${transitionDuration}ms ease-out`);
+        
+        // Z-index: 이전 페이지(prevCard)가 새 페이지(currentCard)보다 위에 있어야 함
+        prevCard.style.zIndex = '15'; 
+        currentCard.style.zIndex = '10';
+
+        // 2. 새 카드를 준비: 중앙에 위치시키고 opacity는 1로 설정 (prevCard에 의해 가려진 상태)
+        currentCard.style.transform = 'translateX(0)';
+        currentCard.style.opacity = '1';
+        currentCard.classList.add('is-active');
+
+        // 3. 페이지 넘어가는 애니메이션 시작
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                if (direction === 'next') {
+                    // [수정] 다음 페이지로: 이전 카드를 왼쪽으로 밀어내며 (왼쪽 창으로 사라지는 효과) 페이드 아웃
+                    prevCard.style.transform = `translateX(-${slideDistance}px)`;
+                    prevCard.style.opacity = '0';
+                } else { // 'prev'
+                    // [수정] 이전 페이지로: 이전 카드를 오른쪽으로 밀어내며 페이드 아웃
+                    prevCard.style.transform = `translateX(${slideDistance}px)`;
+                    prevCard.style.opacity = '0';
+                }
+                // 새 카드는 중앙에 머무르며 prevCard가 사라지면서 자연스럽게 드러남
+            });
+        });
+
+        // 4. 애니메이션 종료 후 상태 정리
+        setTimeout(() => {
+            // 전환 효과 제거 
+            cards.forEach(card => card.style.transition = 'none'); 
+
+            // 이전 카드 완전히 숨김 및 위치 초기화
+            prevCard.style.opacity = '0'; 
+            prevCard.style.transform = 'translateX(0)'; // 다음 애니메이션을 위해 초기화
+            prevCard.classList.remove('is-active');
+
+            isAnimating = false;
+        }, transitionDuration);
+    }
+    
+    // 다음 페이지로 이동
+    function goToNext() {
+        let newIndex = (currentIndex + 1) % CARD_COUNT;
+        showCard(newIndex, 'next');
+    }
+    
+    // 이전 페이지로 이동
+    function goToPrev() {
+        let newIndex = (currentIndex - 1 + CARD_COUNT) % CARD_COUNT;
+        showCard(newIndex, 'prev');
     }
 
     // ----------------------------------------------------
-    // 3. 회전 정지 및 카드 중앙 정렬 함수
+    // 3. 자동 전환 제어 함수
     // ----------------------------------------------------
-    function stopAndCenterCard(clickedCard, clickedIndex) {
-        if (rotationInterval) {
-            clearInterval(rotationInterval);
-            rotationInterval = null;
-            isPaused = true;
+
+    function startAutoFlip() {
+        stopAutoFlip(); 
+        autoFlipTimer = setInterval(goToNext, autoFlipInterval);
+    }
+    
+    function stopAutoFlip() {
+        if (autoFlipTimer) {
+            clearInterval(autoFlipTimer);
+            autoFlipTimer = null;
         }
-        
-        const carousel = document.getElementById('carousel');
-        const cards = document.querySelectorAll('.tech-card');
-
-        // 기존 선택 해제
-        cards.forEach(c => c.classList.remove('is-selected'));
-
-        // 1. 클릭된 카드를 정면(0도)으로 가져오기 위한 목표 회전 각도 계산
-        // 카드의 초기 각도는 0, 120, 240도 입니다.
-        const targetCardAngle = clickedIndex * ANGLE_STEP; 
-        
-        // 최종 캐러셀 회전 각도: 클릭된 카드의 초기 각도를 0도로 맞추는 값
-        // 예: B(120도)를 클릭하면, 캐러셀은 120도 역회전(rotateY(-120deg))해야 B의 초기 위치가 정면으로 옵니다.
-        let finalRotation = -targetCardAngle;
-        
-        // 여기에 현재 회전 중이던 각도(currentRotationY)의 오차를 보정합니다.
-        // 현재 캐러셀의 회전은 -currentRotationY가 적용 중입니다.
-        // 따라서 최종 정지 각도는 (finalRotation - (currentRotationY % ANENT_STEP))이어야 하지만, 
-        // JS에서 currentRotationY가 지속적으로 업데이트되므로, 가장 가까운 targetRotation으로 맞춰주는 것이 부드럽습니다.
-        
-        // 가장 가까운 120도의 배수를 찾아 부드럽게 정렬 (옵션)
-        // finalRotation은 0, -120, -240 중 하나로 설정하여 정면으로 향하게 함
-
-        // 2. 부드러운 전환 효과 적용 후 최종 각도 적용
-        carousel.style.transition = 'transform 0.6s ease-out';
-        carousel.style.transform = `rotateY(${finalRotation}deg)`;
-        
-        // 3. 클릭된 카드 선택 상태 표시
-        clickedCard.classList.add('is-selected');
-
-        // 4. 다음 회전을 위해 currentRotationY 업데이트 (선택된 카드를 0도로 간주)
-        currentRotationY = -finalRotation; 
     }
+
 
     // ----------------------------------------------------
     // 4. 초기화 및 이벤트 리스너 부착
     // ----------------------------------------------------
     document.addEventListener('DOMContentLoaded', () => {
-        const carousel = document.getElementById('carousel');
-        const cards = document.querySelectorAll('.tech-card');
+        
+        // 1. 초기 카드 표시 및 자동 전환 시작
+        resetCards();
+        cards[0].classList.add('is-active'); 
+        cards[0].style.opacity = '1';
+        cards[0].style.zIndex = '10';
+        
+        startAutoFlip();
 
-        // 자동 회전 시작
-        startRotation(); 
+        // 2. 버튼 이벤트 리스너 부착 (클릭 시 자동 전환 일시 정지 후 재개)
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        prevBtn.addEventListener('click', () => {
+            stopAutoFlip();
+            goToPrev();
+            // 수동으로 넘긴 후 1초 후에 자동 전환 재개
+            setTimeout(startAutoFlip, 1000); 
+        });
 
-        cards.forEach((card, index) => {
+        nextBtn.addEventListener('click', () => {
+            stopAutoFlip();
+            goToNext();
+            // 수동으로 넘긴 후 1초 후에 자동 전환 재개
+            setTimeout(startAutoFlip, 1000);
+        });
+
+        // 3. 카드 클릭 이벤트: 팝업 열기 시 자동 전환 일시 정지
+        cards.forEach(card => {
             card.addEventListener('click', function(event) {
-                const cardIndex = parseInt(this.getAttribute('data-index'));
-
-                // 1. 이미지 클릭 (팝업 실행)
-                if (event.target.closest('.tech-card-image') || event.target.closest('a.openBatteryDetail')) {
-                    if (card.classList.contains('is-selected')) {
+                if (this.classList.contains('is-active') && !isAnimating) {
+                     if (event.target.closest('.tech-card-image') || event.target.closest('a.openBatteryDetail')) {
+                        stopAutoFlip(); 
+                        
                         const link = event.target.closest('a') || event.target;
                         const imageSrc = link.getAttribute('data-detail-src') || event.target.getAttribute('src');
                         const textContent = link.getAttribute('data-detail-text') || 'No description available.';
-                        openSolutionPopup(imageSrc, textContent);
-                        event.stopPropagation(); // 팝업 후 회전/정지 로직 방지
+                        
+                        // 팝업 닫기 콜백 함수를 통해 자동 전환 재개
+                        openSolutionPopup(imageSrc, textContent, startAutoFlip); 
+                        
+                        event.stopPropagation();
                         return;
                     }
-                    return; // 비선택 카드 이미지 클릭 무시
-                }
-                
-                // 2. 카드 배경 클릭 (정지/선택/재개 로직)
-                if (card.classList.contains('is-selected')) {
-                    // 이미 선택된 카드를 다시 클릭 -> 회전 재개
-                    startRotation();
-                } else {
-                    // 회전 중이거나 다른 카드를 클릭 -> 정지 및 해당 카드 중앙 정렬
-                    stopAndCenterCard(card, cardIndex);
                 }
             });
         });
-
-        // 모바일 메뉴 토글 (기존 로직 유지)
+        
+        // 4. 모바일 메뉴 토글 (기존 로직 유지)
         document.getElementById('mobileMenuBtn').addEventListener('click', function() {
             document.getElementById('mobileMenu').classList.toggle('hidden');
             document.getElementById('mobileMenu').classList.toggle('flex');
