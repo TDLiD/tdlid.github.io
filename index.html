@@ -13,34 +13,27 @@
 
     <style>
         /* ===== IMAGE MODAL ===== */
-        #imageModal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,.9);
-            z-index: 10000;
-        }
-        #modalDetailImage {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-        }
+        #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; }
+        #modalDetailImage { max-width: 90%; max-height: 90%; object-fit: contain; }
 
-        /* [수정] 드롭다운 스타일 (디자인 통일) */
-        .dropdown-link { 
-            padding: 12px 20px; display: block; color: #ccc; 
-            border-bottom: 1px solid #262626; transition: all 0.2s;
-            text-align: left; /* 정렬 수정 */
-        }
+        /* 드롭다운 스타일 */
+        .dropdown-link { padding: 12px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; transition: all 0.2s; text-align: left; }
         .dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
-        .dropdown-quote-btn { 
-            padding: 12px 20px; display: block; background: #22d3ee; 
-            color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; 
-            transition: background 0.2s;
-        }
+        .dropdown-quote-btn { padding: 12px 20px; display: block; background: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; transition: background 0.2s; }
         .dropdown-quote-btn:hover { background: #67e8f9; }
-
-        /* 데스크톱/모바일 공통 버튼 깨짐 방지 */
         .whitespace-nowrap { white-space: nowrap !important; }
+
+        /* 뮤직 플레이어 컨트롤 */
+        #musicToggleBtn { position: fixed; bottom: 25px; right: 25px; z-index: 10005; width: 44px; height: 44px; background: rgba(23, 23, 23, 0.8); border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #22d3ee; backdrop-filter: blur(4px); transition: all 0.3s; }
+        #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
+
+        /* ===== 이스터 에그 오버레이 ===== */
+        #easterEggOverlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; color: #22d3ee; padding: 20px; }
+        .scanning-line { width: 100%; height: 2px; background: #22d3ee; position: absolute; top: 0; left: 0; box-shadow: 0 0 15px #22d3ee; animation: scan 1.5s linear infinite; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* Staff 이미지 스타일 */
+        #staffImage { margin-top: 30px; max-width: 300px; border-radius: 12px; border: 1px solid #22d3ee; box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); opacity: 0; transition: opacity 1.5s ease-in-out; }
     </style>
 </head>
 
@@ -48,13 +41,22 @@
 
 <audio id="bgm" src="mp3/Caribbean.mp3" autoplay loop muted></audio>
 
+<div id="easterEggOverlay">
+    <div class="scanning-line"></div>
+    <div class="text-2xl font-bold mb-4 animate-pulse">⚡⚡⚡ TDLiD SYSTEM SCANNING...</div>
+    <div id="statusLog" class="text-xl text-neutral-400">Initializing Security Protocol...</div>
+    <img id="staffImage" src="images/staff.jpg" alt="TDL Staff">
+</div>
+
+<button id="musicToggleBtn" title="Play/Pause Music">
+    <span id="musicIconUI">🔇</span>
+</button>
+
 <header class="fixed top-0 left-0 w-full z-[10001] bg-neutral-950/90 backdrop-blur-sm border-b border-neutral-800 p-4 flex justify-between items-center">
     <a href="index.html" class="flex items-center gap-3 text-xl font-bold shrink-0">
         <img src="images/logo/logo.png" class="h-14 w-auto">
-        <span class="animated-logo-text uppercase text-sm md:text-base">
-            &nbsp;&nbsp;&nbsp;&nbsp; TDL ENERGY INDONESIA</span>
+        <span class="animated-logo-text uppercase text-sm md:text-base">&nbsp;&nbsp;&nbsp;&nbsp; TDL ENERGY INDONESIA</span>
     </a>
-
     <nav class="relative flex items-center gap-6">
         <ul class="hidden lg:flex items-center gap-8 text-sm font-light">
             <li><a href="index.html" class="text-cyan-400 font-bold whitespace-nowrap">Home</a></li>
@@ -65,11 +67,9 @@
             <li><a href="news.html" class="hover:text-cyan-400 whitespace-nowrap">News</a></li>
             <li><a href="contact.html" class="px-5 py-2 rounded-full bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition whitespace-nowrap">Request Quote</a></li>
         </ul>
-
         <button id="menuToggleBtn" class="lg:hidden text-2xl text-cyan-400 w-10 h-10 border border-cyan-500 rounded-full flex items-center justify-center z-[10002]">
             <span id="menuIcon">☰</span>
         </button>
-
         <div id="dropdownMenu" class="absolute top-full right-0 mt-4 w-56 bg-neutral-900 border border-neutral-700 rounded-xl opacity-0 invisible transition-all duration-300 z-[10002] shadow-2xl overflow-hidden">
             <a href="index.html" class="dropdown-link text-cyan-400 font-bold">Home</a>
             <a href="products.html" class="dropdown-link">Products</a>
@@ -86,12 +86,10 @@
     <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="images/flag.jpg">
         <source src="videos/battery14.mp4" type="video/mp4">
     </video>
-    
     <div class="hero-content max-w-6xl w-full px-6 text-center">
         <h1 class="hero-logo-gradient">TDLiD</h1>
         <p class="hero-slogan-gradient">NO MORE CARBON</p>
-
-        <p id="heroIntroText" class="hero-description mt-22 md:mt-36 mb-24 max-w-3xl mx-auto">
+        <p class="hero-description text-xl mt-22 md:mt-36 mb-24 max-w-3xl mx-auto">
             TDLiD is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
         </p>
     </div>
@@ -100,41 +98,36 @@
 <section id="trust-certs-showcase" class="py-24 md:py-32 px-6 bg-neutral-900 border-t border-b border-neutral-800">
     <div class="max-w-7xl mx-auto">
         <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-extralight mb-10 text-cyan-400">
-                A Pillar of Trust in the EV Ecosystem
-            </h2>
+            <h2 class="text-3xl md:text-4xl font-extralight mb-10 text-cyan-400">A Pillar of Trust in the EV Ecosystem</h2>
             <div class="flex flex-wrap items-center justify-center gap-10 md:gap-16 opacity-75 grayscale hover:grayscale-0 transition-all duration-500">
-                <img src="images/DAVIGO.png" alt="DAVIGO" class="h-10 md:h-14" loading="lazy">
-                <img src="images/GESITS.png" alt="GESITS" class="h-10 md:h-14" loading="lazy">
-                <img src="images/ALESSA.png" alt="ALESSA" class="h-10 md:h-14" loading="lazy">
+                <img src="images/DAVIGO.png" alt="DAVIGO" class="h-10 md:h-14">
+                <img src="images/GESITS.png" alt="GESITS" class="h-10 md:h-14">
+                <img src="images/ALESSA.png" alt="ALESSA" class="h-10 md:h-14">
             </div>
         </div>
-        
         <div class="mt-20">
-            <h2 class="text-2xl md:text-3xl font-extralight text-center mb-10 text-cyan-400">
-                Global Compliance and Safety Standards
-            </h2>
+            <h2 class="text-2xl md:text-3xl font-extralight text-center mb-10 text-cyan-400">Global Compliance and Safety Standards</h2>
             <div id="certifications-inside-hero" class="flex flex-wrap gap-4 md:gap-8 items-center justify-center interactive-certs">
                 <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CE-EMC-TEST.jpg">
-                    <img src="images/certification/CE-EMC-TEST.jpg" alt="CE-EMC-TEST" class="h-16 md:h-20 transition-transform duration-300 shadow-xl" loading="lazy">
+                    <img src="images/certification/CE-EMC-TEST.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
                 </a>
                 <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CB-TEST.jpg">
-                    <img src="images/certification/CB-TEST.jpg" alt="CB-TEST" class="h-16 md:h-20 transition-transform duration-300 shadow-xl" loading="lazy">
+                    <img src="images/certification/CB-TEST.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
                 </a>
                 <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/EMC-COMPLIANCE.jpg">
-                    <img src="images/certification/EMC-COMPLIANCE.jpg" alt="EMC-COMPLIANCE" class="h-16 md:h-20 transition-transform duration-300 shadow-xl" loading="lazy">
+                    <img src="images/certification/EMC-COMPLIANCE.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
                 </a>
                 <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/IEC-62619.jpg">
-                    <img src="images/certification/IEC-62619.jpg" alt="IEC-62619" class="h-16 md:h-20 transition-transform duration-300 shadow-xl" loading="lazy">
+                    <img src="images/certification/IEC-62619.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
                 </a>
                 <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Material-Safety.jpg">
-                    <img src="images/certification/Material-Safety.jpg" alt="Material-Safety" class="h-16 md:h-20 transition-transform duration-300 shadow-xl" loading="lazy">
+                    <img src="images/certification/Material-Safety.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
                 </a>
                 <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/UN38.3.jpg">
-                    <img src="images/certification/UN38.3.jpg" alt="UN38.3" class="h-16 md:h-20 transition-transform duration-300 shadow-xl" loading="lazy">
+                    <img src="images/certification/UN38.3.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
                 </a>
                 <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Dangerous-Goods.jpg">
-                    <img src="images/certification/Dangerous-Goods.jpg" alt="Dangerous-Goods" class="h-16 md:h-20 transition-transform duration-300 shadow-xl" loading="lazy">
+                    <img src="images/certification/Dangerous-Goods.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
                 </a>
             </div>
         </div>
@@ -143,82 +136,126 @@
 
 <div id="imageModal" class="hidden">
     <div class="flex items-center justify-center w-full h-full">
-        <img id="modalDetailImage" src="" alt="Detail Image" class="max-w-full max-h-full object-contain">
+        <img id="modalDetailImage" src="" class="max-w-full max-h-full object-contain">
     </div>
 </div>
 
 <footer class="py-6 text-center text-neutral-500 border-t border-neutral-800 bg-neutral-900">
-    <div class="max-w-7xl mx-auto px-6">
-        <p class="text-sm">© 2025 TDL Energy Indonesia - Driving the Future of Mobility.</p>
-    </div>
+    <p class="text-sm">© 2025 TDL Energy Indonesia - Driving the Future of Mobility.</p>
 </footer>
 
-<script src="js/main.js"></script>
 <script>
-    // [기존 유지] 팝업 이미지 열기
-    document.querySelectorAll('.cert-link').forEach(link => {
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            const imageSrc = e.currentTarget.getAttribute('data-original-src');
-            document.getElementById('modalDetailImage').src = imageSrc;
-            const modal = document.getElementById('imageModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden'; 
-        });
-    });
+    // 1. 마우스 오른쪽 클릭 방지 (F12는 허용)
+    document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
 
-    // [기존 유지] 모달 닫기
-    document.getElementById('imageModal').addEventListener('click', function (e) {
-        if (e.target.id !== 'modalDetailImage') { 
-            this.classList.remove('flex');
-            this.classList.add('hidden');
-            document.body.style.overflow = '';
+    // 2. 이스터 에그 로직 (tdlid 입력)
+    let inputBuffer = "";
+    document.addEventListener("keydown", (e) => {
+        inputBuffer += e.key.toLowerCase();
+        if (inputBuffer.length > 5) inputBuffer = inputBuffer.slice(-5);
+        if (inputBuffer === "tdlid") {
+            runScanAnimation();
+            inputBuffer = "";
         }
     });
 
-    // [기존 유지] 음악 시작
+    function runScanAnimation() {
+        const overlay = document.getElementById('easterEggOverlay');
+        const log = document.getElementById('statusLog');
+        const staffImg = document.getElementById('staffImage');
+        overlay.style.display = 'flex';
+        staffImg.style.opacity = '0';
+
+        const messages = [
+            "Accessing Battery Management System...",
+            "Decrypting Li-ion Data...",
+            "Fetching Energy Report...",
+            "TDLiD Verified. Syncing Console...",
+            "Mr. Ray...🧔", "Mr. Eza...😎", "Mr. Rezy...👨‍🦰", "Miss. Etno...🧕"
+        ];
+
+        messages.forEach((msg, i) => {
+            setTimeout(() => {
+                log.innerText = msg;
+                if (i === 4) staffImg.style.opacity = '1';
+                if (i === messages.length - 1) {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        printConsoleData();
+                        alert("Scan Successful! Please Press F12 to see the Energy Report.");
+                    }, 1500);
+                }
+            }, i * 800);
+        });
+    }
+
+    function printConsoleData() {
+        const logo = `
+ ████████╗██████╗ ██╗     ██╗██████╗ 
+ ╚══██╔══╝██╔══██╗██║     ██║██╔══██╗
+    ██║   ██║  ██║██║     ██║██║  ██║
+    ██║   ██║  ██║██║     ██║██║  ██║
+    ██║   ██████╔╝███████╗██║██████╔╝
+    ╚═╝   ╚═════╝ ╚══════╝╚═╝╚═════╝ `;
+        console.clear();
+        console.log("%c" + logo, "color: #22d3ee; font-weight: bold;");
+        if (navigator.getBattery) {
+            navigator.getBattery().then(b => {
+                console.log(`%c[REPORT] User Battery: ${Math.round(b.level * 100)}%`, "color: #22d3ee; font-size: 14px;");
+            });
+        }
+    }
+
+    // 3. 뮤직 컨트롤
+    const bgm = document.getElementById('bgm');
+    const musicBtn = document.getElementById('musicToggleBtn');
+    const musicIcon = document.getElementById('musicIconUI');
+
+    musicBtn.onclick = () => {
+        if (bgm.muted) { bgm.muted = false; bgm.play(); musicIcon.innerText = "🎵"; }
+        else { bgm.muted = true; musicIcon.innerText = "🔇"; }
+    };
+
     document.addEventListener('click', () => {
-        const bgm = document.getElementById('bgm');
-        if (bgm && bgm.muted) {
-            bgm.muted = false;
-            bgm.play().catch(e => console.log('BGM Autoplay failed:', e));
+        if (bgm.muted && musicIcon.innerText === "🔇") {
+            bgm.muted = false; bgm.play().then(() => musicIcon.innerText = "🎵").catch(() => {});
         }
     }, { once: true });
 
-    // ----------------------------------------------------
-    // [수정] 메뉴 제어 로직 (solutions.html 방식 적용)
-    // ----------------------------------------------------
-    document.addEventListener("DOMContentLoaded", () => {
-        const menuBtn = document.getElementById("menuToggleBtn");
-        const dropdown = document.getElementById("dropdownMenu");
-        const menuIcon = document.getElementById("menuIcon");
-
-        menuBtn.onclick = (e) => {
-            e.stopPropagation();
-            const isOpen = dropdown.classList.contains("visible");
-            
-            if (isOpen) {
-                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                dropdown.classList.add("opacity-0", "invisible");
-                menuIcon.innerText = "☰";
-            } else {
-                dropdown.classList.remove("opacity-0", "invisible");
-                dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                menuIcon.innerText = "✕";
-            }
+    // 4. 이미지 모달 및 메뉴 제어
+    document.querySelectorAll('.cert-link').forEach(link => {
+        link.onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('modalDetailImage').src = link.getAttribute('data-original-src');
+            const modal = document.getElementById('imageModal');
+            modal.classList.replace('hidden', 'flex');
+            document.body.style.overflow = 'hidden';
         };
-
-        // 바깥 클릭 시 메뉴 닫기
-        document.addEventListener('click', (e) => {
-            if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
-                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                dropdown.classList.add("opacity-0", "invisible");
-                menuIcon.innerText = "☰";
-            }
-        });
     });
-</script>
 
+    document.getElementById('imageModal').onclick = (e) => {
+        if (e.target.id !== 'modalDetailImage') {
+            document.getElementById('imageModal').classList.replace('flex', 'hidden');
+            document.body.style.overflow = '';
+        }
+    };
+
+    const menuBtn = document.getElementById("menuToggleBtn");
+    const dropdown = document.getElementById("dropdownMenu");
+    const menuIcon = document.getElementById("menuIcon");
+    menuBtn.onclick = (e) => {
+        e.stopPropagation();
+        const isOpen = dropdown.classList.contains("visible");
+        if (isOpen) {
+            dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+            dropdown.classList.add("opacity-0", "invisible");
+            menuIcon.innerText = "☰";
+        } else {
+            dropdown.classList.remove("opacity-0", "invisible");
+            dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+            menuIcon.innerText = "✕";
+        }
+    };
+</script>
 </body>
 </html>
