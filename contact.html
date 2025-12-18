@@ -21,7 +21,7 @@
         max-width: 700px; 
         width: 100%;
     }
-    /* 드롭다운 스타일 */
+    /* 드롭다운 스타일 (컴포넌트 대응) */
     .dropdown-link {
         padding: 12px 20px;
         display: block;
@@ -47,52 +47,7 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
 
-<header class="fixed top-0 left-0 w-full z-[10001] bg-neutral-950/90 backdrop-blur-sm border-b border-neutral-800 p-4 flex justify-between items-center">
-    
-    <a href="index.html" class="flex items-center gap-2 md:gap-3 text-xl font-bold shrink-0">
-        <img src="images/logo/logo.png" class="h-14 w-auto">
-        <span class="animated-logo-text uppercase text-sm md:text-base">
-            &nbsp;&nbsp;&nbsp;&nbsp; TDL ENERGY INDONESIA</span>
-    </a>
-
-    <nav class="relative flex items-center gap-2 md:gap-6">
-        <ul class="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-light whitespace-nowrap">
-            <li><a href="index.html" class="hover:text-cyan-400">Home</a></li>
-            <li><a href="products.html" class="hover:text-cyan-400">Products</a></li>
-            <li><a href="technology.html" class="hover:text-cyan-400">Technology</a></li>
-            <li><a href="solutions.html" class="hover:text-cyan-400">Solutions</a></li>
-            <li><a href="company.html" class="hover:text-cyan-400">Company</a></li>
-            <li><a href="news.html" class="hover:text-cyan-400">News</a></li>
-            <li>
-                <a href="contact.html"
-                    class="px-3 py-2 md:px-5 md:py-2 rounded-full bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition text-xs md:text-sm whitespace-nowrap">
-                    Request Quote
-                </a>
-            </li>
-        </ul>
-
-        <button id="menuToggleBtn"
-            class="lg:hidden text-2xl text-cyan-400 w-10 h-10 flex items-center justify-center border border-cyan-500 rounded-full hover:bg-cyan-500 hover:text-black transition-all duration-300"
-            aria-expanded="false"
-            aria-controls="dropdownMenu">
-            <span id="menuIcon">☰</span>
-        </button>
-
-        <div id="dropdownMenu"
-            class="absolute top-full right-0 mt-4 w-48 bg-neutral-900 border border-neutral-700
-                   rounded-xl shadow-xl flex flex-col opacity-0 invisible translate-y-[-10px]
-                   transition-all duration-300"
-            role="menu">
-            <a href="index.html" class="dropdown-link">Home</a>
-            <a href="products.html" class="dropdown-link">Products</a>
-            <a href="technology.html" class="dropdown-link">Technology</a>
-            <a href="solutions.html" class="dropdown-link">Solutions</a>
-            <a href="company.html" class="dropdown-link">Company</a>
-            <a href="news.html" class="dropdown-link">News</a>
-            <a href="contact.html" class="dropdown-quote-btn">Request Quote</a>
-        </div>
-    </nav>
-</header>
+<div id="header-placeholder"></div>
 
 <main class="pt-32 pb-10 px-6 contact-form-container">
     <div class="form-card bg-neutral-900 border border-neutral-700 p-8 rounded-2xl shadow-2xl relative mt-16 md:mt-0">
@@ -126,77 +81,104 @@
     </div>
 </main>
 
-<footer class="py-10 px-6 text-center text-neutral-500 border-t border-neutral-800">
-    © 2025 TDL Energy Indonesia. All rights reserved.
-</footer>
+<div id="footer-placeholder"></div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // 1. 폼 전송 로직 (성공/실패 메시지 처리)
-    const form = document.getElementById('quoteForm');
-    const formStatus = document.getElementById('formStatus');
-
-    if(form) {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            formStatus.textContent = 'Sending...';
+    /**
+     * 1. 레이아웃 로드 및 기능 초기화
+     */
+    async function loadLayout() {
+        try {
+            const headerRes = await fetch('components/header.html');
+            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
             
-            try {
-                const response = await fetch(form.action, {
-                    method: form.method,
-                    body: new FormData(form),
-                    headers: { 'Accept': 'application/json' }
-                });
+            const footerRes = await fetch('components/footer.html');
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            
+            initMenuToggle();
+            initFormHandler();
+        } catch (err) {
+            console.error("Layout load failed:", err);
+        }
+    }
 
-                if (response.ok) {
-                    formStatus.textContent = '✅ Your request has been successfully submitted!';
-                    formStatus.className = 'mt-4 text-center text-sm text-green-500';
-                    form.reset();
+    /**
+     * 2. 모바일 메뉴 제어
+     */
+    function initMenuToggle() {
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const dropdown = document.getElementById("dropdownMenu");
+        const menuIcon = document.getElementById("menuIcon");
+
+        if (menuBtn && dropdown) {
+            menuBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const isOpen = dropdown.classList.contains("opacity-100");
+
+                if (!isOpen) {
+                    dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                    menuIcon.innerText = "✕";
+                    menuBtn.setAttribute("aria-expanded", "true");
                 } else {
-                    formStatus.textContent = '❌ Failed to send request.';
+                    closeMenu();
+                }
+            });
+
+            function closeMenu() {
+                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
+                menuIcon.innerText = "☰";
+                menuBtn.setAttribute("aria-expanded", "false");
+            }
+
+            document.addEventListener("click", (e) => {
+                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
+            });
+
+            window.addEventListener("resize", () => {
+                if (window.innerWidth >= 1024) closeMenu();
+            });
+        }
+    }
+
+    /**
+     * 3. 견적 요청 폼 전송 핸들러
+     */
+    function initFormHandler() {
+        const form = document.getElementById('quoteForm');
+        const formStatus = document.getElementById('formStatus');
+
+        if(form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                formStatus.textContent = 'Sending...';
+                
+                try {
+                    const response = await fetch(form.action, {
+                        method: form.method,
+                        body: new FormData(form),
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (response.ok) {
+                        formStatus.textContent = '✅ Your request has been successfully submitted!';
+                        formStatus.className = 'mt-4 text-center text-sm text-green-500';
+                        form.reset();
+                    } else {
+                        formStatus.textContent = '❌ Failed to send request.';
+                        formStatus.className = 'mt-4 text-center text-sm text-red-500';
+                    }
+                } catch (error) {
+                    formStatus.textContent = '❌ An error occurred. Please try again.';
                     formStatus.className = 'mt-4 text-center text-sm text-red-500';
                 }
-            } catch (error) {
-                formStatus.textContent = '❌ An error occurred. Please try again.';
-            }
-        });
-    }
-
-    // 2. 메뉴 제어 로직 (news.html과 통일)
-    const menuBtn = document.getElementById("menuToggleBtn");
-    const dropdown = document.getElementById("dropdownMenu");
-    const menuIcon = document.getElementById("menuIcon");
-
-    if (menuBtn && dropdown) {
-        menuBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const isOpen = dropdown.classList.contains("opacity-100");
-
-            if (!isOpen) {
-                dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
-                dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                menuIcon.innerText = "✕";
-                menuBtn.setAttribute("aria-expanded", "true");
-            } else {
-                closeMenu();
-            }
-        });
-
-        function closeMenu() {
-            dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-            dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
-            menuIcon.innerText = "☰";
-            menuBtn.setAttribute("aria-expanded", "false");
+            });
         }
-
-        document.addEventListener("click", (e) => {
-            if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
-        });
-        window.addEventListener("resize", () => {
-            if (window.innerWidth >= 1024) closeMenu();
-        });
     }
-});
+
+    // 초기 로딩 실행
+    document.addEventListener("DOMContentLoaded", loadLayout);
 </script>
 
 </body>

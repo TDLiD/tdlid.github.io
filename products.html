@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 1. 제품 전환 애니메이션 */
+        /* 1. 제품 전환 애니메이션 (원래 기능 유지) */
         #productContentWrapper {
             transition: transform 0.8s ease-out, opacity 0.8s ease-out;
         }
@@ -25,7 +25,7 @@
             max-width: 100%; height: 100%; object-fit: contain;
         }
 
-        /* 2. 드롭다운 스타일 (디자인 통일) */
+        /* 2. 드롭다운 스타일 (외부 import 후에도 적용되도록 유지) */
         .dropdown-link { 
             padding: 12px 20px; display: block; color: #ccc; 
             border-bottom: 1px solid #262626; transition: all 0.2s;
@@ -38,122 +38,68 @@
     </style>
 </head>
 
-<body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
-<audio id="bgm" src="mp3/Caribbean.mp3" autoplay loop muted></audio>
+<div id="header-placeholder"></div>
 
-<header class="fixed top-0 left-0 w-full z-[10001] bg-neutral-950/90 backdrop-blur-sm border-b border-neutral-800 p-4 flex justify-between items-center">
-    <a href="index.html" class="flex items-center gap-3 text-xl font-bold shrink-0">
-        <img src="images/logo/logo.png" class="h-14 w-auto">
-        <span class="animated-logo-text uppercase text-sm md:text-base">
-            &nbsp;&nbsp;&nbsp;&nbsp; TDL ENERGY INDONESIA</span>
-    </a>
-
-    <nav class="relative flex items-center gap-6">
-        <ul class="hidden lg:flex items-center gap-8 text-sm font-light">
-            <li><a href="index.html" class="hover:text-cyan-400">Home</a></li>
-            <li><a href="products.html" class="text-cyan-400 font-bold">Products</a></li>
-            <li><a href="technology.html" class="hover:text-cyan-400">Technology</a></li>
-            <li><a href="solutions.html" class="hover:text-cyan-400">Solutions</a></li>
-            <li><a href="company.html" class="hover:text-cyan-400">Company</a></li>
-            <li><a href="news.html" class="hover:text-cyan-400">News</a></li>
-            <li><a href="contact.html" class="px-5 py-2 rounded-full bg-cyan-400 text-black font-medium hover:bg-cyan-300">Request Quote</a></li>
-        </ul>
-
-        <button id="menuToggleBtn" class="lg:hidden text-2xl text-cyan-400 w-10 h-10 border border-cyan-500 rounded-full flex items-center justify-center">
-            <span id="menuIcon">☰</span>
-        </button>
-
-        <div id="dropdownMenu" class="absolute top-full right-0 mt-4 w-56 bg-neutral-900 border border-neutral-700 rounded-xl opacity-0 invisible transition-all duration-300 z-[10002] shadow-2xl overflow-hidden">
-            <a href="index.html" class="dropdown-link">Home</a>
-            <a href="products.html" class="dropdown-link text-cyan-400 font-bold">Products</a>
-            <a href="technology.html" class="dropdown-link">Technology</a>
-            <a href="solutions.html" class="dropdown-link">Solutions</a>
-            <a href="company.html" class="dropdown-link">Company</a>
-            <a href="news.html" class="dropdown-link">News</a>
-            <a href="contact.html" class="dropdown-quote-btn">Request Quote</a>
-        </div>
-    </nav>
-</header>
-
-<section class="pt-24 px-6">
+<main class="flex-grow pt-32 pb-24 px-6">
     <div class="max-w-7xl mx-auto">
-
-        <div class="relative flex flex-col items-center mb-8">
-            <h3 class="text-4xl font-black tracking-wide hero-slogan-gradient text-center">
-                TDLiD Products
-            </h3>
-
+        <div class="relative flex flex-col items-center mb-12">
+            <h3 class="text-4xl font-black tracking-wide hero-slogan-gradient text-center">TDLiD Products</h3>
+            
             <div class="flex gap-3 mt-6 lg:absolute lg:right-0 lg:mt-0">
                 <a href="data/catalog/comparison.pdf" target="_blank" class="px-3 py-2 rounded-lg bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform text-sm">Compare Models</a>
                 <a href="data/catalog/tei-catalog-2025.pdf" target="_blank" class="px-3 py-2 rounded-lg bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform text-sm">View Catalog</a>
             </div>
         </div>
-
+        
         <div id="productGallery" class="max-w-4xl mx-auto p-4 bg-neutral-900 rounded-2xl border border-neutral-800 shadow-2xl">
             <div id="productContentWrapper">
                 <div id="galleryImageContainer" class="aspect-[4/3] bg-neutral-800/50 rounded-xl p-6">
                     </div>
-                <h4 id="productName" class="hidden"></h4>
-                <p id="productDescription" class="hidden"></p>
             </div>
             
             <div class="flex justify-between items-center mt-6 px-2">
                 <button id="galleryPrevBtn" class="w-12 h-12 flex items-center justify-center bg-neutral-800 rounded-full border border-neutral-700 text-cyan-400 hover:bg-cyan-500 hover:text-black transition">
                     <span class="text-xl">←</span>
                 </button>
-                
-                <span id="galleryStatus" class="text-neutral-500 font-mono tracking-widest text-sm uppercase">
-                    </span>
-
+                <span id="galleryStatus" class="text-neutral-500 font-mono tracking-widest text-sm uppercase"></span>
                 <button id="galleryNextBtn" class="w-12 h-12 flex items-center justify-center bg-neutral-800 rounded-full border border-neutral-700 text-cyan-400 hover:bg-cyan-500 hover:text-black transition">
                     <span class="text-xl">→</span>
                 </button>
             </div>
         </div>
     </div>
-</section>
+</main>
 
-
-<footer class="py-10 text-center text-neutral-500 border-t border-neutral-800 mt-10">
-    © 2025 TDL Energy Indonesia. All rights reserved.
-</footer>
+<div id="footer-placeholder"></div>
 
 <script>
-    const productsData = [
-        { id: 1, name: '', spec: '', image: 'images/products/image-1.png', desc: '' },
-        { id: 2, name: '', spec: '', image: 'images/products/image-2.png', desc: '' },
-        { id: 3, name: '', spec: '', image: 'images/products/image-3.png', desc: '' },
-        { id: 4, name: '', spec: '', image: 'images/products/image-4.png', desc: '' },
-        { id: 5, name: '', spec: '', image: 'images/products/image-5.png', desc: '' },
-        { id: 6, name: '', spec: '', image: 'images/products/image-6.png', desc: '' },
-        { id: 7, name: '', spec: '', image: 'images/products/image-7.png', desc: '' },
-        { id: 8, name: '', spec: '', image: 'images/products/image-8.png', desc: '' },
-        { id: 9, name: '', spec: '', image: 'images/products/image-9.png', desc: '' },
-        { id: 10, name: '', spec: '', image: 'images/products/image-10.png', desc: '' },
-        { id: 11, name: '', spec: '', image: 'images/products/image-11.png', desc: '' },
-        { id: 12, name: '', spec: '', image: 'images/products/image-12.png', desc: '' },
-        { id: 13, name: '', spec: '', image: 'images/products/image-13.png', desc: '' },
-        { id: 14, name: '', spec: '', image: 'images/products/image-14.png', desc: '' },
-        { id: 15, name: '', spec: '', image: 'images/products/image-15.png', desc: '' },
-        { id: 16, name: '', spec: '', image: 'images/products/image-16.png', desc: '' },
-        { id: 17, name: '', spec: '', image: 'images/products/image-17.png', desc: '' },
-        { id: 18, name: '', spec: '', image: 'images/products/image-18.png', desc: '' },
-        { id: 19, name: '', spec: '', image: 'images/products/image-19.png', desc: '' },
-        { id: 20, name: '', spec: '', image: 'images/products/image-20.png', desc: '' },
-        { id: 21, name: '', spec: '', image: 'images/products/image-21.png', desc: '' },
-        { id: 22, name: '', spec: '', image: 'images/products/image-22.png', desc: '' },
-        { id: 23, name: '', spec: '', image: 'images/products/image-23.png', desc: '' },
-        { id: 24, name: '', spec: '', image: 'images/products/image-24.png', desc: '' },
-        { id: 25, name: '', spec: '', image: 'images/products/image-25.png', desc: '' },
-        { id: 26, name: '', spec: '', image: 'images/products/image-26.png', desc: '' },
-        { id: 27, name: '', spec: '', image: 'images/products/image-27.png', desc: '' },
-        { id: 28, name: '', spec: '', image: 'images/products/image-28.png', desc: '' },
-        { id: 29, name: '', spec: '', image: 'images/products/image-29.png', desc: '' },
-        { id: 30, name: '', spec: '', image: 'images/products/image-30.png', desc: '' },
-        { id: 31, name: '', spec: '', image: 'images/products/image-31.png', desc: '' },
-        { id: 32, name: '', spec: '', image: 'images/products/image-32.png', desc: '' }
-    ];
+    /**
+     * 1. 레이아웃 Import 함수 (경로: components/)
+     */
+    async function loadLayout() {
+        try {
+            const headerRes = await fetch('components/header.html');
+            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+
+            const footerRes = await fetch('components/footer.html');
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+            // 헤더 로드 후 메뉴 토글 기능 초기화
+            initMenuToggle();
+        } catch (err) {
+            console.error("Layout load failed:", err);
+        }
+    }
+
+    /**
+     * 2. 제품 갤러리 로직 (기존 로직 유지)
+     */
+    const productsData = [];
+    for(let i=1; i<=32; i++) {
+        productsData.push({ image: `images/products/image-${i}.png` });
+    }
 
     const productContentWrapper = document.getElementById('productContentWrapper');
     const galleryImageContainer = document.getElementById('galleryImageContainer');
@@ -169,7 +115,7 @@
     const slideDistance = 100;
 
     function renderProduct(product, index) {
-        galleryImageContainer.innerHTML = `<img src="${product.image}" alt="Battery Pack ${index + 1}" loading="eager" class="max-h-full">`;
+        galleryImageContainer.innerHTML = `<img src="${product.image}" alt="Battery Pack ${index + 1}" class="max-h-full">`;
         galleryStatus.textContent = `${(index + 1).toString().padStart(2, '0')} / ${productsData.length}`;
     }
 
@@ -206,40 +152,46 @@
     galleryNextBtn.onclick = () => changeProduct((currentProductIndex + 1) % productsData.length);
     galleryPrevBtn.onclick = () => changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
 
-    document.addEventListener("DOMContentLoaded", () => {
-        // 초기 렌더링
-        if (productsData.length > 0) {
-            renderProduct(productsData[0], 0);
-            startAutoChange();
-        }
-
-        // [모바일 메뉴 제어]
+    /**
+     * 3. 메뉴 제어 로직 (헤더 로드 후 실행)
+     */
+    function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
         const menuIcon = document.getElementById("menuIcon");
 
-        menuBtn.onclick = (e) => {
-            e.stopPropagation();
-            const isOpen = dropdown.classList.contains("visible");
-            if (isOpen) {
-                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                dropdown.classList.add("opacity-0", "invisible");
-                menuIcon.innerText = "☰";
-            } else {
-                dropdown.classList.remove("opacity-0", "invisible");
-                dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                menuIcon.innerText = "✕";
-            }
-        };
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isOpen = dropdown.classList.contains("visible");
+                if (isOpen) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    menuIcon.innerText = "☰";
+                } else {
+                    dropdown.classList.remove("opacity-0", "invisible");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                    menuIcon.innerText = "✕";
+                }
+            };
 
-        // 바깥 클릭 시 메뉴 닫기
-        document.addEventListener('click', (e) => {
-            if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
-                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                dropdown.classList.add("opacity-0", "invisible");
-                menuIcon.innerText = "☰";
-            }
-        });
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    menuIcon.innerText = "☰";
+                }
+            });
+        }
+    }
+
+    // 초기 실행
+    document.addEventListener("DOMContentLoaded", () => {
+        loadLayout(); // 레이아웃 로드
+        if (productsData.length > 0) {
+            renderProduct(productsData[0], 0);
+            startAutoChange();
+        }
     });
 </script>
 

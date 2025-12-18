@@ -1,0 +1,71 @@
+<style>
+    .glass-footer {
+        background: linear-gradient(to top, rgba(2, 6, 23, 0.95), rgba(2, 6, 23, 0.8));
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(34, 211, 238, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 상단 네온 라인 효과 */
+    .footer-neon-line {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 150px;
+        height: 2px;
+        background: #22d3ee;
+        box-shadow: 0 0 15px #22d3ee, 0 0 30px #22d3ee;
+    }
+
+    /* 좌우 장식 코너 포인트 */
+    .footer-corner {
+        position: absolute;
+        top: 0;
+        width: 40px;
+        height: 1px;
+        background: rgba(34, 211, 238, 0.5);
+    }
+    .footer-corner-left { left: 10%; }
+    .footer-corner-right { right: 10%; }
+
+    /* 텍스트 글로우 애니메이션 */
+    .footer-text-glow {
+        transition: color 0.3s ease;
+    }
+    .footer-text-glow:hover {
+        color: #22d3ee;
+        text-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
+    }
+</style>
+
+<footer class="glass-footer py-12 px-6 mt-20">
+    <div class="footer-neon-line"></div>
+    <div class="footer-corner footer-corner-left"></div>
+    <div class="footer-corner footer-corner-right"></div>
+
+    <div class="max-w-7xl mx-auto flex flex-col items-center gap-6">
+        <div class="flex flex-col items-center gap-2">
+            <img src="images/logo/logo.png" class="h-10 w-auto opacity-80 grayscale hover:grayscale-0 transition-all duration-500">
+            <span class="text-[10px] tracking-[0.3em] text-neutral-500 font-bold uppercase">Technical Excellence</span>
+        </div>
+
+        <div class="text-center space-y-2">
+            <p class="text-neutral-400 text-sm md:text-base font-medium tracking-tight">
+                © 2025 <span class="text-neutral-200">TDL Energy Indonesia</span> 
+                <span class="mx-2 text-neutral-700">|</span> 
+                <span class="footer-text-glow">Driving the Future of Mobility.</span>
+            </p>
+            <p class="text-[11px] text-neutral-600 uppercase tracking-widest font-light">
+                No More Carbon · Innovation · Sustainability
+            </p>
+        </div>
+
+        <div class="flex items-center gap-4 mt-4">
+            <div class="w-12 h-[1px] bg-neutral-800"></div>
+            <div class="w-2 h-2 rounded-full border border-cyan-500/30"></div>
+            <div class="w-12 h-[1px] bg-neutral-800"></div>
+        </div>
+    </div>
+</footer>

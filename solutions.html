@@ -22,36 +22,27 @@
         .modal-close-btn { margin-top: 20px; padding: 10px 24px; background: #06b6d4; color: black; font-weight: 600; border-radius: 50px; cursor: pointer; transition: 0.2s; }
         .modal-close-x { position: absolute; top: 15px; right: 20px; color: #fff; font-size: 28px; cursor: pointer; opacity: 0.6; }
 
-/* 기존 padding: 40px 0; 에서 상단 패딩을 크게 줄입니다. */
-.carousel-wrapper {
-    position: relative; 
-    width: 100%; 
-    overflow: hidden; 
-    padding: 10px 0 40px 0; /* 상단(10px), 좌우(0), 하단(40px) */
-}
-
-        #solutionsContainer {
-            perspective: 1400px; /* 입체감 부여 */
-            width: 100%; max-width: 850px; height: 650px; margin: 0 auto; position: relative;
+        /* 2. 캐러셀 구조 및 애니메이션 */
+        .carousel-wrapper {
+            position: relative; width: 100%; overflow: hidden; padding: 10px 0 40px 0;
         }
-
+        #solutionsContainer {
+            perspective: 1400px; width: 100%; max-width: 850px; margin: 0 auto; position: relative; display: grid;
+        }
         .solution-card {
-            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
-            padding: 2.5rem; background-color: #111; border: 1px solid #333; border-radius: 1.5rem;
+            grid-area: 1 / 1 / 2 / 2; width: 100%; height: auto; padding: 2.5rem; 
+            background-color: #111; border: 1px solid #333; border-radius: 1.5rem;
             opacity: 0; pointer-events: none; z-index: 5;
-            /* 🌟 핵심: 기술 페이지와 동일한 ease-out 곡선 및 시간 (0.8s) */
             transition: transform 0.8s ease-out, opacity 0.8s ease-out;
         }
-
-        /* 활성화 상태 */
         .solution-card.is-active {
-            opacity: 1; pointer-events: auto; z-index: 10;
-            transform: translateX(0);
-            border-color: #06b6d4;
+            position: relative; opacity: 1; pointer-events: auto; z-index: 10;
+            transform: translateX(0); border-color: #06b6d4;
             box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
         }
+        .solution-card img { max-height: 400px; width: 100%; object-fit: contain; }
 
-        /* 내비게이션 버튼 */
+        /* 3. 내비게이션 및 공통 요소 */
         .nav-btn { 
             position: absolute; top: 50%; transform: translateY(-50%); z-index: 100; 
             width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
@@ -61,144 +52,23 @@
         .nav-btn:hover { background: #06b6d4; color: #000; transform: translateY(-50%) scale(1.1); }
         #prevBtn { left: 40px; } #nextBtn { right: 40px; }
 
+        /* 4. 드롭다운 스타일 (컴포넌트 대응) */
+        .dropdown-link { padding: 14px 20px; display: block; color: #ccc; border-bottom: 1px solid #222; transition: all 0.2s; text-align: left; }
+        .dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
+        .dropdown-quote-btn { padding: 14px 20px; display: block; background-color: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; }
+
         @media (max-width: 1024px) {
-            #solutionsContainer { width: 90%; height: auto; min-height: 550px; }
-            #prevBtn { left: 10px; } #nextBtn { right: 10px; }
+            #solutionsContainer { width: 95%; }
+            .solution-card { padding: 1.5rem; }
+            .solution-card img { max-height: 250px; }
+            #prevBtn { left: 5px; } #nextBtn { right: 5px; }
         }
-
-/* 드롭다운 메뉴 세로 리스트 디자인 */
-#dropdownMenu {
-    display: flex;
-    flex-direction: column; /* 세로 정렬 */
-    width: 220px;
-    background-color: #111111; /* 배경색 */
-    border: 1px solid #333;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-}
-
-.dropdown-link { 
-    padding: 14px 20px; 
-    display: block; 
-    color: #cccccc; 
-    font-size: 14px;
-    border-bottom: 1px solid #222; 
-    transition: all 0.2s;
-    text-align: left;
-}
-
-.dropdown-link:hover { 
-    background-color: #1a1a1a; 
-    color: #22d3ee; /* 사이언 색상 */
-}
-
-/* Request Quote 버튼 스타일 */
-.dropdown-quote-btn { 
-    padding: 14px 20px; 
-    display: block; 
-    background-color: #22d3ee; 
-    color: #000; 
-    font-weight: 600; 
-    text-align: center;
-    transition: background 0.2s;
-}
-
-.dropdown-quote-btn:hover {
-    background-color: #06b6d4;
-}
-
-
-/* 2. 캐러셀 구조 수정 */
-.carousel-wrapper {
-    position: relative; width: 100%; overflow: hidden; padding: 40px 0;
-}
-
-#solutionsContainer {
-    perspective: 1400px;
-    width: 100%; max-width: 850px; 
-    /* height: 650px; <- 삭제: 고정 높이 제거 */
-    margin: 0 auto; position: relative;
-    display: grid; /* 카드들을 겹치기 위한 그리드 설정 */
-}
-
-.solution-card {
-    grid-area: 1 / 1 / 2 / 2; /* 모든 카드를 한 위치에 겹침 */
-    width: 100%; 
-    height: auto; /* 콘텐츠에 맞게 높이 조절 */
-    padding: 2.5rem; background-color: #111; border: 1px solid #333; border-radius: 1.5rem;
-    opacity: 0; pointer-events: none; z-index: 5;
-    transition: transform 0.8s ease-out, opacity 0.8s ease-out;
-}
-
-/* 활성화 상태: 높이를 차지하도록 설정 */
-.solution-card.is-active {
-    position: relative; /* absolute 해제 효과: 부모 높이에 영향 줌 */
-    opacity: 1; pointer-events: auto; z-index: 10;
-    transform: translateX(0);
-    border-color: #06b6d4;
-    box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
-}
-
-/* 이미지 반응형 높이 조절 */
-.solution-card img {
-    max-height: 400px; /* 너무 커지는 것 방지 */
-    width: 100%;
-    object-contain: contain;
-}
-
-/* 내비게이션 버튼 (좌우 여백 조정) */
-.nav-btn { 
-    position: absolute; top: 50%; transform: translateY(-50%); z-index: 100; 
-    width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
-    background: rgba(20, 20, 20, 0.8); border: 1px solid #333; border-radius: 50%; 
-    color: #06b6d4; transition: all 0.3s;
-}
-
-@media (max-width: 1024px) {
-    #solutionsContainer { width: 95%; height: auto; min-height: auto; }
-    .solution-card { padding: 1.5rem; }
-    .solution-card img { max-height: 250px; } /* 모바일에서 이미지 높이 축소 */
-    #prevBtn { left: 5px; } /* 버튼이 창 밖으로 나가지 않게 조정 */
-    #nextBtn { right: 5px; }
-}
-
     </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
-<header class="fixed top-0 left-0 w-full z-[10001] bg-neutral-950/90 backdrop-blur-sm border-b border-neutral-800 p-4 flex justify-between items-center">
-    <a href="index.html" class="flex items-center gap-3 text-xl font-bold shrink-0">
-        <img src="images/logo/logo.png" class="h-14 w-auto">
-        <span class="animated-logo-text uppercase text-sm md:text-base">
-            &nbsp;&nbsp;&nbsp;&nbsp; TDL ENERGY INDONESIA</span>
-    </a>
-
-    <nav class="relative flex items-center gap-6">
-        <ul class="hidden lg:flex items-center gap-8 text-sm font-light text-neutral-400">
-            <li><a href="index.html" class="hover:text-cyan-400 transition">Home</a></li>
-            <li><a href="products.html" class="hover:text-cyan-400 transition">Products</a></li>
-            <li><a href="technology.html" class="hover:text-cyan-400 transition">Technology</a></li>
-            <li><a href="solutions.html" class="text-cyan-400 font-bold">Solutions</a></li>
-            <li><a href="company.html" class="hover:text-cyan-400 transition">Company</a></li>
-            <li><a href="news.html" class="hover:text-cyan-400 transition">News</a></li>
-            <li><a href="contact.html" class="px-5 py-2 rounded-full bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition">Request Quote</a></li>
-        </ul>
-
-        <button id="menuToggleBtn" class="lg:hidden text-2xl text-cyan-400 w-10 h-10 border border-cyan-500 rounded-full flex items-center justify-center">
-            <span id="menuIcon">☰</span>
-        </button>
-
-        <div id="dropdownMenu" class="absolute top-full right-0 mt-4 w-56 bg-neutral-900 border border-neutral-700 rounded-xl opacity-0 invisible transition-all duration-300 z-[10002] shadow-2xl overflow-hidden">
-            <a href="index.html" class="dropdown-link">Home</a>
-            <a href="products.html" class="dropdown-link">Products</a>
-            <a href="technology.html" class="dropdown-link">Technology</a>
-            <a href="solutions.html" class="dropdown-link text-cyan-400 font-bold">Solutions</a>
-            <a href="company.html" class="dropdown-link">Company</a>
-            <a href="news.html" class="dropdown-link">News</a>
-            <a href="contact.html" class="dropdown-quote-btn">Request Quote</a>
-        </div>
-    </nav>
-</header>
+<div id="header-placeholder"></div>
 
 <main class="flex-grow pt-24 pb-20">
     <h3 class="text-4xl font-black tracking-wide hero-slogan-gradient text-center mb-2">Custom Solutions</h3>
@@ -212,25 +82,69 @@
     </div>
 
     <div id="stackContainer" class="flex gap-4 overflow-x-auto pb-4 mt-12 justify-center px-6">
-    </div>
+        </div>
 </main>
 
-<footer class="py-10 text-center text-neutral-500 border-t border-neutral-900">
-    © 2025 TDL Energy Indonesia. All rights reserved.
-</footer>
+<div id="footer-placeholder"></div>
 
 <script>
+    /**
+     * 1. 레이아웃 로드 및 메뉴 초기화
+     */
+    async function loadLayout() {
+        try {
+            const headerRes = await fetch('components/header.html');
+            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+            const footerRes = await fetch('components/footer.html');
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            
+            initMenuToggle();
+        } catch (err) {
+            console.error("Layout load failed:", err);
+        }
+    }
+
+    function initMenuToggle() {
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const dropdown = document.getElementById("dropdownMenu");
+        const menuIcon = document.getElementById("menuIcon");
+
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isOpen = dropdown.classList.contains("visible");
+                if (isOpen) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    menuIcon.innerText = "☰";
+                } else {
+                    dropdown.classList.remove("opacity-0", "invisible");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                    menuIcon.innerText = "✕";
+                }
+            };
+            document.onclick = (e) => {
+                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    menuIcon.innerText = "☰";
+                }
+            };
+        }
+    }
+
+    /**
+     * 2. 솔루션 데이터 및 캐러셀 로직
+     */
     const solutionsData = [
         { id: 'A', title: 'A. EV Motorcycle Conversion Business', desc: 'TDLID supplies electric motorcycle conversion kits and battery packs to local governments and universities in Indonesia.', images: ['images/solutions/solution1.png', 'images/solutions/solution1-1.png'] },
-        { id: 'B', title: 'B. Employee Ownership Program', desc: 'TDLID is the initiator of this Program. TDLID announced the \'Employee Ownership Program\' with GESITS and MOTORIZ on April 30, 2024.', images: ['images/solutions/solution2.png', 'images/solutions/solution2-1.png'] },
+        { id: 'B', title: 'B. Employee Ownership Program', desc: 'TDLID announced the \'Employee Ownership Program\' with GESITS and MOTORIZ on April 30, 2024.', images: ['images/solutions/solution2.png', 'images/solutions/solution2-1.png'] },
         { id: 'C', title: 'C. Lease and Rental', desc: 'TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles.', images: ['images/solutions/solution3.png', 'images/solutions/solution3-1.png'] },
         { id: 'D', title: 'D. Solar home charging', desc: 'TDLiD offers solar power generation systems that can be utilized by individual households and small businesses.', images: ['images/solutions/solution4.png', 'images/solutions/solution4-1.png'] },
         { id: 'E', title: 'E. Battery Recycling', desc: 'TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries.', images: ['images/solutions/solution5.png', 'images/solutions/solution5-1.png'] }
     ];
 
     let currentIndex = 0;
-    const container = document.getElementById('solutionsContainer');
-    const stackContainer = document.getElementById('stackContainer');
     let isAnimating = false;
     let autoTimer;
 
@@ -246,7 +160,8 @@
         document.body.appendChild(modal);
     }
 
-    function init() {
+    function initSolutions() {
+        const container = document.getElementById('solutionsContainer');
         container.innerHTML = solutionsData.map((s, idx) => `
             <div class="solution-card ${idx === currentIndex ? 'is-active' : ''}" data-index="${idx}">
                 <h4 class="text-2xl font-bold mb-8 text-cyan-400 text-center">${s.title}</h4>
@@ -259,7 +174,8 @@
         renderStack();
     }
 
-function renderStack() {
+    function renderStack() {
+        const stackContainer = document.getElementById('stackContainer');
         stackContainer.innerHTML = solutionsData.map((s, idx) => `
             <div class="p-3 bg-neutral-900 border ${idx === currentIndex ? 'border-cyan-500 bg-neutral-800' : 'border-neutral-800'} rounded-xl cursor-pointer w-32 text-center transition-all duration-300" onclick="jumpTo(${idx})">
                 <h5 class="text-[10px] mb-2 ${idx === currentIndex ? 'text-cyan-400' : 'text-neutral-500'} line-clamp-1">${s.title}</h5>
@@ -272,7 +188,6 @@ function renderStack() {
         `).join('');
     }
 
-    // 🌟 기술 페이지 소멸 로직 완벽 이식
     function showCard(newIndex, direction) {
         if (isAnimating || newIndex === currentIndex) return;
         isAnimating = true;
@@ -280,26 +195,19 @@ function renderStack() {
         const cards = document.querySelectorAll('.solution-card');
         const prevCard = cards[currentIndex];
         const nextCard = cards[newIndex];
-        const slideDistance = 800; // 기술 페이지와 동일한 거리
+        const slideDistance = 800;
 
-        // 다음 카드 초기 설정
         nextCard.style.transition = 'none';
         nextCard.style.opacity = '0';
         nextCard.classList.add('is-active');
-        
-        // 브라우저 렌더링 강제 업데이트
         void nextCard.offsetWidth;
 
-        // 애니메이션 시작
         nextCard.style.transition = 'transform 0.8s ease-out, opacity 0.8s ease-out';
         prevCard.style.transition = 'transform 0.8s ease-out, opacity 0.8s ease-out';
 
         requestAnimationFrame(() => {
-            // 현재 카드는 밀려나며 안개처럼 소멸
             prevCard.style.transform = `translateX(${direction === 'next' ? -slideDistance : slideDistance}px)`;
             prevCard.style.opacity = '0';
-            
-            // 새 카드는 중앙으로 안착
             nextCard.style.transform = 'translateX(0)';
             nextCard.style.opacity = '1';
         });
@@ -327,44 +235,11 @@ function renderStack() {
     document.getElementById('prevBtn').onclick = () => { stopAuto(); showCard((currentIndex - 1 + solutionsData.length) % solutionsData.length, 'prev'); startAuto(); };
     document.getElementById('nextBtn').onclick = () => { stopAuto(); showCard((currentIndex + 1) % solutionsData.length, 'next'); startAuto(); };
 
-document.addEventListener("DOMContentLoaded", () => { 
-        init(); 
+    document.addEventListener("DOMContentLoaded", () => { 
+        loadLayout();
+        initSolutions(); 
         startAuto(); 
-
-        // --- 모바일 메뉴 제어 로직 추가 ---
-        const menuBtn = document.getElementById("menuToggleBtn");
-        const dropdown = document.getElementById("dropdownMenu");
-        const menuIcon = document.getElementById("menuIcon");
-
-        if (menuBtn && dropdown) {
-            menuBtn.onclick = (e) => {
-                e.stopPropagation();
-                const isOpen = dropdown.classList.contains("visible");
-                
-                if (isOpen) {
-                    // 메뉴 닫기
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                    dropdown.classList.add("opacity-0", "invisible");
-                    menuIcon.innerText = "☰";
-                } else {
-                    // 메뉴 열기
-                    dropdown.classList.remove("opacity-0", "invisible");
-                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                    menuIcon.innerText = "✕";
-                }
-            };
-
-            // 바깥 클릭 시 메뉴 닫기
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                    dropdown.classList.add("opacity-0", "invisible");
-                    menuIcon.innerText = "☰";
-                }
-            });
-        }
     });
-
 </script>
 
 </body>

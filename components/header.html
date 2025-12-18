@@ -1,0 +1,170 @@
+<style>
+    /* 1. 기본 헤더 레이아웃 스타일 */
+    .glass-header {
+        background: rgba(2, 6, 23, 0.8) !important;
+        backdrop-filter: blur(12px) saturate(180%);
+        border: 1px solid rgba(34, 211, 238, 0.2);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .header-frame-deco {
+        position: absolute;
+        bottom: -1px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #22d3ee, transparent);
+        width: 100%;
+        opacity: 0.5;
+    }
+
+    .animated-logo-text {
+        letter-spacing: 0.15em;
+        background: linear-gradient(90deg, #fff, #22d3ee, #fff);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shine 3s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+
+    /* 2. 내비게이션 링크 스타일 */
+    .nav-link {
+        position: relative;
+        display: inline-block;
+        color: #94a3b8;
+        transition: color 0.3s ease, transform 0.3s ease;
+        padding: 4px 0;
+        white-space: nowrap;
+    }
+
+    /* 3. 활성화된 탭 (떨림 방지 고정) */
+    .nav-link.active-tab {
+        color: #22d3ee !important;
+        font-weight: 700; 
+        transform: translateY(-4px); /* 팝업 효과 고정 */
+        text-shadow: 0 0 10px rgba(34, 211, 238, 0.4);
+    }
+
+    .nav-link.active-tab::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #22d3ee;
+        box-shadow: 0 0 10px #22d3ee;
+    }
+
+    /* 4. ⭐ 버튼 깨짐 완전 방지 스타일 ⭐ */
+    .btn-neon {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap !important;
+        /* 글자가 절대 꺾이지 않도록 고정 너비와 패딩 부여 */
+        width: 150px !important; 
+        height: 42px !important;
+        box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+        border: 1px solid rgba(34, 211, 238, 0.5);
+        transition: all 0.3s ease;
+        flex-shrink: 0 !important; /* 공간이 부족해도 절대 줄어들지 않음 */
+    }
+    
+    .btn-neon:hover {
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
+        background-color: #22d3ee;
+        color: #000 !important;
+    }
+
+    /* 메뉴 간격 최적화 (글자 겹침 방지) */
+    @media (min-width: 1024px) {
+        #main-nav {
+            gap: 1.25rem !important; 
+        }
+    }
+</style>
+
+<header class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-[10001] glass-header rounded-2xl px-6 py-3 flex justify-between items-center overflow-visible">
+
+    <a href="index.html" class="flex items-center gap-3 shrink-0">
+        <div class="relative">
+            <img src="images/logo/logo.png" class="h-10 w-auto">
+        </div>
+        <div class="flex flex-col">
+            <span class="animated-logo-text font-black text-[10px] md:text-xs tracking-[0.1em]">TDL ENERGY INDONESIA</span>
+            <span class="text-[9px] text-neutral-500 font-bold uppercase">Indonesia Division</span>
+        </div>
+    </a>
+
+    <nav class="hidden lg:flex items-center justify-center flex-1 px-4">
+        <ul id="main-nav" class="flex items-center text-[11px] xl:text-[12px] font-semibold uppercase tracking-wider whitespace-nowrap">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="products.html" class="nav-link">Products</a></li>
+            <li><a href="technology.html" class="nav-link">Technology</a></li>
+            <li><a href="solutions.html" class="nav-link">Solutions</a></li>
+            <li><a href="company.html" class="nav-link">Company</a></li>
+            <li><a href="news.html" class="nav-link">News</a></li>
+        </ul>
+    </nav>
+
+    <div class="hidden lg:flex shrink-0">
+        <a href="contact.html" class="btn-neon rounded-xl bg-cyan-400 text-black font-bold text-[11px] uppercase">
+            Get a Quote
+        </a>
+    </div>
+
+    <div class="lg:hidden flex items-center gap-3">
+        <button id="menuToggleBtn" class="w-10 h-10 border border-cyan-500/50 rounded-xl flex flex-col items-center justify-center gap-1.5 flex-shrink-0">
+            <span class="w-5 h-0.5 bg-cyan-400"></span>
+            <span class="w-5 h-0.5 bg-cyan-400"></span>
+            <span class="w-5 h-0.5 bg-cyan-400"></span>
+        </button>
+    </div>
+
+    <div id="dropdownMenu" class="absolute top-[calc(100%+15px)] right-0 w-64 bg-[#020617]/95 border border-cyan-500/30 rounded-2xl opacity-0 invisible -translate-y-5 transition-all duration-300 z-[10002] backdrop-blur-xl overflow-hidden">
+        <div id="mobile-nav" class="p-2 space-y-1">
+            <a href="index.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-300">Home</a>
+            <a href="products.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-300">Products</a>
+            <a href="technology.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-300">Technology</a>
+            <a href="solutions.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-300">Solutions</a>
+            <a href="company.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-300">Company</a>
+            <a href="news.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-300">News</a>
+            <div class="pt-2">
+                <a href="contact.html" class="flex items-center justify-center p-4 rounded-xl bg-cyan-400 text-black font-black uppercase text-sm">Request Quote</a>
+            </div>
+        </div>
+    </div>
+    <div class="header-frame-deco"></div>
+</header>
+
+<script>
+    (function setActiveMenu() {
+        const path = window.location.pathname;
+        const page = path.split("/").pop() || "index.html";
+
+        const navLinks = document.querySelectorAll('.nav-link, .nav-item-m');
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === page) {
+                if(link.classList.contains('nav-link')) {
+                    link.classList.add('active-tab');
+                } else {
+                    link.classList.add('bg-cyan-500/20', 'text-cyan-400', 'font-bold');
+                }
+            }
+        });
+    })();
+
+    document.getElementById("menuToggleBtn").addEventListener("click", function() {
+        const mobileMenu = document.getElementById("dropdownMenu");
+        const isVisible = mobileMenu.classList.contains("visible");
+        
+        if (isVisible) {
+            mobileMenu.classList.remove("opacity-100", "visible", "translate-y-2");
+            mobileMenu.classList.add("opacity-0", "invisible", "-translate-y-5");
+        } else {
+            mobileMenu.classList.add("opacity-100", "visible", "translate-y-2");
+            mobileMenu.classList.remove("opacity-0", "invisible", "-translate-y-5");
+        }
+    });
+</script>

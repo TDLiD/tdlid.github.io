@@ -35,18 +35,58 @@
         /* Staff 이미지 스타일 */
         #staffImage { margin-top: 30px; max-width: 300px; border-radius: 12px; border: 1px solid #22d3ee; box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); opacity: 0; transition: opacity 1.5s ease-in-out; }
 
-        /* TDLiD 클릭 포인트 스타일 수정 */
+        /* TDLiD 클릭 포인트 스타일 */
         #triggerWord {
             cursor: pointer !important;
             position: relative !important;
-            z-index: 9999 !important; /* 모든 레이어보다 최상단으로 */
+            z-index: 9999 !important;
             display: inline-block;
             transition: all 0.3s ease;
-            pointer-events: auto !important; /* 클릭 이벤트 강제 활성화 */
+            pointer-events: auto !important;
         }
         #triggerWord:hover {
             color: #22d3ee !important;
             text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+        }
+
+        /* 비디오 배경 섹션 한정 스타일 */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-bg-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .video-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4) contrast(1.1); 
+        }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
         }
     </style>
 </head>
@@ -66,87 +106,66 @@
     <span id="musicIconUI">🔇</span>
 </button>
 
-<header class="fixed top-0 left-0 w-full z-[10001] bg-neutral-950/90 backdrop-blur-sm border-b border-neutral-800 p-4 flex justify-between items-center">
-    <a href="index.html" class="flex items-center gap-3 text-xl font-bold shrink-0">
-        <img src="images/logo/logo.png" class="h-14 w-auto">
-        <span class="animated-logo-text uppercase text-sm md:text-base">&nbsp;&nbsp;&nbsp;&nbsp; TDL ENERGY INDONESIA</span>
-    </a>
-    <nav class="relative flex items-center gap-6">
-        <ul class="hidden lg:flex items-center gap-8 text-sm font-light">
-            <li><a href="index.html" class="text-cyan-400 font-bold whitespace-nowrap">Home</a></li>
-            <li><a href="products.html" class="hover:text-cyan-400 whitespace-nowrap">Products</a></li>
-            <li><a href="technology.html" class="hover:text-cyan-400 whitespace-nowrap">Technology</a></li>
-            <li><a href="solutions.html" class="hover:text-cyan-400 whitespace-nowrap">Solutions</a></li>
-            <li><a href="company.html" class="hover:text-cyan-400 whitespace-nowrap">Company</a></li>
-            <li><a href="news.html" class="hover:text-cyan-400 whitespace-nowrap">News</a></li>
-            <li><a href="contact.html" class="px-5 py-2 rounded-full bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition whitespace-nowrap">Request Quote</a></li>
-        </ul>
-        <button id="menuToggleBtn" class="lg:hidden text-2xl text-cyan-400 w-10 h-10 border border-cyan-500 rounded-full flex items-center justify-center z-[10002]">
-            <span id="menuIcon">☰</span>
-        </button>
-        <div id="dropdownMenu" class="absolute top-full right-0 mt-4 w-56 bg-neutral-900 border border-neutral-700 rounded-xl opacity-0 invisible transition-all duration-300 z-[10002] shadow-2xl overflow-hidden">
-            <a href="index.html" class="dropdown-link text-cyan-400 font-bold">Home</a>
-            <a href="products.html" class="dropdown-link">Products</a>
-            <a href="technology.html" class="dropdown-link">Technology</a>
-            <a href="solutions.html" class="dropdown-link">Solutions</a>
-            <a href="company.html" class="dropdown-link">Company</a>
-            <a href="news.html" class="dropdown-link">News</a>
-            <a href="contact.html" class="dropdown-quote-btn">Request Quote</a>
+<div id="header-placeholder"></div>
+
+<main class="flex-grow">
+    <section class="hero-section">
+        <div class="video-bg-container">
+            <div class="video-overlay"></div> 
+            <video autoplay loop muted playsinline poster="images/poster.jpg" class="video-bg">
+                <source src="videos/background.webm" type="video/webm">
+                <source src="videos/battery14.mp4" type="video/mp4">
+            </video>
         </div>
-    </nav>
-</header>
 
-<section class="hero-section pt-0 px-0">
-    <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="images/flag.jpg">
-        <source src="videos/battery14.mp4" type="video/mp4">
-    </video>
-    <div class="hero-content max-w-6xl w-full px-6 text-center">
-        <h1 class="hero-logo-gradient">TDLiD</h1>
-        <p class="hero-slogan-gradient">NO MORE CARBON</p>
-        <p class="hero-description text-xl mt-22 md:mt-36 mb-24 max-w-3xl mx-auto" style="position: relative; z-index: 9998;">
-            <span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
-        </p>
-    </div>
-</section>
+        <div class="hero-content max-w-6xl w-full px-6 text-center">
+            <h1 class="hero-logo-gradient">TDLiD</h1>
+            <p class="hero-slogan-gradient">NO MORE CARBON</p>
+            <p class="hero-description text-xl mt-22 md:mt-36 mb-24 max-w-3xl mx-auto" style="position: relative; z-index: 9998;">
+                <span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
+            </p>
+        </div>
+    </section>
 
-<section id="trust-certs-showcase" class="py-24 md:py-32 px-6 bg-neutral-900 border-t border-b border-neutral-800">
-    <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-extralight mb-10 text-cyan-400">A Pillar of Trust in the EV Ecosystem</h2>
-            <div class="flex flex-wrap items-center justify-center gap-10 md:gap-16 opacity-75 grayscale hover:grayscale-0 transition-all duration-500">
-                <img src="images/DAVIGO.png" alt="DAVIGO" class="h-10 md:h-14">
-                <img src="images/GESITS.png" alt="GESITS" class="h-10 md:h-14">
-                <img src="images/ALESSA.png" alt="ALESSA" class="h-10 md:h-14">
+    <section id="trust-certs-showcase" class="py-24 md:py-32 px-6 bg-neutral-900 border-t border-b border-neutral-800 relative z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-extralight mb-10 text-cyan-400">A Pillar of Trust in the EV Ecosystem</h2>
+                <div class="flex flex-wrap items-center justify-center gap-10 md:gap-16 opacity-75 grayscale hover:grayscale-0 transition-all duration-500">
+                    <img src="images/DAVIGO.png" alt="DAVIGO" class="h-10 md:h-14">
+                    <img src="images/GESITS.png" alt="GESITS" class="h-10 md:h-14">
+                    <img src="images/ALESSA.png" alt="ALESSA" class="h-10 md:h-14">
+                </div>
+            </div>
+            <div class="mt-20">
+                <h2 class="text-2xl md:text-3xl font-extralight text-center mb-10 text-cyan-400">Global Compliance and Safety Standards</h2>
+                <div id="certifications-inside-hero" class="flex flex-wrap gap-4 md:gap-8 items-center justify-center interactive-certs">
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CE-EMC-TEST.jpg">
+                        <img src="images/certification/CE-EMC-TEST.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CB-TEST.jpg">
+                        <img src="images/certification/CB-TEST.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/EMC-COMPLIANCE.jpg">
+                        <img src="images/certification/EMC-COMPLIANCE.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/IEC-62619.jpg">
+                        <img src="images/certification/IEC-62619.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Material-Safety.jpg">
+                        <img src="images/certification/Material-Safety.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/UN38.3.jpg">
+                        <img src="images/certification/UN38.3.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Dangerous-Goods.jpg">
+                        <img src="images/certification/Dangerous-Goods.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="mt-20">
-            <h2 class="text-2xl md:text-3xl font-extralight text-center mb-10 text-cyan-400">Global Compliance and Safety Standards</h2>
-            <div id="certifications-inside-hero" class="flex flex-wrap gap-4 md:gap-8 items-center justify-center interactive-certs">
-                <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CE-EMC-TEST.jpg">
-                    <img src="images/certification/CE-EMC-TEST.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
-                </a>
-                <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CB-TEST.jpg">
-                    <img src="images/certification/CB-TEST.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
-                </a>
-                <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/EMC-COMPLIANCE.jpg">
-                    <img src="images/certification/EMC-COMPLIANCE.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
-                </a>
-                <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/IEC-62619.jpg">
-                    <img src="images/certification/IEC-62619.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
-                </a>
-                <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Material-Safety.jpg">
-                    <img src="images/certification/Material-Safety.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
-                </a>
-                <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/UN38.3.jpg">
-                    <img src="images/certification/UN38.3.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
-                </a>
-                <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Dangerous-Goods.jpg">
-                    <img src="images/certification/Dangerous-Goods.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
+</main>
 
 <div id="imageModal" class="hidden">
     <div class="flex items-center justify-center w-full h-full">
@@ -154,50 +173,76 @@
     </div>
 </div>
 
-<footer class="py-6 text-center text-neutral-500 border-t border-neutral-800 bg-neutral-900">
-    <p class="text-sm">© 2025 TDL Energy Indonesia - Driving the Future of Mobility.</p>
-</footer>
+<div id="footer-placeholder"></div>
 
 <script>
-    // 1. 핵심: 모든 초기화는 DOMContentLoaded 내부에서 수행
-    document.addEventListener("DOMContentLoaded", () => {
-        
-        // [신규] TDLiD 클릭 즉시 실행
+    /** 1. 레이아웃 로드 및 트리거 초기화 **/
+    async function loadLayout() {
+        try {
+            const headerRes = await fetch('components/header.html');
+            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+
+            const footerRes = await fetch('components/footer.html');
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+            initNavigation();
+            initEasterEggTriggers(); // 이스터 에그는 헤더 로드 후 바인딩
+        } catch (err) { console.error(err); }
+    }
+
+    /** 2. 내비게이션 **/
+    function initNavigation() {
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const dropdown = document.getElementById("dropdownMenu");
+        const menuIcon = document.getElementById("menuIcon");
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isOpen = dropdown.classList.contains("visible");
+                if (isOpen) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    menuIcon.innerText = "☰";
+                } else {
+                    dropdown.classList.remove("opacity-0", "invisible");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                    menuIcon.innerText = "✕";
+                }
+            };
+        }
+    }
+
+    /** 3. 모든 이스터 에그 트리거 복구 **/
+    function initEasterEggTriggers() {
+        // [1] TDLiD 단어 클릭
         const triggerWord = document.getElementById('triggerWord');
         if (triggerWord) {
-            // PC 클릭 및 모바일 터치 둘 다 대응
-            const activateEgg = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                runScanAnimation();
-            };
-            triggerWord.addEventListener('mousedown', activateEgg); // 클릭보다 빠른 반응
-            triggerWord.addEventListener('touchstart', activateEgg, { passive: false });
+            triggerWord.addEventListener('click', (e) => {
+                e.preventDefault(); runScanAnimation();
+            });
         }
 
-        // [기존] 로고 5번 클릭/터치
+        // [2] 로고 5번 클릭
         let touchCount = 0;
         let lastTouchTime = 0;
         const logoImg = document.querySelector('header img');
-
         if (logoImg) {
-            const handleLogo = (e) => {
+            logoImg.addEventListener('click', (e) => {
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastTouchTime;
-                if (tapLength < 500 && tapLength > 0) { touchCount++; } 
-                else { touchCount = 1; }
+                if (tapLength < 500 && tapLength > 0) touchCount++;
+                else touchCount = 1;
                 lastTouchTime = currentTime;
-                if (touchCount === 5) {
-                    if (e.cancelable) e.preventDefault();
-                    runScanAnimation();
-                    touchCount = 0;
-                }
-            };
-            logoImg.addEventListener('click', handleLogo);
-            logoImg.addEventListener('touchstart', handleLogo, { passive: false });
+                if (touchCount === 5) { runScanAnimation(); touchCount = 0; }
+            });
         }
+    }
 
-        // [기존] 뮤직 제어 로직 유지
+    /** 4. 공통 기능 **/
+    document.addEventListener("DOMContentLoaded", () => {
+        loadLayout();
+
+        // 뮤직
         const bgm = document.getElementById('bgm');
         const musicBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIconUI');
@@ -207,104 +252,58 @@
                 else { bgm.muted = true; musicIcon.innerText = "🔇"; }
             };
         }
+
+        // 모달
+        document.querySelectorAll('.cert-link').forEach(link => {
+            link.onclick = (e) => {
+                e.preventDefault();
+                const modal = document.getElementById('imageModal');
+                document.getElementById('modalDetailImage').src = link.getAttribute('data-original-src');
+                modal.classList.replace('hidden', 'flex');
+                document.body.style.overflow = 'hidden';
+            };
+        });
+        
+        const modal = document.getElementById('imageModal');
+        if(modal) {
+            modal.onclick = (e) => {
+                if (e.target.id !== 'modalDetailImage') {
+                    modal.classList.replace('flex', 'hidden');
+                    document.body.style.overflow = '';
+                }
+            };
+        }
     });
 
-    // 3. 마우스 오른쪽 클릭 방지 유지
-    document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
-
-    // 4. 키보드 입력 이스터에그 (tdlid) 유지
+    // [3] 키보드 입력 'tdlid'
     let inputBuffer = "";
     document.addEventListener("keydown", (e) => {
         inputBuffer += e.key.toLowerCase();
         if (inputBuffer.length > 5) inputBuffer = inputBuffer.slice(-5);
-        if (inputBuffer === "tdlid") {
-            runScanAnimation();
-            inputBuffer = "";
-        }
+        if (inputBuffer === "tdlid") { runScanAnimation(); inputBuffer = ""; }
     });
 
-    // 5. 애니메이션 및 콘솔 출력 함수 유지
+    // 스캔 애니메이션
     function runScanAnimation() {
         const overlay = document.getElementById('easterEggOverlay');
         const log = document.getElementById('statusLog');
         const staffImg = document.getElementById('staffImage');
         if(!overlay) return;
-
         overlay.style.display = 'flex';
         staffImg.style.opacity = '0';
-
-        const messages = [
-            "Accessing Battery Management System...",
-            "Decrypting Li-ion Data...",
-            "Fetching Energy Report...",
-            "TDLiD Verified. Syncing Console...",
-            "Mr. Ray...🧔", "Mr. Eza...😎", "Mr. Rezy...👨‍🦰", "Miss. Etno...🧕"
-        ];
-
-        messages.forEach((msg, i) => {
+        const msgs = ["System Scanning...", "Decrypting BMS...", "TDLiD Verified.", "Mr. Ray🧔", "Mr. Eza😎", "Mr. Rezy👨‍🦰", "Miss. Etno🧕"];
+        msgs.forEach((msg, i) => {
             setTimeout(() => {
                 log.innerText = msg;
                 if (i === 4) staffImg.style.opacity = '1';
-                if (i === messages.length - 1) {
-                    setTimeout(() => {
-                        overlay.style.display = 'none';
-                        printConsoleData();
-                        alert("Scan Successful! Please Press F12 to see the Energy Report.");
-                    }, 1500);
+                if (i === msgs.length - 1) {
+                    setTimeout(() => { overlay.style.display = 'none'; alert("Access Granted!"); }, 1500);
                 }
-            }, i * 800);
+            }, i * 700);
         });
     }
 
-    function printConsoleData() {
-        const logoText = `
- ████████╗██████╗ ██╗     ██╗██████╗ 
- ╚══██╔══╝██╔══██╗██║     ██║██╔══██╗
-    ██║   ██║  ██║██║     ██║██║  ██║
-    ██║   ██║  ██║██║     ██║██║  ██║
-    ██║   ██████╔╝███████╗██║██████╔╝
-    ╚═╝   ╚═════╝ ╚══════╝╚═╝╚═════╝ `;
-        console.clear();
-        console.log("%c" + logoText, "color: #22d3ee; font-weight: bold;");
-    }
-
-    // 7. 모달 및 메뉴 제어 유지
-    document.querySelectorAll('.cert-link').forEach(link => {
-        link.onclick = (e) => {
-            e.preventDefault();
-            const modalImg = document.getElementById('modalDetailImage');
-            modalImg.src = link.getAttribute('data-original-src');
-            const modal = document.getElementById('imageModal');
-            modal.classList.replace('hidden', 'flex');
-            document.body.style.overflow = 'hidden';
-        };
-    });
-
-    document.getElementById('imageModal').onclick = (e) => {
-        if (e.target.id !== 'modalDetailImage') {
-            document.getElementById('imageModal').classList.replace('flex', 'hidden');
-            document.body.style.overflow = '';
-        }
-    };
-
-    const menuBtn = document.getElementById("menuToggleBtn");
-    const dropdown = document.getElementById("dropdownMenu");
-    const menuIcon = document.getElementById("menuIcon");
-    if(menuBtn) {
-        menuBtn.onclick = (e) => {
-            e.stopPropagation();
-            const isOpen = dropdown.classList.contains("visible");
-            if (isOpen) {
-                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                dropdown.classList.add("opacity-0", "invisible");
-                menuIcon.innerText = "☰";
-            } else {
-                dropdown.classList.remove("opacity-0", "invisible");
-                dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                menuIcon.innerText = "✕";
-            }
-        };
-    }
+    document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
 </script>
 </body>
 </html>
