@@ -34,6 +34,20 @@
 
         /* Staff 이미지 스타일 */
         #staffImage { margin-top: 30px; max-width: 300px; border-radius: 12px; border: 1px solid #22d3ee; box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); opacity: 0; transition: opacity 1.5s ease-in-out; }
+
+        /* TDLiD 클릭 포인트 스타일 수정 */
+        #triggerWord {
+            cursor: pointer !important;
+            position: relative !important;
+            z-index: 9999 !important; /* 모든 레이어보다 최상단으로 */
+            display: inline-block;
+            transition: all 0.3s ease;
+            pointer-events: auto !important; /* 클릭 이벤트 강제 활성화 */
+        }
+        #triggerWord:hover {
+            color: #22d3ee !important;
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+        }
     </style>
 </head>
 
@@ -89,8 +103,8 @@
     <div class="hero-content max-w-6xl w-full px-6 text-center">
         <h1 class="hero-logo-gradient">TDLiD</h1>
         <p class="hero-slogan-gradient">NO MORE CARBON</p>
-        <p class="hero-description text-xl mt-22 md:mt-36 mb-24 max-w-3xl mx-auto">
-            TDLiD is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
+        <p class="hero-description text-xl mt-22 md:mt-36 mb-24 max-w-3xl mx-auto" style="position: relative; z-index: 9998;">
+            <span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
         </p>
     </div>
 </section>
@@ -144,55 +158,61 @@
     <p class="text-sm">© 2025 TDL Energy Indonesia - Driving the Future of Mobility.</p>
 </footer>
 
-
 <script>
+    // 1. 핵심: 모든 초기화는 DOMContentLoaded 내부에서 수행
+    document.addEventListener("DOMContentLoaded", () => {
+        
+        // [신규] TDLiD 클릭 즉시 실행
+        const triggerWord = document.getElementById('triggerWord');
+        if (triggerWord) {
+            // PC 클릭 및 모바일 터치 둘 다 대응
+            const activateEgg = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                runScanAnimation();
+            };
+            triggerWord.addEventListener('mousedown', activateEgg); // 클릭보다 빠른 반응
+            triggerWord.addEventListener('touchstart', activateEgg, { passive: false });
+        }
 
-// [아이폰 & 안드로이드 통합] 로고 5번 터치 시 이스터에그 실행
-let touchCount = 0;
-let lastTouchTime = 0;
-const logoImg = document.querySelector('header img');
+        // [기존] 로고 5번 클릭/터치
+        let touchCount = 0;
+        let lastTouchTime = 0;
+        const logoImg = document.querySelector('header img');
 
-if (logoImg) {
-    // 1. touchstart: 모바일(아이폰/안드로이드) 즉각 반응
-    logoImg.addEventListener('touchstart', handleEasterEggTouch, { passive: false });
-    
-    // 2. click: 데스크탑 환경 및 하이브리드 대응
-    logoImg.addEventListener('click', (e) => {
-        // 모바일 터치와 중복 실행되지 않도록 처리 (마우스 클릭인 경우만 카운트)
-        if (new Date().getTime() - lastTouchTime > 500) {
-            handleEasterEggTouch(e);
+        if (logoImg) {
+            const handleLogo = (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTouchTime;
+                if (tapLength < 500 && tapLength > 0) { touchCount++; } 
+                else { touchCount = 1; }
+                lastTouchTime = currentTime;
+                if (touchCount === 5) {
+                    if (e.cancelable) e.preventDefault();
+                    runScanAnimation();
+                    touchCount = 0;
+                }
+            };
+            logoImg.addEventListener('click', handleLogo);
+            logoImg.addEventListener('touchstart', handleLogo, { passive: false });
+        }
+
+        // [기존] 뮤직 제어 로직 유지
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('musicToggleBtn');
+        const musicIcon = document.getElementById('musicIconUI');
+        if (musicBtn && bgm) {
+            musicBtn.onclick = () => {
+                if (bgm.muted) { bgm.muted = false; bgm.play(); musicIcon.innerText = "🎵"; }
+                else { bgm.muted = true; musicIcon.innerText = "🔇"; }
+            };
         }
     });
-}
 
-function handleEasterEggTouch(e) {
-    const currentTime = new Date().getTime();
-    const tapLength = currentTime - lastTouchTime;
-
-    // 0.5초 이내의 터치만 연속 터치로 인정
-    if (tapLength < 500 && tapLength > 0) {
-        touchCount++;
-    } else {
-        touchCount = 1;
-    }
-
-    lastTouchTime = currentTime;
-
-    // 5번 연속 터치 성공 시
-    if (touchCount === 5) {
-        // 아이폰의 돋보기/확대/메뉴 팝업 방지
-        if (e.cancelable) e.preventDefault();
-        
-        runScanAnimation(); // 이스터에그 애니메이션 호출
-        touchCount = 0;     // 초기화
-    }
-}
-
-
-    // 1. 마우스 오른쪽 클릭 방지 (F12는 허용)
+    // 3. 마우스 오른쪽 클릭 방지 유지
     document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
 
-    // 2. 이스터 에그 로직 (tdlid 입력)
+    // 4. 키보드 입력 이스터에그 (tdlid) 유지
     let inputBuffer = "";
     document.addEventListener("keydown", (e) => {
         inputBuffer += e.key.toLowerCase();
@@ -203,10 +223,13 @@ function handleEasterEggTouch(e) {
         }
     });
 
+    // 5. 애니메이션 및 콘솔 출력 함수 유지
     function runScanAnimation() {
         const overlay = document.getElementById('easterEggOverlay');
         const log = document.getElementById('statusLog');
         const staffImg = document.getElementById('staffImage');
+        if(!overlay) return;
+
         overlay.style.display = 'flex';
         staffImg.style.opacity = '0';
 
@@ -234,7 +257,7 @@ function handleEasterEggTouch(e) {
     }
 
     function printConsoleData() {
-        const logo = `
+        const logoText = `
  ████████╗██████╗ ██╗     ██╗██████╗ 
  ╚══██╔══╝██╔══██╗██║     ██║██╔══██╗
     ██║   ██║  ██║██║     ██║██║  ██║
@@ -242,35 +265,15 @@ function handleEasterEggTouch(e) {
     ██║   ██████╔╝███████╗██║██████╔╝
     ╚═╝   ╚═════╝ ╚══════╝╚═╝╚═════╝ `;
         console.clear();
-        console.log("%c" + logo, "color: #22d3ee; font-weight: bold;");
-        if (navigator.getBattery) {
-            navigator.getBattery().then(b => {
-                console.log(`%c[REPORT] User Battery: ${Math.round(b.level * 100)}%`, "color: #22d3ee; font-size: 14px;");
-            });
-        }
+        console.log("%c" + logoText, "color: #22d3ee; font-weight: bold;");
     }
 
-    // 3. 뮤직 컨트롤
-    const bgm = document.getElementById('bgm');
-    const musicBtn = document.getElementById('musicToggleBtn');
-    const musicIcon = document.getElementById('musicIconUI');
-
-    musicBtn.onclick = () => {
-        if (bgm.muted) { bgm.muted = false; bgm.play(); musicIcon.innerText = "🎵"; }
-        else { bgm.muted = true; musicIcon.innerText = "🔇"; }
-    };
-
-    document.addEventListener('click', () => {
-        if (bgm.muted && musicIcon.innerText === "🔇") {
-            bgm.muted = false; bgm.play().then(() => musicIcon.innerText = "🎵").catch(() => {});
-        }
-    }, { once: true });
-
-    // 4. 이미지 모달 및 메뉴 제어
+    // 7. 모달 및 메뉴 제어 유지
     document.querySelectorAll('.cert-link').forEach(link => {
         link.onclick = (e) => {
             e.preventDefault();
-            document.getElementById('modalDetailImage').src = link.getAttribute('data-original-src');
+            const modalImg = document.getElementById('modalDetailImage');
+            modalImg.src = link.getAttribute('data-original-src');
             const modal = document.getElementById('imageModal');
             modal.classList.replace('hidden', 'flex');
             document.body.style.overflow = 'hidden';
@@ -287,19 +290,21 @@ function handleEasterEggTouch(e) {
     const menuBtn = document.getElementById("menuToggleBtn");
     const dropdown = document.getElementById("dropdownMenu");
     const menuIcon = document.getElementById("menuIcon");
-    menuBtn.onclick = (e) => {
-        e.stopPropagation();
-        const isOpen = dropdown.classList.contains("visible");
-        if (isOpen) {
-            dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-            dropdown.classList.add("opacity-0", "invisible");
-            menuIcon.innerText = "☰";
-        } else {
-            dropdown.classList.remove("opacity-0", "invisible");
-            dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-            menuIcon.innerText = "✕";
-        }
-    };
+    if(menuBtn) {
+        menuBtn.onclick = (e) => {
+            e.stopPropagation();
+            const isOpen = dropdown.classList.contains("visible");
+            if (isOpen) {
+                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                dropdown.classList.add("opacity-0", "invisible");
+                menuIcon.innerText = "☰";
+            } else {
+                dropdown.classList.remove("opacity-0", "invisible");
+                dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                menuIcon.innerText = "✕";
+            }
+        };
+    }
 </script>
 </body>
 </html>
