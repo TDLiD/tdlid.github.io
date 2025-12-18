@@ -36,18 +36,26 @@
         #staffImage { margin-top: 30px; max-width: 300px; border-radius: 12px; border: 1px solid #22d3ee; box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); opacity: 0; transition: opacity 1.5s ease-in-out; }
 
         /* TDLiD 클릭 포인트 스타일 */
-        #triggerWord {
-            cursor: pointer !important;
-            position: relative !important;
-            z-index: 9999 !important;
-            display: inline-block;
-            transition: all 0.3s ease;
-            pointer-events: auto !important;
-        }
-        #triggerWord:hover {
-            color: #22d3ee !important;
-            text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
-        }
+/* TDLiD 클릭 포인트 스타일 수정 */
+#triggerWord {
+    cursor: pointer !important;
+    position: relative !important;
+    z-index: 9999 !important;
+    display: inline-block;
+    transition: all 0.3s ease;
+    pointer-events: auto !important;
+
+    /* 주변 텍스트와 색상/두께를 동일하게 맞춤 */
+    color: inherit !important;        /* 부모 요소인 p 태그의 글자색을 그대로 따름 */
+    font-weight: inherit !important;   /* 부모 요소인 p 태그의 글자 두께를 그대로 따름 */
+    text-decoration: none !important; /* 혹시 모를 밑줄 제거 */
+}
+
+/* 마우스를 올렸을 때만 티가 나도록 설정 (원치 않으시면 이 블록 전체를 삭제하세요) */
+#triggerWord:hover {
+    color: #22d3ee !important; /* 마우스를 올렸을 때만 하늘색으로 변화 */
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+}
 
         /* 비디오 배경 섹션 한정 스타일 */
         .hero-section {
@@ -145,7 +153,7 @@
             <div class="video-overlay"></div> 
             <video autoplay loop muted playsinline poster="images/flag.jpg" class="video-bg">
                 <source src="videos/background.webm" type="video/webm">
-                <source src="videos/battery14.mp4" type="video/mp4">
+                <source src="videos/1.mp4" type="video/mp4">
             </video>
         </div>
 
@@ -161,7 +169,7 @@
     <section id="trust-certs-showcase" class="pt-10 pb-10 md:pt-16 md:pb-16 bg-neutral-900 border-t border-b border-neutral-800 relative z-10">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-8">
-                <h2 class="text-3xl md:text-4xl font-extralight mb-10 text-cyan-400">A Pillar of Trust in the EV Ecosystem</h2>
+                <h2 class="text-3xl md:text-4xl font-extralight mb-10 text-cyan-400">A Pillar of Trust in the E-Scooter Ecosystem</h2>
                 <div class="flex flex-wrap items-center justify-center gap-10 md:gap-16 opacity-75 grayscale hover:grayscale-0 transition-all duration-500">
                     <img src="images/DAVIGO.png" alt="DAVIGO" class="h-10 md:h-14">
                     <img src="images/GESITS.png" alt="GESITS" class="h-10 md:h-14">
