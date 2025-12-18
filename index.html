@@ -144,7 +144,24 @@
     <p class="text-sm">© 2025 TDL Energy Indonesia - Driving the Future of Mobility.</p>
 </footer>
 
+
 <script>
+
+// 로고를 5번 연속 터치하면 이스터에그 실행
+let touchCount = 0;
+const logoImg = document.querySelector('header img'); // 헤더 로고 선택
+
+logoImg.addEventListener('click', () => {
+    touchCount++;
+    if (touchCount === 5) {
+        runScanAnimation(); // 이스터에그 함수 호출
+        touchCount = 0;
+    }
+    // 3초간 입력 없으면 초기화
+    setTimeout(() => { touchCount = 0; }, 3000);
+});
+
+
     // 1. 마우스 오른쪽 클릭 방지 (F12는 허용)
     document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
 
