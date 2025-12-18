@@ -1,38 +1,26 @@
 <style>
     .glass-footer {
         background: linear-gradient(to top, rgba(2, 6, 23, 0.95), rgba(2, 6, 23, 0.8));
-        backdrop-filter: blur(10px);
-        border-top: 1px solid rgba(34, 211, 238, 0.2);
+        backdrop-filter: blur(15px);
+        border-top: 1px solid rgba(34, 211, 238, 0.3);
         position: relative;
         overflow: hidden;
     }
 
-    /* 상단 네온 라인 효과 */
+    /* 상단 네온 라인 효과 유지 */
     .footer-neon-line {
         position: absolute;
         top: 0;
         left: 50%;
         transform: translateX(-50%);
-        width: 150px;
+        width: 180px;
         height: 2px;
         background: #22d3ee;
-        box-shadow: 0 0 15px #22d3ee, 0 0 30px #22d3ee;
+        box-shadow: 0 0 20px #22d3ee, 0 0 40px #22d3ee;
     }
 
-    /* 좌우 장식 코너 포인트 */
-    .footer-corner {
-        position: absolute;
-        top: 0;
-        width: 40px;
-        height: 1px;
-        background: rgba(34, 211, 238, 0.5);
-    }
-    .footer-corner-left { left: 10%; }
-    .footer-corner-right { right: 10%; }
-
-    /* 텍스트 글로우 애니메이션 */
     .footer-text-glow {
-        transition: color 0.3s ease;
+        transition: all 0.3s ease;
     }
     .footer-text-glow:hover {
         color: #22d3ee;
@@ -40,32 +28,25 @@
     }
 </style>
 
-<footer class="glass-footer py-12 px-6 mt-20">
+<footer class="glass-footer py-6 px-6 mt-10">
     <div class="footer-neon-line"></div>
-    <div class="footer-corner footer-corner-left"></div>
-    <div class="footer-corner footer-corner-right"></div>
 
-    <div class="max-w-7xl mx-auto flex flex-col items-center gap-6">
-        <div class="flex flex-col items-center gap-2">
-            <img src="images/logo/logo.png" class="h-10 w-auto opacity-80 grayscale hover:grayscale-0 transition-all duration-500">
-            <span class="text-[10px] tracking-[0.3em] text-neutral-500 font-bold uppercase">Technical Excellence</span>
-        </div>
+    <div class="max-w-7xl mx-auto flex flex-col gap-4">
+        <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
 
-        <div class="text-center space-y-2">
-            <p class="text-neutral-400 text-sm md:text-base font-medium tracking-tight">
-                © 2025 <span class="text-neutral-200">TDL Energy Indonesia</span> 
-                <span class="mx-2 text-neutral-700">|</span> 
-                <span class="footer-text-glow">Driving the Future of Mobility.</span>
-            </p>
-            <p class="text-[11px] text-neutral-600 uppercase tracking-widest font-light">
-                No More Carbon · Innovation · Sustainability
+            <p class="text-neutral-300 text-sm font-medium tracking-tight">
+                TDL Energy Indonesia <span class="mx-2 text-neutral-600">|</span> Driving the Future of Mobility
             </p>
         </div>
 
-        <div class="flex items-center gap-4 mt-4">
-            <div class="w-12 h-[1px] bg-neutral-800"></div>
-            <div class="w-2 h-2 rounded-full border border-cyan-500/30"></div>
-            <div class="w-12 h-[1px] bg-neutral-800"></div>
+        <div class="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6 border-t border-white/5 pt-4">
+            <p class="text-neutral-500 text-[11px] font-light">
+                © 2025 TDL Energy Indonesia. All rights reserved.
+            </p>
+            <div class="hidden md:block w-1 h-1 rounded-full bg-cyan-500/30"></div>
+            <p class="text-[10px] text-neutral-600 uppercase tracking-[0.2em] font-light">
+                No More Carbon <span class="text-cyan-900 mx-1">·</span> Innovation <span class="text-cyan-900 mx-1">·</span> Sustainability
+            </p>
         </div>
     </div>
 </footer>

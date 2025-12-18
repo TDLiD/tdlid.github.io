@@ -1,107 +1,123 @@
 <style>
     /* 1. 기본 헤더 레이아웃 스타일 */
     .glass-header {
-        background: rgba(2, 6, 23, 0.8) !important;
-        backdrop-filter: blur(12px) saturate(180%);
-        border: 1px solid rgba(34, 211, 238, 0.2);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+        background: rgba(2, 6, 23, 0.9) !important;
+        backdrop-filter: blur(15px) saturate(200%);
+        border: 1px solid rgba(34, 211, 238, 0.3);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 1px 10px rgba(255, 255, 255, 0.1);
+        transition: background 0.3s ease;
     }
 
     .header-frame-deco {
         position: absolute;
         bottom: -1px;
-        height: 2px;
+        height: 3px;
         background: linear-gradient(90deg, transparent, #22d3ee, transparent);
         width: 100%;
-        opacity: 0.5;
+        opacity: 0.7;
     }
 
     .animated-logo-text {
-        letter-spacing: 0.15em;
+        letter-spacing: 0.2em;
         background: linear-gradient(90deg, #fff, #22d3ee, #fff);
         background-size: 200% auto;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         animation: shine 3s linear infinite;
     }
-    @keyframes shine { to { background-position: 200% center; } }
+    @keyframes shine { 
+        to { background-position: 200% center; } 
+    }
 
     /* 2. 내비게이션 링크 스타일 */
     .nav-link {
         position: relative;
         display: inline-block;
-        color: #94a3b8;
-        transition: color 0.3s ease, transform 0.3s ease;
-        padding: 4px 0;
+        color: #f0f4f8;
+        font-weight: 600;
+        transition: color 0.3s ease, transform 0.3s ease, text-shadow 0.3s ease;
+        padding: 6px 0;
         white-space: nowrap;
     }
 
-    /* 3. 활성화된 탭 (떨림 방지 고정) */
+    /* 활성화된 탭 스타일 */
     .nav-link.active-tab {
         color: #22d3ee !important;
-        font-weight: 700; 
-        transform: translateY(-4px); /* 팝업 효과 고정 */
-        text-shadow: 0 0 10px rgba(34, 211, 238, 0.4);
+        font-weight: 800;
+        transform: translateY(-6px);
+        text-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
     }
 
     .nav-link.active-tab::after {
         content: '';
         position: absolute;
-        bottom: -4px;
+        bottom: -6px;
         left: 0;
         width: 100%;
-        height: 2px;
+        height: 3px;
         background: #22d3ee;
         box-shadow: 0 0 10px #22d3ee;
     }
 
-    /* 4. ⭐ 버튼 깨짐 완전 방지 스타일 ⭐ */
+    .nav-link:hover {
+        color: #22d3ee;
+        transform: translateY(-2px);
+        text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+    }
+
+    /* 3. 버튼 디자인 */
     .btn-neon {
         display: inline-flex !important;
         align-items: center;
         justify-content: center;
         white-space: nowrap !important;
-        /* 글자가 절대 꺾이지 않도록 고정 너비와 패딩 부여 */
-        width: 150px !important; 
+        width: 150px !important;
         height: 42px !important;
-        box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+        background: #22d3ee;
+        color: #000 !important;
+        box-shadow: 0 0 15px rgba(34, 211, 238, 0.5);
         border: 1px solid rgba(34, 211, 238, 0.5);
+        border-radius: 8px;
         transition: all 0.3s ease;
-        flex-shrink: 0 !important; /* 공간이 부족해도 절대 줄어들지 않음 */
+        flex-shrink: 0 !important;
+        cursor: pointer;
     }
     
     .btn-neon:hover {
-        box-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
-        background-color: #22d3ee;
-        color: #000 !important;
+        box-shadow: 0 0 30px rgba(34, 211, 238, 0.8);
+        background-color: #fff;
+        color: #22d3ee !important;
     }
 
-    /* 메뉴 간격 최적화 (글자 겹침 방지) */
+    .btn-neon:active {
+        transform: scale(0.95);
+    }
+
+    /* 메뉴 간격 최적화 */
     @media (min-width: 1024px) {
         #main-nav {
-            gap: 1.25rem !important; 
+            gap: 1.5rem !important;
         }
     }
 </style>
 
 <header class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-[10001] glass-header rounded-2xl px-6 py-3 flex justify-between items-center overflow-visible">
-
     <a href="index.html" class="flex items-center gap-3 shrink-0">
         <div class="relative">
-            <img src="images/logo/logo.png" class="h-10 w-auto">
+            <img src="images/logo/logo.png" class="h-10 w-auto transition-all duration-500 hover:rotate-[360deg]">
         </div>
-<div class="flex flex-col gap-1">
-    <span class="animated-logo-text font-black text-[10px] md:text-xs tracking-[0.1em] pb-1 leading-normal">
-        TDL ENERGY INDONESIA
-    </span>
-    <span class="text-[9px] text-neutral-500 font-bold uppercase leading-none">
-        Indonesia Division
-    </span>
-</div>
+        <div class="flex flex-col gap-1">
+            <span class="animated-logo-text font-black text-[10px] md:text-xs tracking-[0.1em] pb-1 leading-normal">
+                TDL ENERGY INDONESIA
+            </span>
+            <span class="text-[9px] text-neutral-500 font-bold uppercase leading-none">
+                Indonesia Division
+            </span>
+        </div>
     </a>
 
     <nav class="hidden lg:flex items-center justify-center flex-1 px-4">
-        <ul id="main-nav" class="flex items-center text-[11px] xl:text-[12px] font-semibold uppercase tracking-wider whitespace-nowrap">
+        <ul id="main-nav" class="flex items-center text-[11px] xl:text-[12px] font-semibold uppercase tracking-wider whitespace-nowrap gap-6">
             <li><a href="index.html" class="nav-link">Home</a></li>
             <li><a href="products.html" class="nav-link">Products</a></li>
             <li><a href="technology.html" class="nav-link">Technology</a></li>
