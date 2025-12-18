@@ -88,6 +88,33 @@
             position: relative;
             z-index: 10;
         }
+
+/* #staffImage 대신 .staff-img 사용 */
+.staff-img { 
+    margin-top: 30px; 
+
+    /* 너비와 높이 조절 */
+    width: 500px;       /* 원하는 가로 크기 */
+    height: 450px;      /* 원하는 세로 크기 */
+    /* 이미지가 찌그러지지 않게 해주는 속성 */
+    object-fit: cover;  /* 설정한 크기에 맞게 이미지를 채움 (추천) */
+
+    border-radius: 12px; 
+    border: 1px solid #22d3ee; 
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); 
+    opacity: 0; 
+    transition: opacity 1.5s ease-in-out; 
+}
+
+/* 이미지들을 가로로 배치하기 위한 컨테이너 */
+.staff-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+
     </style>
 </head>
 
@@ -99,7 +126,11 @@
     <div class="scanning-line"></div>
     <div class="text-2xl font-bold mb-4 animate-pulse">⚡⚡⚡ TDLiD SYSTEM SCANNING...</div>
     <div id="statusLog" class="text-xl text-neutral-400">Initializing Security Protocol...</div>
-    <img id="staffImage" src="images/staff.jpeg" alt="TDL Staff">
+    
+    <div class="staff-container">
+        <img class="staff-img" src="images/staff.jpeg" alt="TDL Staff 1">
+        <img class="staff-img" src="images/staff-2.png" alt="TDL Staff 2">
+    </div>
 </div>
 
 <button id="musicToggleBtn" title="Play/Pause Music">
@@ -284,24 +315,34 @@
     });
 
     // 스캔 애니메이션
-    function runScanAnimation() {
-        const overlay = document.getElementById('easterEggOverlay');
-        const log = document.getElementById('statusLog');
-        const staffImg = document.getElementById('staffImage');
-        if(!overlay) return;
-        overlay.style.display = 'flex';
-        staffImg.style.opacity = '0';
-        const msgs = ["System Scanning...", "Decrypting BMS...", "TDLiD Verified.", "Mr. Ray🧔", "Mr. Eza😎", "Mr. Rezy👨‍🦰", "Miss. Etno🧕"];
-        msgs.forEach((msg, i) => {
-            setTimeout(() => {
-                log.innerText = msg;
-                if (i === 4) staffImg.style.opacity = '1';
-                if (i === msgs.length - 1) {
-                    setTimeout(() => { overlay.style.display = 'none'; alert("Access Granted!"); }, 1500);
-                }
-            }, i * 700);
-        });
-    }
+function runScanAnimation() {
+    const overlay = document.getElementById('easterEggOverlay');
+    const log = document.getElementById('statusLog');
+    const staffImgs = document.querySelectorAll('.staff-img'); // 모든 이미지 선택
+    
+    if(!overlay) return;
+    overlay.style.display = 'flex';
+    
+    // 모든 이미지 초기화 (숨김)
+    staffImgs.forEach(img => img.style.opacity = '0');
+    
+    const msgs = ["System Scanning...", "Decrypting BMS...", "TDLiD Verified.", "Mr. Ray🧔", "Mr. Eza😎", "Mr. Rezy👨‍🦰", "Miss. Etno🧕"];
+    msgs.forEach((msg, i) => {
+        setTimeout(() => {
+            log.innerText = msg;
+            // 특정 시점(i === 4)에 모든 이미지 나타나게 함
+            if (i === 4) {
+                staffImgs.forEach(img => img.style.opacity = '1');
+            }
+            if (i === msgs.length - 1) {
+                setTimeout(() => { 
+                    overlay.style.display = 'none'; 
+                    alert("Access Granted!"); 
+                }, 1500);
+            }
+        }, i * 700);
+    });
+}
 
     document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
 </script>
