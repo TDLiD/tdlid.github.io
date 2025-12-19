@@ -2,28 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script>
-        /**
-         * [데스크톱 전용 모드 설정]
-         * 모바일 기기로 접속 시 news_m.html로 리다이렉트 합니다.
-         */
-        (function() {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPCMode = urlParams.get('view_mode') === 'pc';
-
-            if (isMobile && !isPCMode) {
-                let path = window.location.pathname;
-                let page = path.split("/").pop();
-                if (page === "news.html" || page === "") {
-                    window.location.href = "news_m.html";
-                }
-            }
-        })();
-    </script>
-
     <title>Latest News | TDL Energy Indonesia</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,32 +11,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-    /* 드롭다운 스타일 (컴포넌트 대응) */
+    /* 전체 페이지 드래그 및 선택 방지 */
+    body {
+        -webkit-user-select: none;
+        user-select: none;
+        overflow-x: hidden;
+    }
+
+    /* 드롭다운 스타일 (모바일 최적화) */
     .dropdown-link {
-        padding: 12px 20px;
+        padding: 16px 20px;
         display: block;
         color: #ccc;
-        transition: background 0.2s;
         border-bottom: 1px solid #262626;
     }
-    .dropdown-link:hover {
-        background: #1f2937;
-        color: #22d3ee;
-    }
     .dropdown-quote-btn {
-        padding: 12px 20px;
+        padding: 16px 20px;
         display: block;
         background: #22d3ee;
         color: #000;
-        font-weight: 600;
+        font-weight: 700;
         text-align: center;
         border-radius: 0 0 11px 11px;
     }
 
-    /* 데스크톱 전용: 가로 스크롤 방지 및 여백 고정 */
-    body {
-        overflow-x: hidden;
-        min-width: 1280px; /* 데스크톱 최소 너비 보장 */
+    /* 뉴스 카드 모바일 가독성 향상 */
+    #newsListContainer article {
+        background: rgba(23, 23, 23, 0.5);
+        border: 1px solid rgba(64, 64, 64, 0.5);
+        border-radius: 1rem;
+        padding: 1.25rem;
+        transition: all 0.3s ease;
     }
 </style>
 </head>
@@ -65,16 +50,19 @@
 
 <div id="header-placeholder"></div>
 
-<main class="pt-32 pb-20 px-6 min-h-screen">
-    <div class="max-w-7xl mx-auto pt-10 px-12">
-        <h2 class="text-5xl font-black tracking-wide hero-slogan-gradient mb-12">Latest News</h2>
+<main class="pt-24 pb-12 px-5 min-h-screen">
+    <div class="max-w-full mx-auto pt-6">
+        <h2 class="text-3xl font-bold tracking-tight hero-slogan-gradient mb-8 px-2">Latest News</h2>
         
-        <div id="newsListContainer" class="flex flex-col gap-8">
-            <p class="text-center text-neutral-500 py-20 text-xl">Loading news...</p>
+        <div id="newsListContainer" class="flex flex-col gap-5">
+            <div class="flex flex-col items-center justify-center py-20 space-y-4">
+                <div class="w-8 h-8 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div>
+                <p class="text-neutral-500 font-medium tracking-widest text-sm">LOADING ARCHIVES...</p>
+            </div>
         </div>
 
-        <div class="mt-20 text-center">
-            <a href="index.html" class="inline-block px-8 py-4 rounded-xl border border-neutral-700 hover:bg-neutral-800 hover:border-cyan-500/50 transition-all duration-300 text-lg">
+        <div class="mt-12 text-center pb-10">
+            <a href="index.html" class="inline-block px-8 py-3 rounded-xl border border-neutral-800 bg-neutral-900/50 text-neutral-400 text-sm font-medium active:scale-95 transition-all">
                 ← Back to Home
             </a>
         </div>
@@ -85,14 +73,14 @@
 
 <script>
     /**
-     * 1. 레이아웃 로드 및 메뉴 초기화
+     * 1. 레이아웃 로드 및 메뉴 초기화 (모바일 버전 header_m, footer_m 호출)
      */
     async function loadLayout() {
         try {
-            const headerRes = await fetch('components/header.html');
+            const headerRes = await fetch('components/header_m.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
             
-            const footerRes = await fetch('components/footer.html');
+            const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
             initMenuToggle();
@@ -102,7 +90,7 @@
     }
 
     /**
-     * 2. 모바일 메뉴 제어 로직 (데스크톱 환경에서도 윈도우 크기 축소 시 작동 유지)
+     * 2. 모바일 메뉴 제어 로직
      */
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
@@ -117,7 +105,7 @@
                 if (!isOpen) {
                     dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
                     dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                    menuIcon.innerText = "✕";
+                    if(menuIcon) menuIcon.innerText = "✕";
                     menuBtn.setAttribute("aria-expanded", "true");
                 } else {
                     closeMenu();
@@ -127,7 +115,7 @@
             function closeMenu() {
                 dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
                 dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
-                menuIcon.innerText = "☰";
+                if(menuIcon) menuIcon.innerText = "☰";
                 menuBtn.setAttribute("aria-expanded", "false");
             }
 
@@ -138,14 +126,13 @@
             document.addEventListener("keydown", (e) => {
                 if (e.key === "Escape") closeMenu();
             });
-
-            window.addEventListener("resize", () => {
-                if (window.innerWidth >= 1024) closeMenu();
-            });
         }
     }
 
-    // 초기 실행
+    // 보안: 우클릭 방지
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // 초기 로드 실행
     document.addEventListener("DOMContentLoaded", loadLayout);
 </script>
 

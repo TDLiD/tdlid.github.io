@@ -2,25 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script>
-        (function() {
-            // 1. 기기 감지 및 리다이렉트 (데스크톱 전용 페이지 설정)
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPCMode = urlParams.get('view_mode') === 'pc';
-
-            if (isMobile && !isPCMode) {
-                let path = window.location.pathname;
-                let page = path.split("/").pop();
-                if (page === "contact.html" || page === "") {
-                    window.location.href = "contact_m.html";
-                }
-            }
-        })();
-    </script>
-
     <title>Request Quote | TDL Energy Indonesia</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,36 +14,36 @@
     /* 전체 페이지 드래그 방지 (입력창 제외) */
     body {
         -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
         user-select: none;
+        overflow-x: hidden;
     }
 
     /* 입력창 및 선택창은 정상적으로 사용 가능하도록 설정 */
     input, textarea, select {
         user-select: auto !important;
         -webkit-user-select: auto !important;
+        font-size: 16px !important; /* iOS 자동 줌 방지 */
     }
 
     .contact-form-container {
-        min-height: calc(100vh - 120px);
+        min-height: 100vh;
         display: flex;
-        align-items: center; /* 데스크톱에서 중앙 정렬 */
+        align-items: center;
         justify-content: center;
-        padding-top: 8rem; /* 헤더 여백 고정 */
     }
+    
     .form-card {
-        max-width: 800px; /* 데스크톱 최적화 너비 상향 */
+        max-width: 100%;
         width: 100%;
-        margin-bottom: 5rem;
+        margin: 0 auto;
     }
-    /* 드롭다운 스타일 */
-    .dropdown-link { padding: 12px 20px; display: block; color: #ccc; transition: background 0.2s; border-bottom: 1px solid #262626; }
-    .dropdown-link:hover { background: #1f2937; color: #22d3ee; }
-    .dropdown-quote-btn { padding: 12px 20px; display: block; background: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; }
+
+    /* 드롭다운 스타일 (모바일 최적화) */
+    .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; }
+    .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
 
     /* =========================================
-        🚀 업그레이드된 사이버 이스터 에그 스타일
+        🚀 사이버 이스터 에그 스타일 (모바일 최적화)
     ========================================= */
     #easterEggOverlay {
         position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
@@ -73,14 +56,14 @@
         position: absolute; inset: 0;
         background: linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
                     linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
-        background-size: 30px 30px;
+        background-size: 20px 20px;
         pointer-events: none;
     }
 
     .scanning-bar {
-        position: absolute; width: 100%; height: 4px;
+        position: absolute; width: 100%; height: 3px;
         background: linear-gradient(to right, transparent, #22d3ee, transparent);
-        box-shadow: 0 0 20px #22d3ee;
+        box-shadow: 0 0 15px #22d3ee;
         top: -10px; animation: cyberScan 2s linear infinite;
     }
 
@@ -90,56 +73,46 @@
     }
 
     .status-terminal {
-        background: rgba(0, 0, 0, 0.8);
-        padding: 3rem; border: 1px solid #22d3ee;
-        border-radius: 8px; box-shadow: 0 0 60px rgba(34, 211, 238, 0.3);
-        z-index: 20001; text-align: center; max-width: 800px;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 1.5rem; border: 1px solid #22d3ee;
+        border-radius: 12px; box-shadow: 0 0 30px rgba(34, 211, 238, 0.3);
+        z-index: 20001; text-align: center; max-width: 85%;
     }
 
     .staff-container {
-        display: flex; gap: 40px; justify-content: center;
-        margin-top: 40px;
+        display: flex; gap: 15px; justify-content: center;
+        flex-direction: column; align-items: center; margin-top: 20px;
     }
 
     .staff-img {
-        width: 320px;
+        width: 100%;
+        max-width: 200px;
         height: auto;
-        object-fit: cover;
-        border-radius: 12px;
-        filter: saturate(1.2) contrast(1.1);
-        opacity: 0; transform: translateY(20px);
-        transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border-radius: 8px;
+        opacity: 0; transform: translateY(10px);
+        transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .staff-img.reveal { opacity: 1; transform: translateY(0); box-shadow: 0 0 30px rgba(34, 211, 238, 0.4); }
+    .staff-img.reveal { opacity: 1; transform: translateY(0); box-shadow: 0 0 20px rgba(34, 211, 238, 0.5); }
 
+    /* 트리거 위장 스타일 */
     .stealth-trigger {
         cursor: text !important;
-        text-decoration: none !important;
         -webkit-tap-highlight-color: transparent;
         user-select: none;
-        -webkit-user-select: none;
         pointer-events: auto !important;
     }
-
-    .stealth-title { color: unset !important; font-weight: unset !important; }
-    .stealth-text { color: inherit !important; font-weight: inherit !important; }
-
 </style>
 </head>
 
-<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] overflow-x-hidden">
-
-<script>
-    document.addEventListener('contextmenu', e => e.preventDefault());
-</script>
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
 
 <div id="easterEggOverlay">
     <div class="cyber-bg"></div>
     <div class="scanning-bar"></div>
     <div class="status-terminal">
-        <div class="text-cyan-400 text-sm mb-2 tracking-[0.3em]">SECURE ACCESS GRANTED</div>
-        <div id="statusLog" class="text-3xl font-bold text-white mb-6">INITIALIZING...</div>
+        <div class="text-cyan-400 text-xs mb-2 tracking-[0.2em]">SECURE ACCESS GRANTED</div>
+        <div id="statusLog" class="text-lg font-bold text-white mb-4">INITIALIZING...</div>
         <div class="staff-container">
             <img class="staff-img" src="images/cy1.png" alt="Staff 1">
             <img class="staff-img" src="images/cy2.jpg" alt="Staff 2">
@@ -149,41 +122,41 @@
 
 <div id="header-placeholder"></div>
 
-<main class="px-6 contact-form-container">
-    <div class="form-card bg-neutral-900 border border-neutral-800 p-12 rounded-3xl shadow-2xl relative">
-        <h2 class="text-5xl font-black tracking-tight hero-slogan-gradient mb-4">
-            Request a <span id="triggerWord" class="stealth-trigger stealth-title">Quote</span>
+<main class="pt-24 pb-12 px-5 contact-form-container">
+    <div class="form-card bg-neutral-900/80 border border-neutral-800 p-6 rounded-2xl shadow-2xl relative">
+        <h2 class="text-3xl font-bold tracking-tight hero-slogan-gradient mb-2">
+            Request a <span id="triggerWord" class="stealth-trigger">Quote</span>
         </h2>
-        <p class="text-neutral-400 text-lg mb-10">
-            Please provide details for a customized quotation. <span id="triggerWord2" class="stealth-trigger stealth-text">Our</span> team will contact you shortly.
+        <p class="text-sm text-neutral-400 mb-8 leading-relaxed">
+            Please provide details for a customized quotation. <span id="triggerWord2" class="stealth-trigger">Our</span> team will contact you shortly.
         </p>
 
-        <form id="quoteForm" method="POST" action="https://formspree.io/f/mdkqddlz" class="grid gap-6">
-            <div class="grid grid-cols-2 gap-6">
-                <input name="company" placeholder="Company / Name" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required>
-                <input name="email" type="email" placeholder="Email Address" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-6">
-                <input name="phone" placeholder="Phone / WhatsApp (Optional)" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition">
-                <select name="product" id="quoteProductSelect" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition text-neutral-400">
-                    <option value="" class="text-neutral-400">-- Select Product / Service (Optional) --</option>
-                    <option value="72V 20Ah Battery Pack">72V 20Ah Battery Pack</option>
-                    <option value="EV Conversion Kit">EV Conversion Kit</option>
-                    <option value="Solar Home Charging Solution">Solar Home Charging Solution</option>
-                    <option value="Battery Recycling Program">Battery Recycling Program</option>
-                    <option value="Other / General Inquiry">Other / General Inquiry</option>
-                </select>
-            </div>
+        <form id="quoteForm" method="POST" action="https://formspree.io/f/mdkqddlz" class="flex flex-col gap-4">
+            <div class="space-y-4">
+                <input name="company" placeholder="Company / Name" class="w-full p-4 rounded-xl bg-neutral-800/50 border border-neutral-700 focus:border-cyan-500 outline-none transition placeholder:text-neutral-500" required>
+                <input name="email" type="email" placeholder="Email Address" class="w-full p-4 rounded-xl bg-neutral-800/50 border border-neutral-700 focus:border-cyan-500 outline-none transition placeholder:text-neutral-500" required>
+                <input name="phone" placeholder="Phone / WhatsApp (Optional)" class="w-full p-4 rounded-xl bg-neutral-800/50 border border-neutral-700 focus:border-cyan-500 outline-none transition placeholder:text-neutral-500">
 
-            <textarea name="details" rows="8" placeholder="Project details, required quantity, use-case, delivery location, etc." class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition"></textarea>
+                <div class="relative">
+                    <select name="product" id="quoteProductSelect" class="w-full p-4 rounded-xl bg-neutral-800/50 border border-neutral-700 focus:border-cyan-500 outline-none transition text-neutral-300 appearance-none">
+                        <option value="">-- Select Product (Optional) --</option>
+                        <option value="72V 20Ah Battery Pack">72V 20Ah Battery Pack</option>
+                        <option value="EV Conversion Kit">EV Conversion Kit</option>
+                        <option value="Solar Home Charging Solution">Solar Home Charging Solution</option>
+                        <option value="Battery Recycling Program">Battery Recycling Program</option>
+                        <option value="Other / General Inquiry">Other / General Inquiry</option>
+                    </select>
+                </div>
+
+                <textarea name="details" rows="5" placeholder="Project details, required quantity, etc." class="w-full p-4 rounded-xl bg-neutral-800/50 border border-neutral-700 focus:border-cyan-500 outline-none transition placeholder:text-neutral-500"></textarea>
+            </div>
             
-            <button type="submit" class="w-full mt-6 py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black text-xl font-bold transition shadow-lg shadow-cyan-500/20">
+            <button type="submit" class="w-full mt-2 py-4 rounded-xl bg-cyan-500 active:bg-cyan-600 text-black font-bold transition-all shadow-lg shadow-cyan-500/20">
                 Submit Request
             </button>
         </form>
 
-        <p id="formStatus" class="mt-6 text-center text-lg font-medium"></p>
+        <p id="formStatus" class="mt-4 text-center text-sm font-medium"></p>
     </div>
 </main>
 
@@ -192,10 +165,11 @@
 <script>
     async function loadLayout() {
         try {
-            const headerRes = await fetch('components/header.html');
+            // 모바일 전용 헤더/푸터 호출
+            const headerRes = await fetch('components/header_m.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
             
-            const footerRes = await fetch('components/footer.html');
+            const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
             initMenuToggle();
@@ -223,13 +197,11 @@
                     closeMenu();
                 }
             };
-
             function closeMenu() {
                 dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
                 dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
                 if(menuIcon) menuIcon.innerText = "☰";
             }
-
             document.addEventListener("click", (e) => {
                 if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
             });
@@ -248,9 +220,9 @@
             overlay.style.display = 'flex';
             
             const msgs = [
-                "> ACCESSING ENCRYPTED CORE...",
-                "> BYPASSING FIREWALL...",
-                "> The prettiest girl confirmed",
+                "> ENCRYPTING...",
+                "> BYPASSING...",
+                "> Confirmed",
                 "Welcome: Miss. Kim ♥"
             ];
 
@@ -259,7 +231,7 @@
                     log.innerText = msg;
                     if(i === 2) {
                         staffImgs.forEach((img, idx) => {
-                            setTimeout(() => img.classList.add('reveal'), idx * 200);
+                            setTimeout(() => img.classList.add('reveal'), idx * 300);
                         });
                     }
                     if(i === msgs.length - 1) {
@@ -272,13 +244,14 @@
                             }, 500);
                         }, 2500);
                     }
-                }, i * 800);
+                }, i * 700);
             });
         }
 
         if(t1) t1.onclick = runCyberEffect;
         if(t2) t2.onclick = runCyberEffect;
 
+        // 키워드 타이핑 트리거
         let inputStr = "";
         document.onkeydown = (e) => {
             inputStr += e.key.toLowerCase();
@@ -295,7 +268,7 @@
             form.onsubmit = async (e) => {
                 e.preventDefault();
                 formStatus.textContent = 'Sending...';
-                formStatus.className = 'mt-6 text-center text-lg text-cyan-400';
+                formStatus.className = 'mt-4 text-center text-sm text-cyan-400';
                 try {
                     const response = await fetch(form.action, {
                         method: form.method,
@@ -304,18 +277,19 @@
                     });
                     if (response.ok) {
                         formStatus.textContent = '✅ Submitted successfully!';
-                        formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
+                        formStatus.className = 'mt-4 text-center text-sm text-green-500';
                         form.reset();
                     } else { throw new Error(); }
                 } catch {
                     formStatus.textContent = '❌ Error. Please try again.';
-                    formStatus.className = 'mt-6 text-center text-lg text-red-500';
+                    formStatus.className = 'mt-4 text-center text-sm text-red-500';
                 }
             };
         }
     }
 
     document.addEventListener("DOMContentLoaded", loadLayout);
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
 </script>
 
 </body>

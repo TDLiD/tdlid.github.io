@@ -2,6 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script>
+        (function() {
+            // 1. 기기 감지 및 리다이렉트 (데스크톱 전용 페이지이므로 모바일 접근 시 즉시 이동)
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPCMode = urlParams.get('view_mode') === 'pc';
+
+            if (isMobile && !isPCMode) {
+                let path = window.location.pathname;
+                let page = path.split("/").pop();
+                if (page === "" || page === "index.html") {
+                    window.location.href = "index_m.html";
+                } else if (page.endsWith(".html") && !page.includes("_m.html")) {
+                    window.location.href = page.replace(".html", "_m.html");
+                }
+            }
+        })();
+    </script>
+
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,7 +35,7 @@
         #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; }
         #modalDetailImage { max-width: 90%; max-height: 90%; object-fit: contain; }
 
-        /* 드롭다운 스타일 */
+        /* 드롭다운 스타일 (데스크톱 최적화) */
         .dropdown-link { padding: 12px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; transition: all 0.2s; text-align: left; }
         .dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
         .dropdown-quote-btn { padding: 12px 20px; display: block; background: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; transition: background 0.2s; }
@@ -33,40 +52,34 @@
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
         /* Staff 이미지 스타일 */
-        #staffImage { margin-top: 30px; max-width: 300px; border-radius: 12px; border: 1px solid #22d3ee; box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); opacity: 0; transition: opacity 1.5s ease-in-out; }
+        .staff-img { 
+            width: 280px; 
+            height: auto; 
+            object-fit: cover; 
+            border-radius: 12px; 
+            border: 1px solid #22d3ee; 
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); 
+            opacity: 0; 
+            transition: opacity 1.5s ease-in-out; 
+        }
 
-        /* TDLiD 클릭 포인트 스타일 */
-/* TDLiD 클릭 포인트 완벽 위장 */
-#triggerWord {
-    /* 주변 텍스트와 동일하게 설정 */
-    color: inherit !important;
-    font-weight: inherit !important;
-    text-decoration: none !important;
-    
-    /* 마우스 커서를 일반 텍스트 선택 모양으로 설정 (클릭 가능해 보이지 않게 함) */
-    cursor: text !important; 
-    
-    /* 레이아웃 유지 */
-    display: inline;
-    position: relative;
-    z-index: 9998;
-    pointer-events: auto !important;
-}
+        .staff-container { display: flex; gap: 30px; justify-content: center; flex-wrap: nowrap; }
 
-/* hover 시 변화를 주지 않음 (기존 hover 코드 삭제 또는 아래처럼 초기화) */
-#triggerWord:hover {
-    color: inherit !important;
-    text-shadow: none !important;
-}
+        /* TDLiD 클릭 포인트 스타일 (데스크톱 전용) */
+        #triggerWord {
+            color: inherit !important;
+            font-weight: inherit !important;
+            text-decoration: none !important;
+            cursor: text !important; 
+            display: inline;
+            position: relative;
+            z-index: 9998;
+            pointer-events: auto !important;
+        }
 
-#triggerWord, #triggerWord2 {
-    -webkit-tap-highlight-color: transparent; /* 터치 시 반짝이는 효과 제거 */
-    user-select: none; /* 텍스트 선택(드래그) 방지 */
-    -webkit-user-select: none;
-}
+        #triggerWord:hover { color: inherit !important; text-shadow: none !important; }
 
-
-        /* 비디오 배경 섹션 한정 스타일 */
+        /* 비디오 배경 섹션 (데스크톱 풀스크린 고정) */
         .hero-section {
             position: relative;
             width: 100%;
@@ -79,67 +92,33 @@
 
         .video-bg-container {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; overflow: hidden;
         }
 
         .video-bg {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            width: 100%; height: 100%; object-fit: cover;
             filter: brightness(0.4) contrast(1.1); 
         }
 
         .video-overlay {
-            position: absolute;
-            inset: 0;
+            position: absolute; inset: 0;
             background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
             z-index: 1;
         }
 
-        .hero-content {
-            position: relative;
-            z-index: 10;
-        }
-
-/* #staffImage 대신 .staff-img 사용 */
-.staff-img { 
- width: 80vw;    /* 모바일에서는 화면 너비의 80% */
-    height: auto;   /* 가로 비율에 맞춰 자동 조절 */
-    max-width: 280px; /* PC 등 큰 화면에서의 최대 크기 제한 */
-    object-fit: cover;
-    border-radius: 8px;
-
-    border: 1px solid #22d3ee; 
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); 
-    opacity: 0; 
-    transition: opacity 1.5s ease-in-out; 
-}
-
-/* 이미지들을 가로로 배치하기 위한 컨테이너 */
-.staff-container {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-
+        .hero-content { position: relative; z-index: 10; }
     </style>
 </head>
 
-<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
 
 <audio id="bgm" src="mp3/Caribbean.mp3" autoplay loop muted></audio>
 
 <div id="easterEggOverlay">
     <div class="scanning-line"></div>
-    <div class="text-2xl font-bold mb-4 animate-pulse">⚡⚡⚡ TDLiD SYSTEM SCANNING...</div>
-    <div id="statusLog" class="text-xl text-neutral-400">Initializing Security Protocol...</div>
+    <div class="text-3xl font-bold mb-8 animate-pulse">⚡⚡⚡ TDLiD SYSTEM SCANNING...</div>
+    <div id="statusLog" class="text-xl text-neutral-400 mb-10">Initializing Security Protocol...</div>
     
     <div class="staff-container">
         <img class="staff-img" src="images/staff.jpeg" alt="TDL Staff 1">
@@ -163,81 +142,79 @@
             </video>
         </div>
 
-        <div class="hero-content max-w-6xl w-full px-6 text-center">
-            <h1 class="hero-logo-gradient">TDLiD</h1>
-            <p class="hero-slogan-gradient">NO MORE CARBON</p>
-            <p class="hero-description text-xl mt-22 md:mt-36 mb-24 max-w-3xl mx-auto" style="position: relative; z-index: 9998;">
+        <div class="hero-content max-w-6xl w-full px-12 text-center">
+            <h1 class="hero-logo-gradient" style="font-size: 8rem; line-height: 1;">TDLiD</h1>
+            <p class="hero-slogan-gradient" style="font-size: 2rem; letter-spacing: 0.5em; margin-top: 1rem;">NO MORE CARBON</p>
+            <p class="hero-description text-2xl mt-36 mb-24 max-w-4xl mx-auto leading-relaxed">
                 <span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
             </p>
         </div>
     </section>
 
-    <section id="trust-certs-showcase" class="pt-10 pb-10 md:pt-16 md:pb-16 bg-neutral-900 border-t border-b border-neutral-800 relative z-10">
+    <section id="trust-certs-showcase" class="py-24 bg-neutral-900 border-t border-b border-neutral-800 relative z-10">
         <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl md:text-4xl font-extralight mb-10 text-cyan-400">A Pillar of Trust in the E-Scooter Ecosystem</h2>
-                <div class="flex flex-wrap items-center justify-center gap-10 md:gap-16 opacity-75 grayscale hover:grayscale-0 transition-all duration-500">
-                    <img src="images/DAVIGO.png" alt="DAVIGO" class="h-10 md:h-14">
-                    <img src="images/GESITS.png" alt="GESITS" class="h-10 md:h-14">
-                    <img src="images/ALESSA.png" alt="ALESSA" class="h-10 md:h-14">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl font-extralight mb-12 text-cyan-400">A Pillar of Trust in the E-Scooter Ecosystem</h2>
+                <div class="flex items-center justify-center gap-24 opacity-75 grayscale hover:grayscale-0 transition-all duration-700">
+                    <img src="images/DAVIGO.png" alt="DAVIGO" class="h-16">
+                    <img src="images/GESITS.png" alt="GESITS" class="h-16">
+                    <img src="images/ALESSA.png" alt="ALESSA" class="h-16">
                 </div>
             </div>
-            <div class="mt-10">
-                <h2 class="text-2xl md:text-3xl font-extralight text-center mb-10 text-cyan-400">Global Compliance and Safety Standards</h2>
-                <div id="certifications-inside-hero" class="flex flex-wrap gap-4 md:gap-8 items-center justify-center interactive-certs">
+            
+            <div class="mt-20">
+                <h2 class="text-3xl font-extralight text-center mb-16 text-cyan-400">Global Compliance and Safety Standards</h2>
+                <div id="certifications-inside-hero" class="flex flex-wrap gap-10 items-center justify-center interactive-certs">
                     <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CE-EMC-TEST.jpg">
-                        <img src="images/certification/CE-EMC-TEST.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                        <img src="images/certification/CE-EMC-TEST.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
                     <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CB-TEST.jpg">
-                        <img src="images/certification/CB-TEST.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                        <img src="images/certification/CB-TEST.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
                     <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/EMC-COMPLIANCE.jpg">
-                        <img src="images/certification/EMC-COMPLIANCE.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                        <img src="images/certification/EMC-COMPLIANCE.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
                     <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/IEC-62619.jpg">
-                        <img src="images/certification/IEC-62619.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                        <img src="images/certification/IEC-62619.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
                     <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Material-Safety.jpg">
-                        <img src="images/certification/Material-Safety.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                        <img src="images/certification/Material-Safety.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
                     <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/UN38.3.jpg">
-                        <img src="images/certification/UN38.3.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                        <img src="images/certification/UN38.3.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
                     <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Dangerous-Goods.jpg">
-                        <img src="images/certification/Dangerous-Goods.jpg" class="h-16 md:h-20 transition-transform duration-300 shadow-xl">
+                        <img src="images/certification/Dangerous-Goods.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
                 </div>
             </div>
         </div>
     </section>
-
-
 </main>
 
 <div id="imageModal" class="hidden">
     <div class="flex items-center justify-center w-full h-full">
-        <img id="modalDetailImage" src="" class="max-w-full max-h-full object-contain">
+        <img id="modalDetailImage" src="" class="max-w-[90%] max-h-[90%] object-contain">
     </div>
 </div>
 
 <div id="footer-placeholder"></div>
 
 <script>
-    /** 1. 레이아웃 로드 및 트리거 초기화 **/
+    /** 1. 레이아웃 로드 **/
     async function loadLayout() {
         try {
             const headerRes = await fetch('components/header.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-
             const footerRes = await fetch('components/footer.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
 
             initNavigation();
-            initEasterEggTriggers(); // 이스터 에그는 헤더 로드 후 바인딩
+            initEasterEggTriggers();
         } catch (err) { console.error(err); }
     }
 
-    /** 2. 내비게이션 **/
+    /** 2. 내비게이션 (데스크톱 드롭다운 제어) **/
     function initNavigation() {
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
@@ -259,9 +236,8 @@
         }
     }
 
-    /** 3. 모든 이스터 에그 트리거 복구 **/
+    /** 3. 이스터 에그 트리거 **/
     function initEasterEggTriggers() {
-        // [1] TDLiD 단어 클릭
         const triggerWord = document.getElementById('triggerWord');
         if (triggerWord) {
             triggerWord.addEventListener('click', (e) => {
@@ -269,7 +245,6 @@
             });
         }
 
-        // [2] 로고 5번 클릭
         let touchCount = 0;
         let lastTouchTime = 0;
         const logoImg = document.querySelector('header img');
@@ -285,11 +260,10 @@
         }
     }
 
-    /** 4. 공통 기능 **/
+    /** 4. 초기화 및 공통 기능 **/
     document.addEventListener("DOMContentLoaded", () => {
         loadLayout();
 
-        // 뮤직
         const bgm = document.getElementById('bgm');
         const musicBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIconUI');
@@ -300,7 +274,6 @@
             };
         }
 
-        // 모달
         document.querySelectorAll('.cert-link').forEach(link => {
             link.onclick = (e) => {
                 e.preventDefault();
@@ -322,7 +295,7 @@
         }
     });
 
-    // [3] 키보드 입력 'tdlid'
+    // 키보드 입력 'tdlid'
     let inputBuffer = "";
     document.addEventListener("keydown", (e) => {
         inputBuffer += e.key.toLowerCase();
@@ -330,35 +303,29 @@
         if (inputBuffer === "tdlid") { runScanAnimation(); inputBuffer = ""; }
     });
 
-    // 스캔 애니메이션
-function runScanAnimation() {
-    const overlay = document.getElementById('easterEggOverlay');
-    const log = document.getElementById('statusLog');
-    const staffImgs = document.querySelectorAll('.staff-img'); // 모든 이미지 선택
-    
-    if(!overlay) return;
-    overlay.style.display = 'flex';
-    
-    // 모든 이미지 초기화 (숨김)
-    staffImgs.forEach(img => img.style.opacity = '0');
-    
-    const msgs = ["System Scanning...", "Decrypting BMS...", "TDLiD Verified.", "Mr. Ray🧔", "Mr. Eza😎", "Mr. Rezy👨‍🦰", "Miss. Etno🧕"];
-    msgs.forEach((msg, i) => {
-        setTimeout(() => {
-            log.innerText = msg;
-            // 특정 시점(i === 4)에 모든 이미지 나타나게 함
-            if (i === 4) {
-                staffImgs.forEach(img => img.style.opacity = '1');
-            }
-            if (i === msgs.length - 1) {
-                setTimeout(() => { 
-                    overlay.style.display = 'none'; 
-                    alert("Access Granted!"); 
-                }, 1500);
-            }
-        }, i * 700);
-    });
-}
+    function runScanAnimation() {
+        const overlay = document.getElementById('easterEggOverlay');
+        const log = document.getElementById('statusLog');
+        const staffImgs = document.querySelectorAll('.staff-img');
+        
+        if(!overlay) return;
+        overlay.style.display = 'flex';
+        staffImgs.forEach(img => img.style.opacity = '0');
+        
+        const msgs = ["System Scanning...", "Decrypting BMS...", "TDLiD Verified.", "Mr. Ray🧔", "Mr. Eza😎", "Mr. Rezy👨‍🦰", "Miss. Etno🧕"];
+        msgs.forEach((msg, i) => {
+            setTimeout(() => {
+                log.innerText = msg;
+                if (i === 4) staffImgs.forEach(img => img.style.opacity = '1');
+                if (i === msgs.length - 1) {
+                    setTimeout(() => { 
+                        overlay.style.display = 'none'; 
+                        alert("Access Granted!"); 
+                    }, 1500);
+                }
+            }, i * 700);
+        });
+    }
 
     document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
 </script>

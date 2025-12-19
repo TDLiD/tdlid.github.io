@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products | TDL Energy Indonesia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="TDLiD - High-density lithium battery packs for electric motorcycles.">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 드래그 및 우클릭 방지 */
+        body {
+            -webkit-user-select: none;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        /* 1. 제품 전환 애니메이션 */
+        #productContentWrapper {
+            transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.8s ease-out;
+            will-change: transform, opacity;
+        }
+
+        #galleryImageContainer {
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            position: relative;
+        }
+        
+        #galleryImageContainer img {
+            max-width: 100%; height: auto; object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+        }
+
+        /* 모바일 터치 최적화 버튼 */
+        .gallery-nav-btn {
+            width: 56px; height: 56px;
+            display: flex; items-center: center; justify-content: center;
+            background: rgba(23, 23, 23, 0.8);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            border-radius: 50%;
+            color: #22d3ee;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
+        }
+        .gallery-nav-btn:active {
+            transform: scale(0.9);
+            background: #22d3ee;
+            color: #000;
+        }
+
+        /* 드롭다운 스타일 */
+        .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; }
+        .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
+    </style>
+</head>
+
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
+
+<div id="header-placeholder"></div>
+
+<main class="flex-grow pt-24 pb-12 px-5 flex flex-col justify-center">
+    <div class="max-w-full mx-auto w-full">
+        <div class="flex flex-col items-center mb-8">
+            <h3 class="text-3xl font-bold tracking-tight hero-slogan-gradient text-center mb-6">TDLiD Products</h3>
+            
+            <div class="grid grid-cols-2 gap-3 w-full max-w-sm">
+                <a href="data/catalog/comparison.pdf" target="_blank" class="flex items-center justify-center py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs font-semibold active:bg-neutral-800 transition shadow-lg">
+                    Compare Models
+                </a>
+                <a href="data/catalog/tei-catalog-2025.pdf" target="_blank" class="flex items-center justify-center py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs font-semibold active:bg-neutral-800 transition shadow-lg">
+                    View Catalog
+                </a>
+            </div>
+        </div>
+        
+        <div id="productGallery" class="relative w-full max-w-md mx-auto aspect-[4/5] bg-neutral-900/50 rounded-3xl border border-neutral-800/50 shadow-2xl flex flex-col overflow-hidden">
+            <div class="flex-grow flex items-center justify-center p-8 overflow-hidden">
+                <div id="productContentWrapper" class="w-full h-full flex items-center justify-center">
+                    <div id="galleryImageContainer" class="w-full h-full">
+                        </div>
+                </div>
+            </div>
+
+            <div class="absolute top-6 left-1/2 -translate-x-1/2">
+                <span id="galleryStatus" class="px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/5 text-cyan-400 font-mono text-[10px] tracking-[0.2em] uppercase"></span>
+            </div>
+            
+            <div class="flex justify-between items-center px-6 pb-8">
+                <button id="galleryPrevBtn" class="gallery-nav-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                
+                <div class="text-neutral-500 text-[10px] uppercase tracking-widest font-bold">Battery Pack Archive</div>
+
+                <button id="galleryNextBtn" class="gallery-nav-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <p class="text-center text-neutral-600 text-[11px] mt-8 tracking-tighter">
+            Swipe or use buttons to navigate through our 32 battery models.
+        </p>
+    </div>
+</main>
+
+<div id="footer-placeholder"></div>
+
+<script>
+    /**
+     * 1. 레이아웃 로드 (모바일 전용 컴포넌트 호출)
+     */
+    async function loadLayout() {
+        try {
+            const headerRes = await fetch('components/header_m.html');
+            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+
+            const footerRes = await fetch('components/footer_m.html');
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+            initMenuToggle();
+        } catch (err) {
+            console.error("Layout load failed:", err);
+        }
+    }
+
+    /**
+     * 2. 제품 갤러리 로직 (기존 로직 및 데이터 보존)
+     */
+    const productsData = [];
+    for(let i=1; i<=32; i++) {
+        productsData.push({ image: `images/products/image-${i}.png` });
+    }
+
+    const productContentWrapper = document.getElementById('productContentWrapper');
+    const galleryImageContainer = document.getElementById('galleryImageContainer');
+    const galleryStatus = document.getElementById('galleryStatus');
+    const galleryPrevBtn = document.getElementById('galleryPrevBtn');
+    const galleryNextBtn = document.getElementById('galleryNextBtn');
+
+    let currentProductIndex = 0;
+    let isAnimating = false;
+    let autoChangeInterval;
+    const AUTO_CHANGE_TIME = 3500;
+    const transitionDuration = 600;
+    const slideDistance = 50;
+
+    function renderProduct(product, index) {
+        galleryImageContainer.innerHTML = `<img src="${product.image}" alt="Battery Pack ${index + 1}" class="max-h-full">`;
+        galleryStatus.textContent = `${(index + 1).toString().padStart(2, '0')} / ${productsData.length}`;
+    }
+
+    function stopAutoChange() { if (autoChangeInterval) clearInterval(autoChangeInterval); }
+    function startAutoChange() {
+        stopAutoChange();
+        autoChangeInterval = setInterval(() => changeProduct((currentProductIndex + 1) % productsData.length, true), AUTO_CHANGE_TIME);
+    }
+
+    function changeProduct(newIndex, isAutomatic = false) {
+        if (isAnimating) return;
+        isAnimating = true;
+        if (!isAutomatic) stopAutoChange();
+
+        productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.23, 1, 0.32, 1), opacity ${transitionDuration}ms ease-out`;
+        productContentWrapper.style.transform = `translateX(-${slideDistance}px)`;
+        productContentWrapper.style.opacity = '0';
+        
+        setTimeout(() => {
+            currentProductIndex = newIndex;
+            const newProduct = productsData[currentProductIndex];
+            productContentWrapper.style.transition = 'none';
+            productContentWrapper.style.transform = `translateX(${slideDistance}px)`;
+            renderProduct(newProduct, currentProductIndex); 
+            void productContentWrapper.offsetWidth; 
+            productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.23, 1, 0.32, 1), opacity ${transitionDuration}ms ease-out`;
+            productContentWrapper.style.transform = 'translateX(0)';
+            productContentWrapper.style.opacity = '1';
+            isAnimating = false;
+            if (!isAutomatic) startAutoChange();
+        }, transitionDuration); 
+    }
+
+    galleryNextBtn.onclick = () => changeProduct((currentProductIndex + 1) % productsData.length);
+    galleryPrevBtn.onclick = () => changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
+
+    /**
+     * 3. 모바일 메뉴 제어
+     */
+    function initMenuToggle() {
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const dropdown = document.getElementById("dropdownMenu");
+        const menuIcon = document.getElementById("menuIcon");
+
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isOpen = dropdown.classList.contains("opacity-100");
+                if (isOpen) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    if(menuIcon) menuIcon.innerText = "☰";
+                } else {
+                    dropdown.classList.remove("opacity-0", "invisible");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                    if(menuIcon) menuIcon.innerText = "✕";
+                }
+            };
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    if(menuIcon) menuIcon.innerText = "☰";
+                }
+            });
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadLayout();
+        if (productsData.length > 0) {
+            renderProduct(productsData[0], 0);
+            startAutoChange();
+        }
+    });
+
+    // 우클릭 방지
+    document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+
+</body>
+</html>

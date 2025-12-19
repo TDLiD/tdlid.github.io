@@ -2,12 +2,11 @@
    GLOBAL VARIABLE: Header logo/subtitle controls
    -------------------------------------------- */
 :root {
-    --header-logo-font-size: 9.2rem;       /* 상단 TDLiD 크기 */
-    --header-logo-font-weight: 990;        /* 상단 TDLiD 두께 */
-
-    --header-subtitle-font-size: 1.50rem;  /* "TDL ENERGY INDONESIA" 크기 */
-    --header-subtitle-font-weight: 800;    /* 두께 */
-
+    /* 모바일 기본 크기 (축소) */
+    --header-logo-font-size: 4rem; 
+    --header-logo-font-weight: 900;
+    --header-subtitle-font-size: 1.1rem;
+    --header-subtitle-font-weight: 800;
 }
 
 /* 기존 내용은 그대로 (파일 상단에서 유지) */
@@ -73,13 +72,18 @@
     font-size: 0.85rem;
 }
 
-/* Mobile tweaks */
-@media (max-width: 768px) {
-    #stickyCTABar { 
-        display: none !important; 
+/* 태블릿 및 데스크톱 크기 (확대) */
+@media (min-width: 1024px) {
+    :root {
+        --header-logo-font-size: 9.2rem;
+        --header-subtitle-font-size: 1.50rem;
     }
-    .hero-content { 
-        padding: 2rem 1rem; 
+}
+
+/* 이미지 카드 호버 효과 모바일 제외 */
+@media (hover: hover) {
+    .image-card:hover img {
+        transform: scale(1.2); /* 모바일에서는 터치 시 화면을 너무 가리지 않게 축소 */
     }
 }
 

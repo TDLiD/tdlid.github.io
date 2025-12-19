@@ -2,6 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script>
+        /**
+         * [데스크톱 전용 모드 설정]
+         * 모바일 기기로 접속 시 solutions_m.html로 리다이렉트 합니다.
+         */
+        (function() {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPCMode = urlParams.get('view_mode') === 'pc';
+
+            if (isMobile && !isPCMode) {
+                let path = window.location.pathname;
+                let page = path.split("/").pop();
+                if (page === "solutions.html" || page === "") {
+                    window.location.href = "solutions_m.html";
+                }
+            }
+        })();
+    </script>
+
     <title>Solutions | TDLiD</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,53 +35,53 @@
             display: flex; justify-content: center; align-items: center; z-index: 10002;
         }
         .modal-content {
-            background: #171717; color: #ddd; padding: 30px; border-radius: 12px;
-            max-width: 90%; max-height: 90%; text-align: center; border: 1px solid #333; position: relative;
+            background: #171717; color: #ddd; padding: 40px; border-radius: 20px;
+            max-width: 80%; max-height: 90%; text-align: center; border: 1px solid #333; position: relative;
         }
-        .modal-image { max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px; margin-bottom: 20px; }
-        .modal-close-btn { margin-top: 20px; padding: 10px 24px; background: #06b6d4; color: black; font-weight: 600; border-radius: 50px; cursor: pointer; transition: 0.2s; }
-        .modal-close-x { position: absolute; top: 15px; right: 20px; color: #fff; font-size: 28px; cursor: pointer; opacity: 0.6; }
+        .modal-image { max-width: 100%; max-height: 65vh; object-fit: contain; border-radius: 12px; margin-bottom: 25px; }
+        .modal-close-btn { margin-top: 20px; padding: 12px 32px; background: #06b6d4; color: black; font-weight: 700; border-radius: 50px; cursor: pointer; transition: 0.2s; }
+        .modal-close-x { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 32px; cursor: pointer; opacity: 0.6; }
 
-        /* 2. 캐러셀 구조 및 애니메이션 */
+        /* 2. 캐러셀 구조 및 애니메이션 - 데스크톱 최적화 */
         .carousel-wrapper {
-            position: relative; width: 100%; overflow: hidden; padding: 10px 0 40px 0;
+            position: relative; width: 100%; overflow: hidden; padding: 40px 0 60px 0;
         }
         #solutionsContainer {
-            perspective: 1400px; width: 100%; max-width: 850px; margin: 0 auto; position: relative; display: grid;
+            perspective: 2000px; width: 100%; max-width: 1100px; margin: 0 auto; position: relative; display: grid;
         }
         .solution-card {
-            grid-area: 1 / 1 / 2 / 2; width: 100%; height: auto; padding: 2.5rem; 
-            background-color: #111; border: 1px solid #333; border-radius: 1.5rem;
+            grid-area: 1 / 1 / 2 / 2; width: 100%; height: auto; padding: 4rem; 
+            background-color: #0f0f0f; border: 1px solid #222; border-radius: 2.5rem;
             opacity: 0; pointer-events: none; z-index: 5;
-            transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out;
         }
         .solution-card.is-active {
             position: relative; opacity: 1; pointer-events: auto; z-index: 10;
             transform: translateX(0); border-color: #06b6d4;
-            box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), 0 0 40px rgba(6, 182, 212, 0.1);
         }
-        .solution-card img { max-height: 400px; width: 100%; object-fit: contain; }
+        .solution-card img { max-height: 450px; width: 100%; object-fit: contain; }
 
         /* 3. 내비게이션 및 공통 요소 */
         .nav-btn { 
             position: absolute; top: 50%; transform: translateY(-50%); z-index: 100; 
-            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
-            background: rgba(20, 20, 20, 0.8); border: 1px solid #333; border-radius: 50%; 
-            color: #06b6d4; transition: all 0.3s;
+            width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;
+            background: rgba(15, 15, 15, 0.9); border: 1px solid #333; border-radius: 50%; 
+            color: #06b6d4; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 1.5rem;
         }
-        .nav-btn:hover { background: #06b6d4; color: #000; transform: translateY(-50%) scale(1.1); }
-        #prevBtn { left: 40px; } #nextBtn { right: 40px; }
+        .nav-btn:hover { background: #06b6d4; color: #000; transform: translateY(-50%) scale(1.15); box-shadow: 0 0 30px rgba(6, 182, 212, 0.4); }
+        #prevBtn { left: 60px; } #nextBtn { right: 60px; }
 
-        /* 4. 드롭다운 스타일 (컴포넌트 대응) */
+        /* 4. 드롭다운 스타일 유지 */
         .dropdown-link { padding: 14px 20px; display: block; color: #ccc; border-bottom: 1px solid #222; transition: all 0.2s; text-align: left; }
         .dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
         .dropdown-quote-btn { padding: 14px 20px; display: block; background-color: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; }
 
-        @media (max-width: 1024px) {
-            #solutionsContainer { width: 95%; }
-            .solution-card { padding: 1.5rem; }
-            .solution-card img { max-height: 250px; }
-            #prevBtn { left: 5px; } #nextBtn { right: 5px; }
+        /* 데스크톱 가로 너비 강제 고정 */
+        body {
+            min-width: 1280px;
+            overflow-x: hidden;
         }
     </style>
 </head>
@@ -70,8 +90,8 @@
 
 <div id="header-placeholder"></div>
 
-<main class="flex-grow pt-24 pb-20">
-    <h3 class="text-4xl font-black tracking-wide hero-slogan-gradient text-center mb-2">Custom Solutions</h3>
+<main class="flex-grow pt-40 pb-20">
+    <h3 class="text-5xl font-black tracking-tight hero-slogan-gradient text-center mb-10">Custom Solutions</h3>
 
     <div class="carousel-wrapper">
         <button id="prevBtn" class="nav-btn">❮</button>
@@ -81,7 +101,7 @@
             </div>
     </div>
 
-    <div id="stackContainer" class="flex gap-4 overflow-x-auto pb-4 mt-12 justify-center px-6">
+    <div id="stackContainer" class="flex gap-6 overflow-x-auto pb-10 mt-16 justify-center px-6">
         </div>
 </main>
 
@@ -134,7 +154,7 @@
     }
 
     /**
-     * 2. 솔루션 데이터 및 캐러셀 로직
+     * 2. 솔루션 데이터 및 캐러셀 로직 (기존 기능 유지)
      */
     const solutionsData = [
         { id: 'A', title: 'A. EV Motorcycle Conversion Business', desc: 'TDLID supplies electric motorcycle conversion kits and battery packs to local governments and universities in Indonesia.', images: ['images/solutions/solution1.png', 'images/solutions/solution1-1.png'] },
@@ -152,7 +172,7 @@
         stopAuto();
         const modal = document.createElement('div');
         modal.className = 'modal-backdrop';
-        modal.innerHTML = `<div class="modal-content"><span class="modal-close-x">✕</span><img src="${imgSrc}" class="modal-image"><p class="mt-4 text-neutral-300">${detail}</p><button class="modal-close-btn">Close</button></div>`;
+        modal.innerHTML = `<div class="modal-content"><span class="modal-close-x">✕</span><img src="${imgSrc}" class="modal-image"><p class="mt-4 text-neutral-300 text-lg">${detail}</p><button class="modal-close-btn">Close</button></div>`;
         const close = () => { document.body.removeChild(modal); startAuto(); };
         modal.querySelector('.modal-close-btn').onclick = close;
         modal.querySelector('.modal-close-x').onclick = close;
@@ -164,11 +184,11 @@
         const container = document.getElementById('solutionsContainer');
         container.innerHTML = solutionsData.map((s, idx) => `
             <div class="solution-card ${idx === currentIndex ? 'is-active' : ''}" data-index="${idx}">
-                <h4 class="text-2xl font-bold mb-8 text-cyan-400 text-center">${s.title}</h4>
-                <div class="grid md:grid-cols-2 gap-6 mb-8">
-                    ${s.images.map(img => `<img src="${img}" class="w-full h-64 object-contain bg-neutral-800/10 rounded-xl cursor-pointer hover:scale-105 transition duration-300" onclick="openPopup('${img}', '${s.desc.replace(/'/g, "\\'")}')">`).join('')}
+                <h4 class="text-3xl font-bold mb-10 text-cyan-400 text-center">${s.title}</h4>
+                <div class="grid md:grid-cols-2 gap-10 mb-10">
+                    ${s.images.map(img => `<img src="${img}" class="w-full h-80 object-contain bg-neutral-800/20 rounded-2xl cursor-pointer hover:scale-105 transition-all duration-500 hover:rotate-1" onclick="openPopup('${img}', '${s.desc.replace(/'/g, "\\\\'")}')">`).join('')}
                 </div>
-                <p class="text-lg text-neutral-300 text-center max-w-2xl mx-auto leading-relaxed">${s.desc}</p>
+                <p class="text-xl text-neutral-300 text-center max-w-3xl mx-auto leading-relaxed font-light">${s.desc}</p>
             </div>
         `).join('');
         renderStack();
@@ -177,11 +197,11 @@
     function renderStack() {
         const stackContainer = document.getElementById('stackContainer');
         stackContainer.innerHTML = solutionsData.map((s, idx) => `
-            <div class="p-3 bg-neutral-900 border ${idx === currentIndex ? 'border-cyan-500 bg-neutral-800' : 'border-neutral-800'} rounded-xl cursor-pointer w-32 text-center transition-all duration-300" onclick="jumpTo(${idx})">
-                <h5 class="text-[10px] mb-2 ${idx === currentIndex ? 'text-cyan-400' : 'text-neutral-500'} line-clamp-1">${s.title}</h5>
-                <div class="flex flex-col gap-1">
+            <div class="p-4 bg-neutral-900/50 border-2 ${idx === currentIndex ? 'border-cyan-500 bg-neutral-800 scale-105' : 'border-neutral-800 hover:border-neutral-700'} rounded-2xl cursor-pointer w-44 text-center transition-all duration-500 shadow-xl" onclick="jumpTo(${idx})">
+                <h5 class="text-xs mb-3 font-bold ${idx === currentIndex ? 'text-cyan-400' : 'text-neutral-500'} line-clamp-1 uppercase tracking-wider">${s.title}</h5>
+                <div class="flex flex-col gap-2">
                     ${s.images.map(img => `
-                        <img src="${img}" class="w-full h-10 object-cover rounded ${idx === currentIndex ? 'opacity-100' : 'opacity-30'} transition-opacity">
+                        <img src="${img}" class="w-full h-12 object-cover rounded-lg ${idx === currentIndex ? 'opacity-100 shadow-lg' : 'opacity-20'} transition-all duration-500">
                     `).join('')}
                 </div>
             </div>
@@ -195,20 +215,20 @@
         const cards = document.querySelectorAll('.solution-card');
         const prevCard = cards[currentIndex];
         const nextCard = cards[newIndex];
-        const slideDistance = 800;
+        const slideDistance = 1000; // 데스크톱에 맞춰 슬라이드 거리 확대
 
         nextCard.style.transition = 'none';
         nextCard.style.opacity = '0';
         nextCard.classList.add('is-active');
         void nextCard.offsetWidth;
 
-        nextCard.style.transition = 'transform 0.8s ease-out, opacity 0.8s ease-out';
-        prevCard.style.transition = 'transform 0.8s ease-out, opacity 0.8s ease-out';
+        nextCard.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out';
+        prevCard.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out';
 
         requestAnimationFrame(() => {
-            prevCard.style.transform = `translateX(${direction === 'next' ? -slideDistance : slideDistance}px)`;
+            prevCard.style.transform = `translateX(${direction === 'next' ? -slideDistance : slideDistance}px) rotateY(${direction === 'next' ? -20 : 20}deg)`;
             prevCard.style.opacity = '0';
-            nextCard.style.transform = 'translateX(0)';
+            nextCard.style.transform = 'translateX(0) rotateY(0)';
             nextCard.style.opacity = '1';
         });
 
@@ -217,7 +237,7 @@
 
         setTimeout(() => {
             prevCard.classList.remove('is-active');
-            prevCard.style.transform = 'translateX(0)'; 
+            prevCard.style.transform = 'translateX(0) rotateY(0)'; 
             isAnimating = false;
         }, 800);
     }
@@ -229,7 +249,7 @@
         startAuto();
     }
 
-    const startAuto = () => { stopAuto(); autoTimer = setInterval(() => showCard((currentIndex + 1) % solutionsData.length, 'next'), 5000); };
+    const startAuto = () => { stopAuto(); autoTimer = setInterval(() => showCard((currentIndex + 1) % solutionsData.length, 'next'), 6000); };
     const stopAuto = () => clearInterval(autoTimer);
 
     document.getElementById('prevBtn').onclick = () => { stopAuto(); showCard((currentIndex - 1 + solutionsData.length) % solutionsData.length, 'prev'); startAuto(); };

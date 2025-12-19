@@ -2,6 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script>
+        (function() {
+            // 1. 기기 감지 및 리다이렉트 (데스크톱 전용 페이지이므로 모바일 접근 시 즉시 이동)
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPCMode = urlParams.get('view_mode') === 'pc';
+
+            if (isMobile && !isPCMode) {
+                let path = window.location.pathname;
+                let page = path.split("/").pop();
+                // company.html 접근 시 company_m.html로 이동
+                if (page === "company.html") {
+                    window.location.href = "company_m.html";
+                }
+            }
+        })();
+    </script>
+
     <title>Company Profile | TDL Energy Indonesia</title> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -31,7 +49,7 @@
             z-index:0;
         }
 
-        /* 3 Image Stage */
+        /* 3 Image Stage (데스크톱 전용 가로 배열) */
         .image-stage { position: relative; z-index: 1; }
         .image-card {
             position: relative;
@@ -43,7 +61,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 200px;
+            min-height: 250px;
+            width: 100%;
         }
         .image-card img {
             max-height: 100%; width: 100%; height: auto;
@@ -60,7 +79,7 @@
             to {opacity:1;transform:translateY(0)}
         }
         
-        /* 드롭다운 스타일 (컴포넌트 대응) */
+        /* 드롭다운 스타일 */
         .dropdown-link {
             padding: 12px 20px;
             display: block;
@@ -81,21 +100,21 @@
     </style>
 </head>
 
-<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative"> 
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative overflow-x-hidden"> 
 
 <div id="header-placeholder"></div>
 
-<main class="relative z-10 pt-32 pb-24 max-w-7xl mx-auto px-6">
+<main class="relative z-10 pt-48 pb-32 max-w-7xl mx-auto px-6">
     <div class="company-bg"></div>
 
-    <div class="text-center mb-10 float-in">
-        <h1 class="text-4xl font-black tracking-wide hero-slogan-gradient">
+    <div class="text-center mb-20 float-in">
+        <h1 class="text-5xl font-black tracking-tight hero-slogan-gradient leading-tight">
             Designing the Energy Infrastructure of Tomorrow
         </h1>
     </div>
 
-    <section class="mb-16">
-        <div class="image-stage flex flex-col md:flex-row gap-8 justify-center">
+    <section class="mb-24">
+        <div class="image-stage flex flex-row gap-10 justify-center">
             <div class="image-card hover-expand">
                 <img src="images/company1.png">
             </div>
@@ -108,29 +127,29 @@
         </div>
     </section>
 
-    <section class="max-w-7xl mx-auto space-y-16 text-lg text-center">
+    <section class="max-w-7xl mx-auto space-y-24 text-lg text-center">
         <div class="float-in">
-            <h2 class="text-4xl font-bold text-cyan-400 mb-6">Who We Are</h2>
+            <h2 class="text-5xl font-bold text-cyan-400 mb-8">Who We Are</h2>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-cyan-400/40 transition">
-                <h3 class="text-xl font-bold text-cyan-300 mb-4">MISSION</h3>
-                <p class="text-neutral-300">
-                    “NO MORE CARBON” <br>Deliver the best products and services to our customers.<br>Promote leadership consistently.<br>Create and Innovate value
+        <div class="grid grid-cols-3 gap-10">
+            <div class="p-10 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-cyan-400/40 transition-all duration-300">
+                <h3 class="text-2xl font-bold text-cyan-300 mb-6">MISSION</h3>
+                <p class="text-neutral-300 leading-relaxed">
+                    “NO MORE CARBON” <br><br>Deliver the best products and services to our customers.<br>Promote leadership consistently.<br>Create and Innovate value
                 </p>
             </div>
 
-            <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-purple-400/40 transition">
-                <h3 class="text-xl font-bold text-purple-300 mb-4">TECHNOLOGY</h3>
-                <p class="text-neutral-300">
+            <div class="p-10 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-purple-400/40 transition-all duration-300">
+                <h3 class="text-2xl font-bold text-purple-300 mb-6">TECHNOLOGY</h3>
+                <p class="text-neutral-300 leading-relaxed">
                     TDLiD's high-density lithium-ion batteries, combined with an AI-based BMS, optimize performance, improve power and range, and maintain thermal stability and safety.
                 </p>
             </div>
 
-            <div class="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-blue-400/40 transition">
-                <h3 class="text-xl font-bold text-blue-300 mb-4">VISION</h3>
-                <p class="text-neutral-300">
+            <div class="p-10 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-blue-400/40 transition-all duration-300">
+                <h3 class="text-2xl font-bold text-blue-300 mb-6">VISION</h3>
+                <p class="text-neutral-300 leading-relaxed">
                     To provide EV motors and batteries that enhance lifestyles and contribute to a better environment.
                 </p>
             </div>
@@ -159,7 +178,7 @@
     }
 
     /**
-     * 2. 모바일 메뉴 제어 (다른 페이지와 동일 로직)
+     * 2. 메뉴 제어 (데스크톱 최적화)
      */
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
@@ -175,7 +194,6 @@
                     dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
                     dropdown.classList.add("opacity-100", "visible", "translate-y-2");
                     menuIcon.innerText = "✕";
-                    menuBtn.setAttribute("aria-expanded", "true");
                 } else {
                     closeMenu();
                 }
@@ -185,15 +203,10 @@
                 dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
                 dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
                 menuIcon.innerText = "☰";
-                menuBtn.setAttribute("aria-expanded", "false");
             }
 
             document.addEventListener("click", (e) => {
                 if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
-            });
-
-            window.addEventListener("resize", () => {
-                if (window.innerWidth >= 1024) closeMenu();
             });
         }
     }

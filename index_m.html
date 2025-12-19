@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/main.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== IMAGE MODAL ===== */
+        #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; display: none; }
+        #modalDetailImage { max-width: 95%; max-height: 80%; object-fit: contain; }
+
+        /* 드롭다운 스타일 (모바일 터치 최적화) */
+        .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; transition: all 0.2s; text-align: left; font-size: 16px; }
+        .dropdown-quote-btn { padding: 18px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
+        
+        /* 뮤직 플레이어 컨트롤 */
+        #musicToggleBtn { position: fixed; bottom: 20px; right: 20px; z-index: 10005; width: 48px; height: 48px; background: rgba(23, 23, 23, 0.9); border: 1.5px solid rgba(34, 211, 238, 0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #22d3ee; backdrop-filter: blur(8px); }
+
+        /* ===== 이스터 에그 오버레이 ===== */
+        #easterEggOverlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.98); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #22d3ee; padding: 20px; text-align: center; }
+        .scanning-line { width: 100%; height: 2px; background: #22d3ee; position: absolute; top: 0; left: 0; box-shadow: 0 0 15px #22d3ee; animation: scan 2s linear infinite; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* TDLiD 클릭 포인트 완벽 위장 */
+        #triggerWord { color: inherit !important; font-weight: inherit !important; text-decoration: none !important; cursor: text !important; display: inline; position: relative; z-index: 9998; -webkit-tap-highlight-color: transparent; }
+
+        /* 히어로 섹션 모바일 최적화 */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 100svh; /* 모바일 브라우저 주소창 대응 */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-bg-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+        }
+
+        .video-bg {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: brightness(0.35) contrast(1.1);
+        }
+
+        .video-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+            z-index: 1;
+        }
+
+        .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 24px; }
+        
+        /* 폰트 크기 모바일 반응형 조절 */
+        .hero-logo-gradient { font-size: 15vw; line-height: 1; margin-bottom: 10px; font-weight: 900; background: linear-gradient(to bottom, #fff, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-slogan-gradient { font-size: 5vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); font-weight: 600; }
+        .hero-description { font-size: 16px; line-height: 1.6; margin-top: 40px; color: #cbd5e1; }
+
+        /* Staff 이미지 모바일 정렬 */
+        .staff-img { 
+            width: 70vw; max-width: 240px; height: auto; border-radius: 12px;
+            border: 1px solid #22d3ee; box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+            opacity: 0; transition: opacity 1s ease-in-out;
+        }
+        .staff-container { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 25px; }
+
+        /* 인증서/로고 그리드 최적화 */
+        .partner-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; align-items: center; justify-items: center; }
+        .cert-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 10px; }
+        .cert-zoom-wrapper img { width: 100%; height: auto; border-radius: 4px; }
+    </style>
+</head>
+
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
+
+<audio id="bgm" src="mp3/Caribbean.mp3" autoplay loop muted playsinline></audio>
+
+<div id="easterEggOverlay">
+    <div class="scanning-line"></div>
+    <div class="text-xl font-bold mb-4 animate-pulse text-cyan-400">⚡ SYSTEM SCANNING...</div>
+    <div id="statusLog" class="text-sm text-neutral-400 mb-6 font-mono">Initializing...</div>
+    <div class="staff-container">
+        <img class="staff-img" src="images/staff.jpeg" alt="Staff 1">
+        <img class="staff-img" src="images/staff-2.png" alt="Staff 2">
+    </div>
+</div>
+
+<button id="musicToggleBtn">
+    <span id="musicIconUI" class="text-xl">🔇</span>
+</button>
+
+<div id="header-placeholder"></div>
+
+<main class="flex-grow">
+    <section class="hero-section">
+        <div class="video-bg-container">
+            <div class="video-overlay"></div> 
+            <video autoplay loop muted playsinline poster="images/flag.jpg" class="video-bg">
+                <source src="videos/background.webm" type="video/webm">
+                <source src="videos/battery17.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <div class="hero-content text-center">
+            <h1 class="hero-logo-gradient">TDLiD</h1>
+            <p class="hero-slogan-gradient">NO MORE CARBON</p>
+            <p class="hero-description">
+                <span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-12 bg-neutral-900 border-y border-neutral-800">
+        <div class="px-6">
+            <h2 class="text-xl font-light text-center mb-8 text-cyan-400 tracking-tight">E-Scooter Ecosystem Partners</h2>
+            <div class="partner-grid opacity-80">
+                <img src="images/DAVIGO.png" alt="DAVIGO" class="h-8">
+                <img src="images/GESITS.png" alt="GESITS" class="h-8">
+                <img src="images/ALESSA.png" alt="ALESSA" class="h-8">
+                <img src="images/logo/logo.png" alt="TDL" class="h-8"> </div>
+            
+            <div class="mt-16">
+                <h2 class="text-xl font-light text-center mb-8 text-cyan-400 tracking-tight">Global Safety Standards</h2>
+                <div class="cert-grid">
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CE-EMC-TEST.jpg">
+                        <img src="images/certification/CE-EMC-TEST.jpg" alt="CE">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CB-TEST.jpg">
+                        <img src="images/certification/CB-TEST.jpg" alt="CB">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/EMC-COMPLIANCE.jpg">
+                        <img src="images/certification/EMC-COMPLIANCE.jpg" alt="EMC">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/IEC-62619.jpg">
+                        <img src="images/certification/IEC-62619.jpg" alt="IEC">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Material-Safety.jpg">
+                        <img src="images/certification/Material-Safety.jpg" alt="MSDS">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/UN38.3.jpg">
+                        <img src="images/certification/UN38.3.jpg" alt="UN38.3">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="imageModal">
+    <div class="flex flex-col items-center justify-center w-full h-full p-4">
+        <img id="modalDetailImage" src="">
+        <button class="mt-6 px-8 py-2 border border-cyan-500/50 text-cyan-400 rounded-full text-sm bg-black/50">Close</button>
+    </div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script>
+    // 1. PC 접속 시 리다이렉트
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (!isMobile) {
+        let currentPage = window.location.pathname.split("/").pop();
+        if(currentPage.includes("_m.html")) {
+            window.location.href = currentPage.replace("_m.html", ".html");
+        }
+    }
+
+    // 2. 레이아웃 로드
+    async function loadLayout() {
+        try {
+            const headerRes = await fetch('components/header_m.html'); // 모바일용 헤더 호출
+            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+            const footerRes = await fetch('components/footer_m.html'); // 모바일용 푸터 호출
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            
+            initNavigation();
+            initEasterEggTriggers();
+        } catch (err) { console.error("Layout load error:", err); }
+    }
+
+    // 3. 내비게이션 (헤더 로드 후 실행)
+    function initNavigation() {
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const dropdown = document.getElementById("dropdownMenu");
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isHidden = dropdown.classList.contains("invisible");
+                if (isHidden) {
+                    dropdown.classList.remove("opacity-0", "invisible");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                } else {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                }
+            };
+        }
+    }
+
+    // 4. 이스터 에그 트리거
+    function initEasterEggTriggers() {
+        // [1] TDLiD 텍스트 클릭
+        const triggerWord = document.getElementById('triggerWord');
+        if (triggerWord) triggerWord.onclick = (e) => { e.preventDefault(); runScanAnimation(); };
+
+        // [2] 로고 5번 터치
+        let touchCount = 0;
+        let lastTouchTime = 0;
+        setTimeout(() => { // 헤더 로드 대기
+            const logoImg = document.querySelector('header img');
+            if (logoImg) {
+                logoImg.onclick = () => {
+                    const now = Date.now();
+                    if (now - lastTouchTime < 500) touchCount++;
+                    else touchCount = 1;
+                    lastTouchTime = now;
+                    if (touchCount === 5) { runScanAnimation(); touchCount = 0; }
+                };
+            }
+        }, 1000);
+    }
+
+    // 5. 스캔 애니메이션 (이스터 에그)
+    function runScanAnimation() {
+        const overlay = document.getElementById('easterEggOverlay');
+        const log = document.getElementById('statusLog');
+        const staffImgs = document.querySelectorAll('.staff-img');
+        
+        overlay.style.display = 'flex';
+        staffImgs.forEach(img => img.style.opacity = '0');
+        
+        const msgs = ["Connecting to BMS...", "Scanning Cells...", "TDLiD Verified.", "Ray🧔", "Eza😎", "Rezy👨‍🦰", "Etno🧕"];
+        msgs.forEach((msg, i) => {
+            setTimeout(() => {
+                log.innerText = msg;
+                if (i === 3) staffImgs.forEach(img => img.style.opacity = '1');
+                if (i === msgs.length - 1) {
+                    setTimeout(() => { 
+                        overlay.style.display = 'none';
+                    }, 2000);
+                }
+            }, i * 800);
+        });
+    }
+
+    // 초기화
+    document.addEventListener("DOMContentLoaded", () => {
+        loadLayout();
+
+        // 뮤직 컨트롤
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('musicToggleBtn');
+        const musicIcon = document.getElementById('musicIconUI');
+        musicBtn.onclick = () => {
+            if (bgm.muted) { bgm.muted = false; bgm.play(); musicIcon.innerText = "🎵"; }
+            else { bgm.muted = true; musicIcon.innerText = "🔇"; }
+        };
+
+        // 모달 제어
+        document.querySelectorAll('.cert-link').forEach(link => {
+            link.onclick = (e) => {
+                e.preventDefault();
+                const modal = document.getElementById('imageModal');
+                document.getElementById('modalDetailImage').src = link.getAttribute('data-original-src');
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            };
+        });
+
+        document.getElementById('imageModal').onclick = function() {
+            this.style.display = 'none';
+            document.body.style.overflow = '';
+        };
+    });
+
+    // 우클릭 방지
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+</script>
+</body>
+</html>

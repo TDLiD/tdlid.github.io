@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Technology | TDLiD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* 1. 팝업 모달 스타일 (모바일 최적화) */
+        .modal-backdrop {
+            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.95);
+            display: flex; justify-content: center; align-items: center; z-index: 10002;
+            padding: 20px;
+        }
+        .modal-content {
+            background: #111; color: #ddd; padding: 24px; border-radius: 20px;
+            max-width: 100%; width: 100%; max-height: 85vh; text-align: center; 
+            border: 1px solid #333; position: relative; overflow-y: auto;
+        }
+        .modal-image { max-width: 100%; height: auto; object-fit: contain; border-radius: 12px; margin-bottom: 16px; }
+        .modal-close-btn { margin-top: 20px; padding: 12px 32px; background: #06b6d4; color: black; font-weight: 700; border-radius: 50px; width: 100%; }
+        .modal-close-x { position: absolute; top: 12px; right: 16px; color: #fff; font-size: 24px; opacity: 0.5; }
+
+        /* 2. 슬라이딩 캐러셀 구조 (모바일 폭 100% 대응) */
+        #technologyContainer {
+            perspective: 1000px; 
+            width: 100%; 
+            margin: 10px auto 30px;
+            position: relative;
+        }
+        #carousel { 
+            width: 100%; 
+            position: relative; 
+            transform-style: preserve-3d;
+            display: grid;
+        }
+        .tech-card {
+            grid-area: 1 / 1 / 2 / 2;
+            width: 100%; 
+            height: auto; 
+            padding: 1.5rem;
+            border: 1px solid #1f1f1f; 
+            border-radius: 1.5rem; 
+            background-color: #0a0a0a;
+            opacity: 0; 
+            pointer-events: none; 
+            z-index: 5; 
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.6s ease-out;
+        }
+        .tech-card.is-active { 
+            position: relative; 
+            opacity: 1; 
+            pointer-events: auto; 
+            z-index: 10; 
+            transform: translateX(0); 
+            border-color: #06b6d4; 
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); 
+        }
+
+        /* 3. 내비게이션 버튼 (모바일 터치 영역 확대) */
+        .nav-btn { 
+            position: absolute; top: 40%; transform: translateY(-50%); z-index: 100; 
+            width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+            background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; 
+            color: #06b6d4; backdrop-filter: blur(5px);
+        }
+        #prevBtn { left: -5px; } 
+        #nextBtn { right: -5px; }
+        .nav-btn:active { background: #06b6d4; color: #000; transform: translateY(-50%) scale(0.9); }
+
+        /* 4. 스크롤바 및 드롭다운 */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        
+        .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #222; }
+        .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
+    </style>
+</head>
+
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
+
+<div id="header-placeholder"></div>
+
+<main class="flex-grow pt-24 pb-12 px-5">
+    <div class="max-w-xl mx-auto">
+        <div class="mb-8">
+            <h3 class="text-3xl font-bold tracking-tight hero-slogan-gradient mb-1">Core Technology</h3>
+            <p class="text-neutral-500 text-xs">High-Density Battery Architecture</p>
+        </div>
+
+        <div id="technologyContainer">
+            <button id="prevBtn" class="nav-btn" aria-label="Previous">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+
+            <div id="carousel">
+                <div class="tech-card is-active" data-index="0">
+                    <img src="images/technology/72V20A.png" 
+                         data-popup-src="images/technology/72V20A-1.png"
+                         class="mx-auto mb-6 h-56 object-contain cursor-pointer active:scale-95 transition" 
+                         data-detail="TDLiD’s 72V battery system utilizes LG NMC INR21700 cell architecture...">
+                    <h4 class="text-xl font-bold mb-2 text-cyan-400">72V 20Ah Battery</h4>
+                    <p class="text-sm text-neutral-400">Cell Model: LG INR21700M50VT</p>
+                </div>
+
+                <div class="tech-card" data-index="1">
+                    <div class="max-h-[300px] overflow-y-auto pr-1 mb-6 custom-scrollbar">
+                        <img src="images/technology/72V20A-2.png" class="mx-auto mb-4 h-40 object-contain cursor-pointer active:scale-95">
+                        <img src="images/technology/72V20A-3.png" class="mx-auto mb-4 h-40 object-contain cursor-pointer active:scale-95">
+                        <img src="images/technology/72V20A-5.png" class="mx-auto mb-4 h-40 object-contain cursor-pointer active:scale-95" data-detail="em.">
+                        <img src="images/technology/72V20A-6.png" class="mx-auto h-40 object-contain cursor-pointer active:scale-95">
+                    </div>
+                    <h4 class="text-xl font-bold mb-2 text-cyan-400">Smart Monitoring</h4>
+                    <p class="text-sm text-neutral-400">Advanced BMS integration for safety.</p>
+                </div>
+
+                <div class="tech-card" data-index="2">
+                    <div class="flex flex-col gap-4 mb-6">
+                        <img src="images/technology/YEDEA-1.png" class="mx-auto h-40 object-contain cursor-pointer active:scale-95" data-detail="The integration of TDLiD’s 72V... with YADEA electric motorcycles...">
+                        <img src="images/technology/72V5A-charger-2.png" class="mx-auto h-40 object-contain cursor-pointer active:scale-95" data-detail="The pairing of TDLiD’s 72V-5A smart lithium charger...">
+                    </div>
+                    <h4 class="text-xl font-bold mb-2 text-cyan-400">EV Integration</h4>
+                    <p class="text-sm text-neutral-400">Seamless compatibility with YADEA & more.</p>
+                </div>
+            </div>
+
+            <button id="nextBtn" class="nav-btn" aria-label="Next">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+    </div>
+</main>
+
+<div id="footer-placeholder"></div>
+
+<script>
+    /**
+     * 1. 레이아웃 로드 및 메뉴 초기화 (header_m, footer_m 사용)
+     */
+    async function loadLayout() {
+        try {
+            const headerRes = await fetch('components/header_m.html');
+            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+            const footerRes = await fetch('components/footer_m.html');
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            
+            initMenuToggle();
+        } catch (err) {
+            console.error("Layout load failed:", err);
+        }
+    }
+
+    function initMenuToggle() {
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const dropdown = document.getElementById("dropdownMenu");
+        const menuIcon = document.getElementById("menuIcon");
+
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isOpen = dropdown.classList.contains("opacity-100");
+                if (isOpen) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    if(menuIcon) menuIcon.innerText = "☰";
+                } else {
+                    dropdown.classList.remove("opacity-0", "invisible");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                    if(menuIcon) menuIcon.innerText = "✕";
+                }
+            };
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    if(menuIcon) menuIcon.innerText = "☰";
+                }
+            });
+        }
+    }
+
+    /**
+     * 2. 캐러셀 로직 (기존 기능 유지)
+     */
+    let currentIndex = 0;
+    const cards = document.querySelectorAll('.tech-card');
+    const CARD_COUNT = cards.length;
+    let isAnimating = false;
+    let autoTimer;
+
+    function showCard(newIndex, direction) {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        const oldIndex = currentIndex;
+        currentIndex = newIndex;
+        const prevCard = cards[oldIndex];
+        const currentCard = cards[currentIndex];
+        const slideDistance = window.innerWidth; 
+
+        prevCard.style.zIndex = '15';
+        currentCard.style.zIndex = '10';
+        currentCard.style.opacity = '1';
+        currentCard.classList.add('is-active');
+
+        requestAnimationFrame(() => {
+            prevCard.style.transform = direction === 'next' ? `translateX(-${slideDistance}px)` : `translateX(${slideDistance}px)`;
+            prevCard.style.opacity = '0';
+        });
+
+        setTimeout(() => {
+            prevCard.classList.remove('is-active');
+            prevCard.style.transform = 'translateX(0)';
+            isAnimating = false;
+        }, 600);
+    }
+
+    const startAuto = () => { stopAuto(); autoTimer = setInterval(() => showCard((currentIndex + 1) % CARD_COUNT, 'next'), 4000); };
+    const stopAuto = () => clearInterval(autoTimer);
+
+    document.getElementById('prevBtn').onclick = () => { stopAuto(); showCard((currentIndex - 1 + CARD_COUNT) % CARD_COUNT, 'prev'); startAuto(); };
+    document.getElementById('nextBtn').onclick = () => { stopAuto(); showCard((currentIndex + 1) % CARD_COUNT, 'next'); startAuto(); };
+
+    // 이미지 팝업 모달 이벤트 연결 (기존 기능 유지)
+    cards.forEach(card => {
+        card.querySelectorAll('img').forEach(img => {
+            img.onclick = function() {
+                stopAuto();
+                const popupImgTarget = this.dataset.popupSrc || this.src;
+                const modal = document.createElement('div');
+                modal.className = 'modal-backdrop';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="modal-close-x">✕</span>
+                        <img src="${popupImgTarget}" class="modal-image">
+                        <p class="text-sm text-neutral-400 leading-relaxed text-left">${this.dataset.detail || ''}</p>
+                        <button class="modal-close-btn">닫기</button>
+                    </div>`;
+                const close = () => { document.body.removeChild(modal); startAuto(); };
+                modal.querySelector('.modal-close-btn').onclick = close;
+                modal.querySelector('.modal-close-x').onclick = close;
+                modal.onclick = (e) => { if(e.target === modal) close(); };
+                document.body.appendChild(modal);
+            };
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadLayout();
+        startAuto();
+    });
+</script>
+</body>
+</html>
