@@ -36,6 +36,7 @@
             position: relative; 
             transform-style: preserve-3d;
             display: grid;
+            touch-action: pan-y; /* 수직 스크롤은 허용하되 수평 스와이프 간섭 방지 */
         }
         .tech-card {
             grid-area: 1 / 1 / 2 / 2;
@@ -139,7 +140,7 @@
 
 <script>
     /**
-     * 1. 레이아웃 로드 및 메뉴 초기화 (header_m, footer_m 사용)
+     * 1. 레이아웃 로드 및 메뉴 초기화
      */
     async function loadLayout() {
         try {
@@ -184,7 +185,7 @@
     }
 
     /**
-     * 2. 캐러셀 로직 (기존 기능 유지)
+     * 2. 캐러셀 로직 및 스와이프 감지 추가
      */
     let currentIndex = 0;
     const cards = document.querySelectorAll('.tech-card');
@@ -225,7 +226,34 @@
     document.getElementById('prevBtn').onclick = () => { stopAuto(); showCard((currentIndex - 1 + CARD_COUNT) % CARD_COUNT, 'prev'); startAuto(); };
     document.getElementById('nextBtn').onclick = () => { stopAuto(); showCard((currentIndex + 1) % CARD_COUNT, 'next'); startAuto(); };
 
-    // 이미지 팝업 모달 이벤트 연결 (기존 기능 유지)
+    // [추가] 스와이프 기능
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const carouselEl = document.getElementById('carousel');
+
+    carouselEl.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        stopAuto(); // 터치 시작 시 자동 재생 일시 정지
+    }, { passive: true });
+
+    carouselEl.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+        startAuto(); // 터치 종료 시 자동 재생 재개
+    }, { passive: true });
+
+    function handleSwipe() {
+        const swipeThreshold = 50; // 최소 스와이프 거리 (픽셀)
+        if (touchEndX < touchStartX - swipeThreshold) {
+            // 왼쪽으로 스와이프 -> 다음 카드
+            showCard((currentIndex + 1) % CARD_COUNT, 'next');
+        } else if (touchEndX > touchStartX + swipeThreshold) {
+            // 오른쪽으로 스와이프 -> 이전 카드
+            showCard((currentIndex - 1 + CARD_COUNT) % CARD_COUNT, 'prev');
+        }
+    }
+
+    // 이미지 팝업 모달 이벤트 연결
     cards.forEach(card => {
         card.querySelectorAll('img').forEach(img => {
             img.onclick = function() {
