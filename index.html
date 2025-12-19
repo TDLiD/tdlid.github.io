@@ -36,26 +36,35 @@
         #staffImage { margin-top: 30px; max-width: 300px; border-radius: 12px; border: 1px solid #22d3ee; box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); opacity: 0; transition: opacity 1.5s ease-in-out; }
 
         /* TDLiD 클릭 포인트 스타일 */
-/* TDLiD 클릭 포인트 스타일 수정 */
+/* TDLiD 클릭 포인트 완벽 위장 */
 #triggerWord {
-    cursor: pointer !important;
-    position: relative !important;
-    z-index: 9999 !important;
-    display: inline-block;
-    transition: all 0.3s ease;
+    /* 주변 텍스트와 동일하게 설정 */
+    color: inherit !important;
+    font-weight: inherit !important;
+    text-decoration: none !important;
+    
+    /* 마우스 커서를 일반 텍스트 선택 모양으로 설정 (클릭 가능해 보이지 않게 함) */
+    cursor: text !important; 
+    
+    /* 레이아웃 유지 */
+    display: inline;
+    position: relative;
+    z-index: 9998;
     pointer-events: auto !important;
-
-    /* 주변 텍스트와 색상/두께를 동일하게 맞춤 */
-    color: inherit !important;        /* 부모 요소인 p 태그의 글자색을 그대로 따름 */
-    font-weight: inherit !important;   /* 부모 요소인 p 태그의 글자 두께를 그대로 따름 */
-    text-decoration: none !important; /* 혹시 모를 밑줄 제거 */
 }
 
-/* 마우스를 올렸을 때만 티가 나도록 설정 (원치 않으시면 이 블록 전체를 삭제하세요) */
+/* hover 시 변화를 주지 않음 (기존 hover 코드 삭제 또는 아래처럼 초기화) */
 #triggerWord:hover {
-    color: #22d3ee !important; /* 마우스를 올렸을 때만 하늘색으로 변화 */
-    text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+    color: inherit !important;
+    text-shadow: none !important;
 }
+
+#triggerWord, #triggerWord2 {
+    -webkit-tap-highlight-color: transparent; /* 터치 시 반짝이는 효과 제거 */
+    user-select: none; /* 텍스트 선택(드래그) 방지 */
+    -webkit-user-select: none;
+}
+
 
         /* 비디오 배경 섹션 한정 스타일 */
         .hero-section {
@@ -99,15 +108,12 @@
 
 /* #staffImage 대신 .staff-img 사용 */
 .staff-img { 
-    margin-top: 30px; 
+ width: 80vw;    /* 모바일에서는 화면 너비의 80% */
+    height: auto;   /* 가로 비율에 맞춰 자동 조절 */
+    max-width: 280px; /* PC 등 큰 화면에서의 최대 크기 제한 */
+    object-fit: cover;
+    border-radius: 8px;
 
-    /* 너비와 높이 조절 */
-    width: 500px;       /* 원하는 가로 크기 */
-    height: 450px;      /* 원하는 세로 크기 */
-    /* 이미지가 찌그러지지 않게 해주는 속성 */
-    object-fit: cover;  /* 설정한 크기에 맞게 이미지를 채움 (추천) */
-
-    border-radius: 12px; 
     border: 1px solid #22d3ee; 
     box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); 
     opacity: 0; 
