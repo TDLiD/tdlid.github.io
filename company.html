@@ -30,6 +30,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
+
+/* 전체 페이지 드래그 방지 (입력창 제외) */
+body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
         /* 🌟 로고 크기 통일화를 위한 :root 변수 🌟 */
         :root {
             --header-logo-font-size: 8.2rem;
@@ -101,6 +110,10 @@
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative overflow-x-hidden"> 
+
+<script>
+    document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
 
 <div id="header-placeholder"></div>
 
@@ -229,5 +242,4 @@ document.addEventListener('keydown', (e) => {
 </script>
 
 </body>
-
 </html>

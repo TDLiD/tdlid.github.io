@@ -57,11 +57,19 @@
     body {
         overflow-x: hidden;
         min-width: 1280px; /* 데스크톱 최소 너비 보장 */
+-webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     }
 </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
+
+<script>
+    document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
 
 <div id="header-placeholder"></div>
 

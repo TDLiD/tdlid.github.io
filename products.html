@@ -60,11 +60,19 @@
         body {
             min-width: 1280px;
             overflow-x: hidden;
+-webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
         }
     </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
+
+<script>
+    document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
 
 <div id="header-placeholder"></div>
 
