@@ -36,10 +36,15 @@
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
         }
 
+        /* 터치 스와이프를 위해 터치 동작 제어 */
+        #productGallery {
+            touch-action: pan-y; /* 세로 스크롤은 유지, 가로 스와이프는 JS가 제어 */
+        }
+
         /* 모바일 터치 최적화 버튼 */
         .gallery-nav-btn {
             width: 56px; height: 56px;
-            display: flex; items-center: center; justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             background: rgba(23, 23, 23, 0.8);
             border: 1px solid rgba(34, 211, 238, 0.3);
             border-radius: 50%;
@@ -134,7 +139,7 @@
     }
 
     /**
-     * 2. 제품 갤러리 로직 (기존 로직 및 데이터 보존)
+     * 2. 제품 갤러리 로직
      */
     const productsData = [];
     for(let i=1; i<=32; i++) {
@@ -146,6 +151,7 @@
     const galleryStatus = document.getElementById('galleryStatus');
     const galleryPrevBtn = document.getElementById('galleryPrevBtn');
     const galleryNextBtn = document.getElementById('galleryNextBtn');
+    const productGallery = document.getElementById('productGallery');
 
     let currentProductIndex = 0;
     let isAnimating = false;
@@ -189,6 +195,33 @@
         }, transitionDuration); 
     }
 
+    // [추가] 터치 스와이프 기능
+    function initSwipeEvents() {
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        productGallery.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            stopAutoChange();
+        }, { passive: true });
+
+        productGallery.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const swipeThreshold = 50; // 스와이프 인식을 위한 최소 거리
+
+            if (touchEndX < touchStartX - swipeThreshold) {
+                // 다음 제품으로 (왼쪽으로 밀기)
+                changeProduct((currentProductIndex + 1) % productsData.length);
+            } else if (touchEndX > touchStartX + swipeThreshold) {
+                // 이전 제품으로 (오른쪽으로 밀기)
+                changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
+            } else {
+                // 스와이프가 아닌 일반 터치 시 자동 재생 재시작
+                startAutoChange();
+            }
+        }, { passive: true });
+    }
+
     galleryNextBtn.onclick = () => changeProduct((currentProductIndex + 1) % productsData.length);
     galleryPrevBtn.onclick = () => changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
 
@@ -229,6 +262,7 @@
         if (productsData.length > 0) {
             renderProduct(productsData[0], 0);
             startAutoChange();
+            initSwipeEvents(); // 스와이프 초기화
         }
     });
 
