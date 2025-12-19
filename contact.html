@@ -11,6 +11,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
+    /* 전체 페이지 드래그 방지 (입력창 제외) */
+    body {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    /* 입력창 및 선택창은 정상적으로 사용 가능하도록 설정 */
+    input, textarea, select {
+        user-select: auto !important;
+        -webkit-user-select: auto !important;
+    }
+
     .contact-form-container {
         min-height: calc(100vh - 120px);
         display: flex;
@@ -27,7 +41,7 @@
     .dropdown-quote-btn { padding: 12px 20px; display: block; background: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; }
 
     /* =========================================
-       🚀 업그레이드된 사이버 이스터 에그 스타일
+        🚀 업그레이드된 사이버 이스터 에그 스타일
     ========================================= */
     #easterEggOverlay {
         position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
@@ -69,11 +83,11 @@
     }
 
     .staff-img {
-width: 80vw;    /* 모바일에서는 화면 너비의 80% */
-    height: auto;   /* 가로 비율에 맞춰 자동 조절 */
-    max-width: 280px; /* PC 등 큰 화면에서의 최대 크기 제한 */
-    object-fit: cover;
-    border-radius: 8px;
+        width: 80vw;
+        height: auto;
+        max-width: 280px;
+        object-fit: cover;
+        border-radius: 8px;
         filter: saturate(1.2) contrast(1.1);
         opacity: 0; transform: translateY(20px);
         transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -81,19 +95,39 @@ width: 80vw;    /* 모바일에서는 화면 너비의 80% */
 
     .staff-img.reveal { opacity: 1; transform: translateY(0); box-shadow: 0 0 30px rgba(34, 211, 238, 0.4); }
 
-    /* 이스터 에그 트리거 위장 (마우스 커서와 폰트색 완전 통일) */
-#triggerWord, #triggerWord2 {
-    -webkit-tap-highlight-color: transparent; /* 터치 시 반짝이는 효과 제거 */
-    user-select: none; /* 텍스트 선택(드래그) 방지 */
-    -webkit-user-select: none;
-}
+    /* =========================================
+        🕵️ 이스터 에그 트리거 위장 (제목 사라짐 해결)
+    ========================================= */
+    .stealth-trigger {
+        cursor: text !important;
+        text-decoration: none !important;
+        -webkit-tap-highlight-color: transparent;
+        /* 개별 요소 드래그 방지 */
+        user-select: none;
+        -webkit-user-select: none;
+        pointer-events: auto !important;
+    }
+
+    /* 제목 내 Quote 위장 (그라데이션 유지) */
+    .stealth-title {
+        color: unset !important;
+        font-weight: unset !important;
+    }
+
+    /* 본문 내 Our 위장 (주변 텍스트와 동일화) */
+    .stealth-text {
+        color: inherit !important;
+        font-weight: inherit !important;
+    }
 
 </style>
-
-
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
+
+<script>
+    document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
 
 <div id="easterEggOverlay">
     <div class="cyber-bg"></div>
@@ -112,9 +146,11 @@ width: 80vw;    /* 모바일에서는 화면 너비의 80% */
 
 <main class="pt-32 pb-10 px-6 contact-form-container">
     <div class="form-card bg-neutral-900 border border-neutral-700 p-8 rounded-2xl shadow-2xl relative mt-16 md:mt-0">
-        <h2 class="text-4xl font-black tracking-wide hero-slogan-gradient">Request a <span id="triggerWord">Quote</span></h2>
+        <h2 class="text-4xl font-black tracking-wide hero-slogan-gradient">
+            Request a <span id="triggerWord" class="stealth-trigger stealth-title">Quote</span>
+        </h2>
         <p class="text-neutral-400 mb-6">
-            Please provide details for a customized quotation. <span id="triggerWord2">Our</span> team will contact you shortly.
+            Please provide details for a customized quotation. <span id="triggerWord2" class="stealth-trigger stealth-text">Our</span> team will contact you shortly.
         </p>
 
         <form id="quoteForm" method="POST" action="https://formspree.io/f/mdkqddlz" class="grid gap-4">
@@ -245,12 +281,12 @@ width: 80vw;    /* 모바일에서는 화면 너비의 80% */
             };
         }
 
-        // 키보드 'ega' 타이핑 트리거
+        // 키워드 타이핑 트리거
         let inputStr = "";
         document.onkeydown = (e) => {
             inputStr += e.key.toLowerCase();
             if(inputStr.includes("chaeyeon")) { runCyberEffect(); inputStr = ""; }
-            if(inputStr.length > 10) inputStr = inputStr.slice(-5);
+            if(inputStr.length > 15) inputStr = inputStr.slice(-10);
         };
     }
 
