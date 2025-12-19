@@ -16,7 +16,7 @@
         #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; display: none; }
         #modalDetailImage { max-width: 95%; max-height: 80%; object-fit: contain; }
 
-        /* 드롭다운 스타일 (모바일 터치 최적화) */
+        /* 드롭다운 스타일 */
         .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; transition: all 0.2s; text-align: left; font-size: 16px; }
         .dropdown-quote-btn { padding: 18px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
         
@@ -28,14 +28,24 @@
         .scanning-line { width: 100%; height: 2px; background: #22d3ee; position: absolute; top: 0; left: 0; box-shadow: 0 0 15px #22d3ee; animation: scan 2s linear infinite; }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        /* TDLiD 클릭 포인트 완벽 위장 */
-        #triggerWord { color: inherit !important; font-weight: inherit !important; text-decoration: none !important; cursor: text !important; display: inline; position: relative; z-index: 9998; -webkit-tap-highlight-color: transparent; }
+        /* [수정] TDLiD 클릭 포인트 모바일 최적화 */
+        #triggerWord { 
+            color: inherit !important; 
+            font-weight: inherit !important; 
+            text-decoration: none !important; 
+            cursor: pointer !important; 
+            display: inline-block; /* 터치 영역 확보 */
+            position: relative; 
+            z-index: 50; /* hero-content보다 위로 배치 */
+            -webkit-tap-highlight-color: transparent;
+            pointer-events: auto !important;
+        }
 
         /* 히어로 섹션 모바일 최적화 */
         .hero-section {
             position: relative;
             width: 100%;
-            height: 100svh; /* 모바일 브라우저 주소창 대응 */
+            height: 100svh;
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -62,12 +72,10 @@
 
         .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 24px; }
         
-        /* 폰트 크기 모바일 반응형 조절 */
         .hero-logo-gradient { font-size: 15vw; line-height: 1; margin-bottom: 10px; font-weight: 900; background: linear-gradient(to bottom, #fff, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero-slogan-gradient { font-size: 5vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); font-weight: 600; }
         .hero-description { font-size: 16px; line-height: 1.6; margin-top: 40px; color: #cbd5e1; }
 
-        /* Staff 이미지 모바일 정렬 */
         .staff-img { 
             width: 70vw; max-width: 240px; height: auto; border-radius: 12px;
             border: 1px solid #22d3ee; box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
@@ -75,7 +83,6 @@
         }
         .staff-container { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 25px; }
 
-        /* 인증서/로고 그리드 최적화 */
         .partner-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; align-items: center; justify-items: center; }
         .cert-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 10px; }
         .cert-zoom-wrapper img { width: 100%; height: auto; border-radius: 4px; }
@@ -128,7 +135,8 @@
                 <img src="images/DAVIGO.png" alt="DAVIGO" class="h-8">
                 <img src="images/GESITS.png" alt="GESITS" class="h-8">
                 <img src="images/ALESSA.png" alt="ALESSA" class="h-8">
-                <img src="images/logo/logo.png" alt="TDL" class="h-8"> </div>
+                <img src="images/logo/logo.png" alt="TDL" class="h-8"> 
+            </div>
             
             <div class="mt-16">
                 <h2 class="text-xl font-light text-center mb-8 text-cyan-400 tracking-tight">Global Safety Standards</h2>
@@ -179,9 +187,9 @@
     // 2. 레이아웃 로드
     async function loadLayout() {
         try {
-            const headerRes = await fetch('components/header_m.html'); // 모바일용 헤더 호출
+            const headerRes = await fetch('components/header_m.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-            const footerRes = await fetch('components/footer_m.html'); // 모바일용 푸터 호출
+            const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
             initNavigation();
@@ -189,7 +197,7 @@
         } catch (err) { console.error("Layout load error:", err); }
     }
 
-    // 3. 내비게이션 (헤더 로드 후 실행)
+    // 3. 내비게이션
     function initNavigation() {
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
@@ -208,35 +216,52 @@
         }
     }
 
-    // 4. 이스터 에그 트리거
+    // 4. 이스터 에그 트리거 (수정됨)
     function initEasterEggTriggers() {
-        // [1] TDLiD 텍스트 클릭
+        // [1] TDLiD 텍스트 터치 대응
         const triggerWord = document.getElementById('triggerWord');
-        if (triggerWord) triggerWord.onclick = (e) => { e.preventDefault(); runScanAnimation(); };
+        if (triggerWord) {
+            const handleEasterEgg = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                runScanAnimation();
+            };
+            // 터치와 클릭 둘 다 이벤트 등록
+            triggerWord.addEventListener('touchstart', handleEasterEgg, { passive: false });
+            triggerWord.addEventListener('click', handleEasterEgg);
+        }
 
         // [2] 로고 5번 터치
         let touchCount = 0;
         let lastTouchTime = 0;
-        setTimeout(() => { // 헤더 로드 대기
+        
+        const checkLogo = () => {
             const logoImg = document.querySelector('header img');
             if (logoImg) {
-                logoImg.onclick = () => {
+                const logoHandler = (e) => {
                     const now = Date.now();
                     if (now - lastTouchTime < 500) touchCount++;
                     else touchCount = 1;
                     lastTouchTime = now;
                     if (touchCount === 5) { runScanAnimation(); touchCount = 0; }
                 };
+                logoImg.addEventListener('click', logoHandler);
+                logoImg.addEventListener('touchstart', logoHandler, { passive: true });
+            } else {
+                setTimeout(checkLogo, 500);
             }
-        }, 1000);
+        };
+        checkLogo();
     }
 
-    // 5. 스캔 애니메이션 (이스터 에그)
+    // 5. 스캔 애니메이션
     function runScanAnimation() {
         const overlay = document.getElementById('easterEggOverlay');
         const log = document.getElementById('statusLog');
         const staffImgs = document.querySelectorAll('.staff-img');
         
+        if (overlay.style.display === 'flex') return;
+
         overlay.style.display = 'flex';
         staffImgs.forEach(img => img.style.opacity = '0');
         
@@ -250,7 +275,7 @@
                         overlay.style.display = 'none';
                     }, 2000);
                 }
-            }, i * 800);
+            }, i * 600);
         });
     }
 
@@ -258,7 +283,6 @@
     document.addEventListener("DOMContentLoaded", () => {
         loadLayout();
 
-        // 뮤직 컨트롤
         const bgm = document.getElementById('bgm');
         const musicBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIconUI');
@@ -267,15 +291,16 @@
             else { bgm.muted = true; musicIcon.innerText = "🔇"; }
         };
 
-        // 모달 제어
-        document.querySelectorAll('.cert-link').forEach(link => {
-            link.onclick = (e) => {
+        // 모달 제어 (이벤트 위임 방식으로 수정 권장하나 기존 유지)
+        document.body.addEventListener('click', function(e) {
+            const certLink = e.target.closest('.cert-link');
+            if (certLink) {
                 e.preventDefault();
                 const modal = document.getElementById('imageModal');
-                document.getElementById('modalDetailImage').src = link.getAttribute('data-original-src');
+                document.getElementById('modalDetailImage').src = certLink.getAttribute('data-original-src');
                 modal.style.display = 'block';
                 document.body.style.overflow = 'hidden';
-            };
+            }
         });
 
         document.getElementById('imageModal').onclick = function() {
@@ -284,7 +309,6 @@
         };
     });
 
-    // 우클릭 방지
     document.addEventListener('contextmenu', (e) => e.preventDefault());
 </script>
 </body>
