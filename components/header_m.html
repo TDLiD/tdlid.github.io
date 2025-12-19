@@ -13,6 +13,23 @@
         animation: shine 3s linear infinite;
     }
     @keyframes shine { to { background-position: 200% center; } }
+
+    /* [수정] 가로 모드 및 화면 높이가 낮은 기기 대응 */
+    #dropdownMenu {
+        /* 헤더 높이(약 68px)를 제외한 나머지 화면만 차지하도록 제한 */
+        max-height: calc(100vh - 68px); 
+        overflow-y: auto; /* 세로 스크롤 활성화 */
+        -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 적용 */
+    }
+
+    /* 스크롤바 커스텀 (메뉴 디자인 유지) */
+    #dropdownMenu::-webkit-scrollbar {
+        width: 4px;
+    }
+    #dropdownMenu::-webkit-scrollbar-thumb {
+        background: rgba(34, 211, 238, 0.3);
+        border-radius: 10px;
+    }
 </style>
 
 <header class="fixed top-0 left-0 w-full z-[10001] glass-header-m px-5 py-4 flex justify-between items-center">
@@ -29,7 +46,7 @@
         </svg>
     </button>
 
-    <div id="dropdownMenu" class="absolute top-[100%] left-0 w-full bg-[#020617] border-b border-cyan-500/20 opacity-0 invisible -translate-y-5 transition-all duration-300">
+    <div id="dropdownMenu" class="absolute top-[100%] left-0 w-full bg-[#020617] border-b border-cyan-500/20 opacity-0 invisible -translate-y-5 transition-all duration-300 shadow-2xl">
         <nav class="flex flex-col p-6 space-y-4">
             <a href="index_m.html" class="text-xl font-bold text-white border-b border-white/5 pb-2">Home</a>
             <a href="products_m.html" class="text-xl font-bold text-white border-b border-white/5 pb-2">Products</a>
@@ -37,9 +54,7 @@
             <a href="solutions_m.html" class="text-xl font-bold text-white border-b border-white/5 pb-2">Solutions</a>
             <a href="company_m.html" class="text-xl font-bold text-white border-b border-white/5 pb-2">Company</a>
             <a href="news_m.html" class="text-xl font-bold text-white border-b border-white/5 pb-2">News</a>
-            <a href="contact_m.html" class="mt-4 w-full py-4 bg-cyan-400 text-black text-center font-black rounded-xl">GET A QUOTE</a>
+            <a href="contact_m.html" class="mt-4 w-full py-4 bg-cyan-400 text-black text-center font-black rounded-xl block mb-4">GET A QUOTE</a>
         </nav>
     </div>
-
 </header>
-
