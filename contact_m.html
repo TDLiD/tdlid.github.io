@@ -25,6 +25,27 @@
         font-size: 16px !important; /* iOS 자동 줌 방지 */
     }
 
+    /* [추가] 모바일 뮤직 플레이어 컨트롤 */
+    #musicToggleBtn { 
+        position: fixed; 
+        bottom: 20px; 
+        right: 20px; 
+        z-index: 10005; 
+        width: 48px; /* 모바일 터치 최적화 크기 */
+        height: 48px; 
+        background: rgba(23, 23, 23, 0.85); 
+        border: 1px solid rgba(34, 211, 238, 0.4); 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        cursor: pointer; 
+        color: #22d3ee; 
+        backdrop-filter: blur(6px); 
+        -webkit-tap-highlight-color: transparent;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
     .contact-form-container {
         min-height: 100vh;
         display: flex;
@@ -42,16 +63,13 @@
     .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; }
     .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
 
-    /* =========================================
-        🚀 사이버 이스터 에그 스타일 (모바일 최적화)
-    ========================================= */
+    /* 이스터 에그 스타일 (기존 유지) */
     #easterEggOverlay {
         position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
         z-index: 20000; display: none; flex-direction: column;
         align-items: center; justify-content: center;
         font-family: 'Courier New', monospace; overflow: hidden;
     }
-
     .cyber-bg {
         position: absolute; inset: 0;
         background: linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
@@ -59,53 +77,33 @@
         background-size: 20px 20px;
         pointer-events: none;
     }
-
     .scanning-bar {
         position: absolute; width: 100%; height: 3px;
         background: linear-gradient(to right, transparent, #22d3ee, transparent);
         box-shadow: 0 0 15px #22d3ee;
         top: -10px; animation: cyberScan 2s linear infinite;
     }
-
-    @keyframes cyberScan {
-        0% { top: -5%; }
-        100% { top: 105%; }
-    }
-
+    @keyframes cyberScan { 0% { top: -5%; } 100% { top: 105%; } }
     .status-terminal {
         background: rgba(0, 0, 0, 0.7);
         padding: 1.5rem; border: 1px solid #22d3ee;
         border-radius: 12px; box-shadow: 0 0 30px rgba(34, 211, 238, 0.3);
         z-index: 20001; text-align: center; max-width: 85%;
     }
-
-    .staff-container {
-        display: flex; gap: 15px; justify-content: center;
-        flex-direction: column; align-items: center; margin-top: 20px;
-    }
-
-    .staff-img {
-        width: 100%;
-        max-width: 200px;
-        height: auto;
-        border-radius: 8px;
-        opacity: 0; transform: translateY(10px);
-        transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
+    .staff-container { display: flex; gap: 15px; justify-content: center; flex-direction: column; align-items: center; margin-top: 20px; }
+    .staff-img { width: 100%; max-width: 200px; height: auto; border-radius: 8px; opacity: 0; transform: translateY(10px); transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .staff-img.reveal { opacity: 1; transform: translateY(0); box-shadow: 0 0 20px rgba(34, 211, 238, 0.5); }
-
-    /* 트리거 위장 스타일 */
-    .stealth-trigger {
-        cursor: text !important;
-        -webkit-tap-highlight-color: transparent;
-        user-select: none;
-        pointer-events: auto !important;
-    }
+    .stealth-trigger { cursor: text !important; -webkit-tap-highlight-color: transparent; user-select: none; pointer-events: auto !important; }
 </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
+
+<audio id="bgm" src="mp3/tdlid3.mp3" autoplay loop muted playsinline></audio>
+
+<button id="musicToggleBtn" title="Play/Pause Music">
+    <span id="musicIconUI">🔇</span>
+</button>
 
 <div id="easterEggOverlay">
     <div class="cyber-bg"></div>
@@ -165,7 +163,6 @@
 <script>
     async function loadLayout() {
         try {
-            // 모바일 전용 헤더/푸터 호출
             const headerRes = await fetch('components/header_m.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
             
@@ -175,8 +172,29 @@
             initMenuToggle();
             initFormHandler();
             initEasterEgg(); 
+            initMusicPlayer(); // [추가] 음악 기능 초기화
         } catch (err) {
             console.error("Layout load failed:", err);
+        }
+    }
+
+    // [추가] 모바일 음악 플레이어 로직
+    function initMusicPlayer() {
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('musicToggleBtn');
+        const musicIcon = document.getElementById('musicIconUI');
+
+        if (musicBtn && bgm) {
+            musicBtn.onclick = () => {
+                if (bgm.muted) {
+                    bgm.muted = false;
+                    bgm.play().catch(e => console.log("Mobile autoplay blocked:", e));
+                    musicIcon.innerText = "🎵";
+                } else {
+                    bgm.muted = true;
+                    musicIcon.innerText = "🔇";
+                }
+            };
         }
     }
 
@@ -219,12 +237,7 @@
             if(overlay.style.display === 'flex') return;
             overlay.style.display = 'flex';
             
-            const msgs = [
-                "> ENCRYPTING...",
-                "> BYPASSING...",
-                "> Confirmed",
-                "Welcome: Miss. Kim ♥"
-            ];
+            const msgs = ["> ENCRYPTING...", "> BYPASSING...", "> Confirmed", "Welcome: Miss. Kim ♥"];
 
             msgs.forEach((msg, i) => {
                 setTimeout(() => {
@@ -250,14 +263,6 @@
 
         if(t1) t1.onclick = runCyberEffect;
         if(t2) t2.onclick = runCyberEffect;
-
-        // 키워드 타이핑 트리거
-        let inputStr = "";
-        document.onkeydown = (e) => {
-            inputStr += e.key.toLowerCase();
-            if(inputStr.includes("chaeyeon")) { runCyberEffect(); inputStr = ""; }
-            if(inputStr.length > 15) inputStr = inputStr.slice(-10);
-        };
     }
 
     function initFormHandler() {

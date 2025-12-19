@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <script>
         (function() {
-            // 1. 기기 감지 및 리다이렉트 (데스크톱 전용 페이지 설정)
+            // 1. 기기 감지 및 리다이렉트
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             const urlParams = new URLSearchParams(window.location.search);
             const isPCMode = urlParams.get('view_mode') === 'pc';
@@ -45,30 +45,49 @@
     .contact-form-container {
         min-height: calc(100vh - 120px);
         display: flex;
-        align-items: center; /* 데스크톱에서 중앙 정렬 */
+        align-items: center; 
         justify-content: center;
-        padding-top: 8rem; /* 헤더 여백 고정 */
+        padding-top: 8rem;
     }
     .form-card {
-        max-width: 800px; /* 데스크톱 최적화 너비 상향 */
+        max-width: 800px;
         width: 100%;
         margin-bottom: 5rem;
     }
+
+    /* [추가] 뮤직 플레이어 컨트롤 스타일 */
+    #musicToggleBtn { 
+        position: fixed; 
+        bottom: 25px; 
+        right: 25px; 
+        z-index: 10005; 
+        width: 44px; 
+        height: 44px; 
+        background: rgba(23, 23, 23, 0.8); 
+        border: 1px solid rgba(34, 211, 238, 0.4); 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        cursor: pointer; 
+        color: #22d3ee; 
+        backdrop-filter: blur(4px); 
+        transition: all 0.3s; 
+    }
+    #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
+
     /* 드롭다운 스타일 */
     .dropdown-link { padding: 12px 20px; display: block; color: #ccc; transition: background 0.2s; border-bottom: 1px solid #262626; }
     .dropdown-link:hover { background: #1f2937; color: #22d3ee; }
     .dropdown-quote-btn { padding: 12px 20px; display: block; background: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; }
 
-    /* =========================================
-        🚀 업그레이드된 사이버 이스터 에그 스타일
-    ========================================= */
+    /* 이스터 에그 관련 스타일 생략 (기존 유지) */
     #easterEggOverlay {
         position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
         z-index: 20000; display: none; flex-direction: column;
         align-items: center; justify-content: center;
         font-family: 'Courier New', monospace; overflow: hidden;
     }
-
     .cyber-bg {
         position: absolute; inset: 0;
         background: linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
@@ -76,55 +95,27 @@
         background-size: 30px 30px;
         pointer-events: none;
     }
-
     .scanning-bar {
         position: absolute; width: 100%; height: 4px;
         background: linear-gradient(to right, transparent, #22d3ee, transparent);
         box-shadow: 0 0 20px #22d3ee;
         top: -10px; animation: cyberScan 2s linear infinite;
     }
-
-    @keyframes cyberScan {
-        0% { top: -5%; }
-        100% { top: 105%; }
-    }
-
+    @keyframes cyberScan { 0% { top: -5%; } 100% { top: 105%; } }
     .status-terminal {
         background: rgba(0, 0, 0, 0.8);
         padding: 3rem; border: 1px solid #22d3ee;
         border-radius: 8px; box-shadow: 0 0 60px rgba(34, 211, 238, 0.3);
         z-index: 20001; text-align: center; max-width: 800px;
     }
-
-    .staff-container {
-        display: flex; gap: 40px; justify-content: center;
-        margin-top: 40px;
-    }
-
+    .staff-container { display: flex; gap: 40px; justify-content: center; margin-top: 40px; }
     .staff-img {
-        width: 320px;
-        height: auto;
-        object-fit: cover;
-        border-radius: 12px;
-        filter: saturate(1.2) contrast(1.1);
-        opacity: 0; transform: translateY(20px);
+        width: 320px; height: auto; object-fit: cover; border-radius: 12px;
+        filter: saturate(1.2) contrast(1.1); opacity: 0; transform: translateY(20px);
         transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-
     .staff-img.reveal { opacity: 1; transform: translateY(0); box-shadow: 0 0 30px rgba(34, 211, 238, 0.4); }
-
-    .stealth-trigger {
-        cursor: text !important;
-        text-decoration: none !important;
-        -webkit-tap-highlight-color: transparent;
-        user-select: none;
-        -webkit-user-select: none;
-        pointer-events: auto !important;
-    }
-
-    .stealth-title { color: unset !important; font-weight: unset !important; }
-    .stealth-text { color: inherit !important; font-weight: inherit !important; }
-
+    .stealth-trigger { cursor: text !important; text-decoration: none !important; pointer-events: auto !important; }
 </style>
 </head>
 
@@ -133,6 +124,12 @@
 <script>
     document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
+
+<audio id="bgm" src="mp3/tdlid3.mp3" autoplay loop muted></audio>
+
+<button id="musicToggleBtn" title="Play/Pause Music">
+    <span id="musicIconUI">🔇</span>
+</button>
 
 <div id="easterEggOverlay">
     <div class="cyber-bg"></div>
@@ -201,11 +198,33 @@
             initMenuToggle();
             initFormHandler();
             initEasterEgg(); 
+            initMusicPlayer(); // [추가] 음악 플레이어 초기화 호출
         } catch (err) {
             console.error("Layout load failed:", err);
         }
     }
 
+    // [추가] 뮤직 플레이어 제어 함수
+    function initMusicPlayer() {
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('musicToggleBtn');
+        const musicIcon = document.getElementById('musicIconUI');
+
+        if (musicBtn && bgm) {
+            musicBtn.onclick = () => {
+                if (bgm.muted) {
+                    bgm.muted = false;
+                    bgm.play().catch(e => console.log("Playback failed:", e));
+                    musicIcon.innerText = "🎵";
+                } else {
+                    bgm.muted = true;
+                    musicIcon.innerText = "🔇";
+                }
+            };
+        }
+    }
+
+    // 기존 함수들 유지 (initMenuToggle, initEasterEgg, initFormHandler)
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
@@ -284,13 +303,17 @@
             inputStr += e.key.toLowerCase();
             if(inputStr.includes("chaeyeon")) { runCyberEffect(); inputStr = ""; }
             if(inputStr.length > 15) inputStr = inputStr.slice(-10);
+            // 키보드 보안
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'u')) {
+                e.preventDefault();
+                return false;
+            }
         };
     }
 
     function initFormHandler() {
         const form = document.getElementById('quoteForm');
         const formStatus = document.getElementById('formStatus');
-
         if(form) {
             form.onsubmit = async (e) => {
                 e.preventDefault();
@@ -316,20 +339,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", loadLayout);
-
-// 키보드 보안 (F12, Ctrl+Shift+I, Ctrl+U 등 차단)
-document.addEventListener('keydown', (e) => {
-    if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-        (e.ctrlKey && e.key === 'u')
-    ) {
-        e.preventDefault();
-        return false;
-    }
-});
-
-
 </script>
 
 </body>
