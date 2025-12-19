@@ -29,26 +29,38 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* 1. 팝업 모달 스타일 (데스크톱 최적화 여백) */
+        /* [수정] 고정 너비 제거 및 반응형 설정 */
+        body {
+            /* min-width: 1280px; 제거 */
+            overflow-x: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* 1. 팝업 모달 스타일 (확대 시 스크롤 가능하도록 개선) */
         .modal-backdrop {
-            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.9);
+            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.95);
             display: flex; justify-content: center; align-items: center; z-index: 10002;
+            padding: 20px;
         }
         .modal-content {
-            background: #171717; color: #ddd; padding: 40px; border-radius: 20px;
-            max-width: 80%; max-height: 90%; text-align: center; border: 1px solid #333; position: relative;
+            background: #171717; color: #ddd; padding: 2rem; border-radius: 20px;
+            max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto;
+            text-align: center; border: 1px solid #333; position: relative;
         }
-        .modal-image { max-width: 100%; max-height: 65vh; object-fit: contain; border-radius: 12px; margin-bottom: 25px; }
+        .modal-image { max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 12px; margin: 0 auto 25px; }
         .modal-close-btn { margin-top: 20px; padding: 12px 32px; background: #06b6d4; color: black; font-weight: 700; border-radius: 50px; cursor: pointer; transition: 0.2s; }
-        .modal-close-btn:hover { background: #22d3ee; transform: scale(1.05); }
-        .modal-close-x { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 32px; cursor: pointer; opacity: 0.6; }
 
-        /* 2. 슬라이딩 캐러셀 구조 - 데스크톱 전용 사이즈 확대 */
+        /* 2. 슬라이딩 캐러셀 구조 - 반응형 너비로 변경 */
         #technologyContainer {
             perspective: 2000px; 
-            width: 1000px; /* 기존 800px에서 확대 */
+            width: 100%;
+            max-width: 1000px; /* 최대 너비 제한 */
             margin: 40px auto 60px;
             position: relative;
+            padding: 0 80px; /* 버튼 공간 확보 */
         }
         #carousel { 
             width: 100%; 
@@ -60,7 +72,7 @@
             grid-area: 1 / 1 / 2 / 2;
             width: 100%; 
             height: auto; 
-            padding: 4rem; /* 패딩 확대 */
+            padding: 2.5rem; /* 확대 대비 패딩 유연화 */
             border: 1px solid #222; 
             border-radius: 2.5rem; 
             background-color: #0f0f0f;
@@ -70,6 +82,8 @@
             text-align: center;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out;
         }
+        @media (min-width: 1024px) { .tech-card { padding: 4rem; } }
+
         .tech-card.is-active { 
             position: relative; 
             opacity: 1; 
@@ -80,28 +94,19 @@
             box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), 0 0 40px rgba(6, 182, 212, 0.15); 
         }
 
-        /* 3. 내비게이션 버튼 디자인 확대 */
+        /* 3. 내비게이션 버튼 - 화면 안쪽으로 배치 */
         .nav-btn { 
             position: absolute; top: 50%; transform: translateY(-50%); z-index: 30; 
-            width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;
-            background: rgba(15, 15, 15, 0.9); border: 1px solid #333; border-radius: 50%; 
-            color: #06b6d4; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;
+            background: rgba(20, 20, 20, 0.8); border: 1px solid #333; border-radius: 50%; 
+            color: #06b6d4; transition: all 0.4s;
+            backdrop-filter: blur(10px);
         }
-        .nav-btn:hover { background: #06b6d4; color: #000; border-color: #06b6d4; transform: translateY(-50%) scale(1.15); }
-        #prevBtn { left: -100px; } 
-        #nextBtn { right: -100px; }
+        .nav-btn:hover { background: #06b6d4; color: #000; border-color: #06b6d4; transform: translateY(-50%) scale(1.1); }
+        #prevBtn { left: 0; } 
+        #nextBtn { right: 0; }
 
-        /* 4. 데스크톱 전용 가로 너비 고정 */
-        body {
-            min-width: 1280px;
-            overflow-x: hidden;
--webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-        }
-
-        /* 기타 스타일 유지 */
+        /* 공통 스타일 유지 */
         .dropdown-link { padding: 12px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; transition: all 0.2s; }
         .dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
         .dropdown-quote-btn { padding: 12px 20px; display: block; background: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; }
@@ -119,9 +124,9 @@
 
 <div id="header-placeholder"></div>
 
-<main class="flex-grow pt-40 pb-24 px-6">
+<main class="flex-grow pt-32 lg:pt-40 pb-24 px-6">
     <div class="max-w-7xl mx-auto">
-        <h3 class="text-5xl font-black tracking-tight hero-slogan-gradient text-center mb-12">Core Technology</h3>
+        <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient text-center mb-12">Core Technology</h3>
 
         <div id="technologyContainer">
             <button id="prevBtn" class="nav-btn" aria-label="Previous">
@@ -132,29 +137,29 @@
                 <div class="tech-card is-active" data-index="0">
                     <img src="images/technology/72V20A.png" 
                          data-popup-src="images/technology/72V20A-1.png"
-                         class="mx-auto mb-8 max-h-[500px] object-contain cursor-pointer hover:scale-105 transition-transform duration-500" 
+                         class="mx-auto mb-8 max-h-[400px] lg:max-h-[500px] object-contain cursor-pointer hover:scale-105 transition-transform duration-500" 
                          data-detail="TDLiD’s 72V battery system utilizes LG NMC INR21700 cell architecture...">
-                    <h4 class="text-2xl font-bold mb-4 text-cyan-400">72V 20Ah Battery</h4>
-                    <p class="text-xl mb-4 text-neutral-300">Cell Model: LG INR21700M50VT</p>
+                    <h4 class="text-xl md:text-2xl font-bold mb-4 text-cyan-400">72V 20Ah Battery</h4>
+                    <p class="text-lg md:text-xl mb-4 text-neutral-300">Cell Model: LG INR21700M50VT</p>
                 </div>
 
                 <div class="tech-card" data-index="1">
-                    <div class="max-h-[450px] overflow-y-auto pr-4 mb-8 custom-scrollbar">
+                    <div class="max-h-[400px] overflow-y-auto pr-4 mb-8 custom-scrollbar">
                         <img src="images/technology/72V20A-2.png" class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition">
                         <img src="images/technology/72V20A-3.png" class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition">
-                        <img src="images/technology/72V20A-5.png" class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition" data-detail="em.">
+                        <img src="images/technology/72V20A-5.png" class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition" data-detail="BMS Protection System">
                         <img src="images/technology/72V20A-6.png" class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition">
                     </div>
-                    <h4 class="text-2xl font-bold mb-4 text-cyan-400">Smart Monitoring</h4>
-                    <p class="text-xl mb-4 text-neutral-300">Advanced BMS integration for safety and longevity.</p>
+                    <h4 class="text-xl md:text-2xl font-bold mb-4 text-cyan-400">Smart Monitoring</h4>
+                    <p class="text-lg md:text-xl mb-4 text-neutral-300">Advanced BMS integration for safety and longevity.</p>
                 </div>
 
                 <div class="tech-card" data-index="2">
-                    <div class="grid grid-cols-2 gap-6 mb-8">
-                        <img src="images/technology/YEDEA-1.png" class="mx-auto max-h-72 object-contain cursor-pointer hover:scale-105 transition" data-detail="The integration of TDLiD’s 72V... with YADEA electric motorcycles...">
-                        <img src="images/technology/72V5A-charger-2.png" class="mx-auto max-h-72 object-contain cursor-pointer hover:scale-105 transition" data-detail="The pairing of TDLiD’s 72V-5A smart lithium charger...">
+                    <div class="grid grid-cols-2 gap-4 md:gap-6 mb-8">
+                        <img src="images/technology/YEDEA-1.png" class="mx-auto max-h-60 md:max-h-72 object-contain cursor-pointer hover:scale-105 transition" data-detail="YADEA electric motorcycles integration.">
+                        <img src="images/technology/72V5A-charger-2.png" class="mx-auto max-h-60 md:max-h-72 object-contain cursor-pointer hover:scale-105 transition" data-detail="Smart lithium charger pairing.">
                     </div>
-                    <h4 class="text-2xl font-bold mb-4 text-cyan-400">EV Integration</h4>
+                    <h4 class="text-xl md:text-2xl font-bold mb-4 text-cyan-400">EV Integration</h4>
                 </div>
             </div>
 
@@ -168,16 +173,12 @@
 <div id="footer-placeholder"></div>
 
 <script>
-    /**
-     * 1. 레이아웃 로드 및 메뉴 초기화
-     */
     async function loadLayout() {
         try {
             const headerRes = await fetch('components/header.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
             const footerRes = await fetch('components/footer.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
-            
             initMenuToggle();
         } catch (err) {
             console.error("Layout load failed:", err);
@@ -188,7 +189,6 @@
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
         const menuIcon = document.getElementById("menuIcon");
-
         if (menuBtn && dropdown) {
             menuBtn.onclick = (e) => {
                 e.stopPropagation();
@@ -196,26 +196,16 @@
                 if (isOpen) {
                     dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
                     dropdown.classList.add("opacity-0", "invisible");
-                    menuIcon.innerText = "☰";
+                    if(menuIcon) menuIcon.innerText = "☰";
                 } else {
                     dropdown.classList.remove("opacity-0", "invisible");
                     dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                    menuIcon.innerText = "✕";
-                }
-            };
-            document.onclick = (e) => {
-                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                    dropdown.classList.add("opacity-0", "invisible");
-                    menuIcon.innerText = "☰";
+                    if(menuIcon) menuIcon.innerText = "✕";
                 }
             };
         }
     }
 
-    /**
-     * 2. 캐러셀 및 모달 로직 (기능 유지)
-     */
     let currentIndex = 0;
     const cards = document.querySelectorAll('.tech-card');
     const CARD_COUNT = cards.length;
@@ -230,7 +220,9 @@
         currentIndex = newIndex;
         const prevCard = cards[oldIndex];
         const currentCard = cards[currentIndex];
-        const slideDistance = 1000; 
+        
+        // 브라우저 너비에 맞춘 동적 슬라이드 거리 계산
+        const slideDistance = document.getElementById('technologyContainer').offsetWidth;
 
         prevCard.style.zIndex = '15';
         currentCard.style.zIndex = '10';
@@ -255,7 +247,7 @@
     document.getElementById('prevBtn').onclick = () => { stopAuto(); showCard((currentIndex - 1 + CARD_COUNT) % CARD_COUNT, 'prev'); startAuto(); };
     document.getElementById('nextBtn').onclick = () => { stopAuto(); showCard((currentIndex + 1) % CARD_COUNT, 'next'); startAuto(); };
 
-    // 이미지 팝업 모달 이벤트 연결
+    // 이미지 팝업 모달 이벤트
     cards.forEach(card => {
         card.querySelectorAll('img').forEach(img => {
             img.onclick = function() {
@@ -264,15 +256,16 @@
                 const modal = document.createElement('div');
                 modal.className = 'modal-backdrop';
                 modal.innerHTML = `
-                    <div class="modal-content">
-                        <span class="modal-close-x">✕</span>
+                    <div class="modal-content custom-scrollbar">
+                        <span class="absolute top-5 right-6 text-3xl cursor-pointer opacity-50 hover:opacity-100" id="closeX">✕</span>
                         <img src="${popupImgTarget}" class="modal-image">
-                        <p class="mt-4 text-neutral-300 text-lg">${this.dataset.detail || ''}</p>
+                        <p class="mt-4 text-neutral-300 text-lg px-4">${this.dataset.detail || ''}</p>
                         <button class="modal-close-btn">Close</button>
                     </div>`;
-                const close = () => { document.body.removeChild(modal); startAuto(); };
+                
+                const close = () => { if(modal.parentNode) document.body.removeChild(modal); startAuto(); };
                 modal.querySelector('.modal-close-btn').onclick = close;
-                modal.querySelector('.modal-close-x').onclick = close;
+                modal.querySelector('#closeX').onclick = close;
                 modal.onclick = (e) => { if(e.target === modal) close(); };
                 document.body.appendChild(modal);
             };
@@ -284,19 +277,13 @@
         startAuto();
     });
 
-// 키보드 보안 (F12, Ctrl+Shift+I, Ctrl+U 등 차단)
-document.addEventListener('keydown', (e) => {
-    if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-        (e.ctrlKey && e.key === 'u')
-    ) {
-        e.preventDefault();
-        return false;
-    }
-});
-
-
+    // F12 보안 코드 유지
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'u')) {
+            e.preventDefault();
+            return false;
+        }
+    });
 </script>
 </body>
 </html>

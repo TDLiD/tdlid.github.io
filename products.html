@@ -36,13 +36,19 @@
         /* 1. 제품 전환 애니메이션 (원래 기능 유지) */
         #productContentWrapper {
             transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+            width: 100%;
         }
 
         #galleryImageContainer {
             display: flex; align-items: center; justify-content: center; overflow: hidden;
+            width: 100%;
         }
         #galleryImageContainer img {
-            max-width: 100%; height: 100%; object-fit: contain;
+            max-width: 100%; 
+            max-height: 100%; 
+            object-fit: contain;
+            /* 확대/축소 시 이미지 깨짐 방지 */
+            height: auto;
         }
 
         /* 2. 드롭다운 스타일 유지 */
@@ -56,14 +62,20 @@
             color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; 
         }
 
-        /* 데스크톱 전용 가로 너비 고정 */
+        /* [수정] 고정 너비를 제거하고 반응형 기반 마련 */
         body {
-            min-width: 1280px;
+            /* min-width: 1280px; -> 제거하여 확대 시 유동적으로 대응 */
             overflow-x: hidden;
--webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* 갤러리 카드 반응형 높이 조절 */
+        .gallery-card {
+            width: 100%;
+            max-width: 1024px; /* max-w-5xl 대응 */
         }
     </style>
 </head>
@@ -76,37 +88,37 @@
 
 <div id="header-placeholder"></div>
 
-<main class="flex-grow pt-40 pb-24 px-6">
+<main class="flex-grow pt-32 lg:pt-40 pb-24 px-6">
     <div class="max-w-7xl mx-auto">
-        <div class="relative flex flex-col items-center mb-16">
-            <h3 class="text-5xl font-black tracking-tight hero-slogan-gradient text-center">TDLiD Products</h3>
+        <div class="relative flex flex-col md:flex-row items-center justify-center mb-16 gap-8">
+            <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient text-center">TDLiD Products</h3>
             
-            <div class="flex gap-4 mt-8 lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:mt-0">
-                <a href="data/catalog/comparison.pdf" target="_blank" class="px-5 py-3 rounded-xl bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform font-bold text-sm">Compare Models</a>
-                <a href="data/catalog/tei-catalog-2025.pdf" target="_blank" class="px-5 py-3 rounded-xl bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform font-bold text-sm">View Catalog</a>
+            <div class="flex gap-4 md:absolute md:right-0">
+                <a href="data/catalog/comparison.pdf" target="_blank" class="whitespace-nowrap px-5 py-3 rounded-xl bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform font-bold text-sm">Compare Models</a>
+                <a href="data/catalog/tei-catalog-2025.pdf" target="_blank" class="whitespace-nowrap px-5 py-3 rounded-xl bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform font-bold text-sm">View Catalog</a>
             </div>
         </div>
         
-        <div id="productGallery" class="max-w-5xl mx-auto p-8 bg-neutral-900 rounded-[2.5rem] border border-neutral-800 shadow-[0_30px_100px_rgba(0,0,0,0.6)]">
-            <div id="productContentWrapper">
-                <div id="galleryImageContainer" class="aspect-[16/10] bg-neutral-800/30 rounded-3xl p-10">
+        <div id="productGallery" class="gallery-card mx-auto p-4 md:p-8 bg-neutral-900 rounded-[2rem] md:rounded-[2.5rem] border border-neutral-800 shadow-[0_30px_100px_rgba(0,0,0,0.6)]">
+            <div id="productContentWrapper" class="overflow-hidden">
+                <div id="galleryImageContainer" class="aspect-[16/10] bg-neutral-800/30 rounded-2xl md:rounded-3xl p-4 md:p-10">
                     </div>
             </div>
             
-            <div class="flex justify-between items-center mt-10 px-4">
-                <button id="galleryPrevBtn" class="w-16 h-16 flex items-center justify-center bg-neutral-800 rounded-full border border-neutral-700 text-cyan-400 hover:bg-cyan-500 hover:text-black hover:scale-110 transition-all duration-300">
-                    <span class="text-2xl">←</span>
+            <div class="flex justify-between items-center mt-6 md:mt-10 px-2 md:px-4">
+                <button id="galleryPrevBtn" class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-neutral-800 rounded-full border border-neutral-700 text-cyan-400 hover:bg-cyan-500 hover:text-black hover:scale-110 transition-all duration-300">
+                    <span class="text-xl md:text-2xl">←</span>
                 </button>
                 
                 <div class="flex flex-col items-center">
-                    <span id="galleryStatus" class="text-neutral-500 font-mono tracking-[0.3em] text-lg uppercase font-bold"></span>
-                    <div class="h-1 w-20 bg-cyan-500/20 mt-2 rounded-full overflow-hidden">
+                    <span id="galleryStatus" class="text-neutral-500 font-mono tracking-[0.2em] md:tracking-[0.3em] text-sm md:text-lg uppercase font-bold"></span>
+                    <div class="h-1 w-16 md:w-20 bg-cyan-500/20 mt-2 rounded-full overflow-hidden">
                         <div id="progressBar" class="h-full bg-cyan-500 transition-all duration-300" style="width: 0%"></div>
                     </div>
                 </div>
 
-                <button id="galleryNextBtn" class="w-16 h-16 flex items-center justify-center bg-neutral-800 rounded-full border border-neutral-700 text-cyan-400 hover:bg-cyan-500 hover:text-black hover:scale-110 transition-all duration-300">
-                    <span class="text-2xl">→</span>
+                <button id="galleryNextBtn" class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-neutral-800 rounded-full border border-neutral-700 text-cyan-400 hover:bg-cyan-500 hover:text-black hover:scale-110 transition-all duration-300">
+                    <span class="text-xl md:text-2xl">→</span>
                 </button>
             </div>
         </div>
@@ -122,10 +134,12 @@
     async function loadLayout() {
         try {
             const headerRes = await fetch('components/header.html');
-            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+            const headerHtml = await headerRes.text();
+            document.getElementById('header-placeholder').innerHTML = headerHtml;
 
             const footerRes = await fetch('components/footer.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            const footerHtml = await footerRes.text();
+            document.getElementById('footer-placeholder').innerHTML = footerHtml;
 
             initMenuToggle();
         } catch (err) {
@@ -153,7 +167,11 @@
     let autoChangeInterval;
     const AUTO_CHANGE_TIME = 3000;
     const transitionDuration = 800;
-    const slideDistance = 150; // 데스크톱에 맞춰 슬라이드 거리 증가
+
+    // 반응형 대응을 위해 슬라이드 거리를 화면 너비에 비례하게 설정
+    function getSlideDistance() {
+        return window.innerWidth < 768 ? 100 : 150;
+    }
 
     function renderProduct(product, index) {
         galleryImageContainer.innerHTML = `<img src="${product.image}" alt="Battery Pack ${index + 1}" class="max-h-full drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]">`;
@@ -174,15 +192,16 @@
         isAnimating = true;
         if (!isAutomatic) stopAutoChange();
 
+        const dist = getSlideDistance();
         productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${transitionDuration}ms ease-out`;
-        productContentWrapper.style.transform = `translateX(-${slideDistance}px)`;
+        productContentWrapper.style.transform = `translateX(-${dist}px)`;
         productContentWrapper.style.opacity = '0';
         
         setTimeout(() => {
             currentProductIndex = newIndex;
             const newProduct = productsData[currentProductIndex];
             productContentWrapper.style.transition = 'none';
-            productContentWrapper.style.transform = `translateX(${slideDistance}px)`;
+            productContentWrapper.style.transform = `translateX(${dist}px)`;
             renderProduct(newProduct, currentProductIndex); 
             void productContentWrapper.offsetWidth; 
             productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${transitionDuration}ms ease-out`;
@@ -211,11 +230,11 @@
                 if (isOpen) {
                     dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
                     dropdown.classList.add("opacity-0", "invisible");
-                    menuIcon.innerText = "☰";
+                    if(menuIcon) menuIcon.innerText = "☰";
                 } else {
                     dropdown.classList.remove("opacity-0", "invisible");
                     dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                    menuIcon.innerText = "✕";
+                    if(menuIcon) menuIcon.innerText = "✕";
                 }
             };
 
@@ -223,7 +242,7 @@
                 if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
                     dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
                     dropdown.classList.add("opacity-0", "invisible");
-                    menuIcon.innerText = "☰";
+                    if(menuIcon) menuIcon.innerText = "☰";
                 }
             });
         }
@@ -237,18 +256,16 @@
         }
     });
 
-// 키보드 보안 (F12, Ctrl+Shift+I, Ctrl+U 등 차단)
-document.addEventListener('keydown', (e) => {
-    if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-        (e.ctrlKey && e.key === 'u')
-    ) {
-        e.preventDefault();
-        return false;
-    }
-});
-
+    document.addEventListener('keydown', (e) => {
+        if (
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+            (e.ctrlKey && e.key === 'u')
+        ) {
+            e.preventDefault();
+            return false;
+        }
+    });
 </script>
 
 </body>
