@@ -37,6 +37,7 @@
         }
         #solutionsContainer {
             perspective: 1000px; width: 100%; margin: 0 auto; position: relative; display: grid;
+            touch-action: pan-y; /* 수직 스크롤은 허용, 수평 스와이프는 JS가 제어 */
         }
         .solution-card {
             grid-area: 1 / 1 / 2 / 2; width: 100%; height: auto; padding: 1.5rem; 
@@ -102,7 +103,7 @@
 
 <script>
     /**
-     * 1. 레이아웃 로드 및 메뉴 초기화 (모바일 버전 header_m, footer_m 호출)
+     * 1. 레이아웃 로드 및 메뉴 초기화
      */
     async function loadLayout() {
         try {
@@ -147,7 +148,7 @@
     }
 
     /**
-     * 2. 솔루션 데이터 및 로직 (기존 데이터 유지)
+     * 2. 솔루션 데이터 및 로직
      */
     const solutionsData = [
         { id: 'A', title: 'A. EV Motorcycle Conversion', desc: 'TDLID supplies electric motorcycle conversion kits and battery packs to local governments and universities in Indonesia.', images: ['images/solutions/solution1.png', 'images/solutions/solution1-1.png'] },
@@ -191,6 +192,7 @@
             </div>
         `).join('');
         renderStack();
+        initSwipeEvents(); // 스와이프 이벤트 초기화 추가
     }
 
     function renderStack() {
@@ -244,6 +246,34 @@
         stopAuto();
         showCard(idx, idx > currentIndex ? 'next' : 'prev');
         startAuto();
+    }
+
+    /**
+     * 3. [추가] 스와이프 로직
+     */
+    function initSwipeEvents() {
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const container = document.getElementById('solutionsContainer');
+
+        container.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            stopAuto();
+        }, { passive: true });
+
+        container.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const swipeThreshold = 50;
+            
+            if (touchEndX < touchStartX - swipeThreshold) {
+                // 다음 카드로 (왼쪽으로 밀기)
+                showCard((currentIndex + 1) % solutionsData.length, 'next');
+            } else if (touchEndX > touchStartX + swipeThreshold) {
+                // 이전 카드로 (오른쪽으로 밀기)
+                showCard((currentIndex - 1 + solutionsData.length) % solutionsData.length, 'prev');
+            }
+            startAuto();
+        }, { passive: true });
     }
 
     const startAuto = () => { stopAuto(); autoTimer = setInterval(() => showCard((currentIndex + 1) % solutionsData.length, 'next'), 5000); };
