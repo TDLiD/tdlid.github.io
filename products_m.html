@@ -13,14 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 드래그 및 우클릭 방지 */
-        body {
-            -webkit-user-select: none;
-            user-select: none;
-            overflow-x: hidden;
-        }
+        body { -webkit-user-select: none; user-select: none; overflow-x: hidden; }
 
-        /* 1. 제품 전환 애니메이션 */
         #productContentWrapper {
             transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.8s ease-out;
             will-change: transform, opacity;
@@ -36,29 +30,34 @@
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
         }
 
-        /* 터치 스와이프를 위해 터치 동작 제어 */
-        #productGallery {
-            touch-action: pan-y; /* 세로 스크롤은 유지, 가로 스와이프는 JS가 제어 */
+        /* [추가] 모바일 전용 팝업 모달 스타일 */
+        .modal-backdrop {
+            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.95);
+            display: flex; justify-content: center; align-items: center; z-index: 10002;
+            padding: 20px; backdrop-filter: blur(5px);
         }
+        .modal-content {
+            background: #111; color: #ddd; padding: 24px; border-radius: 24px;
+            max-width: 100%; width: 100%; max-height: 85vh; text-align: center; 
+            border: 1px solid #333; position: relative; overflow-y: auto;
+        }
+        .modal-image { max-width: 100%; max-height: 50vh; object-fit: contain; border-radius: 12px; margin: 0 auto; }
+        .modal-close-btn { 
+            margin-top: 24px; width: 100%; padding: 14px; background: #06b6d4; color: black; 
+            font-weight: 700; border-radius: 12px; transition: all 0.2s;
+        }
+        .modal-close-x { position: absolute; top: 15px; right: 20px; color: #fff; font-size: 24px; opacity: 0.5; }
 
-        /* 모바일 터치 최적화 버튼 */
+        #productGallery { touch-action: pan-y; }
+
         .gallery-nav-btn {
-            width: 56px; height: 56px;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(23, 23, 23, 0.8);
-            border: 1px solid rgba(34, 211, 238, 0.3);
-            border-radius: 50%;
-            color: #22d3ee;
-            backdrop-filter: blur(8px);
+            width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;
+            background: rgba(23, 23, 23, 0.8); border: 1px solid rgba(34, 211, 238, 0.3);
+            border-radius: 50%; color: #22d3ee; backdrop-filter: blur(8px);
             transition: all 0.2s ease;
         }
-        .gallery-nav-btn:active {
-            transform: scale(0.9);
-            background: #22d3ee;
-            color: #000;
-        }
+        .gallery-nav-btn:active { transform: scale(0.9); background: #22d3ee; color: #000; }
 
-        /* 드롭다운 스타일 */
         .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; }
         .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
     </style>
@@ -67,7 +66,6 @@
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
 <div id="bgm-placeholder"></div>
-
 <div id="header-placeholder"></div>
 
 <main class="flex-grow pt-24 pb-12 px-5 flex flex-col justify-center">
@@ -89,7 +87,7 @@
             <div class="flex-grow flex items-center justify-center p-8 overflow-hidden">
                 <div id="productContentWrapper" class="w-full h-full flex items-center justify-center">
                     <div id="galleryImageContainer" class="w-full h-full">
-                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -115,7 +113,7 @@
         </div>
         
         <p class="text-center text-neutral-600 text-[11px] mt-8 tracking-tighter">
-            Swipe or use buttons to navigate through our 32 battery models.
+            Swipe or tap image to enlarge 32 battery models.
         </p>
     </div>
 </main>
@@ -123,33 +121,23 @@
 <div id="footer-placeholder"></div>
 
 <script>
- /**
-     * 1. 레이아웃 로드 (BGM 포함)
-     */
     async function loadLayout() {
         try {
-            // 헤더 로드
             const headerRes = await fetch('components/header_m.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-
-            // 푸터 로드
             const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
 
-            // --- BGM 추가 코드 시작 ---
             const bgmRes = await fetch('components/bgm_m.html');
-            const bgmHTML = await bgmRes.text();
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            bgmPlaceholder.innerHTML = bgmHTML;
+            bgmPlaceholder.innerHTML = await bgmRes.text();
 
-            // BGM 내부에 포함된 스크립트를 수동으로 추출하여 실행
             const scripts = bgmPlaceholder.querySelectorAll("script");
             scripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
                 newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
-            // --- BGM 추가 코드 끝 ---
 
             initMenuToggle();
         } catch (err) {
@@ -157,10 +145,6 @@
         }
     }
 
-
-    /**
-     * 2. 제품 갤러리 로직
-     */
     const productsData = [];
     for(let i=1; i<=32; i++) {
         productsData.push({ image: `images/products/image-${i}.webp` });
@@ -180,9 +164,41 @@
     const transitionDuration = 600;
     const slideDistance = 50;
 
+    // [수정] 렌더링 시 클릭 이벤트(모달) 추가
     function renderProduct(product, index) {
-        galleryImageContainer.innerHTML = `<img src="${product.image}" alt="Battery Pack ${index + 1}" class="max-h-full">`;
+        galleryImageContainer.innerHTML = `
+            <img src="${product.image}" 
+                 alt="Battery Pack ${index + 1}" 
+                 class="max-h-full cursor-pointer"
+                 onclick="openImagePopup('${product.image}', ${index + 1})">`;
         galleryStatus.textContent = `${(index + 1).toString().padStart(2, '0')} / ${productsData.length}`;
+    }
+
+    // [추가] 모바일 팝업 열기 함수
+    function openImagePopup(src, num) {
+        stopAutoChange(); // 팝업 시 자동 슬라이드 정지
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal-backdrop';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="modal-close-x">✕</span>
+                <img src="${src}" class="modal-image">
+                <h4 class="text-cyan-400 mt-6 text-xl font-bold">Battery Pack Technology#${num}</h4>
+                <p class="text-neutral-500 mt-1 text-[10px] uppercase tracking-widest">Next-Gen Energy Solution</p>
+                <button class="modal-close-btn">닫기 (Close)</button>
+            </div>`;
+        
+        const close = () => { 
+            if(document.body.contains(modal)) document.body.removeChild(modal); 
+            startAutoChange(); 
+        };
+
+        modal.querySelector('.modal-close-btn').onclick = close;
+        modal.querySelector('.modal-close-x').onclick = close;
+        modal.onclick = (e) => { if(e.target === modal) close(); };
+        
+        document.body.appendChild(modal);
     }
 
     function stopAutoChange() { if (autoChangeInterval) clearInterval(autoChangeInterval); }
@@ -215,7 +231,6 @@
         }, transitionDuration); 
     }
 
-    // [추가] 터치 스와이프 기능
     function initSwipeEvents() {
         let touchStartX = 0;
         let touchEndX = 0;
@@ -227,16 +242,13 @@
 
         productGallery.addEventListener('touchend', (e) => {
             touchEndX = e.changedTouches[0].screenX;
-            const swipeThreshold = 50; // 스와이프 인식을 위한 최소 거리
+            const swipeThreshold = 50;
 
             if (touchEndX < touchStartX - swipeThreshold) {
-                // 다음 제품으로 (왼쪽으로 밀기)
                 changeProduct((currentProductIndex + 1) % productsData.length);
             } else if (touchEndX > touchStartX + swipeThreshold) {
-                // 이전 제품으로 (오른쪽으로 밀기)
                 changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
             } else {
-                // 스와이프가 아닌 일반 터치 시 자동 재생 재시작
                 startAutoChange();
             }
         }, { passive: true });
@@ -245,9 +257,6 @@
     galleryNextBtn.onclick = () => changeProduct((currentProductIndex + 1) % productsData.length);
     galleryPrevBtn.onclick = () => changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
 
-    /**
-     * 3. 모바일 메뉴 제어
-     */
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
@@ -282,11 +291,10 @@
         if (productsData.length > 0) {
             renderProduct(productsData[0], 0);
             startAutoChange();
-            initSwipeEvents(); // 스와이프 초기화
+            initSwipeEvents();
         }
     });
 
-    // 우클릭 방지
     document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
 
