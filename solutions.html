@@ -2,25 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script>
-        /**
-         * [데스크톱 전용 모드 설정]
-         * 모바일 기기로 접속 시 solutions_m.html로 리다이렉트 합니다.
-         */
-        (function() {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPCMode = urlParams.get('view_mode') === 'pc';
+ <script>
+    (function() {
+        // 1. [수정] iPad를 제외하고 iPhone, Android 폰만 감지
+        const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const isPCMode = urlParams.get('view_mode') === 'pc';
 
-            if (isMobile && !isPCMode) {
-                let path = window.location.pathname;
-                let page = path.split("/").pop();
-                if (page === "solutions.html" || page === "") {
-                    window.location.href = "solutions_m.html";
-                }
+        // 2. [수정] 모바일 폰으로 접속했을 때만 products_m.html로 이동
+        if (isMobileOnly && !isPCMode) {
+            let path = window.location.pathname;
+            let page = path.split("/").pop();
+            
+            // 현재 페이지가 products.html이거나 빈 값일 때 모바일 버전으로 리다이렉트
+            if (page === "products.html" || page === "") {
+                window.location.href = "products_m.html";
             }
-        })();
-    </script>
+        }
+    })();
+</script>
 
     <title>Solutions | TDLiD</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -2,23 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script>
-        (function() {
-            // 1. 기기 감지 및 리다이렉트 (데스크톱 전용 페이지이므로 모바일 접근 시 즉시 이동)
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPCMode = urlParams.get('view_mode') === 'pc';
+ <script>
+    (function() {
+        // 1. [수정] iPad를 제외하고 iPhone, Android 폰만 감지
+        const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const isPCMode = urlParams.get('view_mode') === 'pc';
 
-            if (isMobile && !isPCMode) {
-                let path = window.location.pathname;
-                let page = path.split("/").pop();
-                // company.html 접근 시 company_m.html로 이동
-                if (page === "company.html") {
-                    window.location.href = "company_m.html";
-                }
+        // 2. [수정] 모바일 폰으로 접속했을 때만 products_m.html로 이동
+        if (isMobileOnly && !isPCMode) {
+            let path = window.location.pathname;
+            let page = path.split("/").pop();
+            
+            // 현재 페이지가 products.html이거나 빈 값일 때 모바일 버전으로 리다이렉트
+            if (page === "products.html" || page === "") {
+                window.location.href = "products_m.html";
             }
-        })();
-    </script>
+        }
+    })();
+</script>
 
     <title>Company Profile | TDL Energy Indonesia</title> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

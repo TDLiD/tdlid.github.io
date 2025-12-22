@@ -192,11 +192,23 @@
 <div id="footer-placeholder"></div>
 
 <script>
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (!isMobile) {
-        let currentPage = window.location.pathname.split("/").pop();
-        if(currentPage.includes("_m.html")) {
-            window.location.href = currentPage.replace("_m.html", ".html");
+    // 1. [수정] index.html과 동일하게 iPad를 제외한 기기만 모바일로 인식
+    const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+    
+    // PC 모드 강제 접속 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPCMode = urlParams.get('view_mode') === 'pc';
+
+    // 2. [수정] 모바일 기기가 아니거나(iPad 포함), PC 모드라면 데스크톱 페이지로 리다이렉트
+    if (!isMobileOnly || isPCMode) {
+        let path = window.location.pathname;
+        let page = path.split("/").pop();
+        
+        // 현재 페이지가 _m.html을 포함하고 있다면 일반 .html로 전환
+        if (page.includes("_m.html")) {
+            window.location.href = page.replace("_m.html", ".html");
+        } else if (page === "index_m.html" || page === "") {
+            window.location.href = "index.html";
         }
     }
 
