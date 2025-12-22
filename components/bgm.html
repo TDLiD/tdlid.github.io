@@ -1,0 +1,38 @@
+<style>
+    #musicToggleBtn { 
+        position: fixed; bottom: 25px; right: 25px; z-index: 10005; 
+        width: 44px; height: 44px; background: rgba(23, 23, 23, 0.8); 
+        border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 50%; 
+        display: flex; align-items: center; justify-content: center; 
+        cursor: pointer; color: #22d3ee; backdrop-filter: blur(4px); 
+        transition: all 0.3s; 
+    }
+    #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
+</style>
+
+<audio id="bgm" src="mp3/tdlid.mp3" loop muted></audio>
+
+<button id="musicToggleBtn" title="Play/Pause Music">
+    <span id="musicIconUI">🔇</span>
+</button>
+
+<script>
+    (function() {
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('musicToggleBtn');
+        const musicIcon = document.getElementById('musicIconUI');
+
+        if (musicBtn && bgm) {
+            musicBtn.onclick = () => {
+                if (bgm.muted) {
+                    bgm.muted = false;
+                    bgm.play().catch(e => console.log("User interaction required"));
+                    musicIcon.innerText = "🎵";
+                } else {
+                    bgm.muted = true;
+                    musicIcon.innerText = "🔇";
+                }
+            };
+        }
+    })();
+</script>
