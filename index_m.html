@@ -209,7 +209,7 @@
             const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
 
-            const bgmRes = await fetch('components/bgm.html');
+            const bgmRes = await fetch('components/bgm_m.html');
             const bgmHTML = await bgmRes.text();
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
             bgmPlaceholder.innerHTML = bgmHTML;

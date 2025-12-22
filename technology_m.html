@@ -155,7 +155,7 @@
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
             // --- BGM 추가 코드 시작 ---
-            const bgmRes = await fetch('components/bgm.html');
+            const bgmRes = await fetch('components/bgm_m.html');
             const bgmHTML = await bgmRes.text();
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
             bgmPlaceholder.innerHTML = bgmHTML;

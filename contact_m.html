@@ -173,7 +173,7 @@
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
             // --- 2. BGM 공통 컴포넌트 적용 시작 ---
-            const bgmRes = await fetch('components/bgm.html');
+            const bgmRes = await fetch('components/bgm_m.html');
             const bgmHTML = await bgmRes.text();
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
             bgmPlaceholder.innerHTML = bgmHTML;
