@@ -22,60 +22,47 @@
         const musicBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIconUI');
 
-        // 1. 초기 상태 설정 함수
         const initBGM = () => {
             const savedTime = sessionStorage.getItem('bgmTime');
             const isMuted = sessionStorage.getItem('bgmMuted');
 
-            // 저장된 재생 위치 복원
-            if (savedTime) {
-                bgm.currentTime = parseFloat(savedTime);
-            }
+            if (savedTime) bgm.currentTime = parseFloat(savedTime);
 
-            // 음소거 상태 복원 (기본값은 muted=true)
+            // [핵심] 모바일은 페이지 로드 직후 .play()를 호출하면 거부됩니다.
+            // 따라서 저장된 상태가 '재생(false)'이라 하더라도 우선 UI만 세팅합니다.
             if (isMuted === 'false') {
-                bgm.muted = false;
-                musicIcon.innerText = "🎵";
-                // 브라우저 정책상 첫 로드 시 자동재생이 막힐 수 있으므로 play() 시도
-                bgm.play().catch(() => {
-                    // 자동재생 차단 시 다시 음소거 상태로 UI 세팅
-                    bgm.muted = true;
-                    musicIcon.innerText = "🔇";
-                });
-            } else {
-                bgm.muted = true;
-                musicIcon.innerText = "🔇";
+                // 사용자가 이전에 켰던 기록이 있다면, 화면 아무곳이나 터치할 때 재생되도록 한시적 허용
+                const playOnGesture = () => {
+                    bgm.muted = false;
+                    bgm.play().then(() => {
+                        musicIcon.innerText = "🎵";
+                        document.removeEventListener('click', playOnGesture);
+                    }).catch(() => {});
+                };
+                document.addEventListener('click', playOnGesture);
             }
-        };
-
-        // 2. 상태 저장 함수 (재생 시간 실시간 기록)
-        const saveStatus = () => {
-            sessionStorage.setItem('bgmTime', bgm.currentTime);
-            sessionStorage.setItem('bgmMuted', bgm.muted);
         };
 
         if (musicBtn && bgm) {
-            // 초기화 실행
             initBGM();
 
-            // 클릭 이벤트
-            musicBtn.onclick = () => {
+            musicBtn.onclick = (e) => {
+                e.stopPropagation(); // 중복 이벤트 방지
                 if (bgm.muted) {
                     bgm.muted = false;
-                    bgm.play().catch(e => console.log("User interaction required"));
+                    bgm.play();
                     musicIcon.innerText = "🎵";
                 } else {
                     bgm.muted = true;
                     musicIcon.innerText = "🔇";
                 }
-                saveStatus();
+                sessionStorage.setItem('bgmMuted', bgm.muted);
             };
 
-            // 재생 중 주기적으로 시간 저장 (1초 간격)
-            setInterval(saveStatus, 1000);
-
-            // 페이지를 떠나기 직전에 최종 시간 저장
-            window.addEventListener('beforeunload', saveStatus);
+            // 시간 저장 (모바일 배터리 절약을 위해 2초 간격)
+            setInterval(() => {
+                if(!bgm.paused) sessionStorage.setItem('bgmTime', bgm.currentTime);
+            }, 2000);
         }
     })();
 </script>
