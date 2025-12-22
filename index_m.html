@@ -4,104 +4,110 @@
     <meta charset="UTF-8">
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
+    <script>
+        // 1. Firebase 설정 (index.html과 동일)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+            authDomain: "tdlid-107669.firebaseapp.com",
+            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+            projectId: "tdlid-107669",
+            storageBucket: "tdlid-107669.firebasestorage.app",
+            messagingSenderId: "604782345004",
+            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+
+        // 2. 접속 기록 함수 (상세 정보 수집 버전)
+        async function recordVisit() {
+            try {
+                // 위치 및 IP 정보 가져오기
+                let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
+                try {
+                    const response = await fetch('https://ipapi.co/json/');
+                    const data = await response.json();
+                    geoData = {
+                        ip: data.ip,
+                        country: data.country_name,
+                        city: data.city
+                    };
+                } catch (e) { console.error("Geo API Error:", e); }
+
+                const now = new Date();
+                const visitData = {
+                    timestamp: now.getTime(),
+                    timeStr: now.toLocaleString(),
+                    page: window.location.pathname.split('/').pop() || 'index_m.html',
+                    
+                    // 상세 정보
+                    ip: geoData.ip,
+                    country: geoData.country,
+                    city: geoData.city,
+                    device: "Mobile", // 모바일 페이지이므로 고정 또는 감지
+                    os: navigator.platform, 
+                    referrer: document.referrer || "Direct"
+                };
+                
+                database.ref('visits').push(visitData);
+            } catch(e) { console.error("History error:", e); }
+        }
+
+        // 즉시 실행
+        recordVisit();
+
+        // 3. 리다이렉트 로직 (기존 유지)
+        (function() {
+            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPCMode = urlParams.get('view_mode') === 'pc';
+
+            if (!isMobileOnly || isPCMode) {
+                let path = window.location.pathname;
+                let page = path.split("/").pop();
+                if (page.includes("_m.html")) {
+                    window.location.href = page.replace("_m.html", ".html");
+                } else if (page === "index_m.html" || page === "") {
+                    window.location.href = "index.html";
+                }
+            }
+        })();
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* ===== [추가] 모바일 전용 헤더 대응 스타일 (기본 기능 유지) ===== */
-        #header-placeholder {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 10001; /* 비디오보다 위로 */
-        }
-
-        /* 로고 텍스트가 메뉴 버튼을 가리지 않도록 자동 크기 조절 */
-        .animated-logo-text-m {
-            font-size: 3.8vw !important; 
-            white-space: nowrap;
-        }
-        @media (max-width: 380px) {
-            .animated-logo-text-m { font-size: 11px !important; }
-        }
-
-        /* ===== IMAGE MODAL ===== */
+        /* (기존 CSS 스타일 유지...) */
+        #header-placeholder { position: fixed; top: 0; left: 0; width: 100%; z-index: 10001; }
+        .animated-logo-text-m { font-size: 3.8vw !important; white-space: nowrap; }
+        @media (max-width: 380px) { .animated-logo-text-m { font-size: 11px !important; } }
         #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; display: none; }
         #modalDetailImage { max-width: 95%; max-height: 80%; object-fit: contain; }
-
-        /* 드롭다운 스타일 */
-        .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; transition: all 0.2s; text-align: left; font-size: 16px; }
-        .dropdown-quote-btn { padding: 18px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
-        
-        /* 뮤직 플레이어 컨트롤 */
         #musicToggleBtn { position: fixed; bottom: 20px; right: 20px; z-index: 10005; width: 48px; height: 48px; background: rgba(23, 23, 23, 0.9); border: 1.5px solid rgba(34, 211, 238, 0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #22d3ee; backdrop-filter: blur(8px); }
-
-        /* ===== 이스터 에그 오버레이 ===== */
         #easterEggOverlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.98); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #22d3ee; padding: 20px; text-align: center; }
         .scanning-line { width: 100%; height: 2px; background: #22d3ee; position: absolute; top: 0; left: 0; box-shadow: 0 0 15px #22d3ee; animation: scan 2s linear infinite; }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-
-        /* TDLiD 클릭 포인트 */
-        #triggerWord { 
-            color: inherit !important; 
-            font-weight: inherit !important; 
-            text-decoration: none !important; 
-            cursor: pointer !important; 
-            display: inline-block;
-            position: relative; 
-            z-index: 50;
-            -webkit-tap-highlight-color: transparent;
-            pointer-events: auto !important;
-        }
-
-        /* 히어로 섹션 */
-        .hero-section {
-            position: relative;
-            width: 100%;
-            height: 100svh;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1; /* 헤더보다 낮게 */
-        }
-
-        .video-bg-container {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0;
-        }
-
-        .video-bg {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            filter: brightness(0.35) contrast(1.1);
-        }
-
-        .video-overlay {
-            position: absolute; inset: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
-            z-index: 1;
-        }
-
+        #triggerWord { color: inherit !important; font-weight: inherit !important; text-decoration: none !important; cursor: pointer !important; display: inline-block; position: relative; z-index: 50; -webkit-tap-highlight-color: transparent; pointer-events: auto !important; }
+        .hero-section { position: relative; width: 100%; height: 100svh; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 1; }
+        .video-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.1); }
+        .video-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%); z-index: 1; }
         .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 24px; }
-        
         .hero-logo-gradient { font-size: 15vw; line-height: 1; margin-bottom: 10px; font-weight: 900; background: linear-gradient(to bottom, #fff, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero-slogan-gradient { font-size: 5vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); font-weight: 600; }
         .hero-description { font-size: 16px; line-height: 1.6; margin-top: 40px; color: #cbd5e1; }
-
-        .staff-img { 
-            width: 70vw; max-width: 240px; height: auto; border-radius: 12px;
-            border: 1px solid #22d3ee; box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
-            opacity: 0; transition: opacity 1s ease-in-out;
-        }
+        .staff-img { width: 70vw; max-width: 240px; height: auto; border-radius: 12px; border: 1px solid #22d3ee; box-shadow: 0 0 15px rgba(34, 211, 238, 0.3); opacity: 0; transition: opacity 1s ease-in-out; }
         .staff-container { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 25px; }
-
         .partner-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; align-items: center; justify-items: center; }
         .cert-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 10px; }
         .cert-zoom-wrapper img { width: 100%; height: auto; border-radius: 4px; }
@@ -109,6 +115,7 @@
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
+
 
 <div id="bgm-placeholder"></div>
 

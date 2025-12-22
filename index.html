@@ -29,6 +29,54 @@
     })();
 </script>
 
+
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
+<script>
+  // 2. Firebase 설정
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+    authDomain: "tdlid-107669.firebaseapp.com",
+    databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+    projectId: "tdlid-107669",
+    storageBucket: "tdlid-107669.firebasestorage.app",
+    messagingSenderId: "604782345004",
+    appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+  };
+
+  // 초기화
+  if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+  }
+  const database = firebase.database();
+
+  // 3. 접속 기록 함수 (개선 버전)
+  function recordVisit() {
+    try {
+        const now = new Date();
+        const visitData = {
+          timestamp: now.getTime(),
+          timeStr: now.toLocaleString(),
+          // 현재 파일명 추출 (예: index_m.html)
+          page: window.location.pathname.split('/').pop() || 'index.html',
+          // 기기 구분 로직 강화
+          device: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "Mobile" : "PC",
+          referrer: document.referrer || "Direct"
+        };
+        database.ref('visits').push(visitData);
+        console.log("Visit recorded:", visitData.page);
+    } catch(e) { 
+        console.error("Firebase Recording Error:", e); 
+    }
+  }
+
+  // 즉시 실행 (리다이렉트 직후 또는 페이지 로드 시)
+  recordVisit();
+</script>
+
+
+
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -211,9 +259,35 @@
 /** 1. 레이아웃 로드 **/
 async function loadLayout() {
     try {
+        // 헤더 로드
         const headerRes = await fetch('components/header.html');
-        document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-        
+        const headerHTML = await headerRes.text();
+        document.getElementById('header-placeholder').innerHTML = headerHTML;
+
+        // --- [테스트용] Admin 탭 추가 코드 시작 ---
+        const navContainer = document.querySelector('#header-placeholder nav div.flex.items-center.gap-8');
+        const mobileNav = document.getElementById('mobile-nav');
+
+        if (navContainer) {
+            // 데스크톱 메뉴 끝에 Admin 추가
+            const adminLink = document.createElement('a');
+            adminLink.href = 'admin.html';
+            adminLink.className = 'text-sm font-medium text-neutral-400 hover:text-cyan-400 transition-colors';
+            adminLink.innerText = 'Admin';
+            navContainer.appendChild(adminLink);
+        }
+
+        if (mobileNav) {
+            // 모바일 드롭다운 메뉴 끝에 Admin 추가
+            const adminLinkM = document.createElement('a');
+            adminLinkM.href = 'admin.html';
+            adminLinkM.className = 'nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-200 font-bold';
+            adminLinkM.innerText = 'Admin';
+            mobileNav.appendChild(adminLinkM);
+        }
+        // --- Admin 탭 추가 코드 끝 ---
+
+        // 푸터 로드
         const footerRes = await fetch('components/footer.html');
         document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
 
@@ -221,22 +295,27 @@ async function loadLayout() {
         const bgmRes = await fetch('components/bgm.html');
         const bgmHTML = await bgmRes.text();
         const bgmPlaceholder = document.getElementById('bgm-placeholder');
-        bgmPlaceholder.innerHTML = bgmHTML;
+        if (bgmPlaceholder) {
+            bgmPlaceholder.innerHTML = bgmHTML;
 
-        // BGM 내부에 포함된 스크립트를 수동으로 실행 (필요 시)
-        const scripts = bgmPlaceholder.querySelectorAll("script");
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement("script");
-            newScript.text = oldScript.text;
-            document.body.appendChild(newScript).parentNode.removeChild(newScript);
-        });
+            // BGM 내부에 포함된 스크립트를 수동으로 실행
+            const scripts = bgmPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+        }
         // --- BGM 추가 코드 끝 ---
 
-        initNavigation();
-        initEasterEggTriggers();
-    } catch (err) { console.error(err); }
+        // 기존 초기화 함수 실행
+        if (typeof initNavigation === "function") initNavigation();
+        if (typeof initEasterEggTriggers === "function") initEasterEggTriggers();
+        
+    } catch (err) { 
+        console.error("Layout Load Error:", err); 
+    }
 }
-
 
     /** 2. 내비게이션 (데스크톱 드롭다운 제어) **/
     function initNavigation() {
@@ -354,6 +433,69 @@ document.addEventListener('keydown', (e) => {
             }, i * 700);
         });
     }
+
+// 3. 접속 기록 함수 (국가/IP 정보 추가 버전)
+async function recordVisit() {
+    try {
+        // 위치 및 IP 정보 가져오기 (무료 API 사용)
+        let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
+        try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            geoData = {
+                ip: data.ip,
+                country: data.country_name,
+                city: data.city
+            };
+        } catch (e) { console.error("Geo API Error:", e); }
+
+        const now = new Date();
+        const visitData = {
+            timestamp: now.getTime(),
+            timeStr: now.toLocaleString(),
+            page: window.location.pathname.split('/').pop() || 'index.html',
+            
+            // 상세 정보
+            ip: geoData.ip,
+            country: geoData.country,
+            city: geoData.city,
+            device: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "Mobile" : "PC",
+            os: navigator.platform, // OS 정보
+            referrer: document.referrer || "Direct"
+        };
+        
+        database.ref('visits').push(visitData);
+    } catch(e) { console.error("History error:", e); }
+}
+
+// 간단한 OS 추출기
+function getOS(ua) {
+    if (ua.indexOf("Windows") !== -1) return "Windows";
+    if (ua.indexOf("Mac") !== -1) return "macOS";
+    if (ua.indexOf("Android") !== -1) return "Android";
+    if (ua.indexOf("iPhone") !== -1) return "iOS";
+    return "Unknown";
+}
+
+// 간단한 브라우저 추출기
+function getBrowser(ua) {
+    if (ua.indexOf("Chrome") !== -1) return "Chrome";
+    if (ua.indexOf("Safari") !== -1) return "Safari";
+    if (ua.indexOf("Firefox") !== -1) return "Firefox";
+    if (ua.indexOf("Edge") !== -1) return "Edge";
+    return "Others";
+}
+
+
+// 브라우저를 닫기 전까지 유지되는 간단한 세션 ID 생성기
+function getSessionId() {
+    if (!sessionStorage.getItem('session_id')) {
+        sessionStorage.setItem('session_id', 'sess_' + Math.random().toString(36).substr(2, 9));
+    }
+    return sessionStorage.getItem('session_id');
+}
+
+
 
     document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
 </script>
