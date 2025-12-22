@@ -24,7 +24,6 @@
         font-size: 16px !important;
     }
 
-    /* bgm_m.html에서 버튼 스타일을 가져오므로 여기서는 삭제하거나 유지해도 됨 */
     .contact-form-container {
         min-height: 100vh;
         display: flex;
@@ -41,7 +40,7 @@
     .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; }
     .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
 
-    /* 이스터 에그 스타일 */
+    /* 이스터 에그 스타일 (수정됨) */
     #easterEggOverlay {
         position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
         z-index: 20000; display: none; flex-direction: column;
@@ -68,8 +67,8 @@
         border-radius: 12px; box-shadow: 0 0 30px rgba(34, 211, 238, 0.3);
         z-index: 20001; text-align: center; max-width: 85%;
     }
-    .staff-container { display: flex; gap: 15px; justify-content: center; flex-direction: column; align-items: center; margin-top: 20px; }
-    .staff-img { width: 100%; max-width: 200px; height: auto; border-radius: 8px; opacity: 0; transform: translateY(10px); transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .staff-container { display: flex; justify-content: center; align-items: center; margin-top: 20px; }
+    .staff-img { width: 100%; max-width: 180px; height: auto; border-radius: 8px; opacity: 0; transform: translateY(10px); transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .staff-img.reveal { opacity: 1; transform: translateY(0); box-shadow: 0 0 20px rgba(34, 211, 238, 0.5); }
     .stealth-trigger { cursor: text !important; -webkit-tap-highlight-color: transparent; user-select: none; pointer-events: auto !important; }
 </style>
@@ -86,8 +85,7 @@
         <div class="text-cyan-400 text-xs mb-2 tracking-[0.2em]">SECURE ACCESS GRANTED</div>
         <div id="statusLog" class="text-lg font-bold text-white mb-4">INITIALIZING...</div>
         <div class="staff-container">
-            <img class="staff-img" src="images/easter_egg/cy1.webp" alt="Staff 1">
-            <img class="staff-img" src="images/easter_egg/cy2.webp" alt="Staff 2">
+            <img id="skullImg_m" class="staff-img" src="images/home/skull.webp" alt="TDL Admin">
         </div>
     </div>
 </div>
@@ -137,19 +135,16 @@
 <script>
     async function loadLayout() {
         try {
-            // 1. 헤더/푸터 로드
             const headerRes = await fetch('components/header_m.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
             const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
-            // 2. BGM 공통 컴포넌트 적용 (bgm_m.html 호출)
             const bgmRes = await fetch('components/bgm_m.html');
             const bgmHTML = await bgmRes.text();
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
             bgmPlaceholder.innerHTML = bgmHTML;
 
-            // 스크립트 강제 실행
             const scripts = bgmPlaceholder.querySelectorAll("script");
             scripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
@@ -164,9 +159,6 @@
             console.error("Layout load failed:", err);
         }
     }
-
-    // [중요] 중복되었던 오디오 태그와 버튼 관련 스크립트(initMusicPlayer)는 
-    // 이제 bgm_m.html이 담당하므로 여기서는 완전히 삭제되었습니다.
 
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
@@ -196,26 +188,30 @@
         }
     }
 
+    // 모바일 이스터에그 로직 수정됨
     function initEasterEgg() {
         const t1 = document.getElementById('triggerWord');
         const t2 = document.getElementById('triggerWord2');
         const overlay = document.getElementById('easterEggOverlay');
         const log = document.getElementById('statusLog');
-        const staffImgs = document.querySelectorAll('.staff-img');
+        const skullImg = document.getElementById('skullImg_m');
 
         function runCyberEffect() {
             if(overlay.style.display === 'flex') return;
             overlay.style.display = 'flex';
             
-            const msgs = ["> ENCRYPTING...", "> BYPASSING...", "> Confirmed", "Welcome: Miss. Kim ♥"];
+            const msgs = [
+                "> ENCRYPTING...", 
+                "> BYPASSING...", 
+                "> ROOT ACCESS", 
+                "Welcome: TDLID Admin"
+            ];
 
             msgs.forEach((msg, i) => {
                 setTimeout(() => {
                     log.innerText = msg;
                     if(i === 2) {
-                        staffImgs.forEach((img, idx) => {
-                            setTimeout(() => img.classList.add('reveal'), idx * 300);
-                        });
+                        skullImg.classList.add('reveal');
                     }
                     if(i === msgs.length - 1) {
                         setTimeout(() => {
@@ -223,7 +219,7 @@
                             setTimeout(() => {
                                 overlay.style.display = 'none';
                                 overlay.style.opacity = '1';
-                                staffImgs.forEach(img => img.classList.remove('reveal'));
+                                skullImg.classList.remove('reveal');
                             }, 500);
                         }, 2500);
                     }
