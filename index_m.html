@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
@@ -49,7 +49,6 @@
             return sessionStorage.getItem('session_id');
         }
 
-        // 3. 접속 기록 함수 (상세 정보 수집 버전)
         async function recordVisit() {
             try {
                 let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
@@ -69,43 +68,31 @@
                     timestamp: now.getTime(),
                     timeStr: now.toLocaleString(),
                     page: window.location.pathname.split('/').pop() || 'index_m.html',
-                    
-                    // 상세 정보 추가
                     ip: geoData.ip,
                     country: geoData.country,
                     city: geoData.city,
                     device: "Mobile", 
-                    os: getOS(ua),           // 상세 OS 정보
-                    browser: getBrowser(ua), // 상세 브라우저 정보
-                    sid: getSessionId(),     // 세션 고유 ID
+                    os: getOS(ua),
+                    browser: getBrowser(ua),
+                    sid: getSessionId(),
                     referrer: document.referrer || "Direct"
                 };
-                
                 database.ref('visits').push(visitData);
             } catch(e) { console.error("History error:", e); }
         }
-
-        // 즉시 실행
         recordVisit();
 
-        // 4. 리다이렉트 로직 (기존 유지)
-        (function() {
-            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPCMode = urlParams.get('view_mode') === 'pc';
-
-            if (!isMobileOnly || isPCMode) {
-                let path = window.location.pathname;
-                let page = path.split("/").pop();
-                if (page.includes("_m.html")) {
-                    window.location.href = page.replace("_m.html", ".html");
-                } else if (page === "index_m.html" || page === "") {
-                    window.location.href = "index.html";
-                }
+        // 관리자 접속 키워드 감지 (admin 타이핑 시)
+        let inputKeys = "";
+        window.addEventListener('keydown', (e) => {
+            inputKeys += e.key.toLowerCase();
+            if (inputKeys.includes("admin")) {
+                location.href = "admin.html";
+                inputKeys = "";
             }
-        })();
+            if (inputKeys.length > 10) inputKeys = inputKeys.substring(5);
+        });
     </script>
-
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
@@ -114,7 +101,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* (기존 CSS 스타일 유지...) */
         #header-placeholder { position: fixed; top: 0; left: 0; width: 100%; z-index: 10001; }
         .animated-logo-text-m { font-size: 3.8vw !important; white-space: nowrap; }
         @media (max-width: 380px) { .animated-logo-text-m { font-size: 11px !important; } }
@@ -142,7 +128,6 @@
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
-
 
 <div id="bgm-placeholder"></div>
 
@@ -179,8 +164,7 @@
 
     <section class="py-12 bg-neutral-900 border-y border-neutral-800">
         <div class="px-6">
-            <h2 class="text-lg font-light text-center mb-8 text-cyan-400 tracking-tight">A Pillar of Trust in the E-Scooter Ecosystem
-</h2>
+            <h2 class="text-lg font-light text-center mb-8 text-cyan-400 tracking-tight">A Pillar of Trust in the E-Scooter Ecosystem</h2>
             <div class="partner-grid opacity-80">
                 <img src="images/home/DAVIGO.webp" alt="DAVIGO" class="h-8">
                 <img src="images/home/GESITS.webp" alt="GESITS" class="h-8">
@@ -189,8 +173,7 @@
             </div>
             
             <div class="mt-16">
-                <h2 class="text-lg font-light text-center mb-8 text-cyan-400 tracking-tight">Global Compliance and Safety Standards
-</h2>
+                <h2 class="text-lg font-light text-center mb-8 text-cyan-400 tracking-tight">Global Compliance and Safety Standards</h2>
                 <div class="cert-grid">
                     <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CE-EMC-TEST.webp">
                         <img src="images/certification/CE-EMC-TEST.webp" alt="CE">
@@ -226,19 +209,13 @@
 <div id="footer-placeholder"></div>
 
 <script>
-    // 1. [수정] index.html과 동일하게 iPad를 제외한 기기만 모바일로 인식
     const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-    
-    // PC 모드 강제 접속 확인
     const urlParams = new URLSearchParams(window.location.search);
     const isPCMode = urlParams.get('view_mode') === 'pc';
 
-    // 2. [수정] 모바일 기기가 아니거나(iPad 포함), PC 모드라면 데스크톱 페이지로 리다이렉트
     if (!isMobileOnly || isPCMode) {
         let path = window.location.pathname;
         let page = path.split("/").pop();
-        
-        // 현재 페이지가 _m.html을 포함하고 있다면 일반 .html로 전환
         if (page.includes("_m.html")) {
             window.location.href = page.replace("_m.html", ".html");
         } else if (page === "index_m.html" || page === "") {
@@ -248,12 +225,23 @@
 
     async function loadLayout() {
         try {
-            /* [수정] 모바일 전용 헤더 호출로 변경 */
             const headerRes = await fetch('components/header_m.html');
-            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+            const headerText = await headerRes.text();
+            // 메뉴바에서 Admin 링크 제거 로직 추가
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = headerText;
+            const adminLink = tempDiv.querySelector('a[href="admin.html"]');
+            if(adminLink) adminLink.remove();
+            document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
             
             const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+            // Footer 클릭 시 admin.html 이동 이벤트 추가
+            const footer = document.getElementById('footer-placeholder');
+            footer.addEventListener('click', () => {
+                location.href = "admin.html";
+            });
 
             const bgmRes = await fetch('components/bgm_m.html');
             const bgmHTML = await bgmRes.text();
@@ -305,26 +293,6 @@
             triggerWord.addEventListener('touchstart', handleEasterEgg, { passive: false });
             triggerWord.addEventListener('click', handleEasterEgg);
         }
-
-        let touchCount = 0;
-        let lastTouchTime = 0;
-        const checkLogo = () => {
-            const logoImg = document.querySelector('header img');
-            if (logoImg) {
-                const logoHandler = (e) => {
-                    const now = Date.now();
-                    if (now - lastTouchTime < 500) touchCount++;
-                    else touchCount = 1;
-                    lastTouchTime = now;
-                    if (touchCount === 5) { runScanAnimation(); touchCount = 0; }
-                };
-                logoImg.addEventListener('click', logoHandler);
-                logoImg.addEventListener('touchstart', logoHandler, { passive: true });
-            } else {
-                setTimeout(checkLogo, 500);
-            }
-        };
-        checkLogo();
     }
 
     function runScanAnimation() {
