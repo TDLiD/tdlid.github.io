@@ -201,20 +201,39 @@
         document.body.appendChild(modal);
     }
 
-    function initSolutions() {
+  function initSolutions() {
         const container = document.getElementById('solutionsContainer');
         container.innerHTML = solutionsData.map((s, idx) => `
             <div class="solution-card ${idx === currentIndex ? 'is-active' : ''}" data-index="${idx}">
                 <h4 class="text-xl font-bold mb-6 text-cyan-400">${s.title}</h4>
                 <div class="grid grid-cols-2 gap-3 mb-6">
-                    ${s.images.map(img => `<img src="${img}" class="bg-neutral-900/50 cursor-pointer active:scale-95 transition" onclick="openPopup('${img}', '${s.desc.replace(/'/g, "\\'")}')">`).join('')}
+                    ${s.images.map(img => `
+                        <img src="${img}" 
+                             class="popup-trigger bg-neutral-900/50 cursor-pointer active:scale-95 transition" 
+                             data-desc="${s.desc.replace(/"/g, '&quot;')}">
+                    `).join('')}
                 </div>
                 <p class="text-sm text-neutral-400 leading-relaxed">${s.desc}</p>
             </div>
         `).join('');
+        
         renderStack();
-        initSwipeEvents(); // 스와이프 이벤트 초기화 추가
+        initSwipeEvents();
+        initPopupEvents(); // 생성 후 이벤트를 따로 걸어줍니다.
     }
+
+function initPopupEvents() {
+        // 모든 팝업 대상 이미지에 대해
+        document.querySelectorAll('.popup-trigger').forEach(img => {
+            // 클릭(및 터치) 이벤트 리스너 등록
+            img.addEventListener('click', function() {
+                const src = this.getAttribute('src');
+                const desc = this.getAttribute('data-desc');
+                openPopup(src, desc);
+            });
+        });
+    }
+
 
     function renderStack() {
         const stackContainer = document.getElementById('stackContainer');
