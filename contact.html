@@ -30,10 +30,8 @@
 <style>
     /* 전체 페이지 드래그 방지 (입력창 제외) */
     body {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+        -webkit-user-select: auto;
+        user-select: auto;
     }
 
     /* 입력창 및 선택창은 정상적으로 사용 가능하도록 설정 */
@@ -122,10 +120,6 @@
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] overflow-x-hidden">
 
 <div id="bgm-placeholder"></div>
-
-<script>
-    document.addEventListener('contextmenu', e => e.preventDefault());
-</script>
 
 
 <div id="easterEggOverlay">
@@ -298,11 +292,7 @@
             inputStr += e.key.toLowerCase();
             if(inputStr.includes("chaeyeon")) { runCyberEffect(); inputStr = ""; }
             if(inputStr.length > 15) inputStr = inputStr.slice(-10);
-            // 키보드 보안
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'u')) {
-                e.preventDefault();
-                return false;
-            }
+
         };
     }
 

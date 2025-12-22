@@ -129,8 +129,8 @@
     <div id="statusLog" class="text-xl text-neutral-400 mb-10">Initializing Security Protocol...</div>
     
     <div class="staff-container">
-        <img class="staff-img" src="images/easter_egg/staff.jpeg" alt="TDL Staff 1">
-        <img class="staff-img" src="images/easter_egg/staff-2.png" alt="TDL Staff 2">
+        <img class="staff-img" src="images/easter_egg/staff.webp" alt="TDL Staff 1">
+        <img class="staff-img" src="images/easter_egg/staff-2.webp" alt="TDL Staff 2">
     </div>
 </div>
 
@@ -142,7 +142,7 @@
     <section class="hero-section">
         <div class="video-bg-container">
             <div class="video-overlay"></div> 
-            <video autoplay loop muted playsinline poster="images/home/flag.jpg" class="video-bg">
+            <video autoplay loop muted playsinline poster="images/home/flag.webp" class="video-bg">
                 <source src="videos/background.webm" type="video/webm">
                 <source src="videos/battery17.mp4" type="video/mp4">
             </video>
@@ -162,35 +162,35 @@
             <div class="text-center mb-20">
                 <h2 class="text-2xl font-extralight mb-12 text-cyan-400">A Pillar of Trust in the E-Scooter Ecosystem</h2>
                 <div class="flex items-center justify-center gap-24 opacity-75 grayscale hover:grayscale-0 transition-all duration-700">
-                    <img src="images/home/DAVIGO.png" alt="DAVIGO" class="h-16">
-                    <img src="images/home/GESITS.png" alt="GESITS" class="h-16">
-                    <img src="images/home/ALESSA.png" alt="ALESSA" class="h-16">
+                    <img src="images/home/DAVIGO.webp" alt="DAVIGO" class="h-16">
+                    <img src="images/home/GESITS.webp" alt="GESITS" class="h-16">
+                    <img src="images/home/ALESSA.webp" alt="ALESSA" class="h-16">
                 </div>
             </div>
             
             <div class="mt-20">
                 <h2 class="text-2xl font-extralight text-center mb-16 text-cyan-400">Global Compliance and Safety Standards</h2>
                 <div id="certifications-inside-hero" class="flex flex-wrap gap-10 items-center justify-center interactive-certs">
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CE-EMC-TEST.jpg">
-                        <img src="images/certification/CE-EMC-TEST.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CE-EMC-TEST.webp">
+                        <img src="images/certification/CE-EMC-TEST.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CB-TEST.jpg">
-                        <img src="images/certification/CB-TEST.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CB-TEST.webp">
+                        <img src="images/certification/CB-TEST.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/EMC-COMPLIANCE.jpg">
-                        <img src="images/certification/EMC-COMPLIANCE.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/EMC-COMPLIANCE.webp">
+                        <img src="images/certification/EMC-COMPLIANCE.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/IEC-62619.jpg">
-                        <img src="images/certification/IEC-62619.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/IEC-62619.webp">
+                        <img src="images/certification/IEC-62619.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Material-Safety.jpg">
-                        <img src="images/certification/Material-Safety.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Material-Safety.webp">
+                        <img src="images/certification/Material-Safety.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/UN38.3.jpg">
-                        <img src="images/certification/UN38.3.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/UN38.3.webp">
+                        <img src="images/certification/UN38.3.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Dangerous-Goods.jpg">
-                        <img src="images/certification/Dangerous-Goods.jpg" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Dangerous-Goods.webp">
+                        <img src="images/certification/Dangerous-Goods.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
                 </div>
             </div>
@@ -348,6 +348,7 @@ document.addEventListener('keydown', (e) => {
                 if (i === msgs.length - 1) {
                     setTimeout(() => { 
                         overlay.style.display = 'none'; 
+                        // alert("Access Granted!"); 
                     }, 1500);
                 }
             }, i * 700);

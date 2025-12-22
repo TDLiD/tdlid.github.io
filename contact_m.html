@@ -13,8 +13,8 @@
 <style>
     /* 전체 페이지 드래그 방지 (입력창 제외) */
     body {
-        -webkit-user-select: none;
-        user-select: none;
+        -webkit-user-select: auto;
+        user-select: auto;
         overflow-x: hidden;
     }
 
@@ -264,7 +264,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", loadLayout);
-    document.addEventListener('contextmenu', (e) => e.preventDefault());
 </script>
 
 </body>
