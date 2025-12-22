@@ -3,26 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <script>
-    <script>
     (function() {
-        // 1. [수정] iPad를 제외하고 iPhone, Android 폰만 감지
         const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-        
         const urlParams = new URLSearchParams(window.location.search);
         const isPCMode = urlParams.get('view_mode') === 'pc';
 
-        // 2. [수정] 모바일 폰으로 접속했을 때만 products_m.html로 이동
         if (isMobileOnly && !isPCMode) {
             let path = window.location.pathname;
             let page = path.split("/").pop();
             
-            // 현재 페이지가 products.html이거나 빈 값일 때 모바일 버전으로 리다이렉트
             if (page === "products.html" || page === "") {
                 window.location.href = "products_m.html";
             }
         }
     })();
-</script>
+    </script>
 
     <title>Request Quote | TDL Energy Indonesia</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,13 +28,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-    /* 전체 페이지 드래그 방지 (입력창 제외) */
     body {
         -webkit-user-select: auto;
         user-select: auto;
     }
 
-    /* 입력창 및 선택창은 정상적으로 사용 가능하도록 설정 */
     input, textarea, select {
         user-select: auto !important;
         -webkit-user-select: auto !important;
@@ -58,7 +51,6 @@
         margin-bottom: 5rem;
     }
 
-    /* [추가] 뮤직 플레이어 컨트롤 스타일 */
     #musicToggleBtn { 
         position: fixed; 
         bottom: 25px; 
@@ -79,12 +71,7 @@
     }
     #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
 
-    /* 드롭다운 스타일 */
-    .dropdown-link { padding: 12px 20px; display: block; color: #ccc; transition: background 0.2s; border-bottom: 1px solid #262626; }
-    .dropdown-link:hover { background: #1f2937; color: #22d3ee; }
-    .dropdown-quote-btn { padding: 12px 20px; display: block; background: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; }
-
-    /* 이스터 에그 관련 스타일 생략 (기존 유지) */
+    /* 이스터 에그 관련 스타일 */
     #easterEggOverlay {
         position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
         z-index: 20000; display: none; flex-direction: column;
@@ -111,10 +98,10 @@
         border-radius: 8px; box-shadow: 0 0 60px rgba(34, 211, 238, 0.3);
         z-index: 20001; text-align: center; max-width: 800px;
     }
-    .staff-container { display: flex; gap: 40px; justify-content: center; margin-top: 40px; }
+    .staff-container { display: flex; justify-content: center; margin-top: 40px; }
     .staff-img {
-        width: 320px; height: auto; object-fit: cover; border-radius: 12px;
-        filter: saturate(1.2) contrast(1.1); opacity: 0; transform: translateY(20px);
+        width: 280px; height: auto; object-fit: cover; border-radius: 12px;
+        opacity: 0; transform: translateY(20px);
         transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .staff-img.reveal { opacity: 1; transform: translateY(0); box-shadow: 0 0 30px rgba(34, 211, 238, 0.4); }
@@ -126,7 +113,6 @@
 
 <div id="bgm-placeholder"></div>
 
-
 <div id="easterEggOverlay">
     <div class="cyber-bg"></div>
     <div class="scanning-bar"></div>
@@ -134,8 +120,7 @@
         <div class="text-cyan-400 text-sm mb-2 tracking-[0.3em]">SECURE ACCESS GRANTED</div>
         <div id="statusLog" class="text-3xl font-bold text-white mb-6">INITIALIZING...</div>
         <div class="staff-container">
-            <img class="staff-img" src="images/easter_egg/cy1.webp" alt="Staff 1">
-            <img class="staff-img" src="images/easter_egg/cy2.webp" alt="Staff 2">
+            <img id="skullImg" class="staff-img" src="images/home/skull.webp" alt="TDL Admin">
         </div>
     </div>
 </div>
@@ -183,42 +168,34 @@
 <div id="footer-placeholder"></div>
 
 <script>
-
-  async function loadLayout() {
+    async function loadLayout() {
         try {
-            // 헤더/푸터 로드
             const headerRes = await fetch('components/header.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
             
             const footerRes = await fetch('components/footer.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
-            // --- 추가: BGM 컴포넌트 로드 시작 ---
             const bgmRes = await fetch('components/bgm.html');
             const bgmHTML = await bgmRes.text();
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
             bgmPlaceholder.innerHTML = bgmHTML;
 
-            // 삽입된 HTML 내의 스크립트(음악 재생 로직)를 강제로 실행시킴
             const scripts = bgmPlaceholder.querySelectorAll("script");
             scripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
                 newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
-            // --- 추가: BGM 컴포넌트 로드 끝 ---
             
             initMenuToggle();
             initFormHandler();
             initEasterEgg(); 
-            // initMusicPlayer(); // <-- 이 줄은 삭제하세요 (bgm.html 내부 스크립트가 대신 처리함)
         } catch (err) {
             console.error("Layout load failed:", err);
         }
     }
 
-
-    // 기존 함수들 유지 (initMenuToggle, initEasterEgg, initFormHandler)
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
@@ -236,25 +213,24 @@
                     closeMenu();
                 }
             };
-
             function closeMenu() {
                 dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
                 dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
                 if(menuIcon) menuIcon.innerText = "☰";
             }
-
             document.addEventListener("click", (e) => {
                 if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
             });
         }
     }
 
+    // 이스터에그 로직 수정됨
     function initEasterEgg() {
         const t1 = document.getElementById('triggerWord');
         const t2 = document.getElementById('triggerWord2');
         const overlay = document.getElementById('easterEggOverlay');
         const log = document.getElementById('statusLog');
-        const staffImgs = document.querySelectorAll('.staff-img');
+        const skullImg = document.getElementById('skullImg');
 
         function runCyberEffect() {
             if(overlay.style.display === 'flex') return;
@@ -263,17 +239,15 @@
             const msgs = [
                 "> ACCESSING ENCRYPTED CORE...",
                 "> BYPASSING FIREWALL...",
-                "> The prettiest girl confirmed",
-                "Welcome: Miss. Kim ♥"
+                "> ROOT PRIVILEGE GRANTED",
+                "Welcome: TDLID Admin"
             ];
 
             msgs.forEach((msg, i) => {
                 setTimeout(() => {
                     log.innerText = msg;
                     if(i === 2) {
-                        staffImgs.forEach((img, idx) => {
-                            setTimeout(() => img.classList.add('reveal'), idx * 200);
-                        });
+                        skullImg.classList.add('reveal');
                     }
                     if(i === msgs.length - 1) {
                         setTimeout(() => {
@@ -281,7 +255,7 @@
                             setTimeout(() => {
                                 overlay.style.display = 'none';
                                 overlay.style.opacity = '1';
-                                staffImgs.forEach(img => img.classList.remove('reveal'));
+                                skullImg.classList.remove('reveal');
                             }, 500);
                         }, 2500);
                     }
@@ -295,9 +269,12 @@
         let inputStr = "";
         document.onkeydown = (e) => {
             inputStr += e.key.toLowerCase();
-            if(inputStr.includes("chaeyeon")) { runCyberEffect(); inputStr = ""; }
+            // 키워드 tdlid로 변경
+            if(inputStr.includes("tdlid")) { 
+                runCyberEffect(); 
+                inputStr = ""; 
+            }
             if(inputStr.length > 15) inputStr = inputStr.slice(-10);
-
         };
     }
 
