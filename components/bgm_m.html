@@ -7,7 +7,7 @@
         cursor: pointer; color: #22d3ee; backdrop-filter: blur(4px); 
         transition: all 0.3s; 
     }
-    #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
+    #musicToggleBtn:active { transform: scale(0.9); } /* 모바일 터치 피드백 */
 </style>
 
 <audio id="bgm" src="mp3/tdlid.mp3" loop muted preload="auto" playsinline></audio>
@@ -22,46 +22,36 @@
         const musicBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIconUI');
 
-        // 1. 상태 복원 및 재생 로직
+        // 1. 상태 복원
         const initBGM = () => {
             const savedTime = sessionStorage.getItem('bgmTime');
             const isMuted = sessionStorage.getItem('bgmMuted'); // 'true' 또는 'false'
 
-            // 저장된 재생 위치가 있으면 복원
-            if (savedTime) {
-                bgm.currentTime = parseFloat(savedTime);
-            }
+            if (savedTime) bgm.currentTime = parseFloat(savedTime);
 
-            // 사용자가 이전에 음악을 켰던 상태(false)라면 재생 시도
+            // [모바일 핵심] 사용자가 이전에 켰던 기록이 있다면 클릭 시 재생 예약
             if (isMuted === 'false') {
-                bgm.muted = false;
-
-                // [A] 즉시 재생 시도 (데스크톱 및 정책 허용 기기)
-                bgm.play().then(() => {
-                    musicIcon.innerText = "🎵";
-                }).catch(() => {
-                    // [B] 자동 재생이 막힌 경우 (모바일 등) 사용자의 첫 클릭 시 재생되도록 대기
-                    console.log("Autoplay blocked. Waiting for user interaction.");
-                    musicIcon.innerText = "🔇";
-                    
-                    const playOnGesture = () => {
-                        bgm.muted = false;
-                        bgm.play().then(() => {
-                            musicIcon.innerText = "🎵";
-                            document.removeEventListener('click', playOnGesture);
-                        });
-                    };
-                    document.addEventListener('click', playOnGesture);
-                });
+                const playOnGesture = () => {
+                    bgm.muted = false;
+                    bgm.play().then(() => {
+                        musicIcon.innerText = "🎵";
+                        // 재생 성공 시 이벤트 제거
+                        document.removeEventListener('touchstart', playOnGesture);
+                        document.removeEventListener('click', playOnGesture);
+                    }).catch(e => console.log("Waiting for user gesture..."));
+                };
+                // 모바일은 click보다 touchstart가 더 빠르고 확실합니다.
+                document.addEventListener('touchstart', playOnGesture);
+                document.addEventListener('click', playOnGesture);
             }
         };
 
         if (musicBtn && bgm) {
             initBGM();
 
-            // 2. 수동 토글 버튼 클릭 이벤트
+            // 2. 버튼 클릭 수동 제어
             musicBtn.onclick = (e) => {
-                e.stopPropagation(); // document 클릭 이벤트 전파 차단
+                e.stopPropagation();
                 if (bgm.muted || bgm.paused) {
                     bgm.muted = false;
                     bgm.play();
@@ -74,15 +64,15 @@
                 }
             };
 
-            // 3. 실시간 상태 저장 (1초 간격)
+            // 3. 상태 저장 (모바일 환경에 맞춰 1.5초 간격 조정)
             setInterval(() => {
-                if (bgm.currentTime > 0) {
+                if (!bgm.paused && bgm.currentTime > 0) {
                     sessionStorage.setItem('bgmTime', bgm.currentTime);
                 }
-            }, 1000);
+            }, 1500);
 
-            // 4. 페이지를 떠날 때 상태 확실히 저장
-            window.addEventListener('beforeunload', () => {
+            // 페이지 이탈 시 저장 (모바일은 pagehide가 더 신뢰도 높음)
+            window.addEventListener('pagehide', () => {
                 sessionStorage.setItem('bgmTime', bgm.currentTime);
                 sessionStorage.setItem('bgmMuted', bgm.muted);
             });
