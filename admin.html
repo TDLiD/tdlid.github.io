@@ -8,7 +8,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
         .cyber-border { border: 1px solid rgba(34, 211, 238, 0.2); }
-        body { background-color: #020617; font-family: 'Pretendard', sans-serif; display: none; }
+        /* display: none 제거하여 즉시 표시 */
+        body { background-color: #020617; font-family: 'Pretendard', sans-serif; }
         .text-xxs { font-size: 0.65rem; }
     </style>
 </head>
@@ -53,19 +54,6 @@
     </div>
 
     <script>
-        const ADMIN_PASSWORD = "tdlid_2026";
-
-        function checkAccess() {
-            const entry = prompt("관리자 비밀번호를 입력하세요:");
-            if (entry === ADMIN_PASSWORD) {
-                document.body.style.display = "block";
-                loadFirebaseData();
-            } else {
-                alert("접근 권한이 없습니다.");
-                window.location.href = "index.html";
-            }
-        }
-
         function loadFirebaseData() {
             const firebaseConfig = {
                 apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
@@ -135,7 +123,9 @@
                 });
             });
         }
-        window.onload = checkAccess;
+        
+        // 페이지 로드 시 바로 데이터 로딩 함수 실행
+        window.onload = loadFirebaseData;
     </script>
 </body>
 </html>
