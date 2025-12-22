@@ -12,6 +12,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* ===== [추가] 모바일 전용 헤더 대응 스타일 (기본 기능 유지) ===== */
+        #header-placeholder {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10001; /* 비디오보다 위로 */
+        }
+
+        /* 로고 텍스트가 메뉴 버튼을 가리지 않도록 자동 크기 조절 */
+        .animated-logo-text-m {
+            font-size: 3.8vw !important; 
+            white-space: nowrap;
+        }
+        @media (max-width: 380px) {
+            .animated-logo-text-m { font-size: 11px !important; }
+        }
+
         /* ===== IMAGE MODAL ===== */
         #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; display: none; }
         #modalDetailImage { max-width: 95%; max-height: 80%; object-fit: contain; }
@@ -28,20 +46,20 @@
         .scanning-line { width: 100%; height: 2px; background: #22d3ee; position: absolute; top: 0; left: 0; box-shadow: 0 0 15px #22d3ee; animation: scan 2s linear infinite; }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        /* [수정] TDLiD 클릭 포인트 모바일 최적화 */
+        /* TDLiD 클릭 포인트 */
         #triggerWord { 
             color: inherit !important; 
             font-weight: inherit !important; 
             text-decoration: none !important; 
             cursor: pointer !important; 
-            display: inline-block; /* 터치 영역 확보 */
+            display: inline-block;
             position: relative; 
-            z-index: 50; /* hero-content보다 위로 배치 */
+            z-index: 50;
             -webkit-tap-highlight-color: transparent;
             pointer-events: auto !important;
         }
 
-        /* 히어로 섹션 모바일 최적화 */
+        /* 히어로 섹션 */
         .hero-section {
             position: relative;
             width: 100%;
@@ -50,6 +68,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1; /* 헤더보다 낮게 */
         }
 
         .video-bg-container {
@@ -171,7 +190,6 @@
 <div id="footer-placeholder"></div>
 
 <script>
-    // 1. PC 접속 시 리다이렉트
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     if (!isMobile) {
         let currentPage = window.location.pathname.split("/").pop();
@@ -180,22 +198,20 @@
         }
     }
 
-/** 1. 레이아웃 로드 **/
     async function loadLayout() {
         try {
-            const headerRes = await fetch('components/header.html');
+            /* [수정] 모바일 전용 헤더 호출로 변경 */
+            const headerRes = await fetch('components/header_m.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
             
-            const footerRes = await fetch('components/footer.html');
+            const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
 
-            // --- BGM 컴포넌트 로드 ---
             const bgmRes = await fetch('components/bgm.html');
             const bgmHTML = await bgmRes.text();
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
             bgmPlaceholder.innerHTML = bgmHTML;
 
-            // BGM 내부에 포함된 스크립트 실행
             const scripts = bgmPlaceholder.querySelectorAll("script");
             scripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
@@ -208,10 +224,11 @@
         } catch (err) { console.error(err); }
     }
 
-    // 3. 내비게이션
     function initNavigation() {
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
+        const menuIcon = document.getElementById("menuIcon");
+
         if (menuBtn && dropdown) {
             menuBtn.onclick = (e) => {
                 e.stopPropagation();
@@ -219,17 +236,17 @@
                 if (isHidden) {
                     dropdown.classList.remove("opacity-0", "invisible");
                     dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                    if(menuIcon) menuIcon.innerText = "✕";
                 } else {
                     dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
                     dropdown.classList.add("opacity-0", "invisible");
+                    if(menuIcon) menuIcon.innerText = "☰";
                 }
             };
         }
     }
 
-    // 4. 이스터 에그 트리거 (수정됨)
     function initEasterEggTriggers() {
-        // [1] TDLiD 텍스트 터치 대응
         const triggerWord = document.getElementById('triggerWord');
         if (triggerWord) {
             const handleEasterEgg = (e) => {
@@ -237,15 +254,12 @@
                 e.stopPropagation();
                 runScanAnimation();
             };
-            // 터치와 클릭 둘 다 이벤트 등록
             triggerWord.addEventListener('touchstart', handleEasterEgg, { passive: false });
             triggerWord.addEventListener('click', handleEasterEgg);
         }
 
-        // [2] 로고 5번 터치
         let touchCount = 0;
         let lastTouchTime = 0;
-        
         const checkLogo = () => {
             const logoImg = document.querySelector('header img');
             if (logoImg) {
@@ -265,37 +279,27 @@
         checkLogo();
     }
 
-    // 5. 스캔 애니메이션
     function runScanAnimation() {
         const overlay = document.getElementById('easterEggOverlay');
         const log = document.getElementById('statusLog');
         const staffImgs = document.querySelectorAll('.staff-img');
-        
         if (overlay.style.display === 'flex') return;
-
         overlay.style.display = 'flex';
         staffImgs.forEach(img => img.style.opacity = '0');
-        
         const msgs = ["Connecting to BMS...", "Scanning Cells...", "TDLiD Verified.", "Ray🧔", "Eza😎", "Rezy👨‍🦰", "Etno🧕"];
         msgs.forEach((msg, i) => {
             setTimeout(() => {
                 log.innerText = msg;
                 if (i === 3) staffImgs.forEach(img => img.style.opacity = '1');
                 if (i === msgs.length - 1) {
-                    setTimeout(() => { 
-                        overlay.style.display = 'none';
-                    }, 2000);
+                    setTimeout(() => { overlay.style.display = 'none'; }, 2000);
                 }
             }, i * 600);
         });
     }
 
-    // 초기화
     document.addEventListener("DOMContentLoaded", () => {
         loadLayout();
-
-
-        // 모달 제어 (이벤트 위임 방식으로 수정 권장하나 기존 유지)
         document.body.addEventListener('click', function(e) {
             const certLink = e.target.closest('.cert-link');
             if (certLink) {
@@ -306,13 +310,11 @@
                 document.body.style.overflow = 'hidden';
             }
         });
-
         document.getElementById('imageModal').onclick = function() {
             this.style.display = 'none';
             document.body.style.overflow = '';
         };
     });
-
     document.addEventListener('contextmenu', (e) => e.preventDefault());
 </script>
 </body>
