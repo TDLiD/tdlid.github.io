@@ -79,6 +79,8 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
+<div id="bgm-placeholder"></div>
+
 <div id="header-placeholder"></div>
 
 <main class="flex-grow pt-24 pb-12">
@@ -102,21 +104,40 @@
 <div id="footer-placeholder"></div>
 
 <script>
-    /**
-     * 1. 레이아웃 로드 및 메뉴 초기화
+  /**
+     * 1. 레이아웃 로드 및 메뉴 초기화 (BGM 포함)
      */
     async function loadLayout() {
         try {
+            // 헤더 로드
             const headerRes = await fetch('components/header_m.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+            
+            // 푸터 로드
             const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            
+            // --- BGM 추가 코드 시작 ---
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmHTML = await bgmRes.text();
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            bgmPlaceholder.innerHTML = bgmHTML;
+
+            // BGM 내부에 포함된 스크립트를 수동으로 추출하여 실행
+            const scripts = bgmPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+            // --- BGM 추가 코드 끝 ---
             
             initMenuToggle();
         } catch (err) {
             console.error("Layout load failed:", err);
         }
     }
+
 
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");

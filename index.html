@@ -113,7 +113,7 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
 
-<audio id="bgm" src="mp3/tdlid.mp3" autoplay loop muted></audio>
+<div id="bgm-placeholder"></div>
 
 <div id="easterEggOverlay">
     <div class="scanning-line"></div>
@@ -126,9 +126,7 @@
     </div>
 </div>
 
-<button id="musicToggleBtn" title="Play/Pause Music">
-    <span id="musicIconUI">🔇</span>
-</button>
+
 
 <div id="header-placeholder"></div>
 
@@ -201,18 +199,36 @@
 <div id="footer-placeholder"></div>
 
 <script>
-    /** 1. 레이아웃 로드 **/
-    async function loadLayout() {
-        try {
-            const headerRes = await fetch('components/header.html');
-            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-            const footerRes = await fetch('components/footer.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
 
-            initNavigation();
-            initEasterEggTriggers();
-        } catch (err) { console.error(err); }
-    }
+/** 1. 레이아웃 로드 **/
+async function loadLayout() {
+    try {
+        const headerRes = await fetch('components/header.html');
+        document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+        
+        const footerRes = await fetch('components/footer.html');
+        document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+        // --- BGM 추가 코드 시작 ---
+        const bgmRes = await fetch('components/bgm.html');
+        const bgmHTML = await bgmRes.text();
+        const bgmPlaceholder = document.getElementById('bgm-placeholder');
+        bgmPlaceholder.innerHTML = bgmHTML;
+
+        // BGM 내부에 포함된 스크립트를 수동으로 실행 (필요 시)
+        const scripts = bgmPlaceholder.querySelectorAll("script");
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            newScript.text = oldScript.text;
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        });
+        // --- BGM 추가 코드 끝 ---
+
+        initNavigation();
+        initEasterEggTriggers();
+    } catch (err) { console.error(err); }
+}
+
 
     /** 2. 내비게이션 (데스크톱 드롭다운 제어) **/
     function initNavigation() {
@@ -263,16 +279,6 @@
     /** 4. 초기화 및 공통 기능 **/
     document.addEventListener("DOMContentLoaded", () => {
         loadLayout();
-
-        const bgm = document.getElementById('bgm');
-        const musicBtn = document.getElementById('musicToggleBtn');
-        const musicIcon = document.getElementById('musicIconUI');
-        if (musicBtn && bgm) {
-            musicBtn.onclick = () => {
-                if (bgm.muted) { bgm.muted = false; bgm.play(); musicIcon.innerText = "🎵"; }
-                else { bgm.muted = true; musicIcon.innerText = "🔇"; }
-            };
-        }
 
         document.querySelectorAll('.cert-link').forEach(link => {
             link.onclick = (e) => {

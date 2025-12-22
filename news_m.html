@@ -48,6 +48,8 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
 
+<div id="bgm-placeholder"></div>
+
 <div id="header-placeholder"></div>
 
 <main class="pt-24 pb-12 px-5 min-h-screen">
@@ -72,8 +74,8 @@
 <div id="footer-placeholder"></div>
 
 <script>
-    /**
-     * 1. 레이아웃 로드 및 메뉴 초기화 (모바일 버전 header_m, footer_m 호출)
+  /**
+     * 1. 레이아웃 로드 및 메뉴 초기화 (BGM 포함)
      */
     async function loadLayout() {
         try {
@@ -83,11 +85,27 @@
             const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
+            // --- BGM 추가 코드 시작 ---
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmHTML = await bgmRes.text();
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            bgmPlaceholder.innerHTML = bgmHTML;
+
+            // BGM 내부에 포함된 스크립트를 수동으로 추출하여 실행
+            const scripts = bgmPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+            // --- BGM 추가 코드 끝 ---
+            
             initMenuToggle();
         } catch (err) {
             console.error("Layout load failed:", err);
         }
     }
+
 
     /**
      * 2. 모바일 메뉴 제어 로직

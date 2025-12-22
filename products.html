@@ -82,6 +82,8 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
+<div id="bgm-placeholder"></div>
+
 <script>
     document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
@@ -128,7 +130,9 @@
 <div id="footer-placeholder"></div>
 
 <script>
-    /**
+
+
+/**
      * 1. 레이아웃 Import 함수
      */
     async function loadLayout() {
@@ -140,6 +144,21 @@
             const footerRes = await fetch('components/footer.html');
             const footerHtml = await footerRes.text();
             document.getElementById('footer-placeholder').innerHTML = footerHtml;
+
+            // --- 추가된 BGM 로드 코드 시작 ---
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmHTML = await bgmRes.text();
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            bgmPlaceholder.innerHTML = bgmHTML;
+
+            // BGM 내부의 스크립트를 수동으로 추출하여 실행
+            const scripts = bgmPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+            // --- 추가된 BGM 로드 코드 끝 ---
 
             initMenuToggle();
         } catch (err) {

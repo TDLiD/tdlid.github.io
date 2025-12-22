@@ -99,6 +99,8 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
 
+<div id="bgm-placeholder"></div>
+
 <audio id="bgm" src="mp3/tdlid3.mp3" autoplay loop muted playsinline></audio>
 
 <button id="musicToggleBtn" title="Play/Pause Music">
@@ -161,22 +163,40 @@
 <div id="footer-placeholder"></div>
 
 <script>
-    async function loadLayout() {
+
+   async function loadLayout() {
         try {
+            // 헤더/푸터 로드
             const headerRes = await fetch('components/header_m.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-            
             const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            
+            // --- 2. BGM 공통 컴포넌트 적용 시작 ---
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmHTML = await bgmRes.text();
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            bgmPlaceholder.innerHTML = bgmHTML;
+
+            const scripts = bgmPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+            // --- BGM 공통 컴포넌트 적용 끝 ---
             
             initMenuToggle();
             initFormHandler();
             initEasterEgg(); 
-            initMusicPlayer(); // [추가] 음악 기능 초기화
+            // initMusicPlayer(); // <- 기존 개별 로직은 삭제합니다.
         } catch (err) {
             console.error("Layout load failed:", err);
         }
     }
+
+    // 3. 기존에 정의된 function initMusicPlayer() { ... } 블록 전체 삭제 (불필요)
+
 
     // [추가] 모바일 음악 플레이어 로직
     function initMusicPlayer() {

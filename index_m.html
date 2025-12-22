@@ -91,7 +91,7 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
 
-<audio id="bgm" src="mp3/tdlid.mp3" autoplay loop muted playsinline></audio>
+<div id="bgm-placeholder"></div>
 
 <div id="easterEggOverlay">
     <div class="scanning-line"></div>
@@ -102,10 +102,6 @@
         <img class="staff-img" src="images/easter_egg/staff-2.png" alt="Staff 2">
     </div>
 </div>
-
-<button id="musicToggleBtn">
-    <span id="musicIconUI" class="text-xl">🔇</span>
-</button>
 
 <div id="header-placeholder"></div>
 
@@ -184,17 +180,32 @@
         }
     }
 
-    // 2. 레이아웃 로드
+/** 1. 레이아웃 로드 **/
     async function loadLayout() {
         try {
-            const headerRes = await fetch('components/header_m.html');
+            const headerRes = await fetch('components/header.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-            const footerRes = await fetch('components/footer_m.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
+            const footerRes = await fetch('components/footer.html');
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+            // --- BGM 컴포넌트 로드 ---
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmHTML = await bgmRes.text();
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            bgmPlaceholder.innerHTML = bgmHTML;
+
+            // BGM 내부에 포함된 스크립트 실행
+            const scripts = bgmPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+
             initNavigation();
             initEasterEggTriggers();
-        } catch (err) { console.error("Layout load error:", err); }
+        } catch (err) { console.error(err); }
     }
 
     // 3. 내비게이션
@@ -283,13 +294,6 @@
     document.addEventListener("DOMContentLoaded", () => {
         loadLayout();
 
-        const bgm = document.getElementById('bgm');
-        const musicBtn = document.getElementById('musicToggleBtn');
-        const musicIcon = document.getElementById('musicIconUI');
-        musicBtn.onclick = () => {
-            if (bgm.muted) { bgm.muted = false; bgm.play(); musicIcon.innerText = "🎵"; }
-            else { bgm.muted = true; musicIcon.innerText = "🔇"; }
-        };
 
         // 모달 제어 (이벤트 위임 방식으로 수정 권장하나 기존 유지)
         document.body.addEventListener('click', function(e) {

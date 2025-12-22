@@ -118,6 +118,8 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
+<div id="bgm-placeholder"></div>
+
 <script>
     document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
@@ -173,17 +175,41 @@
 <div id="footer-placeholder"></div>
 
 <script>
+
+    /**
+     * 레이아웃 Import 함수 (수정본)
+     */
     async function loadLayout() {
         try {
+            // 헤더 로드
             const headerRes = await fetch('components/header.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+            
+            // 푸터 로드
             const footerRes = await fetch('components/footer.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+            // --- 추가: BGM 로드 코드 시작 ---
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmHTML = await bgmRes.text();
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            bgmPlaceholder.innerHTML = bgmHTML;
+
+            // 삽입된 HTML 내 스크립트 강제 실행
+            const scripts = bgmPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+            // --- 추가: BGM 로드 코드 끝 ---
+
             initMenuToggle();
         } catch (err) {
             console.error("Layout load failed:", err);
         }
     }
+
 
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");

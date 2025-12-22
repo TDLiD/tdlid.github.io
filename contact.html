@@ -121,15 +121,12 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] overflow-x-hidden">
 
+<div id="bgm-placeholder"></div>
+
 <script>
     document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
 
-<audio id="bgm" src="mp3/tdlid3.mp3" autoplay loop muted></audio>
-
-<button id="musicToggleBtn" title="Play/Pause Music">
-    <span id="musicIconUI">🔇</span>
-</button>
 
 <div id="easterEggOverlay">
     <div class="cyber-bg"></div>
@@ -187,42 +184,40 @@
 <div id="footer-placeholder"></div>
 
 <script>
-    async function loadLayout() {
+
+  async function loadLayout() {
         try {
+            // 헤더/푸터 로드
             const headerRes = await fetch('components/header.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
             
             const footerRes = await fetch('components/footer.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
+            // --- 추가: BGM 컴포넌트 로드 시작 ---
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmHTML = await bgmRes.text();
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            bgmPlaceholder.innerHTML = bgmHTML;
+
+            // 삽입된 HTML 내의 스크립트(음악 재생 로직)를 강제로 실행시킴
+            const scripts = bgmPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+            // --- 추가: BGM 컴포넌트 로드 끝 ---
+            
             initMenuToggle();
             initFormHandler();
             initEasterEgg(); 
-            initMusicPlayer(); // [추가] 음악 플레이어 초기화 호출
+            // initMusicPlayer(); // <-- 이 줄은 삭제하세요 (bgm.html 내부 스크립트가 대신 처리함)
         } catch (err) {
             console.error("Layout load failed:", err);
         }
     }
 
-    // [추가] 뮤직 플레이어 제어 함수
-    function initMusicPlayer() {
-        const bgm = document.getElementById('bgm');
-        const musicBtn = document.getElementById('musicToggleBtn');
-        const musicIcon = document.getElementById('musicIconUI');
-
-        if (musicBtn && bgm) {
-            musicBtn.onclick = () => {
-                if (bgm.muted) {
-                    bgm.muted = false;
-                    bgm.play().catch(e => console.log("Playback failed:", e));
-                    musicIcon.innerText = "🎵";
-                } else {
-                    bgm.muted = true;
-                    musicIcon.innerText = "🔇";
-                }
-            };
-        }
-    }
 
     // 기존 함수들 유지 (initMenuToggle, initEasterEgg, initFormHandler)
     function initMenuToggle() {
