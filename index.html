@@ -1,17 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"> 
+    <meta charset="UTF-8">
    <script>
     (function() {
         // 1. 기기 감지 수정 (iPad를 명시적으로 제외)
-        // User-Agent에서 iPad를 포함하지 않도록 체크하거나, 
-        // 포함되더라도 무시하도록 로직을 변경합니다.
         const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
         
-        // 최신 iPad는 Macintosh로 인식되는데, 이를 잡아내지 않으므로 
-        // 자연스럽게 PC 버전(index.html)에 머물게 됩니다.
-
         const urlParams = new URLSearchParams(window.location.search);
         const isPCMode = urlParams.get('view_mode') === 'pc';
 
@@ -58,9 +53,7 @@
         const visitData = {
           timestamp: now.getTime(),
           timeStr: now.toLocaleString(),
-          // 현재 파일명 추출 (예: index_m.html)
           page: window.location.pathname.split('/').pop() || 'index.html',
-          // 기기 구분 로직 강화
           device: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "Mobile" : "PC",
           referrer: document.referrer || "Direct"
         };
@@ -71,11 +64,8 @@
     }
   }
 
-  // 즉시 실행 (리다이렉트 직후 또는 페이지 로드 시)
   recordVisit();
 </script>
-
-
 
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -91,7 +81,7 @@
         #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; }
         #modalDetailImage { max-width: 90%; max-height: 90%; object-fit: contain; }
 
-        /* 드롭다운 스타일 (데스크톱 최적화) */
+        /* 드롭다운 스타일 */
         .dropdown-link { padding: 12px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; transition: all 0.2s; text-align: left; }
         .dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
         .dropdown-quote-btn { padding: 12px 20px; display: block; background: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; transition: background 0.2s; }
@@ -107,62 +97,20 @@
         .scanning-line { width: 100%; height: 2px; background: #22d3ee; position: absolute; top: 0; left: 0; box-shadow: 0 0 15px #22d3ee; animation: scan 1.5s linear infinite; }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        /* Staff 이미지 스타일 */
         .staff-img { 
-            width: 280px; 
-            height: auto; 
-            object-fit: cover; 
-            border-radius: 12px; 
-            border: 1px solid #22d3ee; 
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); 
-            opacity: 0; 
-            transition: opacity 1.5s ease-in-out; 
+            width: 280px; height: auto; object-fit: cover; border-radius: 12px; border: 1px solid #22d3ee; box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); opacity: 0; transition: opacity 1.5s ease-in-out; 
         }
 
         .staff-container { display: flex; gap: 30px; justify-content: center; flex-wrap: nowrap; }
 
-        /* TDLiD 클릭 포인트 스타일 (데스크톱 전용) */
         #triggerWord {
-            color: inherit !important;
-            font-weight: inherit !important;
-            text-decoration: none !important;
-            cursor: text !important; 
-            display: inline;
-            position: relative;
-            z-index: 9998;
-            pointer-events: auto !important;
+            color: inherit !important; font-weight: inherit !important; text-decoration: none !important; cursor: text !important; display: inline; position: relative; z-index: 9998; pointer-events: auto !important;
         }
 
-        #triggerWord:hover { color: inherit !important; text-shadow: none !important; }
-
-        /* 비디오 배경 섹션 (데스크톱 풀스크린 고정) */
-        .hero-section {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .video-bg-container {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; overflow: hidden;
-        }
-
-        .video-bg {
-            width: 100%; height: 100%; object-fit: cover;
-            filter: brightness(0.4) contrast(1.1); 
-        }
-
-        .video-overlay {
-            position: absolute; inset: 0;
-            background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
-            z-index: 1;
-        }
-
+        .hero-section { position: relative; width: 100%; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .video-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; }
+        .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4) contrast(1.1); }
+        .video-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%); z-index: 1; }
         .hero-content { position: relative; z-index: 10; }
     </style>
 </head>
@@ -175,14 +123,11 @@
     <div class="scanning-line"></div>
     <div class="text-3xl font-bold mb-8 animate-pulse">⚡⚡⚡ TDLiD SYSTEM SCANNING...</div>
     <div id="statusLog" class="text-xl text-neutral-400 mb-10">Initializing Security Protocol...</div>
-    
     <div class="staff-container">
         <img class="staff-img" src="images/easter_egg/staff.webp" alt="TDL Staff 1">
         <img class="staff-img" src="images/easter_egg/staff-2.webp" alt="TDL Staff 2">
     </div>
 </div>
-
-
 
 <div id="header-placeholder"></div>
 
@@ -255,28 +200,20 @@
 <div id="footer-placeholder"></div>
 
 <script>
-
 /** 1. 레이아웃 로드 **/
 async function loadLayout() {
     try {
-        // 헤더 로드
         const headerRes = await fetch('components/header.html');
-        const headerHTML = await headerRes.text();
-        document.getElementById('header-placeholder').innerHTML = headerHTML;
+        document.getElementById('header-placeholder').innerHTML = await headerRes.text();
 
-       
-        // 푸터 로드
         const footerRes = await fetch('components/footer.html');
         document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
 
-        // --- BGM 추가 코드 시작 ---
         const bgmRes = await fetch('components/bgm.html');
         const bgmHTML = await bgmRes.text();
         const bgmPlaceholder = document.getElementById('bgm-placeholder');
         if (bgmPlaceholder) {
             bgmPlaceholder.innerHTML = bgmHTML;
-
-            // BGM 내부에 포함된 스크립트를 수동으로 실행
             const scripts = bgmPlaceholder.querySelectorAll("script");
             scripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
@@ -284,18 +221,14 @@ async function loadLayout() {
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
         }
-        // --- BGM 추가 코드 끝 ---
 
-        // 기존 초기화 함수 실행
         if (typeof initNavigation === "function") initNavigation();
         if (typeof initEasterEggTriggers === "function") initEasterEggTriggers();
         
-    } catch (err) { 
-        console.error("Layout Load Error:", err); 
-    }
+    } catch (err) { console.error("Layout Load Error:", err); }
 }
 
-    /** 2. 내비게이션 (데스크톱 드롭다운 제어) **/
+    /** 2. 내비게이션 **/
     function initNavigation() {
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
@@ -366,47 +299,53 @@ async function loadLayout() {
         }
     });
 
-    // 키보드 입력 'tdlid'
+    // 키보드 입력 관리 (기존 tdlid + 새로운 admin 추가)
     let inputBuffer = "";
+    let adminBuffer = ""; // admin 전용 버퍼 추가
+
     document.addEventListener("keydown", (e) => {
-        inputBuffer += e.key.toLowerCase();
+        const key = e.key.toLowerCase();
+        
+        // 기존 tdlid 로직
+        inputBuffer += key;
         if (inputBuffer.length > 5) inputBuffer = inputBuffer.slice(-5);
         if (inputBuffer === "tdlid") { runScanAnimation(); inputBuffer = ""; }
+
+        // 신규 admin 이동 로직
+        adminBuffer += key;
+        if (adminBuffer.length > 5) adminBuffer = adminBuffer.slice(-5);
+        if (adminBuffer === "admin") {
+            window.location.href = "admin.html"; // admin.html로 즉시 이동
+            adminBuffer = "";
+        }
     });
 
-
-// 키보드 보안 (F12, Ctrl+Shift+I, Ctrl+U 등 차단)
-document.addEventListener('keydown', (e) => {
-    if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-        (e.ctrlKey && e.key === 'u')
-    ) {
-        e.preventDefault();
-        return false;
-    }
-});
-
+    // 보안 기능
+    document.addEventListener('keydown', (e) => {
+        if (
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+            (e.ctrlKey && e.key === 'u')
+        ) {
+            e.preventDefault();
+            return false;
+        }
+    });
 
     function runScanAnimation() {
         const overlay = document.getElementById('easterEggOverlay');
         const log = document.getElementById('statusLog');
         const staffImgs = document.querySelectorAll('.staff-img');
-        
         if(!overlay) return;
         overlay.style.display = 'flex';
         staffImgs.forEach(img => img.style.opacity = '0');
-        
         const msgs = ["System Scanning...", "Decrypting BMS...", "TDLiD Verified.", "Mr. Ray🧔", "Mr. Eza😎", "Mr. Rezy👨‍🦰", "Miss. Etno🧕"];
         msgs.forEach((msg, i) => {
             setTimeout(() => {
                 log.innerText = msg;
                 if (i === 4) staffImgs.forEach(img => img.style.opacity = '1');
                 if (i === msgs.length - 1) {
-                    setTimeout(() => { 
-                        overlay.style.display = 'none'; 
-                        // alert("Access Granted!"); 
-                    }, 1500);
+                    setTimeout(() => { overlay.style.display = 'none'; }, 1500);
                 }
             }, i * 700);
         });
@@ -414,42 +353,32 @@ document.addEventListener('keydown', (e) => {
 
 async function recordVisit() {
     try {
-        // 위치 및 IP 정보 가져오기
         let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
         try {
             const response = await fetch('https://ipapi.co/json/');
             const data = await response.json();
-            geoData = {
-                ip: data.ip,
-                country: data.country_name,
-                city: data.city
-            };
+            geoData = { ip: data.ip, country: data.country_name, city: data.city };
         } catch (e) { console.error("Geo API Error:", e); }
 
         const ua = navigator.userAgent;
         const now = new Date();
-        
         const visitData = {
             timestamp: now.getTime(),
             timeStr: now.toLocaleString(),
             page: window.location.pathname.split('/').pop() || 'index.html',
-            
-            // 상세 정보 수집
             ip: geoData.ip,
             country: geoData.country,
             city: geoData.city,
             device: /iPhone|iPad|iPod|Android/i.test(ua) ? "Mobile" : "PC",
-            os: getOS(ua),           // OS 정보 추출
-            browser: getBrowser(ua), // 브라우저 정보 추출
-            sid: getSessionId(),     // 세션 ID (브라우저 종료 전까지 유지)
+            os: getOS(ua),
+            browser: getBrowser(ua),
+            sid: getSessionId(),
             referrer: document.referrer || "Direct"
         };
-        
         database.ref('visits').push(visitData);
     } catch(e) { console.error("History error:", e); }
 }
 
-// OS 추출기
 function getOS(ua) {
     if (ua.indexOf("Windows") !== -1) return "Windows";
     if (ua.indexOf("Mac") !== -1) return "macOS";
@@ -458,7 +387,6 @@ function getOS(ua) {
     return "Unknown";
 }
 
-// 브라우저 추출기
 function getBrowser(ua) {
     if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) return "Edge";
     if (ua.indexOf("Chrome") !== -1) return "Chrome";
@@ -467,7 +395,6 @@ function getBrowser(ua) {
     return "Others";
 }
 
-// 세션 ID 생성기
 function getSessionId() {
     if (!sessionStorage.getItem('session_id')) {
         sessionStorage.setItem('session_id', 's_' + Math.random().toString(36).substr(2, 9));
@@ -475,8 +402,7 @@ function getSessionId() {
     return sessionStorage.getItem('session_id');
 }
 
-
-    document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
+document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
 </script>
 </body>
 </html>
