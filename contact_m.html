@@ -18,34 +18,13 @@
         overflow-x: hidden;
     }
 
-    /* 입력창 및 선택창은 정상적으로 사용 가능하도록 설정 */
     input, textarea, select {
         user-select: auto !important;
         -webkit-user-select: auto !important;
-        font-size: 16px !important; /* iOS 자동 줌 방지 */
+        font-size: 16px !important;
     }
 
-    /* [추가] 모바일 뮤직 플레이어 컨트롤 */
-    #musicToggleBtn { 
-        position: fixed; 
-        bottom: 20px; 
-        right: 20px; 
-        z-index: 10005; 
-        width: 48px; /* 모바일 터치 최적화 크기 */
-        height: 48px; 
-        background: rgba(23, 23, 23, 0.85); 
-        border: 1px solid rgba(34, 211, 238, 0.4); 
-        border-radius: 50%; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        cursor: pointer; 
-        color: #22d3ee; 
-        backdrop-filter: blur(6px); 
-        -webkit-tap-highlight-color: transparent;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-
+    /* bgm_m.html에서 버튼 스타일을 가져오므로 여기서는 삭제하거나 유지해도 됨 */
     .contact-form-container {
         min-height: 100vh;
         display: flex;
@@ -59,11 +38,10 @@
         margin: 0 auto;
     }
 
-    /* 드롭다운 스타일 (모바일 최적화) */
     .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; }
     .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
 
-    /* 이스터 에그 스타일 (기존 유지) */
+    /* 이스터 에그 스타일 */
     #easterEggOverlay {
         position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
         z-index: 20000; display: none; flex-direction: column;
@@ -100,12 +78,6 @@
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
 
 <div id="bgm-placeholder"></div>
-
-<audio id="bgm" src="mp3/tdlid3.mp3" autoplay loop muted playsinline></audio>
-
-<button id="musicToggleBtn" title="Play/Pause Music">
-    <span id="musicIconUI">🔇</span>
-</button>
 
 <div id="easterEggOverlay">
     <div class="cyber-bg"></div>
@@ -163,60 +135,38 @@
 <div id="footer-placeholder"></div>
 
 <script>
-
-   async function loadLayout() {
+    async function loadLayout() {
         try {
-            // 헤더/푸터 로드
+            // 1. 헤더/푸터 로드
             const headerRes = await fetch('components/header_m.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
             const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
-            // --- 2. BGM 공통 컴포넌트 적용 시작 ---
+            // 2. BGM 공통 컴포넌트 적용 (bgm_m.html 호출)
             const bgmRes = await fetch('components/bgm_m.html');
             const bgmHTML = await bgmRes.text();
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
             bgmPlaceholder.innerHTML = bgmHTML;
 
+            // 스크립트 강제 실행
             const scripts = bgmPlaceholder.querySelectorAll("script");
             scripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
                 newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
-            // --- BGM 공통 컴포넌트 적용 끝 ---
             
             initMenuToggle();
             initFormHandler();
             initEasterEgg(); 
-            // initMusicPlayer(); // <- 기존 개별 로직은 삭제합니다.
         } catch (err) {
             console.error("Layout load failed:", err);
         }
     }
 
-    // 3. 기존에 정의된 function initMusicPlayer() { ... } 블록 전체 삭제 (불필요)
-
-
-    // [추가] 모바일 음악 플레이어 로직
-    function initMusicPlayer() {
-        const bgm = document.getElementById('bgm');
-        const musicBtn = document.getElementById('musicToggleBtn');
-        const musicIcon = document.getElementById('musicIconUI');
-
-        if (musicBtn && bgm) {
-            musicBtn.onclick = () => {
-                if (bgm.muted) {
-                    bgm.muted = false;
-                    bgm.play().catch(e => console.log("Mobile autoplay blocked:", e));
-                    musicIcon.innerText = "🎵";
-                } else {
-                    bgm.muted = true;
-                    musicIcon.innerText = "🔇";
-                }
-            };
-        }
-    }
+    // [중요] 중복되었던 오디오 태그와 버튼 관련 스크립트(initMusicPlayer)는 
+    // 이제 bgm_m.html이 담당하므로 여기서는 완전히 삭제되었습니다.
 
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
