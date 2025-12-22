@@ -176,9 +176,10 @@
 { 
     id: 'B', 
     title: 'B. Employee Ownership', 
-    desc: 'TDLID announced the &#39;Employee Ownership Program&#39; with GESITS and MOTORIZ on April 30, 2024.', 
+    desc: "TDLID announced the 'Employee Ownership Program' with GESITS and MOTORIZ on April 30, 2024.", 
     images: ['images/solutions/solution2.png', 'images/solutions/solution2-1.png'] 
 },
+
         { id: 'C', title: 'C. Lease and Rental', desc: 'TDLiD offers leasing and rental financing solutions to accelerate the adoption of electric motorcycles.', images: ['images/solutions/solution3.png', 'images/solutions/solution3-1.png'] },
         { id: 'D', title: 'D. Solar home charging', desc: 'TDLiD offers solar power generation systems that can be utilized by individual households and small businesses.', images: ['images/solutions/solution4.png', 'images/solutions/solution4-1.png'] },
         { id: 'E', title: 'E. Battery Recycling', desc: 'TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries.', images: ['images/solutions/solution5.png', 'images/solutions/solution5-1.png'] }
@@ -206,39 +207,36 @@
         document.body.appendChild(modal);
     }
 
-  function initSolutions() {
+function initSolutions() {
         const container = document.getElementById('solutionsContainer');
         container.innerHTML = solutionsData.map((s, idx) => `
             <div class="solution-card ${idx === currentIndex ? 'is-active' : ''}" data-index="${idx}">
-                <h4 class="text-xl font-bold mb-6 text-cyan-400">${s.title}</h4>
-                <div class="grid grid-cols-2 gap-3 mb-6">
+                <h4 class="text-2xl md:text-3xl font-bold mb-6 md:mb-10 text-cyan-400 text-center">${s.title}</h4>
+                <div class="grid md:grid-cols-2 gap-6 md:gap-10 mb-10">
                     ${s.images.map(img => `
                         <img src="${img}" 
-                             class="popup-trigger bg-neutral-900/50 cursor-pointer active:scale-95 transition" 
+                             class="popup-trigger w-full h-64 md:h-80 object-contain bg-neutral-800/20 rounded-2xl cursor-pointer hover:scale-105 transition-all duration-500 hover:rotate-1"
                              data-desc="${s.desc.replace(/"/g, '&quot;')}">
                     `).join('')}
                 </div>
-                <p class="text-sm text-neutral-400 leading-relaxed">${s.desc}</p>
+                <p class="text-lg md:text-xl text-neutral-300 text-center max-w-3xl mx-auto leading-relaxed font-light">${s.desc}</p>
             </div>
         `).join('');
         
         renderStack();
-        initSwipeEvents();
-        initPopupEvents(); // 생성 후 이벤트를 따로 걸어줍니다.
+        initPopupEvents(); // [추가] 팝업 이벤트 바인딩 호출
     }
 
-function initPopupEvents() {
-        // 모든 팝업 대상 이미지에 대해
+    // [추가] 팝업 이벤트를 따로 관리하여 따옴표 충돌 방지
+    function initPopupEvents() {
         document.querySelectorAll('.popup-trigger').forEach(img => {
-            // 클릭(및 터치) 이벤트 리스너 등록
-            img.addEventListener('click', function() {
-                const src = this.getAttribute('src');
-                const desc = this.getAttribute('data-desc');
-                openPopup(src, desc);
-            });
+            img.onclick = function() {
+                const imgSrc = this.getAttribute('src');
+                const detail = this.getAttribute('data-desc');
+                openPopup(imgSrc, detail);
+            };
         });
     }
-
 
     function renderStack() {
         const stackContainer = document.getElementById('stackContainer');
