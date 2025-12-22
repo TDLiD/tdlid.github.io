@@ -2,24 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script>
-        (function() {
-            // 1. 기기 감지 및 리다이렉트 (데스크톱 전용 페이지이므로 모바일 접근 시 즉시 이동)
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPCMode = urlParams.get('view_mode') === 'pc';
+   <script>
+    (function() {
+        // 1. 기기 감지 수정 (iPad를 명시적으로 제외)
+        // User-Agent에서 iPad를 포함하지 않도록 체크하거나, 
+        // 포함되더라도 무시하도록 로직을 변경합니다.
+        const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+        
+        // 최신 iPad는 Macintosh로 인식되는데, 이를 잡아내지 않으므로 
+        // 자연스럽게 PC 버전(index.html)에 머물게 됩니다.
 
-            if (isMobile && !isPCMode) {
-                let path = window.location.pathname;
-                let page = path.split("/").pop();
-                if (page === "" || page === "index.html") {
-                    window.location.href = "index_m.html";
-                } else if (page.endsWith(".html") && !page.includes("_m.html")) {
-                    window.location.href = page.replace(".html", "_m.html");
-                }
+        const urlParams = new URLSearchParams(window.location.search);
+        const isPCMode = urlParams.get('view_mode') === 'pc';
+
+        // 2. 리다이렉트 실행 (아이폰, 안드로이드 폰만 해당)
+        if (isMobileOnly && !isPCMode) {
+            let path = window.location.pathname;
+            let page = path.split("/").pop();
+            
+            if (page === "" || page === "index.html") {
+                window.location.href = "index_m.html";
+            } else if (page.endsWith(".html") && !page.includes("_m.html")) {
+                window.location.href = page.replace(".html", "_m.html");
             }
-        })();
-    </script>
+        }
+    })();
+</script>
 
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
