@@ -264,29 +264,7 @@ async function loadLayout() {
         const headerHTML = await headerRes.text();
         document.getElementById('header-placeholder').innerHTML = headerHTML;
 
-        // --- [테스트용] Admin 탭 추가 코드 시작 ---
-        const navContainer = document.querySelector('#header-placeholder nav div.flex.items-center.gap-8');
-        const mobileNav = document.getElementById('mobile-nav');
-
-        if (navContainer) {
-            // 데스크톱 메뉴 끝에 Admin 추가
-            const adminLink = document.createElement('a');
-            adminLink.href = 'admin.html';
-            adminLink.className = 'text-sm font-medium text-neutral-400 hover:text-cyan-400 transition-colors';
-            adminLink.innerText = 'Admin';
-            navContainer.appendChild(adminLink);
-        }
-
-        if (mobileNav) {
-            // 모바일 드롭다운 메뉴 끝에 Admin 추가
-            const adminLinkM = document.createElement('a');
-            adminLinkM.href = 'admin.html';
-            adminLinkM.className = 'nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-200 font-bold';
-            adminLinkM.innerText = 'Admin';
-            mobileNav.appendChild(adminLinkM);
-        }
-        // --- Admin 탭 추가 코드 끝 ---
-
+       
         // 푸터 로드
         const footerRes = await fetch('components/footer.html');
         document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
