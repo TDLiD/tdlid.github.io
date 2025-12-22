@@ -5,13 +5,11 @@
         backdrop-filter: blur(15px) saturate(180%);
         -webkit-backdrop-filter: blur(15px) saturate(180%);
         
-        /* 핵심: 좌우 테두리는 없애고 위아래만 강조 */
         border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-bottom: 1px solid rgba(34, 211, 238, 0.2) !important;
         border-left: none !important;
         border-right: none !important;
         
-        /* 그림자는 상하로만 퍼지게 조절 */
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
         transition: all 0.3s ease;
     }
@@ -30,7 +28,7 @@
         opacity: 0.7;
     }
 
-    /* 로고 애니메이션 유지 */
+    /* 로고 애니메이션 */
     .animated-logo-text {
         letter-spacing: 0.15em;
         background: linear-gradient(90deg, #fff, #22d3ee, #fff);
@@ -41,7 +39,7 @@
     }
     @keyframes shine { to { background-position: 200% center; } }
 
-    /* 메뉴 링크 호버 3D 효과 */
+    /* 메뉴 링크 효과 */
     .nav-link {
         position: relative;
         color: #94a3b8;
@@ -56,19 +54,7 @@
         text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
     }
 
-    /* 활성화 표시 언더바 */
-    .nav-link.active-tab::after {
-        content: '';
-        position: absolute;
-        bottom: -4px;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: #22d3ee;
-        box-shadow: 0 0 8px #22d3ee;
-    }
-
-    /* 버튼 스타일 유지 */
+    /* 버튼 스타일 */
     .btn-neon {
         display: inline-flex !important;
         align-items: center;
@@ -86,30 +72,28 @@
         box-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
     }
 
-    /* 모바일 드롭다운 배경 가독성 (불투명) */
+    /* 모바일 드롭다운 스타일 */
     #dropdownMenu {
         background: rgba(15, 23, 42, 0.98) !important;
         border: 1px solid rgba(34, 211, 238, 0.3);
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
     }
 
-    /* 메뉴 버튼을 항상 보이도록 */
-    .lg\:hidden {
-        display: flex !important;
+    /* 모바일 전용 아이템 스타일 */
+    .nav-item-m {
+        transition: all 0.2s;
+        border: 1px solid transparent;
     }
-
-    @media (max-width: 1024px) {
-        #menuToggleBtn {
-            display: flex !important;
-        }
+    .nav-item-m:hover {
+        background: rgba(34, 211, 238, 0.1);
+        color: #22d3ee;
     }
 </style>
 
 <header class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-[10001] glass-header rounded-2xl px-6 py-3 flex justify-between items-center">
-
     <a href="index.html" class="flex items-center gap-3 shrink-0">
         <div class="relative">
-            <img src="images/logo/logo-s.webp" class="h-10 w-auto">
+            <img src="images/logo/logo-s.webp" class="h-10 w-auto" alt="Logo">
         </div>
         <div class="flex flex-col gap-1">
             <span class="animated-logo-text font-black text-[10px] md:text-xs tracking-[0.1em] pb-1 leading-normal">
@@ -129,7 +113,7 @@
             <li><a href="solutions.html" class="nav-link">Solutions</a></li>
             <li><a href="company.html" class="nav-link">Company</a></li>
             <li><a href="news.html" class="nav-link">News</a></li>
-            <li><a href="admin.html" class="nav-link text-cyan-500 hover:text-white">Admin</a></li>
+            <li><a href="admin.html" class="nav-link text-cyan-500/80">Admin</a></li>
         </ul>
     </nav>
 
@@ -140,24 +124,27 @@
     </div>
 
     <div class="flex items-center gap-3 lg:hidden">
-        <button id="menuToggleBtn" class="w-10 h-10 border border-cyan-500/50 rounded-xl flex flex-col items-center justify-center gap-1.5 flex-shrink-0">
-            <span class="w-5 h-0.5 bg-cyan-400 shadow-[0_0_5px_#22d3ee]"></span>
-            <span class="w-5 h-0.5 bg-cyan-400 shadow-[0_0_5px_#22d3ee]"></span>
-            <span class="w-5 h-0.5 bg-cyan-400 shadow-[0_0_5px_#22d3ee]"></span>
+        <button id="menuToggleBtn" class="w-10 h-10 border border-cyan-500/50 rounded-xl flex flex-col items-center justify-center gap-1.5 flex-shrink-0 transition-all active:scale-95">
+            <span id="menuIcon" class="text-cyan-400 text-xl font-bold">☰</span>
         </button>
     </div>
 
     <div id="dropdownMenu" class="absolute top-[calc(100%+15px)] right-0 w-64 rounded-2xl opacity-0 invisible -translate-y-5 transition-all duration-300 z-[10002] backdrop-blur-xl overflow-hidden">
-        <div id="mobile-nav" class="p-2 space-y-1">
-            <a href="index.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-200 font-bold">Home</a>
-            <a href="products.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-200 font-bold">Products</a>
-            <a href="technology.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-200 font-bold">Technology</a>
-            <a href="solutions.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-200 font-bold">Solutions</a>
-            <a href="company.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-200 font-bold">Company</a>
-            <a href="news.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-neutral-200 font-bold">News</a>
-            <a href="admin.html" class="nav-item-m flex items-center gap-3 p-4 rounded-xl text-cyan-400 font-bold border border-cyan-400/20">Admin</a>
+        <div id="mobile-nav-container" class="p-3 space-y-1">
+            <a href="index.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Home</a>
+            <a href="products.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Products</a>
+            <a href="technology.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Technology</a>
+            <a href="solutions.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Solutions</a>
+            <a href="company.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Company</a>
+            <a href="news.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">News</a>
+            
+            <div class="border-t border-white/5 my-2"></div>
+            <a href="admin.html" class="nav-item-m flex items-center p-3 rounded-xl text-cyan-400 font-bold text-sm">Admin Access</a>
+            
             <div class="pt-2">
-                <a href="contact.html" class="flex items-center justify-center p-4 rounded-xl bg-cyan-400 text-black font-black uppercase text-sm">Request Quote</a>
+                <a href="contact.html" class="flex items-center justify-center p-4 rounded-xl bg-cyan-400 text-black font-black uppercase text-xs tracking-tighter hover:bg-white transition-colors">
+                    Request Quote
+                </a>
             </div>
         </div>
     </div>
