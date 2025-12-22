@@ -2,13 +2,14 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>TDLiD Admin - Secure Access</title>
+    <title>TDLiD Admin - Analytics Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
         .cyber-border { border: 1px solid rgba(34, 211, 238, 0.2); }
-        body { background-color: #020617; font-family: 'Pretendard', sans-serif; display: none; } /* 초기엔 화면 숨김 */
+        body { background-color: #020617; font-family: 'Pretendard', sans-serif; display: none; }
+        .text-xxs { font-size: 0.65rem; }
     </style>
 </head>
 <body class="text-neutral-200 p-5 md:p-10" id="adminBody">
@@ -16,53 +17,55 @@
     <div class="max-w-7xl mx-auto">
         <header class="flex justify-between items-center mb-10 border-b border-cyan-900/50 pb-6">
             <div>
-                <h1 class="text-3xl font-bold text-cyan-400 tracking-tighter">Visitor Analytics</h1>
-                <p class="text-neutral-500 text-sm mt-1">Authorized Personnel Only</p>
+                <h1 class="text-3xl font-bold text-cyan-400 tracking-tighter italic">VISITOR ANALYTICS</h1>
+                <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">Enhanced Tracking System Active</p>
             </div>
-            <button onclick="location.reload()" class="px-4 py-2 bg-cyan-900/30 border border-cyan-500/50 text-cyan-400 rounded-lg hover:bg-cyan-500 hover:text-black transition">Refresh</button>
+            <button onclick="location.reload()" class="px-4 py-2 bg-cyan-900/30 border border-cyan-500/50 text-cyan-400 rounded-lg hover:bg-cyan-500 hover:text-black transition font-bold">REFRESH</button>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
             <div class="bg-neutral-900/50 p-6 rounded-2xl cyber-border">
-                <p class="text-neutral-500 text-xs font-bold tracking-widest uppercase">Total Visits</p>
-                <h2 id="totalCount" class="text-4xl font-bold text-white mt-2">0</h2>
+                <p class="text-neutral-500 text-xs font-bold tracking-widest uppercase text-cyan-500/70">Unique Visitors</p>
+                <h2 id="uniqueCount" class="text-4xl font-bold text-white mt-2 font-mono">0</h2>
+            </div>
+            <div class="bg-neutral-900/50 p-6 rounded-2xl cyber-border border-dashed">
+                <p class="text-neutral-500 text-xs font-bold tracking-widest uppercase">Total Hits</p>
+                <h2 id="totalCount" class="text-2xl font-bold text-cyan-600 mt-2 font-mono">0</h2>
             </div>
         </div>
 
-        <div class="bg-neutral-900/80 rounded-2xl cyber-border overflow-hidden">
+        <div class="bg-neutral-900/80 rounded-2xl cyber-border overflow-hidden shadow-2xl">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
-                        <tr class="bg-cyan-950/40 text-cyan-300 text-xs uppercase tracking-widest">
-                            <th class="p-5">Time / IP</th>
-                            <th class="p-5">Location</th>
-                            <th class="p-5">Page</th>
-                            <th class="p-5">Device</th>
-                            <th class="p-5">Referrer</th>
+                        <tr class="bg-cyan-950/40 text-cyan-300 text-[10px] uppercase tracking-[0.2em]">
+                            <th class="p-5 border-r border-white/5 text-center">Hits</th>
+                            <th class="p-5">Latest Access / IP</th>
+                            <th class="p-5">Location / Session</th>
+                            <th class="p-5 text-center">OS & Browser</th>
+                            <th class="p-5">Current Page / Referrer</th>
                         </tr>
                     </thead>
-                    <tbody id="visitTableBody" class="divide-y divide-neutral-800 text-sm"></tbody>
+                    <tbody id="visitTableBody" class="divide-y divide-neutral-800 text-sm italic"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        // ======= 1. 보안 설정 (비밀번호) =======
-        const ADMIN_PASSWORD = "tdlid_2026"; // <--- 사용할 비밀번호를 여기서 수정하세요!
+        const ADMIN_PASSWORD = "tdlid_2026";
 
         function checkAccess() {
             const entry = prompt("관리자 비밀번호를 입력하세요:");
             if (entry === ADMIN_PASSWORD) {
-                document.body.style.display = "block"; // 비밀번호 일치 시 화면 표시
+                document.body.style.display = "block";
                 loadFirebaseData();
             } else {
                 alert("접근 권한이 없습니다.");
-                window.location.href = "index.html"; // 메인으로 리다이렉트
+                window.location.href = "index.html";
             }
         }
 
-        // ======= 2. Firebase 데이터 로드 =======
         function loadFirebaseData() {
             const firebaseConfig = {
                 apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
@@ -74,39 +77,64 @@
                 appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
             };
 
-            firebase.initializeApp(firebaseConfig);
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
             const database = firebase.database();
             const tableBody = document.getElementById('visitTableBody');
             const totalCountEl = document.getElementById('totalCount');
+            const uniqueCountEl = document.getElementById('uniqueCount');
 
-            database.ref('visits').orderByChild('timestamp').limitToLast(100).on('value', (snapshot) => {
+            database.ref('visits').orderByChild('timestamp').on('value', (snapshot) => {
                 tableBody.innerHTML = '';
-                let data = [];
-                snapshot.forEach((childSnapshot) => {
-                    data.unshift(childSnapshot.val()); 
+                let rawData = [];
+                snapshot.forEach((child) => { rawData.push(child.val()); });
+                rawData.reverse();
+
+                const groupedData = {};
+                rawData.forEach((visit) => {
+                    const groupKey = `${visit.ip || 'unknown'}_${visit.device}`;
+                    if (!groupedData[groupKey]) {
+                        groupedData[groupKey] = { ...visit, count: 1 };
+                    } else {
+                        groupedData[groupKey].count += 1;
+                    }
                 });
 
-                totalCountEl.innerText = snapshot.numChildren();
+                const displayData = Object.values(groupedData);
+                totalCountEl.innerText = rawData.length;
+                uniqueCountEl.innerText = displayData.length;
 
-                data.forEach((visit) => {
+                displayData.forEach((visit) => {
                     const row = `
-                        <tr class="hover:bg-white/5 transition">
-                            <td class="p-5 text-neutral-400">
-                                <div class="font-mono text-xs">${visit.timeStr}</div>
-                                <div class="text-cyan-600 text-[11px] font-bold mt-1">${visit.ip || '0.0.0.0'}</div>
+                        <tr class="hover:bg-cyan-400/5 transition-colors">
+                            <td class="p-5 text-center border-r border-white/5">
+                                <span class="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-xs font-bold ring-1 ring-cyan-500/30">
+                                    ${visit.count}
+                                </span>
                             </td>
-                            <td class="p-5 text-white font-medium">${visit.country || 'Unknown'} (${visit.city || '-'})</td>
-                            <td class="p-5 font-bold text-cyan-400">${visit.page}</td>
-                            <td class="p-5"><span class="px-2 py-1 rounded text-[10px] bg-blue-900/30 text-blue-400">${visit.device}</span></td>
-                            <td class="p-5 text-neutral-500 italic text-xs truncate max-w-[150px]">${visit.referrer}</td>
+                            <td class="p-5">
+                                <div class="text-neutral-400 text-xs font-mono">${visit.timeStr}</div>
+                                <div class="text-cyan-500 text-sm font-black mt-1 tracking-wider">${visit.ip || '0.0.0.0'}</div>
+                            </td>
+                            <td class="p-5">
+                                <div class="text-white font-bold">${visit.country || 'Unknown'} (${visit.city || '-'})</div>
+                                <div class="text-neutral-600 text-[10px] font-mono mt-1 uppercase tracking-tighter">ID: ${visit.sid || 'No Session'}</div>
+                            </td>
+                            <td class="p-5 text-center">
+                                <div class="flex flex-col gap-1 items-center">
+                                    <span class="px-2 py-1 rounded text-xxs bg-neutral-800 text-neutral-300 border border-neutral-700 w-20">${visit.os || 'Unknown OS'}</span>
+                                    <span class="px-2 py-1 rounded text-xxs bg-blue-900/30 text-blue-400 border border-blue-500/20 w-20">${visit.browser || 'Unknown'}</span>
+                                </div>
+                            </td>
+                            <td class="p-5">
+                                <div class="font-bold text-cyan-400 text-xs uppercase">${visit.page}</div>
+                                <div class="text-neutral-600 italic text-[10px] truncate max-w-[180px] mt-1">${visit.referrer || 'Direct'}</div>
+                            </td>
                         </tr>
                     `;
                     tableBody.innerHTML += row;
                 });
             });
         }
-
-        // 페이지 로드 시 즉시 보안 체크 실행
         window.onload = checkAccess;
     </script>
 </body>

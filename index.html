@@ -434,10 +434,9 @@ document.addEventListener('keydown', (e) => {
         });
     }
 
-// 3. 접속 기록 함수 (국가/IP 정보 추가 버전)
 async function recordVisit() {
     try {
-        // 위치 및 IP 정보 가져오기 (무료 API 사용)
+        // 위치 및 IP 정보 가져오기
         let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
         try {
             const response = await fetch('https://ipapi.co/json/');
@@ -449,18 +448,22 @@ async function recordVisit() {
             };
         } catch (e) { console.error("Geo API Error:", e); }
 
+        const ua = navigator.userAgent;
         const now = new Date();
+        
         const visitData = {
             timestamp: now.getTime(),
             timeStr: now.toLocaleString(),
             page: window.location.pathname.split('/').pop() || 'index.html',
             
-            // 상세 정보
+            // 상세 정보 수집
             ip: geoData.ip,
             country: geoData.country,
             city: geoData.city,
-            device: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "Mobile" : "PC",
-            os: navigator.platform, // OS 정보
+            device: /iPhone|iPad|iPod|Android/i.test(ua) ? "Mobile" : "PC",
+            os: getOS(ua),           // OS 정보 추출
+            browser: getBrowser(ua), // 브라우저 정보 추출
+            sid: getSessionId(),     // 세션 ID (브라우저 종료 전까지 유지)
             referrer: document.referrer || "Direct"
         };
         
@@ -468,33 +471,31 @@ async function recordVisit() {
     } catch(e) { console.error("History error:", e); }
 }
 
-// 간단한 OS 추출기
+// OS 추출기
 function getOS(ua) {
     if (ua.indexOf("Windows") !== -1) return "Windows";
     if (ua.indexOf("Mac") !== -1) return "macOS";
     if (ua.indexOf("Android") !== -1) return "Android";
-    if (ua.indexOf("iPhone") !== -1) return "iOS";
+    if (ua.indexOf("iPhone") !== -1 || ua.indexOf("iPad") !== -1) return "iOS";
     return "Unknown";
 }
 
-// 간단한 브라우저 추출기
+// 브라우저 추출기
 function getBrowser(ua) {
+    if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) return "Edge";
     if (ua.indexOf("Chrome") !== -1) return "Chrome";
     if (ua.indexOf("Safari") !== -1) return "Safari";
     if (ua.indexOf("Firefox") !== -1) return "Firefox";
-    if (ua.indexOf("Edge") !== -1) return "Edge";
     return "Others";
 }
 
-
-// 브라우저를 닫기 전까지 유지되는 간단한 세션 ID 생성기
+// 세션 ID 생성기
 function getSessionId() {
     if (!sessionStorage.getItem('session_id')) {
-        sessionStorage.setItem('session_id', 'sess_' + Math.random().toString(36).substr(2, 9));
+        sessionStorage.setItem('session_id', 's_' + Math.random().toString(36).substr(2, 9));
     }
     return sessionStorage.getItem('session_id');
 }
-
 
 
     document.addEventListener('contextmenu', (e) => e.preventDefault(), false);

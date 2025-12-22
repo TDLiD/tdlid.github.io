@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
-        // 1. Firebase 설정 (index.html과 동일)
+        // 1. Firebase 설정
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -25,10 +25,33 @@
         }
         const database = firebase.database();
 
-        // 2. 접속 기록 함수 (상세 정보 수집 버전)
+        // 2. 상세 정보 수집을 위한 유틸리티 함수
+        function getOS(ua) {
+            if (ua.indexOf("Windows") !== -1) return "Windows";
+            if (ua.indexOf("Mac") !== -1) return "macOS";
+            if (ua.indexOf("Android") !== -1) return "Android";
+            if (ua.indexOf("iPhone") !== -1 || ua.indexOf("iPad") !== -1) return "iOS";
+            return "Unknown";
+        }
+
+        function getBrowser(ua) {
+            if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) return "Edge";
+            if (ua.indexOf("Chrome") !== -1) return "Chrome";
+            if (ua.indexOf("Safari") !== -1) return "Safari";
+            if (ua.indexOf("Firefox") !== -1) return "Firefox";
+            return "Others";
+        }
+
+        function getSessionId() {
+            if (!sessionStorage.getItem('session_id')) {
+                sessionStorage.setItem('session_id', 's_' + Math.random().toString(36).substr(2, 9));
+            }
+            return sessionStorage.getItem('session_id');
+        }
+
+        // 3. 접속 기록 함수 (상세 정보 수집 버전)
         async function recordVisit() {
             try {
-                // 위치 및 IP 정보 가져오기
                 let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
                 try {
                     const response = await fetch('https://ipapi.co/json/');
@@ -40,18 +63,21 @@
                     };
                 } catch (e) { console.error("Geo API Error:", e); }
 
+                const ua = navigator.userAgent;
                 const now = new Date();
                 const visitData = {
                     timestamp: now.getTime(),
                     timeStr: now.toLocaleString(),
                     page: window.location.pathname.split('/').pop() || 'index_m.html',
                     
-                    // 상세 정보
+                    // 상세 정보 추가
                     ip: geoData.ip,
                     country: geoData.country,
                     city: geoData.city,
-                    device: "Mobile", // 모바일 페이지이므로 고정 또는 감지
-                    os: navigator.platform, 
+                    device: "Mobile", 
+                    os: getOS(ua),           // 상세 OS 정보
+                    browser: getBrowser(ua), // 상세 브라우저 정보
+                    sid: getSessionId(),     // 세션 고유 ID
                     referrer: document.referrer || "Direct"
                 };
                 
@@ -62,7 +88,7 @@
         // 즉시 실행
         recordVisit();
 
-        // 3. 리다이렉트 로직 (기존 유지)
+        // 4. 리다이렉트 로직 (기존 유지)
         (function() {
             const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
             const urlParams = new URLSearchParams(window.location.search);
@@ -79,6 +105,7 @@
             }
         })();
     </script>
+
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
