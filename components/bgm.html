@@ -10,7 +10,7 @@
     #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
 </style>
 
-<audio id="bgm" src="mp3/tdlid.mp3" loop muted></audio>
+<audio id="bgm" src="mp3/tdlid.mp3" loop muted preload="auto"></audio>
 
 <button id="musicToggleBtn" title="Play/Pause Music">
     <span id="musicIconUI">🔇</span>
@@ -22,7 +22,43 @@
         const musicBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIconUI');
 
+        // 1. 초기 상태 설정 함수
+        const initBGM = () => {
+            const savedTime = sessionStorage.getItem('bgmTime');
+            const isMuted = sessionStorage.getItem('bgmMuted');
+
+            // 저장된 재생 위치 복원
+            if (savedTime) {
+                bgm.currentTime = parseFloat(savedTime);
+            }
+
+            // 음소거 상태 복원 (기본값은 muted=true)
+            if (isMuted === 'false') {
+                bgm.muted = false;
+                musicIcon.innerText = "🎵";
+                // 브라우저 정책상 첫 로드 시 자동재생이 막힐 수 있으므로 play() 시도
+                bgm.play().catch(() => {
+                    // 자동재생 차단 시 다시 음소거 상태로 UI 세팅
+                    bgm.muted = true;
+                    musicIcon.innerText = "🔇";
+                });
+            } else {
+                bgm.muted = true;
+                musicIcon.innerText = "🔇";
+            }
+        };
+
+        // 2. 상태 저장 함수 (재생 시간 실시간 기록)
+        const saveStatus = () => {
+            sessionStorage.setItem('bgmTime', bgm.currentTime);
+            sessionStorage.setItem('bgmMuted', bgm.muted);
+        };
+
         if (musicBtn && bgm) {
+            // 초기화 실행
+            initBGM();
+
+            // 클릭 이벤트
             musicBtn.onclick = () => {
                 if (bgm.muted) {
                     bgm.muted = false;
@@ -32,7 +68,14 @@
                     bgm.muted = true;
                     musicIcon.innerText = "🔇";
                 }
+                saveStatus();
             };
+
+            // 재생 중 주기적으로 시간 저장 (1초 간격)
+            setInterval(saveStatus, 1000);
+
+            // 페이지를 떠나기 직전에 최종 시간 저장
+            window.addEventListener('beforeunload', saveStatus);
         }
     })();
 </script>
