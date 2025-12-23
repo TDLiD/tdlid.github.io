@@ -19,16 +19,10 @@
         box-shadow: 0 0 20px #22d3ee, 0 0 40px #22d3ee;
     }
 
-    /* [수정] 관리자 트리거 스타일: 평상시엔 일반 텍스트처럼 보이게 함 */
-    .admin-trigger {
+    /* 관리자 트리거 스타일 삭제 및 일반 텍스트 설정 */
+    .footer-bottom-text {
         cursor: default;
         user-select: none;
-        transition: color 0.3s ease;
-    }
-    
-    /* Innovation 텍스트에 마우스를 올렸을 때 아주 미세하게 변화를 주고 싶다면 사용 (선택 사항) */
-    .admin-trigger:active {
-        color: #525252; 
     }
 
     .wa-contact-wrapper {
@@ -111,9 +105,9 @@
             
             <div class="hidden md:block w-1 h-1 rounded-full bg-cyan-500/30"></div>
             
-            <p class="text-[10px] text-neutral-600 uppercase tracking-[0.2em] font-light">
+            <p class="text-[10px] text-neutral-600 uppercase tracking-[0.2em] font-light footer-bottom-text">
                 No More Carbon <span class="text-cyan-900 mx-1">·</span> 
-                <span onclick="location.href='admin.html'" class="admin-trigger hover:text-neutral-500 transition-colors">Innovation</span> 
+                Innovation 
                 <span class="text-cyan-900 mx-1">·</span> Sustainability
             </p>
         </div>
