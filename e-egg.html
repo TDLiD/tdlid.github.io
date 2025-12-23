@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDLiD System Scanning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000; margin: 0; overflow: hidden; }
+        #easterEggOverlay { 
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.98); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            font-family: monospace; color: #22d3ee; padding: 20px; 
+        }
+        .scanning-line { 
+            width: 100%; height: 2px; background: #22d3ee; position: absolute; 
+            top: 0; left: 0; box-shadow: 0 0 15px #22d3ee; animation: scan 1.5s linear infinite; 
+        }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        .staff-img { 
+            width: 280px; height: auto; border-radius: 12px; border: 1px solid #22d3ee; 
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); opacity: 0; transition: opacity 1.5s ease-in-out; 
+        }
+        .staff-container { display: flex; gap: 30px; justify-content: center; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div id="easterEggOverlay">
+        <div class="scanning-line"></div>
+        <div class="text-3xl font-bold mb-8 animate-pulse text-center">⚡⚡⚡ TDLiD SYSTEM SCANNING...</div>
+        <div id="statusLog" class="text-xl text-neutral-400 mb-10 text-center">Initializing...</div>
+        <div class="staff-container">
+            <img class="staff-img" src="images/easter_egg/staff.webp" alt="Staff 1">
+            <img class="staff-img" src="images/easter_egg/staff-2.webp" alt="Staff 2">
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const log = document.getElementById('statusLog');
+            const staffImgs = document.querySelectorAll('.staff-img');
+            const msgs = ["System Scanning...", "Decrypting BMS...", "TDLiD Verified.", "Mr. Ray🧔", "Mr. Eza😎", "Mr. Rezy👨‍🦰", "Miss. Etno🧕"];
+            
+            msgs.forEach((msg, i) => {
+                setTimeout(() => {
+                    log.innerText = msg;
+                    if (i === 4) staffImgs.forEach(img => img.style.opacity = '1');
+                    if (i === msgs.length - 1) {
+                        setTimeout(() => {
+                            // 애니메이션 종료 후 이전 페이지로 돌아가거나 메인으로 이동
+                            if(document.referrer) window.history.back();
+                            else window.location.href = "index.html";
+                        }, 2000);
+                    }
+                }, i * 700);
+            });
+        };
+    </script>
+</body>
+</html>

@@ -14,7 +14,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
-        // 1. Firebase 설정 (contact.html과 동일하게 업데이트)
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -39,7 +38,7 @@
     input, textarea, select {
         user-select: auto !important;
         -webkit-user-select: auto !important;
-        font-size: 16px !important; /* 모바일 줌 방지 */
+        font-size: 16px !important; 
     }
 
     .contact-form-container {
@@ -55,37 +54,12 @@
         margin: 0 auto;
     }
 
-    /* 이스터 에그 스타일 */
-    #easterEggOverlay {
-        position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
-        z-index: 20000; display: none; flex-direction: column;
-        align-items: center; justify-content: center;
-        font-family: 'Courier New', monospace; overflow: hidden;
+    /* 이스터에그 트리거 스타일 (커서 변하지 않음) */
+    .stealth-link {
+        cursor: text !important;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
     }
-    .cyber-bg {
-        position: absolute; inset: 0;
-        background: linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
-        background-size: 20px 20px;
-        pointer-events: none;
-    }
-    .scanning-bar {
-        position: absolute; width: 100%; height: 3px;
-        background: linear-gradient(to right, transparent, #22d3ee, transparent);
-        box-shadow: 0 0 15px #22d3ee;
-        top: -10px; animation: cyberScan 2s linear infinite;
-    }
-    @keyframes cyberScan { 0% { top: -5%; } 100% { top: 105%; } }
-    .status-terminal {
-        background: rgba(0, 0, 0, 0.7);
-        padding: 1.5rem; border: 1px solid #22d3ee;
-        border-radius: 12px; box-shadow: 0 0 30px rgba(34, 211, 238, 0.3);
-        z-index: 20001; text-align: center; max-width: 85%;
-    }
-    .staff-container { display: flex; justify-content: center; align-items: center; margin-top: 20px; }
-    .staff-img { width: 100%; max-width: 180px; height: auto; border-radius: 8px; opacity: 0; transform: translateY(10px); transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .staff-img.reveal { opacity: 1; transform: translateY(0); box-shadow: 0 0 20px rgba(34, 211, 238, 0.5); }
-    .stealth-trigger { cursor: text !important; -webkit-tap-highlight-color: transparent; user-select: none; pointer-events: auto !important; }
 </style>
 </head>
 
@@ -93,27 +67,16 @@
 
 <div id="bgm-placeholder"></div>
 
-<div id="easterEggOverlay">
-    <div class="cyber-bg"></div>
-    <div class="scanning-bar"></div>
-    <div class="status-terminal">
-        <div class="text-cyan-400 text-xs mb-2 tracking-[0.2em]">SECURE ACCESS GRANTED</div>
-        <div id="statusLog" class="text-lg font-bold text-white mb-4">INITIALIZING...</div>
-        <div class="staff-container">
-            <img id="skullImg_m" class="staff-img" src="images/home/skull.webp" alt="TDL Admin">
-        </div>
-    </div>
-</div>
-
 <div id="header-placeholder"></div>
 
 <main class="pt-24 pb-12 px-5 contact-form-container">
     <div class="form-card bg-neutral-900/80 border border-neutral-800 p-6 rounded-2xl shadow-2xl relative">
         <h2 class="text-3xl font-bold tracking-tight hero-slogan-gradient mb-2">
-            Request a <span id="triggerWord" class="stealth-trigger">Quote</span>
+            Request a <span>Quote</span>
         </h2>
         <p class="text-sm text-neutral-400 mb-8 leading-relaxed">
-            Please provide details for a customized quotation. <span id="triggerWord2" class="stealth-trigger">Our</span> team will contact you shortly.
+            Please provide details for a customized quotation. 
+            <span id="triggerOur" class="stealth-link">Our</span> team will contact you shortly.
         </p>
 
         <form id="quoteForm" class="flex flex-col gap-4">
@@ -169,9 +132,19 @@
             
             initMenuToggle();
             initFormHandler();
-            initEasterEgg(); 
+            initEeggTrigger(); // 트리거 초기화
         } catch (err) {
             console.error("Layout load failed:", err);
+        }
+    }
+
+    // 모바일용 이스터에그 이동 함수
+    function initEeggTrigger() {
+        const trigger = document.getElementById('triggerOur');
+        if (trigger) {
+            trigger.onclick = () => {
+                window.location.href = 'e-egg.html';
+            };
         }
     }
 
@@ -203,49 +176,6 @@
         }
     }
 
-    function initEasterEgg() {
-        const t1 = document.getElementById('triggerWord');
-        const t2 = document.getElementById('triggerWord2');
-        const overlay = document.getElementById('easterEggOverlay');
-        const log = document.getElementById('statusLog');
-        const skullImg = document.getElementById('skullImg_m');
-
-        function runCyberEffect() {
-            if(overlay.style.display === 'flex') return;
-            overlay.style.display = 'flex';
-            
-            const msgs = [
-                "> ENCRYPTING...", 
-                "> BYPASSING...", 
-                "> ROOT ACCESS", 
-                "Welcome: TDLID Admin"
-            ];
-
-            msgs.forEach((msg, i) => {
-                setTimeout(() => {
-                    log.innerText = msg;
-                    if(i === 2) {
-                        skullImg.classList.add('reveal');
-                    }
-                    if(i === msgs.length - 1) {
-                        setTimeout(() => {
-                            overlay.style.opacity = '0';
-                            setTimeout(() => {
-                                overlay.style.display = 'none';
-                                overlay.style.opacity = '1';
-                                skullImg.classList.remove('reveal');
-                            }, 500);
-                        }, 2500);
-                    }
-                }, i * 700);
-            });
-        }
-
-        if(t1) t1.onclick = runCyberEffect;
-        if(t2) t2.onclick = runCyberEffect;
-    }
-
-    // 2. Firebase 저장 전 전용 핸들러 (PC 버전과 동일한 로직)
     function initFormHandler() {
         const form = document.getElementById('quoteForm');
         const formStatus = document.getElementById('formStatus');
@@ -253,13 +183,11 @@
         if(form) {
             form.onsubmit = async (e) => {
                 e.preventDefault();
-                
                 formStatus.textContent = 'Storing Request...';
                 formStatus.className = 'mt-4 text-center text-sm text-cyan-400';
                 
                 try {
                     const formData = new FormData(form);
-                    
                     const msgData = {
                         timestamp: Date.now(),
                         date: new Date().toLocaleString(),
@@ -271,17 +199,12 @@
                         read: false,
                         status: 'new'
                     };
-
-                    // Firebase DB 저장
                     await database.ref('messages').push(msgData);
-
                     formStatus.textContent = '✅ Submitted successfully!';
                     formStatus.className = 'mt-4 text-center text-sm text-green-500 font-bold';
                     form.reset();
-                    
                 } catch (error) {
-                    console.error("Database Error:", error);
-                    formStatus.textContent = '❌ Error saving data. Please try again.';
+                    formStatus.textContent = '❌ Error saving data.';
                     formStatus.className = 'mt-4 text-center text-sm text-red-500';
                 }
             };

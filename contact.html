@@ -51,6 +51,13 @@
         margin-bottom: 5rem;
     }
 
+    /* Our 텍스트 스타일: 커서가 변하지 않도록 cursor: text 부여 */
+    .stealth-link {
+        cursor: text !important;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
     #musicToggleBtn { 
         position: fixed; 
         bottom: 25px; 
@@ -70,42 +77,6 @@
         transition: all 0.3s; 
     }
     #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
-
-    /* 이스터 에그 관련 스타일 */
-    #easterEggOverlay {
-        position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
-        z-index: 20000; display: none; flex-direction: column;
-        align-items: center; justify-content: center;
-        font-family: 'Courier New', monospace; overflow: hidden;
-    }
-    .cyber-bg {
-        position: absolute; inset: 0;
-        background: linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
-        background-size: 30px 30px;
-        pointer-events: none;
-    }
-    .scanning-bar {
-        position: absolute; width: 100%; height: 4px;
-        background: linear-gradient(to right, transparent, #22d3ee, transparent);
-        box-shadow: 0 0 20px #22d3ee;
-        top: -10px; animation: cyberScan 2s linear infinite;
-    }
-    @keyframes cyberScan { 0% { top: -5%; } 100% { top: 105%; } }
-    .status-terminal {
-        background: rgba(0, 0, 0, 0.8);
-        padding: 3rem; border: 1px solid #22d3ee;
-        border-radius: 8px; box-shadow: 0 0 60px rgba(34, 211, 238, 0.3);
-        z-index: 20001; text-align: center; max-width: 800px;
-    }
-    .staff-container { display: flex; justify-content: center; margin-top: 40px; }
-    .staff-img {
-        width: 280px; height: auto; object-fit: cover; border-radius: 12px;
-        opacity: 0; transform: translateY(20px);
-        transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .staff-img.reveal { opacity: 1; transform: translateY(0); box-shadow: 0 0 30px rgba(34, 211, 238, 0.4); }
-    .stealth-trigger { cursor: text !important; text-decoration: none !important; pointer-events: auto !important; }
 </style>
 </head>
 
@@ -113,27 +84,16 @@
 
 <div id="bgm-placeholder"></div>
 
-<div id="easterEggOverlay">
-    <div class="cyber-bg"></div>
-    <div class="scanning-bar"></div>
-    <div class="status-terminal">
-        <div class="text-cyan-400 text-sm mb-2 tracking-[0.3em]">SECURE ACCESS GRANTED</div>
-        <div id="statusLog" class="text-3xl font-bold text-white mb-6">INITIALIZING...</div>
-        <div class="staff-container">
-            <img id="skullImg" class="staff-img" src="images/home/skull.webp" alt="TDL Admin">
-        </div>
-    </div>
-</div>
-
 <div id="header-placeholder"></div>
 
 <main class="px-6 contact-form-container">
     <div class="form-card bg-neutral-900 border border-neutral-800 p-12 rounded-3xl shadow-2xl relative">
         <h2 class="text-5xl font-black tracking-tight hero-slogan-gradient mb-4">
-            Request a <span id="triggerWord" class="stealth-trigger stealth-title">Quote</span>
+            Request a <span>Quote</span>
         </h2>
         <p class="text-neutral-400 text-lg mb-10">
-            Please provide details for a customized quotation. <span id="triggerWord2" class="stealth-trigger stealth-text">Our</span> team will contact you shortly.
+            Please provide details for a customized quotation. 
+            <span id="triggerOur" class="stealth-link">Our</span> team will contact you shortly.
         </p>
 
         <form id="quoteForm" class="grid gap-6">
@@ -171,7 +131,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
 <script>
-    // 2. Firebase 설정 및 초기화
+    // Firebase 및 기본 레이아웃 로직 (이전과 동일)
     const firebaseConfig = {
         apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
         authDomain: "tdlid-107669.firebaseapp.com",
@@ -189,10 +149,8 @@
         try {
             const headerRes = await fetch('components/header.html');
             document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-            
             const footerRes = await fetch('components/footer.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
-            
             const bgmRes = await fetch('components/bgm.html');
             const bgmHTML = await bgmRes.text();
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
@@ -206,10 +164,19 @@
             });
             
             initMenuToggle();
-            initFormHandler(); // Form 로직 실행
-            initEasterEgg(); 
+            initFormHandler(); 
+            initEeggTrigger();
         } catch (err) {
             console.error("Layout load failed:", err);
+        }
+    }
+
+    function initEeggTrigger() {
+        const trigger = document.getElementById('triggerOur');
+        if (trigger) {
+            trigger.onclick = () => {
+                window.location.href = 'e-egg.html';
+            };
         }
     }
 
@@ -217,7 +184,6 @@
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
         const menuIcon = document.getElementById("menuIcon");
-
         if (menuBtn && dropdown) {
             menuBtn.onclick = (e) => {
                 e.stopPropagation();
@@ -241,76 +207,16 @@
         }
     }
 
-    // 이스터에그 로직
-    function initEasterEgg() {
-        const t1 = document.getElementById('triggerWord');
-        const t2 = document.getElementById('triggerWord2');
-        const overlay = document.getElementById('easterEggOverlay');
-        const log = document.getElementById('statusLog');
-        const skullImg = document.getElementById('skullImg');
-
-        function runCyberEffect() {
-            if(overlay.style.display === 'flex') return;
-            overlay.style.display = 'flex';
-            
-            const msgs = [
-                "> ACCESSING ENCRYPTED CORE...",
-                "> BYPASSING FIREWALL...",
-                "> ROOT PRIVILEGE GRANTED",
-                "Welcome: TDLID Admin"
-            ];
-
-            msgs.forEach((msg, i) => {
-                setTimeout(() => {
-                    log.innerText = msg;
-                    if(i === 2) {
-                        skullImg.classList.add('reveal');
-                    }
-                    if(i === msgs.length - 1) {
-                        setTimeout(() => {
-                            overlay.style.opacity = '0';
-                            setTimeout(() => {
-                                overlay.style.display = 'none';
-                                overlay.style.opacity = '1';
-                                skullImg.classList.remove('reveal');
-                            }, 500);
-                        }, 2500);
-                    }
-                }, i * 800);
-            });
-        }
-
-        if(t1) t1.onclick = runCyberEffect;
-        if(t2) t2.onclick = runCyberEffect;
-
-        let inputStr = "";
-        document.onkeydown = (e) => {
-            inputStr += e.key.toLowerCase();
-            if(inputStr.includes("tdlid")) { 
-                runCyberEffect(); 
-                inputStr = ""; 
-            }
-            if(inputStr.length > 15) inputStr = inputStr.slice(-10);
-        };
-    }
-
-    // 3. 수정된 폼 핸들러 (이메일 제거 + Firebase 저장 전용)
     function initFormHandler() {
         const form = document.getElementById('quoteForm');
         const formStatus = document.getElementById('formStatus');
-        
         if(form) {
             form.onsubmit = async (e) => {
                 e.preventDefault();
-                
-                // 전송 중 상태 표시
                 formStatus.textContent = 'Storing Request...';
                 formStatus.className = 'mt-6 text-center text-lg text-cyan-400';
-                
                 try {
                     const formData = new FormData(form);
-                    
-                    // Firebase 저장용 객체 생성
                     const msgData = {
                         timestamp: Date.now(),
                         date: new Date().toLocaleString(),
@@ -319,21 +225,15 @@
                         phone: formData.get('phone') || 'N/A',
                         product: formData.get('product') || 'None Selected',
                         details: formData.get('details') || '',
-                        read: false, // 관리자 페이지용
+                        read: false,
                         status: 'new'
                     };
-
-                    // Firebase DB의 'messages' 경로에 데이터 저장
                     await database.ref('messages').push(msgData);
-
-                    // 성공 메시지 출력
                     formStatus.textContent = '✅ Submitted successfully!';
                     formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
-                    form.reset(); // 입력 폼 초기화
-                    
+                    form.reset();
                 } catch (error) {
-                    console.error("Database Error:", error);
-                    formStatus.textContent = '❌ Error saving data. Please try again.';
+                    formStatus.textContent = '❌ Error saving data.';
                     formStatus.className = 'mt-6 text-center text-lg text-red-500';
                 }
             };
