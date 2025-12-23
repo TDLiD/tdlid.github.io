@@ -1,60 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TDLiD System Scanning</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #000; margin: 0; overflow: hidden; }
-        #easterEggOverlay { 
-            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.98); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            font-family: monospace; color: #22d3ee; padding: 20px; 
-        }
-        .scanning-line { 
-            width: 100%; height: 2px; background: #22d3ee; position: absolute; 
-            top: 0; left: 0; box-shadow: 0 0 15px #22d3ee; animation: scan 1.5s linear infinite; 
-        }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-        .staff-img { 
-            width: 280px; height: auto; border-radius: 12px; border: 1px solid #22d3ee; 
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); opacity: 0; transition: opacity 1.5s ease-in-out; 
-        }
-        .staff-container { display: flex; gap: 30px; justify-content: center; margin-top: 20px; }
-    </style>
+<meta charset="UTF-8">
+<title>TDLiD // Secure Node</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+/* ===============================
+    GLOBAL
+================================ */
+body{
+    background:#000;
+    color:#22d3ee;
+    font-family:'Courier New', monospace;
+    overflow:hidden;
+}
+
+/* ===============================
+    BACKGROUND LAYERS
+================================ */
+.cyber-bg{
+    position:fixed; inset:0;
+    background:
+        linear-gradient(rgba(34,211,238,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34,211,238,.07) 1px, transparent 1px);
+    background-size:40px 40px;
+    animation:gridMove 4s linear infinite;
+    z-index:1;
+}
+
+@keyframes gridMove{
+    from{background-position:0 0}
+    to{background-position:40px 40px}
+}
+
+/* ===============================
+    SCARY SKULL ZOOM EFFECT
+================================ */
+.skull-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.skull-scare {
+    position: absolute;
+    width: 100px;
+    opacity: 0;
+    /* 원본 유지: 필터에서 invert 제거 */
+    filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.5));
+    animation: skullZoom 8s infinite;
+}
+
+/* 두 번째 해골: 다른 타이밍과 위치 */
+.skull-scare-2 {
+    position: absolute;
+    width: 80px;
+    opacity: 0;
+    animation: skullZoom 12s infinite;
+    animation-delay: 4s;
+}
+
+@keyframes skullZoom {
+    0% {
+        transform: scale(0.1) rotate(0deg);
+        opacity: 0;
+        filter: blur(10px) brightness(0);
+    }
+    20% {
+        opacity: 0.3;
+        filter: blur(5px) brightness(0.5);
+    }
+    50% {
+        opacity: 0.6;
+        filter: blur(2px) brightness(1);
+    }
+    80% {
+        transform: scale(5) rotate(15deg); /* 화면을 덮을 정도로 커짐 */
+        opacity: 0;
+        filter: blur(0px) brightness(2);
+    }
+    100% {
+        transform: scale(8) rotate(30deg);
+        opacity: 0;
+    }
+}
+
+.noise{
+    position:fixed; inset:0;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+    pointer-events:none;
+    z-index:3;
+}
+
+.vignette{
+    position:fixed; inset:0;
+    background:radial-gradient(circle,transparent 30%,rgba(0,0,0,.95) 100%);
+    z-index:4;
+}
+
+/* ===============================
+    SCAN LINE
+================================ */
+.scan{
+    position:absolute;
+    width:100%; height:3px;
+    background:linear-gradient(to right,transparent,#22d3ee,transparent);
+    box-shadow:0 0 40px #22d3ee;
+    animation:scan 2.8s linear infinite;
+    z-index: 15;
+}
+
+@keyframes scan{
+    from{top:-5%}
+    to{top:105%}
+}
+
+/* ===============================
+    TERMINAL TEXT
+================================ */
+.glitch{
+    position:relative;
+    animation:glitch .4s infinite;
+}
+
+@keyframes glitch{
+    0%{text-shadow:2px 0 #22d3ee,-2px 0 #f0f}
+    50%{text-shadow:-2px 0 #22d3ee,2px 0 #f0f}
+    100%{text-shadow:2px 0 #22d3ee,-2px 0 #f0f}
+}
+
+/* ===============================
+    IMAGES
+================================ */
+.staff-container{
+    display:flex;
+    gap:40px;
+    flex-wrap:wrap;
+    justify-content:center;
+    perspective:1400px;
+}
+
+.staff-img{
+    width:300px;
+    border:2px solid #22d3ee;
+    background:rgba(0,0,0,.6);
+    box-shadow:0 0 30px rgba(34,211,238,.4);
+    opacity:0;
+    transform:rotateX(55deg) translateY(80px);
+    transition:1.2s cubic-bezier(.2,1,.3,1);
+}
+
+.staff-img.reveal{
+    opacity:1;
+    transform:none;
+}
+
+.staff-img:hover{
+    box-shadow:0 0 60px rgba(34,211,238,.9);
+    transform:scale(1.05);
+}
+
+/* ===============================
+    BLINK CURSOR
+================================ */
+.cursor::after{
+    content:'▮';
+    animation:blink 1s steps(1) infinite;
+}
+
+@keyframes blink{
+    50%{opacity:0}
+}
+</style>
 </head>
+
 <body>
-    <div id="easterEggOverlay">
-        <div class="scanning-line"></div>
-        <div class="text-3xl font-bold mb-8 animate-pulse text-center">⚡⚡⚡ TDLiD SYSTEM SCANNING...</div>
-        <div id="statusLog" class="text-xl text-neutral-400 mb-10 text-center">Initializing...</div>
-        <div class="staff-container">
-            <img class="staff-img" src="images/easter_egg/staff.webp" alt="Staff 1">
-            <img class="staff-img" src="images/easter_egg/staff-2.webp" alt="Staff 2">
-        </div>
+<div class="cyber-bg"></div>
+
+<div class="skull-overlay">
+    <img src="images/logo/skull.webp" class="skull-scare">
+    <img src="images/logo/skull.webp" class="skull-scare-2" style="left: 20%; top: 30%;">
+</div>
+
+<div class="noise"></div>
+<div class="vignette"></div>
+
+<div class="relative z-10 h-screen flex flex-col items-center justify-center px-8">
+    <div class="scan"></div>
+
+    <div class="mb-8 border border-cyan-500 px-10 py-4 backdrop-blur bg-cyan-950/40">
+        <h1 class="text-4xl font-black tracking-widest glitch">
+            TDLiD SECURE TERMINAL
+        </h1>
     </div>
 
-    <script>
-        window.onload = function() {
-            const log = document.getElementById('statusLog');
-            const staffImgs = document.querySelectorAll('.staff-img');
-            const msgs = ["System Scanning...", "Decrypting BMS...", "TDLiD Verified.", "Mr. Ray🧔", "Mr. Eza😎", "Mr. Rezy👨‍🦰", "Miss. Etno🧕"];
-            
-            msgs.forEach((msg, i) => {
-                setTimeout(() => {
-                    log.innerText = msg;
-                    if (i === 4) staffImgs.forEach(img => img.style.opacity = '1');
-                    if (i === msgs.length - 1) {
-                        setTimeout(() => {
-                            // 애니메이션 종료 후 이전 페이지로 돌아가거나 메인으로 이동
-                            if(document.referrer) window.history.back();
-                            else window.location.href = "index.html";
-                        }, 2000);
-                    }
-                }, i * 700);
-            });
-        };
-    </script>
+    <div id="terminal" class="text-xl mb-10 cursor min-h-[32px]"></div>
+
+    <div class="staff-container">
+        <img class="staff-img" src="images/easter_egg/staff.webp">
+        <img class="staff-img" src="images/easter_egg/staff-2.webp">
+    </div>
+
+    <div class="absolute bottom-8 left-8 text-[11px] opacity-40 hidden lg:block">
+        CORE_TEMP: 31.8C<br>
+        BMS_STATE: OVERRIDE<br>
+        SIGNAL: CLEAN
+    </div>
+
+    <div class="absolute bottom-8 right-8 text-[11px] opacity-40 text-right hidden lg:block">
+        ENCRYPTION v4.0.2<br>
+        ACCESS LEVEL █████
+    </div>
+</div>
+
+<script>
+const terminal = document.getElementById("terminal");
+const imgs = document.querySelectorAll(".staff-img");
+
+const lines = [
+    "> BOOTING SECURE NODE...",
+    "> LINKING ENCRYPTED CHANNEL...",
+    "> RUNNING BIOMETRIC SCAN...",
+    "> IDENTITIES CONFIRMED:",
+    "RAY // AUTH OK",
+    "EZA // AUTH OK",
+    "REZY // AUTH OK",
+    "ETNO // AUTH OK",
+    "> ACCESS GRANTED"
+];
+
+let i = 0;
+
+function typeLine(text){
+    terminal.innerHTML = "";
+    let c = 0;
+    const t = setInterval(()=>{
+        terminal.innerHTML += text[c++];
+        if(c >= text.length){
+            clearInterval(t);
+        }
+    },30);
+}
+
+const seq = setInterval(()=>{
+    typeLine(lines[i]);
+    if(i === 4){
+        imgs.forEach((img,idx)=>{
+            setTimeout(()=>img.classList.add("reveal"), idx*500);
+        });
+    }
+    i++;
+    if(i >= lines.length){
+        clearInterval(seq);
+        setTimeout(()=>history.back(), 3500);
+    }
+},900);
+</script>
 </body>
 </html>
