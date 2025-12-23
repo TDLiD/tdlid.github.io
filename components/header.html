@@ -4,12 +4,8 @@
         background: rgba(2, 6, 23, 0.75) !important;
         backdrop-filter: blur(15px) saturate(180%);
         -webkit-backdrop-filter: blur(15px) saturate(180%);
-        
         border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-bottom: 1px solid rgba(34, 211, 238, 0.2) !important;
-        border-left: none !important;
-        border-right: none !important;
-        
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
         transition: all 0.3s ease;
     }
@@ -20,10 +16,7 @@
         bottom: -1px;
         left: 0;
         height: 2px;
-        background: linear-gradient(90deg, 
-            transparent 0%, 
-            rgba(34, 211, 238, 0.8) 50%, 
-            transparent 100%);
+        background: linear-gradient(90deg, transparent 0%, rgba(34, 211, 238, 0.8) 50%, transparent 100%);
         width: 100%;
         opacity: 0.7;
     }
@@ -39,15 +32,45 @@
     }
     @keyframes shine { to { background-position: 200% center; } }
 
-    /* 메뉴 링크 효과 */
+    /* --- 신규 추가: 메뉴 순차 등장 애니메이션 (멀리서 다가오는 효과) --- */
+    @keyframes zoomInEntrance {
+        from {
+            opacity: 0;
+            transform: scale(1.5) translateY(-10px); /* 멀리서(크게) 시작 */
+            filter: blur(5px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0); /* 정위치 */
+            filter: blur(0);
+        }
+    }
+
+    /* 초기 상태 숨김 처리 */
+    #main-nav li, .nav-btn-container {
+        opacity: 0;
+        animation: zoomInEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    /* 각 메뉴별 순차적 지연 시간 (0.1초씩 간격) */
+    #main-nav li:nth-child(1) { animation-delay: 0.1s; } /* Home */
+    #main-nav li:nth-child(2) { animation-delay: 0.2s; } /* Products */
+    #main-nav li:nth-child(3) { animation-delay: 0.3s; } /* Technology */
+    #main-nav li:nth-child(4) { animation-delay: 0.4s; } /* Solutions */
+    #main-nav li:nth-child(5) { animation-delay: 0.5s; } /* Company */
+    #main-nav li:nth-child(6) { animation-delay: 0.6s; } /* News */
+    #main-nav li:nth-child(7) { animation-delay: 0.7s; } /* Notice */
+    .nav-btn-container { animation-delay: 0.8s; }       /* Get a Quote */
+
+    /* 메뉴 링크 호버 효과 */
     .nav-link {
         position: relative;
         color: #94a3b8;
         transition: all 0.3s ease;
         padding: 4px 0;
         white-space: nowrap;
+        display: inline-block;
     }
-
     .nav-link:hover, .nav-link.active-tab {
         color: #22d3ee !important;
         transform: translateY(-2px);
@@ -65,29 +88,17 @@
         border: 1px solid rgba(34, 211, 238, 0.5);
         transition: all 0.3s ease;
     }
-    
     .btn-neon:hover {
         background: #22d3ee !important;
         color: #000 !important;
         box-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
     }
+    /* --------------------------------------------------- */
 
-    /* 모바일 드롭다운 스타일 */
-    #dropdownMenu {
-        background: rgba(15, 23, 42, 0.98) !important;
-        border: 1px solid rgba(34, 211, 238, 0.3);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-    }
-
-    /* 모바일 전용 아이템 스타일 */
-    .nav-item-m {
-        transition: all 0.2s;
-        border: 1px solid transparent;
-    }
-    .nav-item-m:hover {
-        background: rgba(34, 211, 238, 0.1);
-        color: #22d3ee;
-    }
+    /* 모바일 드롭다운 및 아이템 스타일 */
+    #dropdownMenu { background: rgba(15, 23, 42, 0.98) !important; border: 1px solid rgba(34, 211, 238, 0.3); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8); }
+    .nav-item-m { transition: all 0.2s; border: 1px solid transparent; }
+    .nav-item-m:hover { background: rgba(34, 211, 238, 0.1); color: #22d3ee; }
 </style>
 
 <header class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-[10001] glass-header rounded-2xl px-6 py-3 flex justify-between items-center">
@@ -96,12 +107,8 @@
             <img src="images/logo/logo-s.webp" class="h-10 w-auto" alt="Logo">
         </div>
         <div class="flex flex-col gap-1">
-            <span class="animated-logo-text font-black text-[10px] md:text-xs tracking-[0.1em] pb-1 leading-normal">
-                TDL ENERGY INDONESIA
-            </span>
-            <span class="text-[9px] text-neutral-500 font-bold uppercase leading-none">
-                Indonesia Division
-            </span>
+            <span class="animated-logo-text font-black text-[10px] md:text-xs tracking-[0.1em] pb-1 leading-normal">TDL ENERGY INDONESIA</span>
+            <span class="text-[9px] text-neutral-500 font-bold uppercase leading-none">Indonesia Division</span>
         </div>
     </a>
 
@@ -114,11 +121,10 @@
             <li><a href="company.html" class="nav-link">Company</a></li>
             <li><a href="news.html" class="nav-link">News</a></li>
             <li><a href="notice.html" class="nav-link">Notice</a></li> 
-
         </ul>
     </nav>
 
-    <div class="hidden lg:flex shrink-0">
+    <div class="hidden lg:flex shrink-0 nav-btn-container">
         <a href="contact.html" class="btn-neon rounded-xl text-cyan-400 font-bold text-[11px] uppercase">
             Get a Quote
         </a>
@@ -139,11 +145,8 @@
             <a href="company.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Company</a>
             <a href="news.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">News</a>
             <a href="notice.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm text-cyan-400">Notice</a> 
-            
             <div class="pt-2">
-                <a href="contact.html" class="flex items-center justify-center p-4 rounded-xl bg-cyan-400 text-black font-black uppercase text-xs tracking-tighter hover:bg-white transition-colors">
-                    Request Quote
-                </a>
+                <a href="contact.html" class="flex items-center justify-center p-4 rounded-xl bg-cyan-400 text-black font-black uppercase text-xs tracking-tighter hover:bg-white transition-colors">Request Quote</a>
             </div>
         </div>
     </div>
