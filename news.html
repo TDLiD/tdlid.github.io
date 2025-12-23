@@ -45,6 +45,7 @@
             border-radius: 0.75rem;
             transition: all 0.3s ease;
             margin-bottom: 0.5rem; 
+            overflow: hidden; /* 영역 밖 노출 방지 */
         }
         .news-list-item:hover {
             transform: translateY(-2px);
@@ -126,19 +127,19 @@
                 return `
                 <div class="news-list-item cursor-pointer" onclick="goToLink('${linkUrl}')">
                     <div class="flex flex-col md:flex-row md:items-center px-6 py-3 md:px-8 md:py-4 gap-2 md:gap-4">
-                        <div class="flex items-center flex-1 gap-3 md:gap-4 overflow-hidden">
-                            <span class="text-cyan-500 font-mono text-sm font-bold shrink-0">${displayNum}.</span>
-                            <h2 class="text-white font-bold text-base md:text-lg tracking-tight truncate">
+                        <div class="flex items-start md:items-center flex-1 gap-3 md:gap-4 overflow-hidden">
+                            <span class="text-cyan-500 font-mono text-sm font-bold shrink-0 mt-1 md:mt-0">${displayNum}.</span>
+                            <h2 class="text-white font-bold text-base md:text-lg tracking-tight leading-snug break-words">
                                 ${item.title}
                             </h2>
                         </div>
                         <div class="flex items-center justify-between md:justify-end gap-4 shrink-0 mt-2 md:mt-0 pt-2 md:pt-0 border-t border-white/5 md:border-none">
                             <div class="flex items-center gap-3">
-                                <span class="text-neutral-500 font-mono text-[10px] md:text-xs uppercase">${item.date}</span>
+                                <span class="text-neutral-500 font-mono text-[10px] md:text-xs uppercase whitespace-nowrap">${item.date}</span>
                                 <span class="text-neutral-700 text-[10px]">|</span>
                                 <span class="text-cyan-500/80 font-mono text-[10px] font-bold tracking-widest uppercase">News</span>
                             </div>
-                            <svg class="arrow-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="arrow-icon w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </div>
@@ -154,7 +155,6 @@
         try { window.open(targetUrl, '_blank'); } catch (e) { alert("Invalid Link."); }
     }
 
-    // [추가] 메뉴 토글 기능 정의
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
@@ -165,8 +165,8 @@
                 e.stopPropagation();
                 const isOpen = dropdown.classList.contains("opacity-100");
                 if (!isOpen) {
-                    dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
-                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.remove("opacity-0", "invisible", "-translate-y-2");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-0");
                     if(menuIcon) menuIcon.innerText = "✕";
                 } else {
                     closeMenu();
@@ -174,8 +174,8 @@
             };
 
             function closeMenu() {
-                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
+                dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
+                dropdown.classList.add("opacity-0", "invisible", "-translate-y-2");
                 if(menuIcon) menuIcon.innerText = "☰";
             }
 
@@ -198,14 +198,12 @@
             const bgmP = document.getElementById('bgm-placeholder');
             bgmP.innerHTML = await b.text();
             
-            // BGM 스크립트 실행
             bgmP.querySelectorAll("script").forEach(s => {
                 const ns = document.createElement("script");
                 ns.text = s.text;
                 document.body.appendChild(ns).parentNode.removeChild(ns);
             });
 
-            // 레이아웃 로드 완료 후 메뉴 핸들러 실행
             initMenuToggle();
         } catch (err) { console.error(err); }
     }
