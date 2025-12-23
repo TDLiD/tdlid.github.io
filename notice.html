@@ -65,7 +65,7 @@
         }
 
         .notice-item.active .notice-content {
-            max-height: 2000px;
+            max-height: 3000px; /* 이미지가 길 경우를 대비해 확장 */
             padding: 2rem;
             border-top: 1px solid rgba(6, 182, 212, 0.1);
         }
@@ -80,9 +80,19 @@
             color: #22d3ee;
         }
 
-        /* 텍스트 드래그 및 복사 허용 */
-        .notice-content div {
+        /* 공지사항 내부 콘텐츠 스타일 */
+        .notice-content-inner {
             user-select: text;
+            white-space: normal; /* HTML 태그(img 등)가 작동하도록 수정 */
+        }
+
+        /* 에디터 삽입 이미지 최적화 */
+        .notice-content-inner img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            display: block;
         }
     </style>
 </head>
@@ -114,6 +124,7 @@
     <div id="footer-placeholder"></div>
 
     <script>
+        // 레이아웃 로드
         async function loadLayout() {
             try {
                 const [h, f, b] = await Promise.all([
@@ -136,6 +147,7 @@
             }
         }
 
+        // 파이어베이스 설정
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -148,6 +160,7 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // 토글 함수
         function toggleNotice(element) {
             const item = element.closest('.notice-item');
             const isActive = item.classList.contains('active');
@@ -155,6 +168,7 @@
             if (!isActive) item.classList.add('active');
         }
 
+        // 데이터 실시간 수신 및 렌더링
         database.ref('notices').on('value', (snapshot) => {
             const noticeList = document.getElementById('noticeList');
             noticeList.innerHTML = '';
@@ -180,14 +194,12 @@
                 finalHtml += `
                 <div class="notice-item">
                     <div class="flex flex-col md:flex-row md:items-center px-6 py-5 md:px-8 md:py-7 cursor-pointer group gap-2 md:gap-4" onclick="toggleNotice(this)">
-                        
                         <div class="flex items-start md:items-center flex-1 gap-3 md:gap-4 overflow-hidden">
                             <span class="text-cyan-500 font-mono text-sm font-bold shrink-0 mt-0.5 md:mt-0">${displayNum}.</span>
                             <h2 class="text-white font-bold text-base md:text-lg tracking-tight leading-snug break-words overflow-hidden">
                                 ${notice.title}
                             </h2>
                         </div>
-                        
                         <div class="flex items-center justify-between md:justify-end gap-4 shrink-0 mt-2 md:mt-0 pt-2 md:pt-0 border-t border-white/5 md:border-none">
                             <div class="flex items-center gap-3">
                                 <span class="text-neutral-500 font-mono text-[10px] md:text-xs uppercase whitespace-nowrap">${notice.date}</span>
@@ -200,7 +212,7 @@
                         </div>
                     </div>
                     <div class="notice-content">
-                        <div class="text-neutral-300 text-[14px] md:text-[15px] leading-relaxed whitespace-pre-wrap border-l-2 border-cyan-500/30 pl-4 md:pl-6 py-2">
+                        <div class="notice-content-inner text-neutral-300 text-[14px] md:text-[15px] leading-relaxed border-l-2 border-cyan-500/30 pl-4 md:pl-6 py-2">
                             ${notice.content}
                         </div>
                     </div>
@@ -209,38 +221,33 @@
             noticeList.innerHTML = finalHtml;
         });
 
+        // 메뉴 토글 (공통)
         function initMenuToggle() {
             const menuBtn = document.getElementById("menuToggleBtn");
             const dropdown = document.getElementById("dropdownMenu");
             const menuIcon = document.getElementById("menuIcon");
 
             if (menuBtn && dropdown) {
-                menuBtn.addEventListener("click", (e) => {
+                menuBtn.onclick = (e) => {
                     e.stopPropagation();
                     const isOpen = dropdown.classList.contains("opacity-100");
                     if (!isOpen) {
-                        dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
-                        dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                        dropdown.classList.remove("opacity-0", "invisible", "-translate-y-2");
+                        dropdown.classList.add("opacity-100", "visible", "translate-y-0");
                         if(menuIcon) menuIcon.innerText = "✕";
-                        menuBtn.setAttribute("aria-expanded", "true");
                     } else {
                         closeMenu();
                     }
-                });
+                };
 
-                function closeMenu() {
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                    dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
+                const closeMenu = () => {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
+                    dropdown.classList.add("opacity-0", "invisible", "-translate-y-2");
                     if(menuIcon) menuIcon.innerText = "☰";
-                    menuBtn.setAttribute("aria-expanded", "false");
-                }
+                };
 
                 document.addEventListener("click", (e) => {
                     if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
-                });
-
-                document.addEventListener("keydown", (e) => {
-                    if (e.key === "Escape") closeMenu();
                 });
             }
         }
