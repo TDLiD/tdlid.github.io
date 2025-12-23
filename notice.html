@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <script>
+        (function() {
+            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPCMode = urlParams.get('view_mode') === 'pc';
+            if (isMobileOnly && !isPCMode) {
+                let path = window.location.pathname;
+                let page = path.split("/").pop();
+                if (page === "notice.html" || page === "") {
+                    // window.location.href = "notice_m.html";
+                }
+            }
+        })();
+    </script>
+
+    <title>Notice | TDL Energy Indonesia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #f5f5f5;
+            font-family: 'Pretendard', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .hero-slogan-gradient {
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .notice-item {
+            background-color: rgba(23, 23, 23, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .notice-item:hover {
+            transform: translateY(-4px);
+            border-color: rgba(6, 182, 212, 0.4);
+            background-color: rgba(23, 23, 23, 0.8);
+        }
+
+        .notice-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .notice-item.active .notice-content {
+            max-height: 2000px;
+            padding: 2rem;
+            border-top: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        .arrow-icon {
+            transition: transform 0.3s ease;
+            color: rgba(6, 182, 212, 0.5);
+        }
+
+        .notice-item.active .arrow-icon {
+            transform: rotate(180deg);
+            color: #22d3ee;
+        }
+
+        /* 텍스트 드래그 및 복사 허용 */
+        .notice-content div {
+            user-select: text;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+    <div id="bgm-placeholder"></div>
+    <div id="header-placeholder"></div>
+
+    <main class="pt-32 lg:pt-40 pb-20 px-6 flex-grow">
+        <div class="max-w-6xl mx-auto pt-10 px-4">
+            <h2 class="text-4xl md:text-5xl font-black tracking-wide hero-slogan-gradient mb-16 text-center italic uppercase">
+                Notice
+            </h2>
+
+            <div id="noticeList" class="flex flex-col gap-4">
+                <div class="text-center py-20 text-neutral-500 animate-pulse tracking-widest uppercase">
+                    Fetching All Data...
+                </div>
+            </div>
+
+            <div class="mt-20 text-center">
+                <a href="index.html" class="inline-block px-8 py-4 rounded-xl border border-neutral-700 hover:bg-neutral-800 hover:border-cyan-500/50 transition-all duration-300 text-lg">
+                    &larr; Back to Home
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        async function loadLayout() {
+            try {
+                const [h, f, b] = await Promise.all([
+                    fetch('components/header.html'),
+                    fetch('components/footer.html'),
+                    fetch('components/bgm.html')
+                ]);
+                document.getElementById('header-placeholder').innerHTML = await h.text();
+                document.getElementById('footer-placeholder').innerHTML = await f.text();
+                const bgmP = document.getElementById('bgm-placeholder');
+                bgmP.innerHTML = await b.text();
+                bgmP.querySelectorAll("script").forEach(s => {
+                    const ns = document.createElement("script");
+                    ns.text = s.text;
+                    document.body.appendChild(ns).parentNode.removeChild(ns);
+                });
+                if (typeof initMenuToggle === 'function') initMenuToggle();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+            authDomain: "tdlid-107669.firebaseapp.com",
+            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+            projectId: "tdlid-107669",
+            storageBucket: "tdlid-107669.firebasestorage.app",
+            messagingSenderId: "604782345004",
+            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function toggleNotice(element) {
+            const item = element.closest('.notice-item');
+            const isActive = item.classList.contains('active');
+            document.querySelectorAll('.notice-item').forEach(el => el.classList.remove('active'));
+            if (!isActive) item.classList.add('active');
+        }
+
+        database.ref('notices').on('value', (snapshot) => {
+            const noticeList = document.getElementById('noticeList');
+            noticeList.innerHTML = '';
+
+            if (!snapshot.exists()) {
+                noticeList.innerHTML = '<p class="text-center text-neutral-600 py-20">No notices registered.</p>';
+                return;
+            }
+
+            let notices = [];
+            snapshot.forEach((child) => {
+                const data = child.val();
+                notices.push(data);
+            });
+
+            notices.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            let finalHtml = '';
+            notices.forEach((notice, index) => {
+                const num = notices.length - index;
+                const displayNum = num < 10 ? '0' + num : num;
+
+                finalHtml += `
+                <div class="notice-item">
+                    <div class="flex flex-col md:flex-row md:items-center px-6 py-5 md:px-8 md:py-7 cursor-pointer group gap-2 md:gap-4" onclick="toggleNotice(this)">
+                        
+                        <div class="flex items-start md:items-center flex-1 gap-3 md:gap-4 overflow-hidden">
+                            <span class="text-cyan-500 font-mono text-sm font-bold shrink-0 mt-0.5 md:mt-0">${displayNum}.</span>
+                            <h2 class="text-white font-bold text-base md:text-lg tracking-tight leading-snug break-words overflow-hidden">
+                                ${notice.title}
+                            </h2>
+                        </div>
+                        
+                        <div class="flex items-center justify-between md:justify-end gap-4 shrink-0 mt-2 md:mt-0 pt-2 md:pt-0 border-t border-white/5 md:border-none">
+                            <div class="flex items-center gap-3">
+                                <span class="text-neutral-500 font-mono text-[10px] md:text-xs uppercase whitespace-nowrap">${notice.date}</span>
+                                <span class="text-neutral-700 text-[10px]">|</span>
+                                <span class="text-cyan-500/80 font-mono text-[10px] font-bold tracking-widest uppercase">Admin</span>
+                            </div>
+                            <svg class="arrow-icon w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="notice-content">
+                        <div class="text-neutral-300 text-[14px] md:text-[15px] leading-relaxed whitespace-pre-wrap border-l-2 border-cyan-500/30 pl-4 md:pl-6 py-2">
+                            ${notice.content}
+                        </div>
+                    </div>
+                </div>`;
+            });
+            noticeList.innerHTML = finalHtml;
+        });
+
+        function initMenuToggle() {
+            const menuBtn = document.getElementById("menuToggleBtn");
+            const dropdown = document.getElementById("dropdownMenu");
+            const menuIcon = document.getElementById("menuIcon");
+
+            if (menuBtn && dropdown) {
+                menuBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    const isOpen = dropdown.classList.contains("opacity-100");
+                    if (!isOpen) {
+                        dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
+                        dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                        if(menuIcon) menuIcon.innerText = "✕";
+                        menuBtn.setAttribute("aria-expanded", "true");
+                    } else {
+                        closeMenu();
+                    }
+                });
+
+                function closeMenu() {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
+                    if(menuIcon) menuIcon.innerText = "☰";
+                    menuBtn.setAttribute("aria-expanded", "false");
+                }
+
+                document.addEventListener("click", (e) => {
+                    if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
+                });
+
+                document.addEventListener("keydown", (e) => {
+                    if (e.key === "Escape") closeMenu();
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadLayout);
+    </script>
+</body>
+</html>

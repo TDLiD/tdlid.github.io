@@ -58,10 +58,10 @@
     body {
         overflow-x: hidden;
         /* min-width: 1280px; 제거 */
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+        -webkit-user-select: auto;
+        -moz-user-select: auto;
+        -ms-user-select: auto;
+        user-select: auto;
     }
 
     /* 뉴스 아이템 호버 효과 (js/news.js에서 생성되는 구조 대응) */
@@ -80,9 +80,6 @@
 
 <div id="bgm-placeholder"></div>
 
-<script>
-    document.addEventListener('contextmenu', e => e.preventDefault());
-</script>
 
 <div id="header-placeholder"></div>
 
@@ -186,13 +183,6 @@
     // 초기 실행
     document.addEventListener("DOMContentLoaded", loadLayout);
 
-    // 보안 설정
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'u')) {
-            e.preventDefault();
-            return false;
-        }
-    });
 </script>
 
 <script src="js/news.js"></script>
