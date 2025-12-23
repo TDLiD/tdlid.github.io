@@ -21,10 +21,10 @@
     /* 드롭다운 메뉴 위치 및 스크롤 최적화 */
     #dropdownMenu {
         max-height: calc(100vh - 70px); 
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
         /* 배경색을 더 불투명하게 하여 가독성 확보 */
         background: rgba(2, 6, 23, 0.98) !important;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     #dropdownMenu::-webkit-scrollbar {
@@ -33,6 +33,23 @@
     #dropdownMenu::-webkit-scrollbar-thumb {
         background: rgba(34, 211, 238, 0.3);
         border-radius: 10px;
+    }
+
+    /* 네비게이션 아이템 스타일 */
+    .nav-item-m {
+        display: block;
+        padding: 0.75rem 0;
+        font-size: 1.125rem; /* text-lg */
+        font-weight: 700;
+        color: white;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: color 0.2s ease;
+    }
+
+    /* 현재 페이지 활성화 표시 (Notice 페이지 등에서 파란색 강조) */
+    .nav-item-m.active-m {
+        color: #22d3ee !important;
+        border-bottom-color: rgba(34, 211, 238, 0.3);
     }
 
     /* 아주 작은 기기 대응 */
@@ -54,27 +71,26 @@
             <span class="animated-logo-text-m font-black tracking-tight truncate">
                 TDL ENERGY INDONESIA
             </span>
-            <span class="text-[8px] text-neutral-500 leading-none uppercase">Indonesia Division</span>
+            <span class="text-[8px] text-neutral-500 leading-none uppercase font-bold">Indonesia Division</span>
         </div>
     </a>
 
-    <button id="menuToggleBtn" class="flex-shrink-0 p-2 border border-cyan-500/30 rounded-lg active:bg-cyan-500/20 ml-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-        </svg>
+    <button id="menuToggleBtn" class="flex-shrink-0 p-2 border border-cyan-500/30 rounded-lg active:bg-cyan-500/20 ml-2 transition-all">
+        <span id="menuIcon" class="text-cyan-400 text-xl font-bold block w-6 h-6 flex items-center justify-center">☰</span>
     </button>
 
     <div id="dropdownMenu" class="absolute top-[100%] left-0 w-full opacity-0 invisible -translate-y-5 transition-all duration-300 shadow-2xl border-b border-cyan-500/20">
-        <nav class="flex flex-col p-6 space-y-2">
-            <a href="index_m.html" class="py-3 text-lg font-bold text-white border-b border-white/5">Home</a>
-            <a href="products_m.html" class="py-3 text-lg font-bold text-white border-b border-white/5">Products</a>
-            <a href="technology_m.html" class="py-3 text-lg font-bold text-white border-b border-white/5">Technology</a>
-            <a href="solutions_m.html" class="py-3 text-lg font-bold text-white border-b border-white/5">Solutions</a>
-            <a href="company_m.html" class="py-3 text-lg font-bold text-white border-b border-white/5">Company</a>
-            <a href="news_m.html" class="py-3 text-lg font-bold text-white border-b border-white/5">News</a>
+        <nav class="flex flex-col p-6 space-y-1">
+            <a href="index_m.html" class="nav-item-m">Home</a>
+            <a href="products_m.html" class="nav-item-m">Products</a>
+            <a href="technology_m.html" class="nav-item-m">Technology</a>
+            <a href="solutions_m.html" class="nav-item-m">Solutions</a>
+            <a href="company_m.html" class="nav-item-m">Company</a>
+            <a href="news_m.html" class="nav-item-m">News</a>
+            <a href="notice_m.html" class="nav-item-m active-m" id="nav-notice-m">Notice</a>
             
             <div class="pt-6">
-                <a href="contact_m.html" class="w-full py-4 bg-cyan-400 text-black text-center font-black rounded-xl block shadow-[0_0_15px_rgba(34,211,238,0.4)]">
+                <a href="contact_m.html" class="w-full py-4 bg-cyan-400 text-black text-center font-black rounded-xl block shadow-[0_0_15px_rgba(34,211,238,0.4)] active:scale-[0.98] transition-transform">
                     GET A QUOTE
                 </a>
             </div>
