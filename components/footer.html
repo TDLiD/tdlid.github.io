@@ -7,7 +7,7 @@
         overflow: hidden;
     }
 
-    /* 상단 네온 라인 효과 유지 */
+    /* 상단 네온 라인 */
     .footer-neon-line {
         position: absolute;
         top: 0;
@@ -19,18 +19,79 @@
         box-shadow: 0 0 20px #22d3ee, 0 0 40px #22d3ee;
     }
 
-    .footer-text-glow {
-        transition: all 0.3s ease;
-    }
-    .footer-text-glow:hover {
-        color: #22d3ee;
-        text-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
+    .admin-trigger {
+        cursor: default;
+        user-select: none;
     }
 
-    /* 관리자 접속용 숨김 링크 스타일 */
-    .admin-trigger {
-        cursor: default; /* 일반 텍스트처럼 보이게 설정 (필요시 pointer로 변경) */
-        user-select: none;
+    /* [수정] 가로 배치(row) 및 정렬 설정 */
+    .wa-contact-wrapper {
+        position: absolute;
+        left: 24px;
+        bottom: 15px;
+        display: flex;
+        flex-direction: row; /* 세로에서 가로 배치로 변경 */
+        align-items: center; /* 세로 중앙 정렬 */
+        gap: 12px;           /* 이미지 사이 간격 */
+        z-index: 20;
+    }
+
+    .qr-container {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 4px; /* 패딩 소폭 축소 */
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
+
+    .qr-container:hover {
+        transform: scale(1.05) translateY(-3px);
+        background: #ffffff;
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+    }
+
+    /* [수정] QR 이미지 사이즈 조절 */
+    .qr-image {
+        width: 60px;  /* 기존 65px에서 조절 */
+        height: 60px;
+        display: block;
+        object-fit: contain;
+    }
+
+    .wa-icon-link {
+        transition: transform 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .wa-icon-link:hover {
+        transform: scale(1.1);
+    }
+
+    /* [수정] WhatsApp 이미지 사이즈 조절 */
+    .wa-image {
+        width: 60px;  /* 기존 28px에서 조절 */
+        height: 60px;
+        object-fit: contain;
+    }
+
+    /* 모바일 레이아웃 */
+    @media (max-width: 768px) {
+        .wa-contact-wrapper {
+            position: static;
+            margin: 20px auto 10px;
+            justify-content: center;
+            gap: 15px;
+        }
+        .qr-image {
+            width: 48px;
+            height: 48px;
+        }
+        .wa-image {
+            width: 28px;
+            height: 28px;
+        }
     }
 </style>
 
@@ -55,5 +116,14 @@
                 No More Carbon <span class="text-cyan-900 mx-1">·</span> Innovation <span class="text-cyan-900 mx-1">·</span> Sustainability
             </p>
         </div>
+    </div>
+
+    <div class="wa-contact-wrapper">
+        <div class="qr-container" onclick="window.open('https://wa.me/6281296075099', '_blank')">
+            <img src="images/footer/qr.png" alt="WhatsApp QR" class="qr-image">
+        </div>
+        <a href="https://wa.me/6281296075099" target="_blank" class="wa-icon-link">
+            <img src="images/footer/whatsapp.png" alt="WhatsApp" class="wa-image">
+        </a>
     </div>
 </footer>

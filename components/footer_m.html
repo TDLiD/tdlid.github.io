@@ -1,15 +1,65 @@
+<style>
+    /* [추가] 모바일 WhatsApp QR 섹션 스타일 */
+    .wa-contact-wrapper-m {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 2rem; /* 관리자 텍스트와의 간격 */
+    }
+
+    .qr-container-m {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 4px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
+        active:scale(0.95); /* 터치 시 피드백 */
+        transition: transform 0.2s;
+    }
+
+    .qr-image-m {
+        width: 48px;  /* 모바일 적정 사이즈 */
+        height: 48px;
+        display: block;
+        object-fit: contain;
+    }
+
+    .wa-icon-link-m {
+        display: flex;
+        align-items: center;
+        active:scale(0.9);
+        transition: transform 0.2s;
+    }
+
+    .wa-image-m {
+        width: 32px;  /* 모바일 적정 사이즈 */
+        height: 32px;
+        object-fit: contain;
+    }
+</style>
+
 <footer class="bg-[#020617] py-12 px-6 border-t border-cyan-900/30 text-center">
     <div class="mb-8">
         <p class="text-cyan-400 font-bold text-sm mb-2">TDL Energy Indonesia</p>
         <p class="text-neutral-500 text-xs">Driving the Future of Mobility</p>
     </div>
 
-    <div class="flex flex-col items-center gap-4 mb-10">
+    <div class="flex flex-col items-center gap-4 mb-8">
         <a href="index.html?view_mode=pc" class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-neutral-700 text-neutral-400 text-xs font-medium active:bg-neutral-800">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             View PC version
+        </a>
+    </div>
+
+    <div class="wa-contact-wrapper-m">
+        <div class="qr-container-m" onclick="window.open('https://wa.me/6281296075099', '_blank')">
+            <img src="images/footer/qr.png" alt="WhatsApp QR" class="qr-image-m">
+        </div>
+        <a href="https://wa.me/6281296075099" target="_blank" class="wa-icon-link-m">
+            <img src="images/footer/whatsapp.png" alt="WhatsApp" class="wa-image-m">
         </a>
     </div>
 
