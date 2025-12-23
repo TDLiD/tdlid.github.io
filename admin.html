@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TDLiD Admin - Analytics & Notice</title>
+    <title>TDLiD Admin - Analytics, Notice & News</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -14,7 +14,7 @@
         .cyber-border { border: 1px solid rgba(34, 211, 238, 0.2); }
         body { background-color: #020617; font-family: 'Pretendard', sans-serif; }
         .text-xxs { font-size: 0.65rem; }
-        input { background: #0f172a !important; border: 1px solid #1e293b !important; color: white !important; }
+        input, select { background: #0f172a !important; border: 1px solid #1e293b !important; color: white !important; }
         .edit-mode { border-color: #f59e0b !important; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
 
         .ql-toolbar { background: #1e293b !important; border-color: #334155 !important; border-radius: 8px 8px 0 0; }
@@ -25,7 +25,6 @@
 
         .unread-row { background-color: rgba(34, 211, 238, 0.05); }
 
-        /* 모달 스타일 */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
@@ -36,6 +35,13 @@
             width: 90%; max-width: 600px; border-radius: 1rem; overflow: hidden;
             box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
+
+/* Quill 에디터 플레이스홀더 색상 변경 */
+.ql-editor.ql-blank::before {
+    color: rgba(255, 255, 255, 0.6) !important; /* 반투명한 흰색 */
+    font-style: normal; /* 기울임 해제 (선택사항) */
+}
+
     </style>
 </head>
 <body class="text-neutral-200 p-5 md:p-10">
@@ -50,7 +56,7 @@
                 <div class="grid grid-cols-2 gap-4 text-xs">
                     <div>
                         <p class="text-neutral-500 uppercase font-bold">Name</p>
-                        <p id="modalName" class="text-white text-base"></p>
+                        <p id="modalName" class="text-white text-base font-bold"></p>
                     </div>
                     <div>
                         <p class="text-neutral-500 uppercase font-bold">Date</p>
@@ -58,11 +64,19 @@
                     </div>
                     <div>
                         <p class="text-neutral-500 uppercase font-bold">Company</p>
-                        <p id="modalCompany" class="text-cyan-400"></p>
+                        <p id="modalCompany" class="text-cyan-400 text-base font-bold"></p>
+                    </div>
+                    <div>
+                        <p class="text-neutral-500 uppercase font-bold">Product</p>
+                        <p id="modalProduct" class="text-amber-400 font-bold"></p>
                     </div>
                     <div>
                         <p class="text-neutral-500 uppercase font-bold">Email</p>
                         <p id="modalEmail" class="text-white"></p>
+                    </div>
+                    <div>
+                        <p class="text-neutral-500 uppercase font-bold">Phone</p>
+                        <p id="modalPhone" class="text-white"></p>
                     </div>
                 </div>
                 <div class="pt-4 border-t border-white/5">
@@ -80,14 +94,14 @@
         <header class="flex justify-between items-center mb-10 border-b border-cyan-900/50 pb-6">
             <div>
                 <h1 class="text-3xl font-bold text-cyan-400 tracking-tighter italic">ADMIN CONTROL CENTER</h1>
-                <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">Notice & Analytics Management</p>
+                <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">Notice & News & Analytics</p>
             </div>
             <button onclick="location.reload()" class="px-4 py-2 bg-cyan-900/30 border border-cyan-500/50 text-cyan-400 rounded-lg hover:bg-cyan-500 hover:text-black transition font-bold">REFRESH</button>
         </header>
 
         <section id="inquirySection" class="mb-12 bg-neutral-900/80 rounded-2xl cyber-border overflow-hidden shadow-2xl">
             <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
-                <span class="font-bold text-xs tracking-widest text-amber-400 uppercase">Customer Inquiry / Quote List</span>
+                <span class="font-bold text-xs tracking-widest text-amber-400 uppercase">Customer Inquiry List</span>
                 <span id="unreadCount" class="bg-amber-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">0 NEW</span>
             </div>
             <div class="overflow-x-auto">
@@ -96,8 +110,8 @@
                         <tr class="bg-neutral-950 text-neutral-400 text-[10px] uppercase tracking-wider">
                             <th class="p-4">Status</th>
                             <th class="p-4">Date / Name</th>
-                            <th class="p-4">Company / Contact</th>
-                            <th class="p-4">Message (Click to open)</th>
+                            <th class="p-4">Company / Product</th>
+                            <th class="p-4">Message</th>
                             <th class="p-4 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -109,25 +123,37 @@
         <section id="noticeFormSection" class="mb-12 bg-neutral-900/50 p-6 rounded-2xl cyber-border transition-all">
             <h3 id="formTitle" class="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <span class="w-2 h-2 bg-cyan-500 rounded-full animate-ping"></span>
-                POST NEW NOTICE
+                POST NEW CONTENT (NOTICE / NEWS)
             </h3>
+            
             <input type="hidden" id="editKey"> 
             <div class="grid grid-cols-1 gap-4">
-                <input type="text" id="noticeTitle" placeholder="Please enter a title for your notice." class="w-full p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <select id="postCategory" onchange="updateFormText()" class="md:col-span-1 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none font-bold text-cyan-400 cursor-pointer">
+                        <option value="notice">ANNOUNCEMENT (NOTICE)</option>
+                        <option value="news">LATEST NEWS (NEWS)</option>
+                    </select>
+                    <input type="text" id="noticeTitle" placeholder="Enter title here..." class="md:col-span-3 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                </div>
+                
                 <div id="editor-container"></div>
+                
                 <div class="flex gap-2">
-                    <button id="submitBtn" onclick="uploadNotice()" class="flex-1 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition shadow-lg">REGISTER NOTICE (POST)</button>
+                    <button id="submitBtn" onclick="uploadNotice()" class="flex-1 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition shadow-lg uppercase">
+                        Register Post
+                    </button>
                     <button id="cancelBtn" onclick="resetForm()" class="hidden px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white font-bold rounded-lg transition">CANCEL</button>
                 </div>
             </div>
         </section>
 
         <section class="mb-12 bg-neutral-900/80 rounded-2xl cyber-border overflow-hidden shadow-2xl">
-            <div class="p-4 border-b border-white/5 bg-white/5 font-bold text-xs tracking-widest text-cyan-400 uppercase">Manage Published Notices</div>
+            <div class="p-4 border-b border-white/5 bg-white/5 font-bold text-xs tracking-widest text-cyan-400 uppercase">Manage Published Notice & News</div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-neutral-950 text-neutral-400 text-[10px] uppercase tracking-wider">
+                            <th class="p-4">Category</th>
                             <th class="p-4">Date</th>
                             <th class="p-4">Title</th>
                             <th class="p-4 text-right">Actions</th>
@@ -137,7 +163,7 @@
                 </table>
             </div>
         </section>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
             <div class="bg-neutral-900/50 p-6 rounded-2xl cyber-border">
                 <p class="text-neutral-500 text-xs font-bold tracking-widest uppercase text-cyan-500/70">Unique Visitors</p>
@@ -155,11 +181,11 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-cyan-950/40 text-cyan-300 text-[10px] uppercase tracking-[0.2em]">
-                            <th class="p-5 border-r border-white/5 text-center">Hits</th>
+                            <th class="p-5 text-center">Hits</th>
                             <th class="p-5">Latest Access / IP</th>
                             <th class="p-5">Location / Session</th>
                             <th class="p-5 text-center">OS & Browser</th>
-                            <th class="p-5">Current Page / Referrer</th>
+                            <th class="p-5">Current Page</th>
                         </tr>
                     </thead>
                     <tbody id="visitTableBody" class="divide-y divide-neutral-800 text-sm italic"></tbody>
@@ -183,258 +209,193 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // 1. Inquiry Logic & Escape
+        // 1. Inquiry Logic
         function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text ? String(text).replace(/[&<>"']/g, m => map[m]) : '';
         }
 
-        // 모달 열기 함수
-        function openInquiry(key, name, date, company, email, details) {
+        function openInquiry(key, name, date, company, email, details, phone, product) {
             document.getElementById('modalName').innerText = name;
             document.getElementById('modalDate').innerText = date;
             document.getElementById('modalCompany').innerText = company;
             document.getElementById('modalEmail').innerText = email;
             document.getElementById('modalMessage').innerText = details;
-            
+            document.getElementById('modalPhone').innerText = phone || 'N/A';
+            document.getElementById('modalProduct').innerText = product || 'None';
             document.getElementById('inquiryModal').style.display = 'flex';
-            
-            // 모달을 열면 자동으로 읽음 처리
             database.ref('messages/' + key).update({ read: true });
         }
 
-        function closeModal() {
-            document.getElementById('inquiryModal').style.display = 'none';
-        }
+        function closeModal() { document.getElementById('inquiryModal').style.display = 'none'; }
 
         function loadInquiries() {
             database.ref('messages').orderByChild('timestamp').on('value', (snapshot) => {
                 const tbody = document.getElementById('inquiryTableBody');
                 const unreadEl = document.getElementById('unreadCount');
                 if(!tbody) return;
-
                 tbody.innerHTML = '';
                 let unreadCount = 0;
                 let items = [];
-
                 snapshot.forEach(child => {
                     const data = child.val();
                     if(!data.read) unreadCount++;
                     items.push({ key: child.key, ...data });
                 });
-                
-                items.reverse(); 
+                items.reverse();
                 unreadEl.innerText = unreadCount + " NEW";
-
                 items.forEach(item => {
                     const row = document.createElement('tr');
                     row.className = "hover:bg-white/10 cursor-pointer transition " + (!item.read ? 'unread-row' : '');
-                    
-                    const safeDetails = escapeHtml(item.details || '');
                     const safeName = escapeHtml(item.name || 'N/A');
                     const safeCompany = escapeHtml(item.company || '-');
                     const safeEmail = escapeHtml(item.email || '');
                     const safeDate = item.date || '';
-
-                    // 행 자체를 클릭하면 상세 보기 실행 (버튼 클릭과 분리하기 위해 onclick 위치 조정)
-                    row.onclick = () => openInquiry(item.key, safeName, safeDate, safeCompany, safeEmail, item.details);
-
+                    const safePhone = escapeHtml(item.phone || 'N/A');
+                    const safeProduct = escapeHtml(item.product || 'None');
+                    row.onclick = () => openInquiry(item.key, safeName, safeDate, safeCompany, safeEmail, item.details, safePhone, safeProduct);
                     row.innerHTML = `
-                        <td class="p-4">
-                            <span class="${item.read ? 'text-neutral-600' : 'text-amber-400 font-bold'} text-xs">
-                                ${item.read ? 'READ' : '● NEW'}
-                            </span>
-                        </td>
-                        <td class="p-4">
-                            <div class="text-neutral-500 text-[10px]">${safeDate}</div>
-                            <div class="text-white font-bold">${safeName}</div>
-                        </td>
-                        <td class="p-4">
-                            <div class="text-cyan-400 font-bold">${safeCompany}</div>
-                            <div class="text-neutral-400 text-xs">${safeEmail}</div>
-                        </td>
-                        <td class="p-4">
-                            <div class="text-neutral-300 truncate max-w-xs opacity-70">
-                                ${safeDetails}
-                            </div>
-                        </td>
+                        <td class="p-4"><span class="${item.read ? 'text-neutral-600' : 'text-amber-400 font-bold'} text-xs">${item.read ? 'READ' : '● NEW'}</span></td>
+                        <td class="p-4"><div class="text-neutral-500 text-[10px]">${safeDate}</div><div class="text-white font-bold">${safeName}</div></td>
+                        <td class="p-4"><div class="text-cyan-400 font-bold">${safeCompany}</div><div class="text-amber-500 text-xs font-bold uppercase mt-1">${safeProduct}</div></td>
+                        <td class="p-4"><div class="text-neutral-300 truncate max-w-xs opacity-70">${escapeHtml(item.details)}</div></td>
                         <td class="p-4 text-right space-x-2" onclick="event.stopPropagation()">
-                            <button onclick="toggleInquiryRead('${item.key}', ${item.read})" class="text-neutral-400 hover:text-white text-xs underline">
-                                ${item.read ? 'Unread' : 'Mark Read'}
-                            </button>
                             <button onclick="deleteInquiry('${item.key}')" class="text-red-500 hover:text-red-400 text-xs font-bold">Del</button>
-                        </td>
-                    `;
+                        </td>`;
                     tbody.appendChild(row);
                 });
             });
         }
 
-        function toggleInquiryRead(key, currentStatus) {
-            database.ref('messages/' + key).update({ read: !currentStatus });
-        }
+        function deleteInquiry(key) { if(confirm("Delete?")) database.ref('messages/' + key).remove(); }
 
-        function deleteInquiry(key) {
-            if(confirm("Delete this inquiry?")) {
-                database.ref('messages/' + key).remove();
+        // 2. Notice & News Logic
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            modules: { toolbar: [[{'header': [1, 2, 3, false]}], ['bold', 'italic', 'underline'], ['image', 'link'], [{'list': 'ordered'}, {'list': 'bullet'}], ['clean']] },
+            placeholder: 'Write content here...'
+        });
+
+        // UI 텍스트 업데이트 (카테고리 선택 시)
+        function updateFormText() {
+            const cat = document.getElementById('postCategory').value;
+            const btn = document.getElementById('submitBtn');
+            const editKey = document.getElementById('editKey').value;
+            
+            if(!editKey) {
+                document.getElementById('formTitle').innerHTML = `<span class="w-2 h-2 bg-cyan-500 rounded-full animate-ping"></span> POST NEW ${cat.toUpperCase()}`;
+                btn.innerText = `REGISTER ${cat.toUpperCase()} (POST)`;
             }
         }
 
-        // 2. Notice Logic
-        const quill = new Quill('#editor-container', {
-            theme: 'snow',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['image', 'link'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    [{ 'color': [] }, { 'background': [] }],
-                    ['clean']
-                ]
-            },
-            placeholder: 'Write notice content here...'
-        });
-
         function uploadNotice() {
+            const category = document.getElementById('postCategory').value;
             const title = document.getElementById('noticeTitle').value;
             const content = quill.root.innerHTML;
             const editKey = document.getElementById('editKey').value;
             
-            if(!title || quill.getText().trim().length === 0) return alert("Please enter both title and content.");
+            if(!title || quill.getText().trim().length === 0) return alert("Enter title and content.");
 
-            const noticeData = {
+            const data = {
+                category: category,
                 title: title,
                 content: content,
                 date: new Date().toLocaleDateString(),
                 timestamp: Date.now()
             };
 
-            if (editKey) {
-                database.ref('notices/' + editKey).update(noticeData).then(() => {
-                    alert("Notice updated successfully.");
-                    resetForm();
-                });
-            } else {
-                database.ref('notices').push(noticeData).then(() => {
-                    alert("Notice posted successfully.");
-                    resetForm();
-                });
-            }
+            const targetPath = 'notices/' + (editKey || database.ref('notices').push().key);
+            database.ref(targetPath).set(data).then(() => {
+                alert("Saved successfully.");
+                resetForm();
+            });
         }
 
         function resetForm() {
             document.getElementById('editKey').value = '';
             document.getElementById('noticeTitle').value = '';
             quill.setContents([]);
-            document.getElementById('formTitle').innerText = "POST NEW NOTICE";
-            document.getElementById('submitBtn').innerText = "REGISTER NOTICE (POST)";
-            document.getElementById('submitBtn').classList.replace('bg-amber-600', 'bg-cyan-600');
             document.getElementById('noticeFormSection').classList.remove('edit-mode');
             document.getElementById('cancelBtn').classList.add('hidden');
+            document.getElementById('postCategory').disabled = false;
+            updateFormText();
         }
 
+        // 목록 로드 (Badge 추가)
         database.ref('notices').orderByChild('timestamp').on('value', (snapshot) => {
             const tbody = document.getElementById('noticeTableBody');
             tbody.innerHTML = '';
             let items = [];
             snapshot.forEach(child => { items.push({ key: child.key, ...child.val() }); });
-            items.reverse();
-            items.forEach(item => {
-                const escapedContent = encodeURIComponent(item.content);
+            items.reverse().forEach(item => {
+                const isNews = item.category === 'news';
+                const badgeClass = isNews ? 'bg-amber-500/20 text-amber-500 border-amber-500/50' : 'bg-cyan-500/20 text-cyan-500 border-cyan-500/50';
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-white/5 transition";
                 tr.innerHTML = `
+                    <td class="p-4">
+                        <span class="px-2 py-0.5 border text-[10px] font-bold rounded ${badgeClass}">${(item.category || 'notice').toUpperCase()}</span>
+                    </td>
                     <td class="p-4 text-neutral-500 text-xs">${item.date}</td>
                     <td class="p-4 font-bold text-neutral-200">${item.title}</td>
                     <td class="p-4 text-right space-x-2">
-                        <button onclick="handleEditClick('${item.key}', \`${item.title}\`, '${escapedContent}')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold uppercase">Edit</button>
+                        <button onclick="handleEditClick('${item.key}', '${item.category || 'notice'}', \`${item.title}\`, '${encodeURIComponent(item.content)}')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold uppercase">Edit</button>
                         <button onclick="deleteNotice('${item.key}')" class="text-red-500 hover:text-red-400 text-xs font-bold uppercase">Delete</button>
-                    </td>
-                `;
+                    </td>`;
                 tbody.appendChild(tr);
             });
         });
 
-        function handleEditClick(key, title, escapedContent) {
+        function handleEditClick(key, category, title, content) {
             document.getElementById('editKey').value = key;
+            document.getElementById('postCategory').value = category;
+            document.getElementById('postCategory').disabled = true; // 수정 시 카테고리 변경 방지
             document.getElementById('noticeTitle').value = title;
-            quill.root.innerHTML = decodeURIComponent(escapedContent);
-            document.getElementById('formTitle').innerText = "EDIT NOTICE";
-            document.getElementById('submitBtn').innerText = "UPDATE NOTICE (SAVE)";
-            document.getElementById('submitBtn').classList.replace('bg-cyan-600', 'bg-amber-600');
+            quill.root.innerHTML = decodeURIComponent(content);
+            
+            document.getElementById('formTitle').innerText = "EDIT " + category.toUpperCase();
+            document.getElementById('submitBtn').innerText = "UPDATE " + category.toUpperCase() + " (SAVE)";
             document.getElementById('noticeFormSection').classList.add('edit-mode');
             document.getElementById('cancelBtn').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function deleteNotice(key) {
-            if(confirm("Delete this notice?")) {
-                database.ref('notices/' + key).remove();
-            }
-        }
+        function deleteNotice(key) { if(confirm("Delete this?")) database.ref('notices/' + key).remove(); }
 
-        // 3. Analytics Logic
+        // 3. Analytics Logic (Same as before)
         function loadAnalytics() {
-            const tableBody = document.getElementById('visitTableBody');
-            const totalCountEl = document.getElementById('totalCount');
-            const uniqueCountEl = document.getElementById('uniqueCount');
-
             database.ref('visits').orderByChild('timestamp').on('value', (snapshot) => {
+                const tableBody = document.getElementById('visitTableBody');
                 tableBody.innerHTML = '';
                 let rawData = [];
-                snapshot.forEach((child) => { rawData.push(child.val()); });
+                snapshot.forEach(c => rawData.push(c.val()));
                 rawData.reverse();
-
-                const groupedData = {};
-                rawData.forEach((visit) => {
-                    const groupKey = (visit.ip || 'unknown') + "_" + visit.device;
-                    if (!groupedData[groupKey]) {
-                        groupedData[groupKey] = { ...visit, count: 1 };
-                    } else {
-                        groupedData[groupKey].count += 1;
-                    }
+                
+                const grouped = {};
+                rawData.forEach(v => {
+                    const k = (v.ip || 'unk') + "_" + v.device;
+                    if(!grouped[k]) grouped[k] = {...v, count: 1};
+                    else grouped[k].count++;
                 });
 
-                const displayData = Object.values(groupedData);
-                totalCountEl.innerText = rawData.length;
-                uniqueCountEl.innerText = displayData.length;
+                const display = Object.values(grouped);
+                document.getElementById('totalCount').innerText = rawData.length;
+                document.getElementById('uniqueCount').innerText = display.length;
 
-                displayData.forEach((visit) => {
+                display.forEach(v => {
                     const row = document.createElement('tr');
-                    row.className = "hover:bg-cyan-400/5 transition-colors";
                     row.innerHTML = `
-                        <td class="p-5 text-center border-r border-white/5">
-                            <span class="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-xs font-bold ring-1 ring-cyan-500/30">${visit.count}</span>
-                        </td>
-                        <td class="p-5">
-                            <div class="text-neutral-400 text-xs font-mono">${visit.timeStr}</div>
-                            <div class="text-cyan-500 text-sm font-black mt-1 tracking-wider">${visit.ip || '0.0.0.0'}</div>
-                        </td>
-                        <td class="p-5">
-                            <div class="text-white font-bold">${visit.country || 'Unknown'} (${visit.city || '-'})</div>
-                            <div class="text-neutral-600 text-[10px] font-mono mt-1 uppercase tracking-tighter">ID: ${visit.sid || 'No Session'}</div>
-                        </td>
-                        <td class="p-5 text-center">
-                            <div class="flex flex-col gap-1 items-center">
-                                <span class="px-2 py-1 rounded text-xxs bg-neutral-800 text-neutral-300 border border-neutral-700 w-20">${visit.os || 'Unknown OS'}</span>
-                                <span class="px-2 py-1 rounded text-xxs bg-blue-900/30 text-blue-400 border border-blue-500/20 w-20">${visit.browser || 'Unknown'}</span>
-                            </div>
-                        </td>
-                        <td class="p-5">
-                            <div class="font-bold text-cyan-400 text-xs uppercase">${visit.page}</div>
-                            <div class="text-neutral-600 italic text-[10px] truncate max-w-[180px] mt-1">${visit.referrer || 'Direct'}</div>
-                        </td>
-                    `;
+                        <td class="p-5 text-center"><span class="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-xs font-bold">${v.count}</span></td>
+                        <td class="p-5"><div class="text-neutral-400 text-xs font-mono">${v.timeStr}</div><div class="text-cyan-500 text-sm font-black">${v.ip || '0.0.0.0'}</div></td>
+                        <td class="p-5"><div class="text-white font-bold">${v.country || 'Unknown'}</div></td>
+                        <td class="p-5 text-center"><span class="px-2 py-1 rounded text-xxs bg-neutral-800 text-neutral-300">${v.os || 'OS'}</span></td>
+                        <td class="p-5"><div class="font-bold text-cyan-400 text-xs">${v.page}</div></td>`;
                     tableBody.appendChild(row);
                 });
             });
         }
 
-        window.onload = () => {
-            loadInquiries();
-            loadAnalytics();
-        };
+        window.onload = () => { loadInquiries(); loadAnalytics(); updateFormText(); };
     </script>
 </body>
 </html>

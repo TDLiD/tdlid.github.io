@@ -24,10 +24,13 @@
             user-select: none;
         }
 
+        /* 데스크톱 스타일 반영: 사이안 그래디언트 */
         .hero-slogan-gradient {
-            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            background: linear-gradient(135deg, #22d3ee 0%, #10b981 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            display: inline-block;
+            padding-right: 0.15em;
         }
 
         /* 공지사항 아이템 모바일 스타일 */
@@ -35,9 +38,9 @@
             background-color: rgba(23, 23, 23, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 1rem;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem; /* 데스크톱 피드백 반영 축소 */
             overflow: hidden;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .notice-item:active {
@@ -52,7 +55,7 @@
         }
 
         .notice-item.active .notice-content {
-            max-height: 3000px; /* 이미지 대비 확장 */
+            max-height: 3000px;
             padding: 1.25rem 1.5rem;
             border-top: 1px solid rgba(6, 182, 212, 0.15);
         }
@@ -67,14 +70,12 @@
             color: #22d3ee;
         }
 
-        /* 내용 부분 수정 */
         .notice-content-inner {
             user-select: text;
             -webkit-user-select: text;
-            white-space: normal; /* HTML 태그(이미지) 허용 */
+            white-space: normal;
         }
 
-        /* 본문 내 이미지 모바일 최적화 */
         .notice-content-inner img {
             max-width: 100%;
             height: auto;
@@ -91,20 +92,20 @@
 
     <main class="pt-24 pb-12 px-5 flex-grow">
         <div class="max-w-full mx-auto pt-4">
-            <h2 class="text-3xl font-bold tracking-tight hero-slogan-gradient mb-8 px-1 italic uppercase">
+            <h2 class="text-3xl font-black tracking-tight hero-slogan-gradient mb-8 px-1 italic uppercase">
                 Notice
             </h2>
 
             <div id="noticeList" class="flex flex-col gap-1">
                 <div class="flex flex-col items-center justify-center py-20 space-y-4">
                     <div class="w-8 h-8 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div>
-                    <p class="text-neutral-500 font-medium tracking-widest text-xs uppercase">Loading Notices...</p>
+                    <p class="text-neutral-500 font-medium tracking-widest text-xs uppercase">Fetching All Data...</p>
                 </div>
             </div>
 
             <div class="mt-12 text-center pb-10">
                 <a href="index.html" class="inline-block px-8 py-3 rounded-xl border border-neutral-800 bg-neutral-900/50 text-neutral-400 text-sm font-medium active:scale-95 transition-all">
-                    ← Back to Home
+                    &larr; Back to Home
                 </a>
             </div>
         </div>
@@ -113,6 +114,7 @@
     <div id="footer-placeholder"></div>
 
     <script>
+        // 레이아웃 로드
         async function loadLayout() {
             try {
                 const [h, f, b] = await Promise.all([
@@ -137,6 +139,7 @@
             }
         }
 
+        // Firebase 설정
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -149,6 +152,7 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // 아코디언 토글
         function toggleNotice(element) {
             const item = element.closest('.notice-item');
             const isActive = item.classList.contains('active');
@@ -162,6 +166,7 @@
             }
         }
 
+        // Firebase 데이터 로드 및 렌더링 (추가된 필터링 기능 적용)
         database.ref('notices').on('value', (snapshot) => {
             const noticeList = document.getElementById('noticeList');
             noticeList.innerHTML = '';
@@ -174,15 +179,23 @@
             let notices = [];
             snapshot.forEach((child) => {
                 const data = child.val();
-                notices.push(data);
+                // [추가 기능] 카테고리가 'notice'인 것만 추출
+                if (data.category === 'notice') {
+                    notices.push(data);
+                }
             });
+
+            // [추가 기능] 공지사항이 없을 경우 예외 처리
+            if (notices.length === 0) {
+                noticeList.innerHTML = '<p class="text-center text-neutral-600 py-20 text-sm">No notices registered.</p>';
+                return;
+            }
 
             // 최신순 정렬
             notices.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
             let finalHtml = '';
             notices.forEach((notice, index) => {
-                // [수정 포인트] 위에서부터 01, 02... 순서로 표시
                 const currentNum = index + 1;
                 const displayNum = currentNum < 10 ? '0' + currentNum : currentNum;
 
@@ -190,7 +203,7 @@
                 <div class="notice-item">
                     <div class="flex flex-col px-5 py-5 cursor-pointer active:bg-white/5" onclick="toggleNotice(this)">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-cyan-500 font-mono text-xs font-bold">${displayNum}</span>
+                            <span class="text-cyan-500 font-mono text-xs font-bold">${displayNum}.</span>
                             <div class="flex items-center gap-2">
                                 <span class="text-neutral-500 font-mono text-[10px] uppercase">${notice.date}</span>
                                 <span class="text-neutral-700 text-[10px]">|</span>
@@ -216,6 +229,7 @@
             noticeList.innerHTML = finalHtml;
         });
 
+        // 메뉴 토글
         function initMenuToggle() {
             const menuBtn = document.getElementById("menuToggleBtn");
             const dropdown = document.getElementById("dropdownMenu");

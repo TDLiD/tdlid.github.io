@@ -2,95 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
- <script>
-    (function() {
-        // 1. [수정] iPad를 제외하고 iPhone, Android 폰만 감지
-        const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const isPCMode = urlParams.get('view_mode') === 'pc';
-
-        // 2. [수정] 모바일 폰으로 접속했을 때만 products_m.html로 이동
-        if (isMobileOnly && !isPCMode) {
-            let path = window.location.pathname;
-            let page = path.split("/").pop();
-            
-            // 현재 페이지가 products.html이거나 빈 값일 때 모바일 버전으로 리다이렉트
-            if (page === "products.html" || page === "") {
-                window.location.href = "products_m.html";
+    <script>
+        (function() {
+            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPCMode = urlParams.get('view_mode') === 'pc';
+            if (isMobileOnly && !isPCMode) {
+                let path = window.location.pathname;
+                let page = path.split("/").pop();
+                if (page === "news.html" || page === "") {
+                    // window.location.href = "news_m.html";
+                }
             }
-        }
-    })();
-</script>
+        })();
+    </script>
 
     <title>Latest News | TDL Energy Indonesia</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 
-<style>
-    /* 드롭다운 스타일 (컴포넌트 대응) */
-    .dropdown-link {
-        padding: 12px 20px;
-        display: block;
-        color: #ccc;
-        transition: background 0.2s;
-        border-bottom: 1px solid #262626;
-    }
-    .dropdown-link:hover {
-        background: #1f2937;
-        color: #22d3ee;
-    }
-    .dropdown-quote-btn {
-        padding: 12px 20px;
-        display: block;
-        background: #22d3ee;
-        color: #000;
-        font-weight: 600;
-        text-align: center;
-        border-radius: 0 0 11px 11px;
-    }
+    <style>
+        body { background-color: #050505; color: #f5f5f5; font-family: 'Pretendard', sans-serif; }
+        
+        .hero-slogan-gradient {
+            background: linear-gradient(135deg, #22d3ee 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            padding-right: 0.15em; 
+        }
 
-    /* [수정] 반응형 레이아웃 설정 */
-    body {
-        overflow-x: hidden;
-        /* min-width: 1280px; 제거 */
-        -webkit-user-select: auto;
-        -moz-user-select: auto;
-        -ms-user-select: auto;
-        user-select: auto;
-    }
-
-    /* 뉴스 아이템 호버 효과 (js/news.js에서 생성되는 구조 대응) */
-    .news-item {
-        transition: all 0.3s ease;
-    }
-    .news-item:hover {
-        transform: translateY(-4px);
-        border-color: rgba(6, 182, 212, 0.4);
-        background-color: rgba(23, 23, 23, 0.8);
-    }
-</style>
+        .news-list-item {
+            background-color: rgba(23, 23, 23, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem; 
+        }
+        .news-list-item:hover {
+            transform: translateY(-2px);
+            border-color: rgba(6, 182, 212, 0.4);
+            background-color: rgba(23, 23, 23, 0.8);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+        .arrow-icon { color: rgba(6, 182, 212, 0.5); transition: all 0.3s; }
+        .news-list-item:hover .arrow-icon { color: #22d3ee; transform: translateX(4px); }
+    </style>
 </head>
 
-<body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
-
+<body class="bg-neutral-950">
 <div id="bgm-placeholder"></div>
-
-
 <div id="header-placeholder"></div>
 
-<main class="pt-32 lg:pt-40 pb-20 px-6 min-h-screen">
-    <div class="max-w-6xl mx-auto pt-10 px-4 md:px-8">
-        <h2 class="text-4xl md:text-5xl font-black tracking-wide hero-slogan-gradient mb-12 text-center">
+<main class="pt-32 lg:pt-48 pb-20 px-6 min-h-screen">
+    <div class="max-w-5xl mx-auto pt-10 px-4 text-center">
+        <h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16 italic uppercase pr-2">
             Latest News
         </h2>
         
-        <div id="newsListContainer" class="flex flex-col gap-6 md:gap-8">
-            <p class="text-center text-neutral-500 py-20 text-xl">Loading news...</p>
+        <div id="newsListContainer" class="flex flex-col gap-1 text-left">
+            <p class="text-center text-neutral-500 py-20 text-xl animate-pulse tracking-widest uppercase">Fetching News...</p>
         </div>
 
         <div class="mt-20 text-center">
@@ -104,88 +82,138 @@
 <div id="footer-placeholder"></div>
 
 <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+        authDomain: "tdlid-107669.firebaseapp.com",
+        databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+        projectId: "tdlid-107669",
+        storageBucket: "tdlid-107669.firebasestorage.app",
+        messagingSenderId: "604782345004",
+        appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+    };
 
- /**
-     * 1. 레이아웃 로드 및 메뉴 초기화
-     */
-    async function loadLayout() {
-        try {
-            // 헤더 로드
-            const headerRes = await fetch('components/header.html');
-            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-            
-            // 푸터 로드
-            const footerRes = await fetch('components/footer.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
-            
-            // --- 추가: BGM 로드 코드 시작 ---
-            const bgmRes = await fetch('components/bgm.html');
-            const bgmHTML = await bgmRes.text();
-            const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            bgmPlaceholder.innerHTML = bgmHTML;
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-            // 삽입된 HTML 내 script 태그를 추출하여 강제로 실행 (재생 컨트롤 로직 활성화)
-            const scripts = bgmPlaceholder.querySelectorAll("script");
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                newScript.text = oldScript.text;
-                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+    function loadNewsFromFirebase() {
+        const container = document.getElementById('newsListContainer');
+        database.ref('notices').on('value', (snapshot) => {
+            if (!snapshot.exists()) {
+                container.innerHTML = '<p class="text-center text-neutral-600 py-20">No news articles found.</p>';
+                return;
+            }
+
+            let newsItems = [];
+            snapshot.forEach(child => {
+                const data = child.val();
+                if (data.category === 'news') {
+                    newsItems.push({ id: child.key, ...data });
+                }
             });
-            // --- 추가: BGM 로드 코드 끝 ---
-            
-            initMenuToggle();
-        } catch (err) {
-            console.error("Layout load failed:", err);
-        }
+
+            if (newsItems.length === 0) {
+                container.innerHTML = '<p class="text-center text-neutral-600 py-20">No news articles found.</p>';
+                return;
+            }
+
+            newsItems.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            container.innerHTML = newsItems.map((item, index) => {
+                const num = index + 1;
+                const displayNum = num < 10 ? '0' + num : num;
+                const linkUrl = item.content.replace(/<[^>]*>?/gm, '').trim();
+
+                return `
+                <div class="news-list-item cursor-pointer" onclick="goToLink('${linkUrl}')">
+                    <div class="flex flex-col md:flex-row md:items-center px-6 py-3 md:px-8 md:py-4 gap-2 md:gap-4">
+                        <div class="flex items-center flex-1 gap-3 md:gap-4 overflow-hidden">
+                            <span class="text-cyan-500 font-mono text-sm font-bold shrink-0">${displayNum}.</span>
+                            <h2 class="text-white font-bold text-base md:text-lg tracking-tight truncate">
+                                ${item.title}
+                            </h2>
+                        </div>
+                        <div class="flex items-center justify-between md:justify-end gap-4 shrink-0 mt-2 md:mt-0 pt-2 md:pt-0 border-t border-white/5 md:border-none">
+                            <div class="flex items-center gap-3">
+                                <span class="text-neutral-500 font-mono text-[10px] md:text-xs uppercase">${item.date}</span>
+                                <span class="text-neutral-700 text-[10px]">|</span>
+                                <span class="text-cyan-500/80 font-mono text-[10px] font-bold tracking-widest uppercase">News</span>
+                            </div>
+                            <svg class="arrow-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        });
     }
 
+    function goToLink(url) {
+        if (!url) return;
+        const targetUrl = (url.startsWith('http://') || url.startsWith('https://')) ? url : 'https://' + url;
+        try { window.open(targetUrl, '_blank'); } catch (e) { alert("Invalid Link."); }
+    }
 
-    /**
-     * 2. 메뉴 제어 로직
-     */
+    // [추가] 메뉴 토글 기능 정의
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
         const dropdown = document.getElementById("dropdownMenu");
         const menuIcon = document.getElementById("menuIcon");
 
         if (menuBtn && dropdown) {
-            menuBtn.addEventListener("click", (e) => {
+            menuBtn.onclick = (e) => {
                 e.stopPropagation();
                 const isOpen = dropdown.classList.contains("opacity-100");
-
                 if (!isOpen) {
                     dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
                     dropdown.classList.add("opacity-100", "visible", "translate-y-2");
                     if(menuIcon) menuIcon.innerText = "✕";
-                    menuBtn.setAttribute("aria-expanded", "true");
                 } else {
                     closeMenu();
                 }
-            });
+            };
 
             function closeMenu() {
                 dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
                 dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
                 if(menuIcon) menuIcon.innerText = "☰";
-                menuBtn.setAttribute("aria-expanded", "false");
             }
 
             document.addEventListener("click", (e) => {
                 if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
             });
-
-            document.addEventListener("keydown", (e) => {
-                if (e.key === "Escape") closeMenu();
-            });
         }
     }
 
-    // 초기 실행
-    document.addEventListener("DOMContentLoaded", loadLayout);
+    async function loadLayout() {
+        try {
+            const [h, f, b] = await Promise.all([
+                fetch('components/header.html'),
+                fetch('components/footer.html'),
+                fetch('components/bgm.html')
+            ]);
+            document.getElementById('header-placeholder').innerHTML = await h.text();
+            document.getElementById('footer-placeholder').innerHTML = await f.text();
+            
+            const bgmP = document.getElementById('bgm-placeholder');
+            bgmP.innerHTML = await b.text();
+            
+            // BGM 스크립트 실행
+            bgmP.querySelectorAll("script").forEach(s => {
+                const ns = document.createElement("script");
+                ns.text = s.text;
+                document.body.appendChild(ns).parentNode.removeChild(ns);
+            });
 
+            // 레이아웃 로드 완료 후 메뉴 핸들러 실행
+            initMenuToggle();
+        } catch (err) { console.error(err); }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadLayout();
+        loadNewsFromFirebase();
+    });
 </script>
-
-<script src="js/news.js"></script>
-
 </body>
 </html>

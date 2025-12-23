@@ -14,22 +14,22 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
-        // Firebase 설정 및 초기화
+        // 1. Firebase 설정 (contact.html과 동일하게 업데이트)
         const firebaseConfig = {
-            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3ws", // index.html 기준
-            authDomain: "tdlid-db.firebaseapp.com",
-            databaseURL: "https://tdlid-db-default-rtdb.firebaseio.com",
-            projectId: "tdlid-db",
-            storageBucket: "tdlid-db.appspot.com",
-            messagingSenderId: "367246231921",
-            appId: "1:367246231921:web:58356f17822a167098f921"
+            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+            authDomain: "tdlid-107669.firebaseapp.com",
+            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+            projectId: "tdlid-107669",
+            storageBucket: "tdlid-107669.firebasestorage.app",
+            messagingSenderId: "604782345004",
+            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
         };
-        firebase.initializeApp(firebaseConfig);
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
     </script>
 
 <style>
-    /* 전체 페이지 드래그 방지 (입력창 제외) */
     body {
         -webkit-user-select: auto;
         user-select: auto;
@@ -39,7 +39,7 @@
     input, textarea, select {
         user-select: auto !important;
         -webkit-user-select: auto !important;
-        font-size: 16px !important;
+        font-size: 16px !important; /* 모바일 줌 방지 */
     }
 
     .contact-form-container {
@@ -54,9 +54,6 @@
         width: 100%;
         margin: 0 auto;
     }
-
-    .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; }
-    .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
 
     /* 이스터 에그 스타일 */
     #easterEggOverlay {
@@ -119,7 +116,7 @@
             Please provide details for a customized quotation. <span id="triggerWord2" class="stealth-trigger">Our</span> team will contact you shortly.
         </p>
 
-        <form id="quoteForm" method="POST" action="https://formspree.io/f/mdkqddlz" class="flex flex-col gap-4">
+        <form id="quoteForm" class="flex flex-col gap-4">
             <div class="space-y-4">
                 <input name="company" placeholder="Company / Name" class="w-full p-4 rounded-xl bg-neutral-800/50 border border-neutral-700 focus:border-cyan-500 outline-none transition placeholder:text-neutral-500" required>
                 <input name="email" type="email" placeholder="Email Address" class="w-full p-4 rounded-xl bg-neutral-800/50 border border-neutral-700 focus:border-cyan-500 outline-none transition placeholder:text-neutral-500" required>
@@ -206,7 +203,6 @@
         }
     }
 
-    // 모바일 이스터에그 로직 수정됨
     function initEasterEgg() {
         const t1 = document.getElementById('triggerWord');
         const t2 = document.getElementById('triggerWord2');
@@ -249,7 +245,7 @@
         if(t2) t2.onclick = runCyberEffect;
     }
 
-    // Firebase 전송 기능이 추가된 핸들러
+    // 2. Firebase 저장 전 전용 핸들러 (PC 버전과 동일한 로직)
     function initFormHandler() {
         const form = document.getElementById('quoteForm');
         const formStatus = document.getElementById('formStatus');
@@ -257,12 +253,13 @@
         if(form) {
             form.onsubmit = async (e) => {
                 e.preventDefault();
-                formStatus.textContent = 'Sending...';
+                
+                formStatus.textContent = 'Storing Request...';
                 formStatus.className = 'mt-4 text-center text-sm text-cyan-400';
                 
                 try {
-                    // 1. Firebase 데이터 저장 로직
                     const formData = new FormData(form);
+                    
                     const msgData = {
                         timestamp: Date.now(),
                         date: new Date().toLocaleString(),
@@ -274,24 +271,17 @@
                         read: false,
                         status: 'new'
                     };
+
+                    // Firebase DB 저장
                     await database.ref('messages').push(msgData);
 
-                    // 2. 기존 Formspree 전송 로직 유지
-                    const response = await fetch(form.action, {
-                        method: form.method,
-                        body: formData,
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    
-                    if (response.ok) {
-                        formStatus.textContent = '✅ Submitted successfully!';
-                        formStatus.className = 'mt-4 text-center text-sm text-green-500';
-                        form.reset();
-                    } else { throw new Error(); }
+                    formStatus.textContent = '✅ Submitted successfully!';
+                    formStatus.className = 'mt-4 text-center text-sm text-green-500 font-bold';
+                    form.reset();
                     
                 } catch (error) {
-                    console.error("Submission Error:", error);
-                    formStatus.textContent = '❌ Error. Please try again.';
+                    console.error("Database Error:", error);
+                    formStatus.textContent = '❌ Error saving data. Please try again.';
                     formStatus.className = 'mt-4 text-center text-sm text-red-500';
                 }
             };
