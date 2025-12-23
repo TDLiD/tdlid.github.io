@@ -18,6 +18,49 @@ body{
 }
 
 /* ===============================
+    HACKING SCREEN EFFECTS (NEW)
+================================ */
+/* 화면 전체가 미세하게 흔들리는 효과 */
+@keyframes shake {
+    0% { transform: translate(0,0); }
+    10% { transform: translate(-1px, -1px); }
+    20% { transform: translate(1px, 1px); }
+    30% { transform: translate(-2px, 0); }
+    100% { transform: translate(0,0); }
+}
+
+/* 가로 노이즈 라인 효과 */
+.hacker-lines {
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0) 0px,
+        rgba(0, 0, 0, 0) 1px,
+        rgba(34, 211, 238, 0.05) 2px,
+        rgba(0, 0, 0, 0) 3px
+    );
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* 무작위로 나타나는 데이터 글리치 조각 */
+@keyframes glitch-slice {
+    0% { clip-path: inset(80% 0 0 0); transform: translateX(-5px); }
+    10% { clip-path: inset(10% 0 70% 0); transform: translateX(5px); }
+    20% { clip-path: inset(50% 0 30% 0); transform: translateX(-3px); }
+    30% { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+.screen-glitch-overlay {
+    position: fixed; inset: 0;
+    background: rgba(34, 211, 238, 0.03);
+    animation: shake 0.2s infinite;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* ===============================
     BACKGROUND LAYERS
 ================================ */
 .cyber-bg{
@@ -52,12 +95,10 @@ body{
     position: absolute;
     width: 100px;
     opacity: 0;
-    /* 원본 유지: 필터에서 invert 제거 */
     filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.5));
     animation: skullZoom 8s infinite;
 }
 
-/* 두 번째 해골: 다른 타이밍과 위치 */
 .skull-scare-2 {
     position: absolute;
     width: 80px;
@@ -67,28 +108,11 @@ body{
 }
 
 @keyframes skullZoom {
-    0% {
-        transform: scale(0.1) rotate(0deg);
-        opacity: 0;
-        filter: blur(10px) brightness(0);
-    }
-    20% {
-        opacity: 0.3;
-        filter: blur(5px) brightness(0.5);
-    }
-    50% {
-        opacity: 0.6;
-        filter: blur(2px) brightness(1);
-    }
-    80% {
-        transform: scale(5) rotate(15deg); /* 화면을 덮을 정도로 커짐 */
-        opacity: 0;
-        filter: blur(0px) brightness(2);
-    }
-    100% {
-        transform: scale(8) rotate(30deg);
-        opacity: 0;
-    }
+    0% { transform: scale(0.1) rotate(0deg); opacity: 0; filter: blur(10px) brightness(0); }
+    20% { opacity: 0.3; filter: blur(5px) brightness(0.5); }
+    50% { opacity: 0.6; filter: blur(2px) brightness(1); }
+    80% { transform: scale(5) rotate(15deg); opacity: 0; filter: blur(0px) brightness(2); }
+    100% { transform: scale(8) rotate(30deg); opacity: 0; }
 }
 
 .noise{
@@ -130,9 +154,9 @@ body{
 }
 
 @keyframes glitch{
-    0%{text-shadow:2px 0 #22d3ee,-2px 0 #f0f}
-    50%{text-shadow:-2px 0 #22d3ee,2px 0 #f0f}
-    100%{text-shadow:2px 0 #22d3ee,-2px 0 #f0f}
+    0%{text-shadow:2px 0 #22d3ee,-2px 0 #f0f; transform: skewX(1deg);}
+    50%{text-shadow:-2px 0 #22d3ee,2px 0 #f0f; transform: skewX(-1deg);}
+    100%{text-shadow:2px 0 #22d3ee,-2px 0 #f0f; transform: skewX(0deg);}
 }
 
 /* ===============================
@@ -144,6 +168,7 @@ body{
     flex-wrap:wrap;
     justify-content:center;
     perspective:1400px;
+    z-index: 20;
 }
 
 .staff-img{
@@ -182,6 +207,8 @@ body{
 
 <body>
 <div class="cyber-bg"></div>
+<div class="screen-glitch-overlay"></div>
+<div class="hacker-lines"></div>
 
 <div class="skull-overlay">
     <img src="images/logo/skull.webp" class="skull-scare">
@@ -210,12 +237,14 @@ body{
     <div class="absolute bottom-8 left-8 text-[11px] opacity-40 hidden lg:block">
         CORE_TEMP: 31.8C<br>
         BMS_STATE: OVERRIDE<br>
-        SIGNAL: CLEAN
+        SIGNAL: CLEAN<br>
+        <span class="text-red-500 font-bold animate-pulse">> WARNING: UNAUTHORIZED ACCESS DETECTED</span>
     </div>
 
     <div class="absolute bottom-8 right-8 text-[11px] opacity-40 text-right hidden lg:block">
         ENCRYPTION v4.0.2<br>
-        ACCESS LEVEL █████
+        ACCESS LEVEL █████<br>
+        IP_ORIGIN: TRACED
     </div>
 </div>
 
@@ -227,6 +256,8 @@ const lines = [
     "> BOOTING SECURE NODE...",
     "> LINKING ENCRYPTED CHANNEL...",
     "> RUNNING BIOMETRIC SCAN...",
+    "> [!] INTRUSION DETECTED...",
+    "> BYPASSING SECURITY...",
     "> IDENTITIES CONFIRMED:",
     "RAY // AUTH OK",
     "EZA // AUTH OK",
@@ -250,7 +281,8 @@ function typeLine(text){
 
 const seq = setInterval(()=>{
     typeLine(lines[i]);
-    if(i === 4){
+    // 특정 라인(IDENTITIES CONFIRMED)에서 이미지 공개 시작
+    if(i === 5){
         imgs.forEach((img,idx)=>{
             setTimeout(()=>img.classList.add("reveal"), idx*500);
         });
