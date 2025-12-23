@@ -1,5 +1,5 @@
 <style>
-    /* [기존 스타일 유지] */
+    /* WhatsApp QR 섹션 스타일 */
     .wa-contact-wrapper-m {
         display: flex;
         flex-direction: row;
@@ -39,15 +39,6 @@
         height: 32px;
         object-fit: contain;
     }
-
-    /* [수정] 관리자 트리거 스타일: 인라인 블록으로 설정하여 텍스트 크기만큼만 영역 차지 */
-    .admin-trigger-m {
-        display: inline-block; /* 영역을 글자 크기로 제한 */
-        cursor: default;
-        -webkit-user-select: none;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent; /* 터치 시 파란색 하이라이트 제거 */
-    }
 </style>
 
 <footer class="bg-[#020617] py-12 px-6 border-t border-cyan-900/30 text-center">
@@ -76,20 +67,6 @@
 
     <div class="text-[10px] text-neutral-600 uppercase tracking-widest space-y-1">
         <p>© 2025 TDL Energy Indonesia</p>
-        <p>
-            <span id="adminTrigger" class="admin-trigger-m active:text-neutral-500 transition-colors">Innovation</span> 
-            · Sustainability · Future
-        </p>
+        <p>Innovation · Sustainability · Future</p>
     </div>
-
-    <script>
-        // "Innovation" 텍스트 클릭 시에만 관리자 페이지 이동
-        const adminBtn = document.getElementById('adminTrigger');
-        if (adminBtn) {
-            adminBtn.addEventListener('click', function(event) {
-                event.stopPropagation(); // 부모 요소로의 클릭 이벤트 전파 차단
-                window.location.href = 'admin.html';
-            });
-        }
-    </script>
 </footer>
