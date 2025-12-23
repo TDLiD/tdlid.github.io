@@ -1,5 +1,5 @@
 <style>
-    /* WhatsApp 및 기본 스타일은 유지 */
+    /* [기존 스타일 유지] */
     .wa-contact-wrapper-m {
         display: flex;
         flex-direction: row;
@@ -9,63 +9,87 @@
         margin-bottom: 2rem;
     }
 
-    /* 관리자 트리거: 일반 텍스트와 완벽히 동일하게 설정 */
-    .admin-secret-trigger {
-        -webkit-user-select: none; /* 텍스트 선택 방지 */
-        user-select: none;
-        -webkit-tap-highlight-color: transparent; /* 터치 하이라이트 제거 */
+    .qr-container-m {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 4px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
+        transition: transform 0.2s;
+    }
+    
+    .qr-container-m:active { transform: scale(0.95); }
+
+    .qr-image-m {
+        width: 48px;
+        height: 48px;
+        display: block;
+        object-fit: contain;
+    }
+
+    .wa-icon-link-m {
+        display: flex;
+        align-items: center;
+        transition: transform 0.2s;
+    }
+    
+    .wa-icon-link-m:active { transform: scale(0.9); }
+
+    .wa-image-m {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+    }
+
+    /* [수정] 관리자 트리거 스타일: 인라인 블록으로 설정하여 텍스트 크기만큼만 영역 차지 */
+    .admin-trigger-m {
+        display: inline-block; /* 영역을 글자 크기로 제한 */
         cursor: default;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent; /* 터치 시 파란색 하이라이트 제거 */
     }
 </style>
 
 <footer class="bg-[#020617] py-12 px-6 border-t border-cyan-900/30 text-center">
+    <div class="mb-8">
+        <p class="text-cyan-400 font-bold text-sm mb-2">TDL Energy Indonesia</p>
+        <p class="text-neutral-500 text-xs">Driving the Future of Mobility</p>
+    </div>
+
+    <div class="flex flex-col items-center gap-4 mb-8">
+        <a href="index.html?view_mode=pc" class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-neutral-700 text-neutral-400 text-xs font-medium active:bg-neutral-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            View PC version
+        </a>
+    </div>
+
     <div class="wa-contact-wrapper-m">
         <div class="qr-container-m" onclick="window.open('https://wa.me/6281296075099', '_blank')">
-            <img src="images/footer/qr.png" alt="WhatsApp QR" class="qr-image-m" style="width:48px; height:48px;">
+            <img src="images/footer/qr.png" alt="WhatsApp QR" class="qr-image-m">
         </div>
-        <a href="https://wa.me/6281296075099" target="_blank">
-            <img src="images/footer/whatsapp.png" alt="WhatsApp" class="wa-image-m" style="width:32px; height:32px;">
+        <a href="https://wa.me/6281296075099" target="_blank" class="wa-icon-link-m">
+            <img src="images/footer/whatsapp.png" alt="WhatsApp" class="wa-image-m">
         </a>
     </div>
 
     <div class="text-[10px] text-neutral-600 uppercase tracking-widest space-y-1">
         <p>© 2025 TDL Energy Indonesia</p>
         <p>
-            <span id="secretAdmin" class="admin-secret-trigger">Innovation</span> 
+            <span id="adminTrigger" class="admin-trigger-m active:text-neutral-500 transition-colors">Innovation</span> 
             · Sustainability · Future
         </p>
     </div>
 
     <script>
-        (function() {
-            const trigger = document.getElementById('secretAdmin');
-            let timer;
-
-            // 터치 시작 시 타이머 작동 (1.5초)
-            trigger.addEventListener('touchstart', function(e) {
-                timer = setTimeout(function() {
-                    window.location.href = 'admin.html';
-                }, 1500); 
-            }, false);
-
-            // 손가락을 떼거나 움직이면 타이머 취소 (실수 클릭 방지)
-            trigger.addEventListener('touchend', function() {
-                clearTimeout(timer);
-            }, false);
-
-            trigger.addEventListener('touchmove', function() {
-                clearTimeout(timer);
-            }, false);
-
-            // 마우스 사용자를 위한 대응 (PC 테스트용)
-            trigger.addEventListener('mousedown', function() {
-                timer = setTimeout(function() {
-                    window.location.href = 'admin.html';
-                }, 1500);
+        // "Innovation" 텍스트 클릭 시에만 관리자 페이지 이동
+        const adminBtn = document.getElementById('adminTrigger');
+        if (adminBtn) {
+            adminBtn.addEventListener('click', function(event) {
+                event.stopPropagation(); // 부모 요소로의 클릭 이벤트 전파 차단
+                window.location.href = 'admin.html';
             });
-            trigger.addEventListener('mouseup', function() {
-                clearTimeout(timer);
-            });
-        })();
+        }
     </script>
 </footer>
