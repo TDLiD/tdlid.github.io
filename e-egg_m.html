@@ -3,74 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TDLiD System Scanning</title>
+    <title>TDLiD Secure Terminal // M</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000; margin: 0; overflow: hidden; touch-action: none; }
-        
-        #easterEggOverlay { 
-            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.98); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            font-family: monospace; color: #22d3ee; padding: 20px; 
+        /* ===============================
+           GLOBAL & MOBILE RESET
+        ================================ */
+        body { 
+            background-color: #000; 
+            margin: 0; 
+            overflow: hidden; 
+            touch-action: none;
+            color: #22d3ee;
+            font-family: 'Courier New', monospace;
         }
 
-        /* 스캔 라인 애니메이션 */
+        /* 사이버 배경 그리드 */
+        .cyber-bg {
+            position: fixed; inset: 0;
+            background:
+                linear-gradient(rgba(34,211,238,.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34,211,238,.07) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: gridMove 4s linear infinite;
+            z-index: 1;
+        }
+        @keyframes gridMove { from { background-position: 0 0; } to { background-position: 30px 30px; } }
+
+        /* ===============================
+           SCARY SKULL ZOOM EFFECT (MOBILE)
+        ================================ */
+        .skull-overlay {
+            position: fixed; inset: 0;
+            z-index: 2; pointer-events: none;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .skull-scare {
+            position: absolute;
+            width: 80px; /* 모바일용 기본 크기 */
+            opacity: 0;
+            filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.4));
+            animation: skullZoomMobile 7s infinite;
+        }
+
+        @keyframes skullZoomMobile {
+            0% { transform: scale(0.1) rotate(0deg); opacity: 0; filter: blur(8px) brightness(0.2); }
+            20% { opacity: 0.4; filter: blur(4px) brightness(0.6); }
+            50% { opacity: 0.7; filter: blur(0px) brightness(1); }
+            75% { transform: scale(6) rotate(20deg); opacity: 0; filter: brightness(2); }
+            100% { transform: scale(8) rotate(40deg); opacity: 0; }
+        }
+
+        .vignette {
+            position: fixed; inset: 0;
+            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.95) 100%);
+            z-index: 4;
+        }
+
+        /* ===============================
+           SCAN LINE
+        ================================ */
         .scanning-line { 
             width: 100%; height: 2px; background: #22d3ee; position: absolute; 
             top: 0; left: 0; box-shadow: 0 0 15px #22d3ee; 
-            animation: scan 2s linear infinite; 
-            z-index: 10;
+            animation: scan 2s linear infinite; z-index: 10;
         }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        @keyframes scan { 0% { top: -5%; } 100% { top: 105%; } }
 
-        /* 반응형 컨테이너 */
+        /* ===============================
+           UI ELEMENTS
+        ================================ */
+        #easterEggOverlay { 
+            position: relative; z-index: 10;
+            height: 100vh; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 20px; 
+        }
+
+        .glitch { animation: glitch .4s infinite; position: relative; }
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 #22d3ee, -2px 0 #f0f; }
+            50% { text-shadow: -2px 0 #22d3ee, 2px 0 #f0f; }
+            100% { text-shadow: 2px 0 #22d3ee, -2px 0 #f0f; }
+        }
+
+        /* 반응형 컨테이너 및 이미지 */
         .staff-container { 
-            display: flex; 
-            flex-wrap: wrap; /* 모바일에서 사진이 넘치면 아래로 내려가게 설정 */
-            gap: 15px; 
-            justify-content: center; 
-            margin-top: 20px; 
-            width: 100%;
-            max-width: 500px; /* 모바일에서 너무 커지지 않게 제한 */
+            display: flex; flex-wrap: wrap; gap: 15px; 
+            justify-content: center; margin-top: 20px; 
+            width: 100%; max-width: 400px;
+            perspective: 1000px;
         }
 
-        /* 반응형 이미지 설정 */
         .staff-img { 
-            width: calc(50% - 10px); /* 한 줄에 두 명씩 배치 */
-            max-width: 180px; 
-            height: auto; 
-            border-radius: 12px; 
-            border: 1px solid #22d3ee; 
+            width: calc(50% - 10px); max-width: 160px; height: auto; 
+            border-radius: 8px; border: 1px solid #22d3ee; 
+            background: rgba(0,0,0,0.6);
             box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); 
-            opacity: 0; 
-            transition: opacity 1.5s ease-in-out, transform 0.5s ease; 
+            opacity: 0; transform: rotateX(45deg) translateY(50px);
+            transition: all 1.2s cubic-bezier(.2,1,.3,1); 
         }
 
-        /* 텍스트 크기 조정 */
-        .scan-title { font-size: 1.5rem; line-height: 2rem; }
-        .status-text { font-size: 1.125rem; min-height: 1.75rem; }
+        .staff-img.reveal { opacity: 1; transform: none; }
 
-        @media (max-width: 380px) {
-            .staff-img { width: 80%; } /* 아주 작은 화면에서는 한 줄에 한 명 */
-            .scan-title { font-size: 1.25rem; }
+        .status-text { min-height: 1.5rem; letter-spacing: 1px; }
+
+        /* 하단 데이터 장식 */
+        .bottom-info {
+            position: absolute; bottom: 20px; width: 100%;
+            display: flex; justify-content: space-between;
+            padding: 0 20px; font-size: 9px; opacity: 0.4;
         }
     </style>
 </head>
 <body>
+    <div class="cyber-bg"></div>
+    
+    <div class="skull-overlay">
+        <img src="images/logo/skull.webp" class="skull-scare">
+    </div>
+
+    <div class="vignette"></div>
+
     <div id="easterEggOverlay">
         <div class="scanning-line"></div>
         
-        <div class="scan-title font-bold mb-6 animate-pulse text-center">
-            ⚡⚡⚡ <br>TDLiD SYSTEM SCANNING...
+        <div class="border border-cyan-500 bg-cyan-950/40 px-6 py-3 mb-6 backdrop-blur-sm">
+            <h1 class="text-xl font-black tracking-tighter glitch text-center">
+                TDLiD SECURE TERMINAL
+            </h1>
         </div>
         
-        <div id="statusLog" class="status-text text-neutral-400 mb-8 text-center">
-            Initializing...
+        <div id="statusLog" class="status-text text-cyan-200 mb-8 text-center text-sm italic">
+            CONNECTING...
         </div>
 
         <div class="staff-container">
             <img class="staff-img" src="images/easter_egg/staff.webp" alt="Staff 1">
             <img class="staff-img" src="images/easter_egg/staff-2.webp" alt="Staff 2">
+        </div>
+
+        <div class="bottom-info">
+            <div>CORE: 31.8C<br>BMS: OVERRIDE</div>
+            <div class="text-right">ENC: v4.0.2<br>LEVEL: █████</div>
         </div>
     </div>
 
@@ -79,40 +154,35 @@
             const log = document.getElementById('statusLog');
             const staffImgs = document.querySelectorAll('.staff-img');
             const msgs = [
-                "System Scanning...", 
-                "Decrypting BMS...", 
-                "TDLiD Verified.", 
-                "Mr. Ray🧔", 
-                "Mr. Eza😎", 
-                "Mr. Rezy👨‍🦰", 
-                "Miss. Etno🧕"
+                "> BOOTING...", 
+                "> BYPASSING BMS...", 
+                "> SCANNING...", 
+                "> ACCESS GRANTED",
+                "MR. RAY 🧔", 
+                "MR. EZA 😎", 
+                "MR. REZY 👨‍🦰", 
+                "MISS. ETNO 🧕"
             ];
             
             msgs.forEach((msg, i) => {
                 setTimeout(() => {
                     log.innerText = msg;
                     
-                    // 메시지가 중간쯤 진행되었을 때 이미지 서서히 나타남
-                    if (i === 3) {
-                        staffImgs.forEach(img => {
-                            img.style.opacity = '1';
-                            img.style.transform = 'scale(1.05)';
-                            setTimeout(() => img.style.transform = 'scale(1)', 500);
+                    // 특정 시점에 이미지 등장 (데스크톱 스타일 트랜지션)
+                    if (i === 4) {
+                        staffImgs.forEach((img, idx) => {
+                            setTimeout(() => img.classList.add('reveal'), idx * 400);
                         });
                     }
                     
                     // 모든 메시지 종료 후 리다이렉트
                     if (i === msgs.length - 1) {
                         setTimeout(() => {
-                            // 모바일용 contact_m.html이 있다면 그곳으로, 없다면 이전 페이지로
-                            if(document.referrer.includes('contact')) {
-                                window.history.back();
-                            } else {
-                                window.location.href = "index.html";
-                            }
-                        }, 2500);
+                            if(document.referrer) window.history.back();
+                            else window.location.href = "index.html";
+                        }, 3000);
                     }
-                }, i * 800); // 모바일 사용자를 위해 메시지 속도를 약간 늦춤
+                }, i * 700);
             });
         };
     </script>
