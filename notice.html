@@ -65,7 +65,7 @@
         }
 
         .notice-item.active .notice-content {
-            max-height: 3000px; /* 이미지가 길 경우를 대비해 확장 */
+            max-height: 3000px;
             padding: 2rem;
             border-top: 1px solid rgba(6, 182, 212, 0.1);
         }
@@ -80,13 +80,11 @@
             color: #22d3ee;
         }
 
-        /* 공지사항 내부 콘텐츠 스타일 */
         .notice-content-inner {
             user-select: text;
-            white-space: normal; /* HTML 태그(img 등)가 작동하도록 수정 */
+            white-space: normal;
         }
 
-        /* 에디터 삽입 이미지 최적화 */
         .notice-content-inner img {
             max-width: 100%;
             height: auto;
@@ -124,7 +122,6 @@
     <div id="footer-placeholder"></div>
 
     <script>
-        // 레이아웃 로드
         async function loadLayout() {
             try {
                 const [h, f, b] = await Promise.all([
@@ -147,7 +144,6 @@
             }
         }
 
-        // 파이어베이스 설정
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -160,7 +156,6 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // 토글 함수
         function toggleNotice(element) {
             const item = element.closest('.notice-item');
             const isActive = item.classList.contains('active');
@@ -168,7 +163,6 @@
             if (!isActive) item.classList.add('active');
         }
 
-        // 데이터 실시간 수신 및 렌더링
         database.ref('notices').on('value', (snapshot) => {
             const noticeList = document.getElementById('noticeList');
             noticeList.innerHTML = '';
@@ -184,12 +178,14 @@
                 notices.push(data);
             });
 
+            // 최신순 정렬 (timestamp 기준)
             notices.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
             let finalHtml = '';
             notices.forEach((notice, index) => {
-                const num = notices.length - index;
-                const displayNum = num < 10 ? '0' + num : num;
+                // [수정 포인트] index는 0부터 시작하므로 1을 더해 1, 2, 3... 순서로 표시합니다.
+                const currentNum = index + 1;
+                const displayNum = currentNum < 10 ? '0' + currentNum : currentNum;
 
                 finalHtml += `
                 <div class="notice-item">
@@ -221,7 +217,6 @@
             noticeList.innerHTML = finalHtml;
         });
 
-        // 메뉴 토글 (공통)
         function initMenuToggle() {
             const menuBtn = document.getElementById("menuToggleBtn");
             const dropdown = document.getElementById("dropdownMenu");
