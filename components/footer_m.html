@@ -6,7 +6,7 @@
         justify-content: center;
         align-items: center;
         gap: 15px;
-        margin-bottom: 2rem; /* 관리자 텍스트와의 간격 */
+        margin-bottom: 2rem;
     }
 
     .qr-container-m {
@@ -14,12 +14,14 @@
         padding: 4px;
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
-        active:scale(0.95); /* 터치 시 피드백 */
         transition: transform 0.2s;
     }
+    
+    /* 터치 시 피드백 효과 */
+    .qr-container-m:active { transform: scale(0.95); }
 
     .qr-image-m {
-        width: 48px;  /* 모바일 적정 사이즈 */
+        width: 48px;
         height: 48px;
         display: block;
         object-fit: contain;
@@ -28,14 +30,22 @@
     .wa-icon-link-m {
         display: flex;
         align-items: center;
-        active:scale(0.9);
         transition: transform 0.2s;
     }
+    
+    .wa-icon-link-m:active { transform: scale(0.9); }
 
     .wa-image-m {
-        width: 32px;  /* 모바일 적정 사이즈 */
+        width: 32px;
         height: 32px;
         object-fit: contain;
+    }
+
+    /* 관리자 전용 스타일 (숨김 처리) */
+    .admin-trigger-m {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
     }
 </style>
 
@@ -63,13 +73,16 @@
         </a>
     </div>
 
-    <div id="adminTrigger" class="text-[10px] text-neutral-600 uppercase tracking-widest space-y-1 cursor-pointer active:text-neutral-400 transition-colors">
+    <div class="text-[10px] text-neutral-600 uppercase tracking-widest space-y-1">
         <p>© 2025 TDL Energy Indonesia</p>
-        <p>Innovation · Sustainability · Future</p>
+        <p>
+            <span id="adminTrigger" class="admin-trigger-m active:text-neutral-500 transition-colors">Innovation</span> 
+            · Sustainability · Future
+        </p>
     </div>
 
     <script>
-        // Footer 텍스트 클릭 시 관리자 페이지 이동
+        // "Innovation" 텍스트 클릭 시에만 관리자 페이지 이동
         document.getElementById('adminTrigger').addEventListener('click', function() {
             window.location.href = 'admin.html';
         });
