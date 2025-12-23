@@ -363,37 +363,95 @@
         function deleteNotice(key) { if(confirm("Delete this?")) database.ref('notices/' + key).remove(); }
 
         // 3. Analytics Logic (Same as before)
-        function loadAnalytics() {
-            database.ref('visits').orderByChild('timestamp').on('value', (snapshot) => {
-                const tableBody = document.getElementById('visitTableBody');
-                tableBody.innerHTML = '';
-                let rawData = [];
-                snapshot.forEach(c => rawData.push(c.val()));
-                rawData.reverse();
-                
-                const grouped = {};
-                rawData.forEach(v => {
-                    const k = (v.ip || 'unk') + "_" + v.device;
-                    if(!grouped[k]) grouped[k] = {...v, count: 1};
-                    else grouped[k].count++;
-                });
-
-                const display = Object.values(grouped);
-                document.getElementById('totalCount').innerText = rawData.length;
-                document.getElementById('uniqueCount').innerText = display.length;
-
-                display.forEach(v => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td class="p-5 text-center"><span class="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-xs font-bold">${v.count}</span></td>
-                        <td class="p-5"><div class="text-neutral-400 text-xs font-mono">${v.timeStr}</div><div class="text-cyan-500 text-sm font-black">${v.ip || '0.0.0.0'}</div></td>
-                        <td class="p-5"><div class="text-white font-bold">${v.country || 'Unknown'}</div></td>
-                        <td class="p-5 text-center"><span class="px-2 py-1 rounded text-xxs bg-neutral-800 text-neutral-300">${v.os || 'OS'}</span></td>
-                        <td class="p-5"><div class="font-bold text-cyan-400 text-xs">${v.page}</div></td>`;
-                    tableBody.appendChild(row);
-                });
+function loadAnalytics() {
+    database.ref('visits').orderByChild('timestamp').on('value', (snapshot) => {
+        const tableBody = document.getElementById('visitTableBody');
+        if (!tableBody) return;
+        
+        tableBody.innerHTML = '';
+        let rawData = [];
+        
+        if (snapshot.exists()) {
+            snapshot.forEach(c => {
+                const val = c.val();
+                if (val && val.timestamp) {
+                    rawData.push(val);
+                }
             });
         }
+        
+        // 최신 데이터가 위로 오도록 정렬
+        rawData.sort((a, b) => b.timestamp - a.timestamp);
+
+        // --- 그룹화 로직 시작 ---
+        const groupedData = [];
+        const map = new Map();
+
+        rawData.forEach(v => {
+            // IP + OS 조합을 고유 키로 사용
+            const key = `${v.ip}_${v.os}`;
+            
+            if (!map.has(key)) {
+                // 처음 발견된 조합이면 객체 생성
+                const entry = {
+                    ...v,
+                    count: 1, // 접속 횟수 초기화
+                    lastAccess: v.timeStr // 가장 최근 시간 저장
+                };
+                map.set(key, entry);
+                groupedData.push(entry);
+            } else {
+                // 이미 존재하는 조합이면 카운트만 증가
+                const existing = map.get(key);
+                existing.count += 1;
+                // 이미 정렬되어 있으므로 처음 만난 시간이 가장 최신 시간임
+            }
+        });
+        // --- 그룹화 로직 끝 ---
+
+        // 상단 대시보드 업데이트 (전체 히트 수와 순 방문자 수)
+        const uniqueIps = new Set(rawData.map(v => v.ip).filter(ip => ip)).size;
+        document.getElementById('totalCount').innerText = rawData.length;
+        document.getElementById('uniqueCount').innerText = uniqueIps;
+
+        if (groupedData.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-neutral-500">No visitor logs found.</td></tr>`;
+            return;
+        }
+
+        groupedData.forEach(v => {
+            const row = document.createElement('tr');
+            row.className = "hover:bg-white/5 transition border-b border-white/5";
+            row.innerHTML = `
+                <td class="p-5 text-center">
+                    <div class="flex flex-col items-center">
+                        <span class="bg-cyan-500 text-black px-2 py-0.5 rounded text-[10px] font-black mb-1">${v.count}</span>
+                        <span class="text-[9px] text-neutral-500 uppercase tracking-tighter">Hits</span>
+                    </div>
+                </td>
+                <td class="p-5">
+                    <div class="text-neutral-400 text-xs font-mono">${v.lastAccess || '-'}</div>
+                    <div class="text-cyan-500 text-sm font-black">${v.ip || '0.0.0.0'}</div>
+                </td>
+                <td class="p-5">
+                    <div class="text-white font-bold">${v.country || 'Unknown'}</div>
+                    <div class="text-neutral-500 text-xxs">${v.city || ''}</div>
+                </td>
+                <td class="p-5 text-center">
+                    <div class="flex flex-col gap-1 items-center">
+                        <span class="px-2 py-1 rounded text-xxs bg-neutral-800 text-neutral-300 w-24 truncate">${v.os || 'OS'}</span>
+                        <span class="px-2 py-1 rounded text-xxs bg-cyan-900/20 text-cyan-500 w-24 truncate">${v.browser || v.device || 'Device'}</span>
+                    </div>
+                </td>
+                <td class="p-5">
+                    <div class="font-bold text-cyan-400 text-xs">${v.page || '/'}</div>
+                    <div class="text-neutral-600 text-[10px] truncate max-w-[150px]">${v.referrer ? 'via ' + new URL(v.referrer).hostname : 'Direct'}</div>
+                </td>`;
+            tableBody.appendChild(row);
+        });
+    });
+}
+
 
         window.onload = () => { loadInquiries(); loadAnalytics(); updateFormText(); };
     </script>
