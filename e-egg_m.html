@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TDLiD System Scanning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000; margin: 0; overflow: hidden; touch-action: none; }
+        
+        #easterEggOverlay { 
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.98); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            font-family: monospace; color: #22d3ee; padding: 20px; 
+        }
+
+        /* 스캔 라인 애니메이션 */
+        .scanning-line { 
+            width: 100%; height: 2px; background: #22d3ee; position: absolute; 
+            top: 0; left: 0; box-shadow: 0 0 15px #22d3ee; 
+            animation: scan 2s linear infinite; 
+            z-index: 10;
+        }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* 반응형 컨테이너 */
+        .staff-container { 
+            display: flex; 
+            flex-wrap: wrap; /* 모바일에서 사진이 넘치면 아래로 내려가게 설정 */
+            gap: 15px; 
+            justify-content: center; 
+            margin-top: 20px; 
+            width: 100%;
+            max-width: 500px; /* 모바일에서 너무 커지지 않게 제한 */
+        }
+
+        /* 반응형 이미지 설정 */
+        .staff-img { 
+            width: calc(50% - 10px); /* 한 줄에 두 명씩 배치 */
+            max-width: 180px; 
+            height: auto; 
+            border-radius: 12px; 
+            border: 1px solid #22d3ee; 
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); 
+            opacity: 0; 
+            transition: opacity 1.5s ease-in-out, transform 0.5s ease; 
+        }
+
+        /* 텍스트 크기 조정 */
+        .scan-title { font-size: 1.5rem; line-height: 2rem; }
+        .status-text { font-size: 1.125rem; min-height: 1.75rem; }
+
+        @media (max-width: 380px) {
+            .staff-img { width: 80%; } /* 아주 작은 화면에서는 한 줄에 한 명 */
+            .scan-title { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="easterEggOverlay">
+        <div class="scanning-line"></div>
+        
+        <div class="scan-title font-bold mb-6 animate-pulse text-center">
+            ⚡⚡⚡ <br>TDLiD SYSTEM SCANNING...
+        </div>
+        
+        <div id="statusLog" class="status-text text-neutral-400 mb-8 text-center">
+            Initializing...
+        </div>
+
+        <div class="staff-container">
+            <img class="staff-img" src="images/easter_egg/staff.webp" alt="Staff 1">
+            <img class="staff-img" src="images/easter_egg/staff-2.webp" alt="Staff 2">
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const log = document.getElementById('statusLog');
+            const staffImgs = document.querySelectorAll('.staff-img');
+            const msgs = [
+                "System Scanning...", 
+                "Decrypting BMS...", 
+                "TDLiD Verified.", 
+                "Mr. Ray🧔", 
+                "Mr. Eza😎", 
+                "Mr. Rezy👨‍🦰", 
+                "Miss. Etno🧕"
+            ];
+            
+            msgs.forEach((msg, i) => {
+                setTimeout(() => {
+                    log.innerText = msg;
+                    
+                    // 메시지가 중간쯤 진행되었을 때 이미지 서서히 나타남
+                    if (i === 3) {
+                        staffImgs.forEach(img => {
+                            img.style.opacity = '1';
+                            img.style.transform = 'scale(1.05)';
+                            setTimeout(() => img.style.transform = 'scale(1)', 500);
+                        });
+                    }
+                    
+                    // 모든 메시지 종료 후 리다이렉트
+                    if (i === msgs.length - 1) {
+                        setTimeout(() => {
+                            // 모바일용 contact_m.html이 있다면 그곳으로, 없다면 이전 페이지로
+                            if(document.referrer.includes('contact')) {
+                                window.history.back();
+                            } else {
+                                window.location.href = "index.html";
+                            }
+                        }, 2500);
+                    }
+                }, i * 800); // 모바일 사용자를 위해 메시지 속도를 약간 늦춤
+            });
+        };
+    </script>
+</body>
+</html>
