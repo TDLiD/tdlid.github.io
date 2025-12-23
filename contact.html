@@ -136,7 +136,7 @@
             Please provide details for a customized quotation. <span id="triggerWord2" class="stealth-trigger stealth-text">Our</span> team will contact you shortly.
         </p>
 
-        <form id="quoteForm" method="POST" action="https://formspree.io/f/mdkqddlz" class="grid gap-6">
+        <form id="quoteForm" class="grid gap-6">
             <div class="grid grid-cols-2 gap-6">
                 <input name="company" placeholder="Company / Name" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required>
                 <input name="email" type="email" placeholder="Email Address" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required>
@@ -167,7 +167,24 @@
 
 <div id="footer-placeholder"></div>
 
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
 <script>
+    // 2. Firebase 설정 및 초기화
+    const firebaseConfig = {
+        apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+        authDomain: "tdlid-107669.firebaseapp.com",
+        databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+        projectId: "tdlid-107669",
+        storageBucket: "tdlid-107669.firebasestorage.app",
+        messagingSenderId: "604782345004",
+        appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
     async function loadLayout() {
         try {
             const headerRes = await fetch('components/header.html');
@@ -189,7 +206,7 @@
             });
             
             initMenuToggle();
-            initFormHandler();
+            initFormHandler(); // Form 로직 실행
             initEasterEgg(); 
         } catch (err) {
             console.error("Layout load failed:", err);
@@ -224,7 +241,7 @@
         }
     }
 
-    // 이스터에그 로직 수정됨
+    // 이스터에그 로직
     function initEasterEgg() {
         const t1 = document.getElementById('triggerWord');
         const t2 = document.getElementById('triggerWord2');
@@ -269,7 +286,6 @@
         let inputStr = "";
         document.onkeydown = (e) => {
             inputStr += e.key.toLowerCase();
-            // 키워드 tdlid로 변경
             if(inputStr.includes("tdlid")) { 
                 runCyberEffect(); 
                 inputStr = ""; 
@@ -278,27 +294,46 @@
         };
     }
 
+    // 3. 수정된 폼 핸들러 (이메일 제거 + Firebase 저장 전용)
     function initFormHandler() {
         const form = document.getElementById('quoteForm');
         const formStatus = document.getElementById('formStatus');
+        
         if(form) {
             form.onsubmit = async (e) => {
                 e.preventDefault();
-                formStatus.textContent = 'Sending...';
+                
+                // 전송 중 상태 표시
+                formStatus.textContent = 'Storing Request...';
                 formStatus.className = 'mt-6 text-center text-lg text-cyan-400';
+                
                 try {
-                    const response = await fetch(form.action, {
-                        method: form.method,
-                        body: new FormData(form),
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    if (response.ok) {
-                        formStatus.textContent = '✅ Submitted successfully!';
-                        formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
-                        form.reset();
-                    } else { throw new Error(); }
-                } catch {
-                    formStatus.textContent = '❌ Error. Please try again.';
+                    const formData = new FormData(form);
+                    
+                    // Firebase 저장용 객체 생성
+                    const msgData = {
+                        timestamp: Date.now(),
+                        date: new Date().toLocaleString(),
+                        company: formData.get('company'),
+                        email: formData.get('email'),
+                        phone: formData.get('phone') || 'N/A',
+                        product: formData.get('product') || 'None Selected',
+                        details: formData.get('details') || '',
+                        read: false, // 관리자 페이지용
+                        status: 'new'
+                    };
+
+                    // Firebase DB의 'messages' 경로에 데이터 저장
+                    await database.ref('messages').push(msgData);
+
+                    // 성공 메시지 출력
+                    formStatus.textContent = '✅ Submitted successfully!';
+                    formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
+                    form.reset(); // 입력 폼 초기화
+                    
+                } catch (error) {
+                    console.error("Database Error:", error);
+                    formStatus.textContent = '❌ Error saving data. Please try again.';
                     formStatus.className = 'mt-6 text-center text-lg text-red-500';
                 }
             };

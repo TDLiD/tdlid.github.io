@@ -17,15 +17,64 @@
         input { background: #0f172a !important; border: 1px solid #1e293b !important; color: white !important; }
         .edit-mode { border-color: #f59e0b !important; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
 
-        /* 2. 에디터 커스텀 스타일 */
         .ql-toolbar { background: #1e293b !important; border-color: #334155 !important; border-radius: 8px 8px 0 0; }
         .ql-container { background: #0f172a !important; border-color: #334155 !important; border-radius: 0 0 8px 8px; min-height: 200px; color: white; font-size: 1rem; }
         .ql-stroke { stroke: #94a3b8 !important; }
         .ql-fill { fill: #94a3b8 !important; }
         .ql-picker { color: #94a3b8 !important; }
+
+        .unread-row { background-color: rgba(34, 211, 238, 0.05); }
+
+        /* 모달 스타일 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .modal-content {
+            background: #0f172a; border: 1px solid rgba(34, 211, 238, 0.3);
+            width: 90%; max-width: 600px; border-radius: 1rem; overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body class="text-neutral-200 p-5 md:p-10">
+
+    <div id="inquiryModal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
+                <h4 class="font-bold text-cyan-400">Inquiry Details</h4>
+                <button onclick="closeModal()" class="text-neutral-400 hover:text-white text-xl">✕</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <p class="text-neutral-500 uppercase font-bold">Name</p>
+                        <p id="modalName" class="text-white text-base"></p>
+                    </div>
+                    <div>
+                        <p class="text-neutral-500 uppercase font-bold">Date</p>
+                        <p id="modalDate" class="text-white"></p>
+                    </div>
+                    <div>
+                        <p class="text-neutral-500 uppercase font-bold">Company</p>
+                        <p id="modalCompany" class="text-cyan-400"></p>
+                    </div>
+                    <div>
+                        <p class="text-neutral-500 uppercase font-bold">Email</p>
+                        <p id="modalEmail" class="text-white"></p>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-white/5">
+                    <p class="text-neutral-500 uppercase text-xs font-bold mb-2">Message</p>
+                    <div id="modalMessage" class="text-neutral-200 leading-relaxed whitespace-pre-wrap bg-black/30 p-4 rounded-lg border border-white/5 max-h-[300px] overflow-y-auto font-mono text-sm"></div>
+                </div>
+            </div>
+            <div class="p-4 bg-white/5 text-right">
+                <button onclick="closeModal()" class="px-6 py-2 bg-neutral-700 hover:bg-neutral-600 rounded-lg text-sm font-bold transition">CLOSE</button>
+            </div>
+        </div>
+    </div>
 
     <div class="max-w-7xl mx-auto">
         <header class="flex justify-between items-center mb-10 border-b border-cyan-900/50 pb-6">
@@ -36,6 +85,27 @@
             <button onclick="location.reload()" class="px-4 py-2 bg-cyan-900/30 border border-cyan-500/50 text-cyan-400 rounded-lg hover:bg-cyan-500 hover:text-black transition font-bold">REFRESH</button>
         </header>
 
+        <section id="inquirySection" class="mb-12 bg-neutral-900/80 rounded-2xl cyber-border overflow-hidden shadow-2xl">
+            <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                <span class="font-bold text-xs tracking-widest text-amber-400 uppercase">Customer Inquiry / Quote List</span>
+                <span id="unreadCount" class="bg-amber-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">0 NEW</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-neutral-950 text-neutral-400 text-[10px] uppercase tracking-wider">
+                            <th class="p-4">Status</th>
+                            <th class="p-4">Date / Name</th>
+                            <th class="p-4">Company / Contact</th>
+                            <th class="p-4">Message (Click to open)</th>
+                            <th class="p-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inquiryTableBody" class="divide-y divide-neutral-800 text-sm"></tbody>
+                </table>
+            </div>
+        </section>
+
         <section id="noticeFormSection" class="mb-12 bg-neutral-900/50 p-6 rounded-2xl cyber-border transition-all">
             <h3 id="formTitle" class="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <span class="w-2 h-2 bg-cyan-500 rounded-full animate-ping"></span>
@@ -44,9 +114,7 @@
             <input type="hidden" id="editKey"> 
             <div class="grid grid-cols-1 gap-4">
                 <input type="text" id="noticeTitle" placeholder="Please enter a title for your notice." class="w-full p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
-                
                 <div id="editor-container"></div>
-
                 <div class="flex gap-2">
                     <button id="submitBtn" onclick="uploadNotice()" class="flex-1 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition shadow-lg">REGISTER NOTICE (POST)</button>
                     <button id="cancelBtn" onclick="resetForm()" class="hidden px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white font-bold rounded-lg transition">CANCEL</button>
@@ -101,6 +169,7 @@
     </div>
 
     <script>
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -114,32 +183,124 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
- // 4. Quill 에디터 초기화 (기능 확장 버전)
-const quill = new Quill('#editor-container', {
-    theme: 'snow',
-    modules: {
-        toolbar: [
-            [{ 'header': [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline', 'strike'],
-            ['image', 'link'], // <--- 'image'를 추가하면 툴바에 사진 아이콘이 생깁니다.
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-            [{ 'color': [] }, { 'background': [] }],
-            ['clean']
-        ]
-    },
-    placeholder: '공지사항 내용을 작성해 주세요.'
-});
+        // 1. Inquiry Logic & Escape
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text ? String(text).replace(/[&<>"']/g, m => map[m]) : '';
+        }
 
+        // 모달 열기 함수
+        function openInquiry(key, name, date, company, email, details) {
+            document.getElementById('modalName').innerText = name;
+            document.getElementById('modalDate').innerText = date;
+            document.getElementById('modalCompany').innerText = company;
+            document.getElementById('modalEmail').innerText = email;
+            document.getElementById('modalMessage').innerText = details;
+            
+            document.getElementById('inquiryModal').style.display = 'flex';
+            
+            // 모달을 열면 자동으로 읽음 처리
+            database.ref('messages/' + key).update({ read: true });
+        }
 
-        // --- Notice Logic ---
+        function closeModal() {
+            document.getElementById('inquiryModal').style.display = 'none';
+        }
+
+        function loadInquiries() {
+            database.ref('messages').orderByChild('timestamp').on('value', (snapshot) => {
+                const tbody = document.getElementById('inquiryTableBody');
+                const unreadEl = document.getElementById('unreadCount');
+                if(!tbody) return;
+
+                tbody.innerHTML = '';
+                let unreadCount = 0;
+                let items = [];
+
+                snapshot.forEach(child => {
+                    const data = child.val();
+                    if(!data.read) unreadCount++;
+                    items.push({ key: child.key, ...data });
+                });
+                
+                items.reverse(); 
+                unreadEl.innerText = unreadCount + " NEW";
+
+                items.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-white/10 cursor-pointer transition " + (!item.read ? 'unread-row' : '');
+                    
+                    const safeDetails = escapeHtml(item.details || '');
+                    const safeName = escapeHtml(item.name || 'N/A');
+                    const safeCompany = escapeHtml(item.company || '-');
+                    const safeEmail = escapeHtml(item.email || '');
+                    const safeDate = item.date || '';
+
+                    // 행 자체를 클릭하면 상세 보기 실행 (버튼 클릭과 분리하기 위해 onclick 위치 조정)
+                    row.onclick = () => openInquiry(item.key, safeName, safeDate, safeCompany, safeEmail, item.details);
+
+                    row.innerHTML = `
+                        <td class="p-4">
+                            <span class="${item.read ? 'text-neutral-600' : 'text-amber-400 font-bold'} text-xs">
+                                ${item.read ? 'READ' : '● NEW'}
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <div class="text-neutral-500 text-[10px]">${safeDate}</div>
+                            <div class="text-white font-bold">${safeName}</div>
+                        </td>
+                        <td class="p-4">
+                            <div class="text-cyan-400 font-bold">${safeCompany}</div>
+                            <div class="text-neutral-400 text-xs">${safeEmail}</div>
+                        </td>
+                        <td class="p-4">
+                            <div class="text-neutral-300 truncate max-w-xs opacity-70">
+                                ${safeDetails}
+                            </div>
+                        </td>
+                        <td class="p-4 text-right space-x-2" onclick="event.stopPropagation()">
+                            <button onclick="toggleInquiryRead('${item.key}', ${item.read})" class="text-neutral-400 hover:text-white text-xs underline">
+                                ${item.read ? 'Unread' : 'Mark Read'}
+                            </button>
+                            <button onclick="deleteInquiry('${item.key}')" class="text-red-500 hover:text-red-400 text-xs font-bold">Del</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+
+        function toggleInquiryRead(key, currentStatus) {
+            database.ref('messages/' + key).update({ read: !currentStatus });
+        }
+
+        function deleteInquiry(key) {
+            if(confirm("Delete this inquiry?")) {
+                database.ref('messages/' + key).remove();
+            }
+        }
+
+        // 2. Notice Logic
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['image', 'link'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Write notice content here...'
+        });
 
         function uploadNotice() {
             const title = document.getElementById('noticeTitle').value;
-            // 5. 에디터에서 HTML 내용 가져오기
             const content = quill.root.innerHTML;
             const editKey = document.getElementById('editKey').value;
             
-            // 텍스트가 없는 경우 체크 (HTML 태그만 있는 빈 상태 방지)
             if(!title || quill.getText().trim().length === 0) return alert("Please enter both title and content.");
 
             const noticeData = {
@@ -162,25 +323,9 @@ const quill = new Quill('#editor-container', {
             }
         }
 
-        function prepareEdit(key, title, content) {
-            document.getElementById('editKey').value = key;
-            document.getElementById('noticeTitle').value = title;
-            // 6. 에디터에 HTML 내용 넣기
-            quill.root.innerHTML = content;
-            
-            document.getElementById('formTitle').innerText = "EDIT NOTICE";
-            document.getElementById('submitBtn').innerText = "UPDATE NOTICE (SAVE)";
-            document.getElementById('submitBtn').classList.replace('bg-cyan-600', 'bg-amber-600');
-            document.getElementById('noticeFormSection').classList.add('edit-mode');
-            document.getElementById('cancelBtn').classList.remove('hidden');
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
         function resetForm() {
             document.getElementById('editKey').value = '';
             document.getElementById('noticeTitle').value = '';
-            // 7. 에디터 초기화
             quill.setContents([]);
             document.getElementById('formTitle').innerText = "POST NEW NOTICE";
             document.getElementById('submitBtn').innerText = "REGISTER NOTICE (POST)";
@@ -189,47 +334,48 @@ const quill = new Quill('#editor-container', {
             document.getElementById('cancelBtn').classList.add('hidden');
         }
 
-        function deleteNotice(key) {
-            if(confirm("Are you sure you want to delete this notice?")) {
-                database.ref('notices/' + key).remove().then(() => alert("Deleted successfully."));
-            }
-        }
-
-        // 실시간 리스트 갱신 (Edit 버튼에 백틱을 이용해 HTML 문자열 안전하게 전달)
         database.ref('notices').orderByChild('timestamp').on('value', (snapshot) => {
             const tbody = document.getElementById('noticeTableBody');
             tbody.innerHTML = '';
-            
             let items = [];
-            snapshot.forEach(child => {
-                items.push({ key: child.key, ...child.val() });
-            });
+            snapshot.forEach(child => { items.push({ key: child.key, ...child.val() }); });
             items.reverse();
-
             items.forEach(item => {
-                // HTML 내용 중 따옴표 등이 prepareEdit 함수 호출 시 문법 오류를 일으키지 않도록 처리
                 const escapedContent = encodeURIComponent(item.content);
-                const tr = `
-                    <tr class="hover:bg-white/5 transition">
-                        <td class="p-4 text-neutral-500 text-xs">${item.date}</td>
-                        <td class="p-4 font-bold text-neutral-200">${item.title}</td>
-                        <td class="p-4 text-right space-x-2">
-                            <button onclick="handleEditClick('${item.key}', \`${item.title}\`, '${escapedContent}')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold uppercase">Edit</button>
-                            <button onclick="deleteNotice('${item.key}')" class="text-red-500 hover:text-red-400 text-xs font-bold uppercase">Delete</button>
-                        </td>
-                    </tr>
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-white/5 transition";
+                tr.innerHTML = `
+                    <td class="p-4 text-neutral-500 text-xs">${item.date}</td>
+                    <td class="p-4 font-bold text-neutral-200">${item.title}</td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="handleEditClick('${item.key}', \`${item.title}\`, '${escapedContent}')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold uppercase">Edit</button>
+                        <button onclick="deleteNotice('${item.key}')" class="text-red-500 hover:text-red-400 text-xs font-bold uppercase">Delete</button>
+                    </td>
                 `;
-                tbody.innerHTML += tr;
+                tbody.appendChild(tr);
             });
         });
 
-        // HTML 문자열 전달 시 오류 방지를 위한 보조 함수
         function handleEditClick(key, title, escapedContent) {
-            prepareEdit(key, title, decodeURIComponent(escapedContent));
+            document.getElementById('editKey').value = key;
+            document.getElementById('noticeTitle').value = title;
+            quill.root.innerHTML = decodeURIComponent(escapedContent);
+            document.getElementById('formTitle').innerText = "EDIT NOTICE";
+            document.getElementById('submitBtn').innerText = "UPDATE NOTICE (SAVE)";
+            document.getElementById('submitBtn').classList.replace('bg-cyan-600', 'bg-amber-600');
+            document.getElementById('noticeFormSection').classList.add('edit-mode');
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- Analytics 로직 생략 (기존과 동일) ---
-        function loadFirebaseData() {
+        function deleteNotice(key) {
+            if(confirm("Delete this notice?")) {
+                database.ref('notices/' + key).remove();
+            }
+        }
+
+        // 3. Analytics Logic
+        function loadAnalytics() {
             const tableBody = document.getElementById('visitTableBody');
             const totalCountEl = document.getElementById('totalCount');
             const uniqueCountEl = document.getElementById('uniqueCount');
@@ -242,7 +388,7 @@ const quill = new Quill('#editor-container', {
 
                 const groupedData = {};
                 rawData.forEach((visit) => {
-                    const groupKey = `${visit.ip || 'unknown'}_${visit.device}`;
+                    const groupKey = (visit.ip || 'unknown') + "_" + visit.device;
                     if (!groupedData[groupKey]) {
                         groupedData[groupKey] = { ...visit, count: 1 };
                     } else {
@@ -255,36 +401,40 @@ const quill = new Quill('#editor-container', {
                 uniqueCountEl.innerText = displayData.length;
 
                 displayData.forEach((visit) => {
-                    const row = `
-                        <tr class="hover:bg-cyan-400/5 transition-colors">
-                            <td class="p-5 text-center border-r border-white/5">
-                                <span class="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-xs font-bold ring-1 ring-cyan-500/30">${visit.count}</span>
-                            </td>
-                            <td class="p-5">
-                                <div class="text-neutral-400 text-xs font-mono">${visit.timeStr}</div>
-                                <div class="text-cyan-500 text-sm font-black mt-1 tracking-wider">${visit.ip || '0.0.0.0'}</div>
-                            </td>
-                            <td class="p-5">
-                                <div class="text-white font-bold">${visit.country || 'Unknown'} (${visit.city || '-'})</div>
-                                <div class="text-neutral-600 text-[10px] font-mono mt-1 uppercase tracking-tighter">ID: ${visit.sid || 'No Session'}</div>
-                            </td>
-                            <td class="p-5 text-center">
-                                <div class="flex flex-col gap-1 items-center">
-                                    <span class="px-2 py-1 rounded text-xxs bg-neutral-800 text-neutral-300 border border-neutral-700 w-20">${visit.os || 'Unknown OS'}</span>
-                                    <span class="px-2 py-1 rounded text-xxs bg-blue-900/30 text-blue-400 border border-blue-500/20 w-20">${visit.browser || 'Unknown'}</span>
-                                </div>
-                            </td>
-                            <td class="p-5">
-                                <div class="font-bold text-cyan-400 text-xs uppercase">${visit.page}</div>
-                                <div class="text-neutral-600 italic text-[10px] truncate max-w-[180px] mt-1">${visit.referrer || 'Direct'}</div>
-                            </td>
-                        </tr>
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-cyan-400/5 transition-colors";
+                    row.innerHTML = `
+                        <td class="p-5 text-center border-r border-white/5">
+                            <span class="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-xs font-bold ring-1 ring-cyan-500/30">${visit.count}</span>
+                        </td>
+                        <td class="p-5">
+                            <div class="text-neutral-400 text-xs font-mono">${visit.timeStr}</div>
+                            <div class="text-cyan-500 text-sm font-black mt-1 tracking-wider">${visit.ip || '0.0.0.0'}</div>
+                        </td>
+                        <td class="p-5">
+                            <div class="text-white font-bold">${visit.country || 'Unknown'} (${visit.city || '-'})</div>
+                            <div class="text-neutral-600 text-[10px] font-mono mt-1 uppercase tracking-tighter">ID: ${visit.sid || 'No Session'}</div>
+                        </td>
+                        <td class="p-5 text-center">
+                            <div class="flex flex-col gap-1 items-center">
+                                <span class="px-2 py-1 rounded text-xxs bg-neutral-800 text-neutral-300 border border-neutral-700 w-20">${visit.os || 'Unknown OS'}</span>
+                                <span class="px-2 py-1 rounded text-xxs bg-blue-900/30 text-blue-400 border border-blue-500/20 w-20">${visit.browser || 'Unknown'}</span>
+                            </div>
+                        </td>
+                        <td class="p-5">
+                            <div class="font-bold text-cyan-400 text-xs uppercase">${visit.page}</div>
+                            <div class="text-neutral-600 italic text-[10px] truncate max-w-[180px] mt-1">${visit.referrer || 'Direct'}</div>
+                        </td>
                     `;
-                    tableBody.innerHTML += row;
+                    tableBody.appendChild(row);
                 });
             });
         }
-        window.onload = loadFirebaseData;
+
+        window.onload = () => {
+            loadInquiries();
+            loadAnalytics();
+        };
     </script>
 </body>
 </html>
