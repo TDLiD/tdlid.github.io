@@ -343,19 +343,6 @@ async function loadLayout() {
         if (e.key === 'Enter') verifyAdminPassword();
     });
 
-    // 보안 기능
-    document.addEventListener('keydown', (e) => {
-        if (
-            e.key === 'F12' ||
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-            (e.ctrlKey && e.key === 'u')
-        ) {
-            e.preventDefault();
-            return false;
-        }
-    });
-
-    document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
 </script>
 </body>
 </html>
