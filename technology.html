@@ -332,13 +332,7 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
         startAuto();
     });
 
-    // F12 보안 코드 유지
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'u')) {
-            e.preventDefault();
-            return false;
-        }
-    });
 </script>
 </body>
+
 </html>
