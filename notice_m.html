@@ -114,14 +114,28 @@
 
     <script>
         // 레이아웃 로드
-       async function loadLayout() {
+ async function loadLayout() {
     try {
         const [h, f] = await Promise.all([
             fetch('components/header_m.html'),
             fetch('components/footer_m.html')
         ]);
+        
+        // 헤더 삽입
         document.getElementById('header-placeholder').innerHTML = await h.text();
-        document.getElementById('footer-placeholder').innerHTML = await f.text();
+        
+        // 푸터 삽입
+        const footerHTML = await f.text();
+        const footerPlaceholder = document.getElementById('footer-placeholder');
+        footerPlaceholder.innerHTML = footerHTML;
+
+        // [중요] 푸터 내부에 포함된 <script> 태그를 강제로 실행시킴
+        const scripts = footerPlaceholder.querySelectorAll("script");
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            newScript.text = oldScript.text; // 소스 코드 복사
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        });
         
         if (typeof initMenuToggle === 'function') initMenuToggle();
     } catch (e) {
