@@ -122,64 +122,73 @@
 </style>
 
 <script>
-    // 관리자 인증 함수: 안전한 참조를 위해 전역 변수 대신 체크 로직 강화
+    // 관리자 인증 함수
     function openAdminAuth() {
         const pw = prompt("관리자 비밀번호를 입력하세요:");
-        if (pw === null || pw === "") return; 
+        if (!pw) return;
 
-        // 1. 페이지 내에 firebase 앱이 로드되었는지 확인
-        // 만약 database 객체가 아직 없다면(서브페이지 로딩 지연 등)
-        // 직접 window 객체나 firebase 객체에서 database를 참조 시도
         let db = null;
         try {
-            if (typeof database !== 'undefined') {
-                db = database;
-            } else if (typeof firebase !== 'undefined' && firebase.database) {
-                db = firebase.database();
-            }
-        } catch (e) {
-            console.error("Firebase Database not found, moving to admin page directly.");
-        }
+            if (typeof database !== 'undefined') db = database;
+            else if (typeof firebase !== 'undefined') db = firebase.database();
+        } catch (e) {}
 
         if (db) {
-            // Firebase 연결이 가능할 때: 실시간 비밀번호 체크
             db.ref('adminConfig/password').once('value').then((snapshot) => {
-                const correctPw = snapshot.val();
-                if (pw === correctPw) {
-                    window.location.href = "admin.html";
-                } else {
-                    alert("비밀번호가 틀렸습니다.");
-                }
-            }).catch(err => {
-                console.error("DB Error:", err);
-                // DB 오류 시 차선책으로 이동 (admin.html 내부에 보안장치가 있다는 전제)
-                window.location.href = "admin.html";
+                if (pw === snapshot.val()) window.location.href = "admin.html";
+                else alert("비밀번호가 틀렸습니다.");
             });
         } else {
-            // Firebase가 없는 페이지이거나 로드 실패 시: 일단 admin.html로 보냄
-            // 어차피 admin.html 접속 시 다시 로그인이 필요하게 설계하는 것이 안전합니다.
             window.location.href = "admin.html";
         }
     }
 
-    // 네비게이션 활성화 로직
-    document.addEventListener('DOMContentLoaded', () => {
-        const path = window.location.pathname.split("/").pop() || 'index.html';
-        // 링크 매칭 시 쿼리 스트링 제거 후 비교
-        const cleanPath = path.split('?')[0];
-        
-        const navLinks = document.querySelectorAll('.nav-link, .nav-item-m');
-        navLinks.forEach(link => {
-            const href = link.getAttribute('href');
-            if (href === cleanPath) {
-                link.classList.add('active-tab');
-                if(link.classList.contains('nav-item-m')) {
-                    link.style.color = "#22d3ee";
+    // [필수 추가] 메뉴 작동 로직: fetch 이후에도 작동하도록 함수화
+    function initNavigation() {
+        const menuBtn = document.getElementById('menuToggleBtn');
+        const dropdown = document.getElementById('dropdownMenu');
+        const menuIcon = document.getElementById('menuIcon');
+
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation(); // 클릭 이벤트 전파 방지
+                const isVisible = !dropdown.classList.contains('invisible');
+                if (isVisible) {
+                    dropdown.classList.add('opacity-0', 'invisible', '-translate-y-5');
+                    dropdown.classList.remove('opacity-100', 'visible', 'translate-y-0');
+                    if(menuIcon) menuIcon.innerText = "☰";
+                } else {
+                    dropdown.classList.remove('opacity-0', 'invisible', '-translate-y-5');
+                    dropdown.classList.add('opacity-100', 'visible', 'translate-y-0');
+                    if(menuIcon) menuIcon.innerText = "✕";
                 }
+            };
+        }
+
+        // 바깥 클릭 시 메뉴 닫기
+        document.addEventListener('click', (e) => {
+            if (dropdown && !dropdown.contains(e.target) && !dropdown.classList.contains('invisible')) {
+                dropdown.classList.add('opacity-0', 'invisible', '-translate-y-5');
+                if(menuIcon) menuIcon.innerText = "☰";
             }
         });
-    });
+
+        // 현재 페이지 활성화 표시
+        const path = window.location.pathname.split("/").pop() || 'index.html';
+        const cleanPath = path.split('?')[0];
+        document.querySelectorAll('.nav-link, .nav-item-m').forEach(link => {
+            if (link.getAttribute('href') === cleanPath) {
+                link.classList.add('active-tab');
+                if(link.classList.contains('nav-item-m')) link.style.color = "#22d3ee";
+            }
+        });
+    }
+
+    // 일반 로드와 fetch 로드 양쪽 모두 대응
+    if (document.readyState === 'complete') initNavigation();
+    else document.addEventListener('DOMContentLoaded', initNavigation);
 </script>
+
 
 <header class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-[10001] glass-header rounded-2xl px-6 py-3 flex justify-between items-center">
     <a href="index.html" class="flex items-center gap-3 shrink-0">
