@@ -21,7 +21,6 @@
     /* 드롭다운 메뉴 위치 및 스크롤 최적화 */
     #dropdownMenu {
         max-height: calc(100vh - 70px); 
-        /* 배경색을 더 불투명하게 하여 가독성 확보 */
         background: rgba(2, 6, 23, 0.98) !important;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
@@ -46,23 +45,60 @@
         transition: color 0.2s ease;
     }
 
-    /* 현재 페이지 활성화 표시 (Notice 페이지 등에서 파란색 강조) */
+    /* 관리자 탭 전용 스타일 */
+    .nav-item-admin-m {
+        font-size: 0.75rem !important;
+        color: #4b5563 !important; /* neutral-500 */
+        text-transform: uppercase;
+        border-bottom: none !important;
+        margin-top: 1rem;
+        text-align: center;
+        opacity: 0.6;
+    }
+
+    /* 현재 페이지 활성화 표시 */
     .nav-item-m.active-m {
         color: #22d3ee !important;
         border-bottom-color: rgba(34, 211, 238, 0.3);
     }
 
-    /* 아주 작은 기기 대응 */
     @media (max-width: 380px) {
-        .animated-logo-text-m {
-            font-size: 11px;
-        }
-        .glass-header-m {
-            padding-left: 12px !important;
-            padding-right: 12px !important;
-        }
+        .animated-logo-text-m { font-size: 11px; }
+        .glass-header-m { padding-left: 12px !important; padding-right: 12px !important; }
     }
 </style>
+
+<script>
+    /** 관리자 인증 함수 (PC 헤더와 동일 로직) **/
+    function openAdminAuth() {
+        // index_m.html에 정의된 openAdminAuth()가 있으면 그것을 실행하고, 
+        // 직접 header_m.html만 쓰일 경우를 대비해 기본 prompt 로직도 유지합니다.
+        if (typeof window.parent.openAdminAuth === "function") {
+            window.parent.openAdminAuth();
+        } else if (typeof openAdminAuth === "function") {
+            // 같은 스코프 내에 정의되어 있다면 (index_m.html에서 이미 로드된 경우)
+            // 별도 처리 없이 index_m.html의 함수가 실행됩니다.
+        } else {
+            const pw = prompt("Enter Administrator Password:");
+            if (!pw) return;
+            
+            let db = (typeof database !== 'undefined') ? database : (typeof firebase !== 'undefined' ? firebase.database() : null);
+            
+            if (db) {
+                db.ref('adminConfig/password').once('value').then((snapshot) => {
+                    if (pw === snapshot.val()) {
+                        sessionStorage.setItem('isAdminAuthenticated', 'true');
+                        window.location.href = "admin.html";
+                    } else {
+                        alert("Invalid Password.");
+                    }
+                });
+            } else {
+                window.location.href = "admin.html";
+            }
+        }
+    }
+</script>
 
 <header class="fixed top-0 left-0 w-full z-[10001] glass-header-m px-4 py-4 flex justify-between items-center">
     <a href="index_m.html" class="flex items-center gap-2 max-w-[75%] overflow-hidden">
@@ -87,7 +123,11 @@
             <a href="solutions_m.html" class="nav-item-m">Solutions</a>
             <a href="company_m.html" class="nav-item-m">Company</a>
             <a href="news_m.html" class="nav-item-m">News</a>
-            <a href="notice_m.html" class="nav-item-m active-m" id="nav-notice-m">Notice</a>
+            <a href="notice_m.html" class="nav-item-m" id="nav-notice-m">Notice</a>
+            
+            <a href="javascript:void(0)" onclick="openAdminAuth()" class="nav-item-m nav-item-admin-m">
+                Admin Access
+            </a>
             
             <div class="pt-6">
                 <a href="contact_m.html" class="w-full py-4 bg-cyan-400 text-black text-center font-black rounded-xl block shadow-[0_0_15px_rgba(34,211,238,0.4)] active:scale-[0.98] transition-transform">

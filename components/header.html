@@ -32,37 +32,37 @@
     }
     @keyframes shine { to { background-position: 200% center; } }
 
-    /* --- 신규 추가: 메뉴 순차 등장 애니메이션 (멀리서 다가오는 효과) --- */
+    /* 메뉴 순차 등장 애니메이션 */
     @keyframes zoomInEntrance {
         from {
             opacity: 0;
-            transform: scale(1.5) translateY(-10px); /* 멀리서(크게) 시작 */
+            transform: scale(1.5) translateY(-10px);
             filter: blur(5px);
         }
         to {
             opacity: 1;
-            transform: scale(1) translateY(0); /* 정위치 */
+            transform: scale(1) translateY(0);
             filter: blur(0);
         }
     }
 
-    /* 초기 상태 숨김 처리 */
+    /* 초기 상태 숨김 처리 및 애니메이션 */
     #main-nav li, .nav-btn-container {
         opacity: 0;
         animation: zoomInEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
 
-    /* 각 메뉴별 순차적 지연 시간 (0.1초씩 간격) */
-    #main-nav li:nth-child(1) { animation-delay: 0.1s; } /* Home */
-    #main-nav li:nth-child(2) { animation-delay: 0.2s; } /* Products */
-    #main-nav li:nth-child(3) { animation-delay: 0.3s; } /* Technology */
-    #main-nav li:nth-child(4) { animation-delay: 0.4s; } /* Solutions */
-    #main-nav li:nth-child(5) { animation-delay: 0.5s; } /* Company */
-    #main-nav li:nth-child(6) { animation-delay: 0.6s; } /* News */
-    #main-nav li:nth-child(7) { animation-delay: 0.7s; } /* Notice */
-    .nav-btn-container { animation-delay: 0.8s; }       /* Get a Quote */
+    /* 순차적 지연 시간 */
+    #main-nav li:nth-child(1) { animation-delay: 0.1s; }
+    #main-nav li:nth-child(2) { animation-delay: 0.2s; }
+    #main-nav li:nth-child(3) { animation-delay: 0.3s; }
+    #main-nav li:nth-child(4) { animation-delay: 0.4s; }
+    #main-nav li:nth-child(5) { animation-delay: 0.5s; }
+    #main-nav li:nth-child(6) { animation-delay: 0.6s; }
+    #main-nav li:nth-child(7) { animation-delay: 0.7s; }
+    #main-nav li:nth-child(8) { animation-delay: 0.8s; } /* Admin */
+    .nav-btn-container { animation-delay: 0.9s; }
 
-    /* 메뉴 링크 호버 효과 */
     .nav-link {
         position: relative;
         color: #94a3b8;
@@ -77,7 +77,6 @@
         text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
     }
 
-    /* 버튼 스타일 */
     .btn-neon {
         display: inline-flex !important;
         align-items: center;
@@ -93,13 +92,94 @@
         color: #000 !important;
         box-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
     }
-    /* --------------------------------------------------- */
 
-    /* 모바일 드롭다운 및 아이템 스타일 */
     #dropdownMenu { background: rgba(15, 23, 42, 0.98) !important; border: 1px solid rgba(34, 211, 238, 0.3); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8); }
     .nav-item-m { transition: all 0.2s; border: 1px solid transparent; }
     .nav-item-m:hover { background: rgba(34, 211, 238, 0.1); color: #22d3ee; }
+
+
+/* Admin 클릭 문제 해결 */
+#main-nav li:last-child,
+#main-nav li:last-child a {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 10010;
+}
+
+/* 장식 요소 클릭 차단 */
+.header-frame-deco {
+    pointer-events: none;
+}
+
+/* 헤더 클릭 우선권 확보 */
+.glass-header {
+    position: relative;
+    z-index: 10001;
+}
+
+
+
 </style>
+
+<script>
+    // 관리자 인증 함수: 안전한 참조를 위해 전역 변수 대신 체크 로직 강화
+    function openAdminAuth() {
+        const pw = prompt("관리자 비밀번호를 입력하세요:");
+        if (pw === null || pw === "") return; 
+
+        // 1. 페이지 내에 firebase 앱이 로드되었는지 확인
+        // 만약 database 객체가 아직 없다면(서브페이지 로딩 지연 등)
+        // 직접 window 객체나 firebase 객체에서 database를 참조 시도
+        let db = null;
+        try {
+            if (typeof database !== 'undefined') {
+                db = database;
+            } else if (typeof firebase !== 'undefined' && firebase.database) {
+                db = firebase.database();
+            }
+        } catch (e) {
+            console.error("Firebase Database not found, moving to admin page directly.");
+        }
+
+        if (db) {
+            // Firebase 연결이 가능할 때: 실시간 비밀번호 체크
+            db.ref('adminConfig/password').once('value').then((snapshot) => {
+                const correctPw = snapshot.val();
+                if (pw === correctPw) {
+                    window.location.href = "admin.html";
+                } else {
+                    alert("비밀번호가 틀렸습니다.");
+                }
+            }).catch(err => {
+                console.error("DB Error:", err);
+                // DB 오류 시 차선책으로 이동 (admin.html 내부에 보안장치가 있다는 전제)
+                window.location.href = "admin.html";
+            });
+        } else {
+            // Firebase가 없는 페이지이거나 로드 실패 시: 일단 admin.html로 보냄
+            // 어차피 admin.html 접속 시 다시 로그인이 필요하게 설계하는 것이 안전합니다.
+            window.location.href = "admin.html";
+        }
+    }
+
+    // 네비게이션 활성화 로직
+    document.addEventListener('DOMContentLoaded', () => {
+        const path = window.location.pathname.split("/").pop() || 'index.html';
+        // 링크 매칭 시 쿼리 스트링 제거 후 비교
+        const cleanPath = path.split('?')[0];
+        
+        const navLinks = document.querySelectorAll('.nav-link, .nav-item-m');
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === cleanPath) {
+                link.classList.add('active-tab');
+                if(link.classList.contains('nav-item-m')) {
+                    link.style.color = "#22d3ee";
+                }
+            }
+        });
+    });
+</script>
 
 <header class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-[10001] glass-header rounded-2xl px-6 py-3 flex justify-between items-center">
     <a href="index.html" class="flex items-center gap-3 shrink-0">
@@ -121,6 +201,7 @@
             <li><a href="company.html" class="nav-link">Company</a></li>
             <li><a href="news.html" class="nav-link">News</a></li>
             <li><a href="notice.html" class="nav-link">Notice</a></li> 
+            <li><a href="javascript:void(0)" onclick="openAdminAuth()" class="nav-link text-[10px] opacity-50 hover:opacity-100 border border-neutral-700 px-2 rounded">Admin</a></li>
         </ul>
     </nav>
 
@@ -145,6 +226,7 @@
             <a href="company.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Company</a>
             <a href="news.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">News</a>
             <a href="notice.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm text-cyan-400">Notice</a> 
+            <a href="javascript:void(0)" onclick="openAdminAuth()" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-500 font-bold text-[10px] uppercase">Admin Access</a>
             <div class="pt-2">
                 <a href="contact.html" class="flex items-center justify-center p-4 rounded-xl bg-cyan-400 text-black font-black uppercase text-xs tracking-tighter hover:bg-white transition-colors">Request Quote</a>
             </div>
