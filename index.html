@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="description" id="metaDescription" content="">
+    <meta name="keywords" id="metaKeywords" content="">
+
     <script>
     (function() {
         // 1. 기기 감지 수정 (iPad를 명시적으로 제외)
@@ -23,122 +26,153 @@
             }
         }
     })();
-</script>
+    </script>
 
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script>
+      // 2. Firebase 설정
+      const firebaseConfig = {
+        apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+        authDomain: "tdlid-107669.firebaseapp.com",
+        databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+        projectId: "tdlid-107669",
+        storageBucket: "tdlid-107669.firebasestorage.app",
+        messagingSenderId: "604782345004",
+        appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+      };
 
-<script>
-  // 2. Firebase 설정
-  const firebaseConfig = {
-    apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
-    authDomain: "tdlid-107669.firebaseapp.com",
-    databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
-    projectId: "tdlid-107669",
-    storageBucket: "tdlid-107669.firebasestorage.app",
-    messagingSenderId: "604782345004",
-    appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
-  };
+    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+      const database = firebase.database();
 
-// 수정 후 (안전함)
-if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-  const database = firebase.database();
-
-  // 3. 접속 기록 함수
-  async function recordVisit() {
-    try {
-        let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
+      // 3. 접속 기록 함수
+      async function recordVisit() {
         try {
-            const response = await fetch('https://ipapi.co/json/');
-            const data = await response.json();
-            geoData = { ip: data.ip, country: data.country_name, city: data.city };
-        } catch (e) { console.error("Geo API Error:", e); }
+            let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                geoData = { ip: data.ip, country: data.country_name, city: data.city };
+            } catch (e) { console.error("Geo API Error:", e); }
 
-        const ua = navigator.userAgent;
-        const now = new Date();
-        const visitData = {
-          timestamp: now.getTime(),
-          timeStr: now.toLocaleString(),
-          page: window.location.pathname.split('/').pop() || 'index.html',
-          ip: geoData.ip,
-          country: geoData.country,
-          city: geoData.city,
-          device: /iPhone|iPad|iPod|Android/i.test(ua) ? "Mobile" : "PC",
-          os: getOS(ua),
-          browser: getBrowser(ua),
-          sid: getSessionId(),
-          referrer: document.referrer || "Direct"
-        };
-        database.ref('visits').push(visitData);
-    } catch(e) { console.error("History error:", e); }
-  }
+            const ua = navigator.userAgent;
+            const now = new Date();
+            const visitData = {
+              timestamp: now.getTime(),
+              timeStr: now.toLocaleString(),
+              page: window.location.pathname.split('/').pop() || 'index.html',
+              ip: geoData.ip,
+              country: geoData.country,
+              city: geoData.city,
+              device: /iPhone|iPad|iPod|Android/i.test(ua) ? "Mobile" : "PC",
+              os: getOS(ua),
+              browser: getBrowser(ua),
+              sid: getSessionId(),
+              referrer: document.referrer || "Direct"
+            };
+            database.ref('visits').push(visitData);
+        } catch(e) { console.error("History error:", e); }
+      }
 
-  function getOS(ua) {
-    if (ua.indexOf("Windows") !== -1) return "Windows";
-    if (ua.indexOf("Mac") !== -1) return "macOS";
-    if (ua.indexOf("Android") !== -1) return "Android";
-    if (ua.indexOf("iPhone") !== -1 || ua.indexOf("iPad") !== -1) return "iOS";
-    return "Unknown";
-  }
+      function getOS(ua) {
+        if (ua.indexOf("Windows") !== -1) return "Windows";
+        if (ua.indexOf("Mac") !== -1) return "macOS";
+        if (ua.indexOf("Android") !== -1) return "Android";
+        if (ua.indexOf("iPhone") !== -1 || ua.indexOf("iPad") !== -1) return "iOS";
+        return "Unknown";
+      }
 
-  function getBrowser(ua) {
-    if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) return "Edge";
-    if (ua.indexOf("Chrome") !== -1) return "Chrome";
-    if (ua.indexOf("Safari") !== -1) return "Safari";
-    if (ua.indexOf("Firefox") !== -1) return "Firefox";
-    return "Others";
-  }
+      function getBrowser(ua) {
+        if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) return "Edge";
+        if (ua.indexOf("Chrome") !== -1) return "Chrome";
+        if (ua.indexOf("Safari") !== -1) return "Safari";
+        if (ua.indexOf("Firefox") !== -1) return "Firefox";
+        return "Others";
+      }
 
-  function getSessionId() {
-    if (!sessionStorage.getItem('session_id')) {
-        sessionStorage.setItem('session_id', 's_' + Math.random().toString(36).substr(2, 9));
-    }
-    return sessionStorage.getItem('session_id');
-  }
-
-  recordVisit();
-
- /* [추가] 관리자 인증 로직 */
-function openAdminAuth() {
-    const modal = document.getElementById('adminAuthModal');
-    modal.classList.remove('hidden');
-    document.getElementById('adminPasswordInput').focus();
-    document.body.style.overflow = 'hidden';
-}
-
-function closeAdminAuth() {
-    const modal = document.getElementById('adminAuthModal');
-    modal.classList.add('hidden');
-    document.getElementById('adminPasswordInput').value = '';
-    document.body.style.overflow = '';
-}
-
-async function verifyAdminPassword() {
-    const inputPw = document.getElementById('adminPasswordInput').value;
-    if (!inputPw) return;
-
-    try {
-        // Firebase database의 adminConfig/password 경로 참조
-        const snapshot = await database.ref('adminConfig/password').once('value');
-        const correctPw = snapshot.val();
-
-        if (inputPw === correctPw) {
-            sessionStorage.setItem('isAdminAuthenticated', 'true');
-            window.location.href = "./admin/admin.html";
-        } else {
-            alert("Invalid Administrator Password.");
-            document.getElementById('adminPasswordInput').value = '';
+      function getSessionId() {
+        if (!sessionStorage.getItem('session_id')) {
+            sessionStorage.setItem('session_id', 's_' + Math.random().toString(36).substr(2, 9));
         }
-    } catch (e) {
-        console.error("Auth Error:", e);
+        return sessionStorage.getItem('session_id');
+      }
+
+      recordVisit();
+
+      /* [추가] 관리자 인증 로직 */
+    function openAdminAuth() {
+        const modal = document.getElementById('adminAuthModal');
+        modal.classList.remove('hidden');
+        document.getElementById('adminPasswordInput').focus();
+        document.body.style.overflow = 'hidden';
     }
-}
 
+    function closeAdminAuth() {
+        const modal = document.getElementById('adminAuthModal');
+        modal.classList.add('hidden');
+        document.getElementById('adminPasswordInput').value = '';
+        document.body.style.overflow = '';
+    }
 
-</script>
+    async function verifyAdminPassword() {
+        const inputPw = document.getElementById('adminPasswordInput').value;
+        if (!inputPw) return;
+
+        try {
+            const snapshot = await database.ref('adminConfig/password').once('value');
+            const correctPw = snapshot.val();
+
+            if (inputPw === correctPw) {
+                sessionStorage.setItem('isAdminAuthenticated', 'true');
+                window.location.href = "./admin/admin.html";
+            } else {
+                alert("Invalid Administrator Password.");
+                document.getElementById('adminPasswordInput').value = '';
+            }
+        } catch (e) {
+            console.error("Auth Error:", e);
+        }
+    }
+
+    /* [추가] 실시간 공지/팝업/SEO 감지 함수 */
+    function initLiveSettings() {
+        // 1. SEO 설정 감지
+        database.ref('siteSettings/seo').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                document.getElementById('metaDescription').content = data.description || "";
+                document.getElementById('metaKeywords').content = data.keywords || "";
+            }
+        });
+
+        // 2. 공지/팝업 설정 감지
+        database.ref('siteSettings/notice').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // 상단 긴급 배너 제어
+                const banner = document.getElementById('emergencyBanner');
+                if (data.bannerActive) {
+                    banner.style.display = 'block';
+                    document.getElementById('bannerText').innerText = data.text;
+                } else {
+                    banner.style.display = 'none';
+                }
+
+                // 중앙 팝업 제어
+                const popup = document.getElementById('mainPopup');
+                if (data.popupActive) {
+                    popup.style.display = 'flex';
+                    document.getElementById('popupText').innerText = data.text;
+                } else {
+                    popup.style.display = 'none';
+                }
+            }
+        });
+    }
+    </script>
 
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -150,24 +184,22 @@ async function verifyAdminPassword() {
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* ===== IMAGE MODAL ===== */
+        /* [추가] 실시간 제어 UI 스타일 */
+        #emergencyBanner { display: none; background: #ef4444; color: white; text-align: center; padding: 12px; font-weight: bold; position: fixed; top: 0; width: 100%; z-index: 99999; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #mainPopup { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .popup-box { background: #0a0a0a; border: 1px solid #22d3ee; padding: 40px; border-radius: 24px; max-width: 420px; width: 90%; text-align: center; }
+
+        /* 기존 스타일 */
         #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; }
         #modalDetailImage { max-width: 90%; max-height: 90%; object-fit: contain; }
-
-        /* 드롭다운 스타일 */
         .dropdown-link { padding: 12px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; transition: all 0.2s; text-align: left; }
         .dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
         .dropdown-quote-btn { padding: 12px 20px; display: block; background: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; transition: background 0.2s; }
         .dropdown-quote-btn:hover { background: #67e8f9; }
         .whitespace-nowrap { white-space: nowrap !important; }
-
         #musicToggleBtn { position: fixed; bottom: 25px; right: 25px; z-index: 10005; width: 44px; height: 44px; background: rgba(23, 23, 23, 0.8); border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #22d3ee; backdrop-filter: blur(4px); transition: all 0.3s; }
         #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
-
-        #triggerWord {
-            color: inherit !important; font-weight: inherit !important; text-decoration: none !important; cursor: text !important; display: inline; position: relative; z-index: 9998; pointer-events: auto !important;
-        }
-
+        #triggerWord { color: inherit !important; font-weight: inherit !important; text-decoration: none !important; cursor: text !important; display: inline; position: relative; z-index: 9998; pointer-events: auto !important; }
         .hero-section { position: relative; width: 100%; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .video-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; }
         .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4) contrast(1.1); }
@@ -177,6 +209,21 @@ async function verifyAdminPassword() {
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
+
+<div id="emergencyBanner">
+    📢 <span id="bannerText">Notice</span>
+</div>
+
+<div id="mainPopup">
+    <div class="popup-box shadow-[0_0_50px_rgba(34,211,238,0.15)]">
+        <h3 class="text-cyan-400 font-black text-2xl mb-4 italic">NOTICE</h3>
+        <p id="popupText" class="text-neutral-300 mb-8 leading-relaxed whitespace-pre-wrap"></p>
+        <button onclick="document.getElementById('mainPopup').style.display='none'" 
+                class="w-full py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition-all active:scale-95">
+            Close
+        </button>
+    </div>
+</div>
 
 <div id="bgm-placeholder"></div>
 <div id="header-placeholder"></div>
@@ -252,20 +299,16 @@ async function verifyAdminPassword() {
 
 <script>
 /** 1. 레이아웃 로드 **/
-/** 1. 레이아웃 로드 **/
 async function loadLayout() {
     try {
-        // [1] 헤더 로드 및 삽입
         const headerRes = await fetch('components/header.html');
         const headerPlaceholder = document.getElementById('header-placeholder');
         headerPlaceholder.innerHTML = await headerRes.text();
 
-        // [2] 헤더 내 스크립트 강제 실행 (Admin 클릭 시 경로 문제 해결)
         const headerScripts = headerPlaceholder.querySelectorAll("script");
         headerScripts.forEach(oldScript => {
             const newScript = document.createElement("script");
             let scriptText = oldScript.text;
-            // index.html은 루트에 있으므로 admin.html을 admin/admin.html로 변경
             if (scriptText.includes("admin.html")) {
                 scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
             }
@@ -273,11 +316,9 @@ async function loadLayout() {
             document.body.appendChild(newScript).parentNode.removeChild(newScript);
         });
 
-        // [3] 공통 관리자 인증 모달 로드 (추가된 부분)
         const authRes = await fetch('components/admin-auth.html');
         const authHTML = await authRes.text();
         
-        // 모달을 넣을 placeholder가 없으면 body 끝에 생성
         let authDiv = document.getElementById('admin-auth-placeholder');
         if (!authDiv) {
             authDiv = document.createElement('div');
@@ -286,7 +327,6 @@ async function loadLayout() {
         }
         authDiv.innerHTML = authHTML;
 
-        // 모달 내 스크립트(verifyAdminPassword 등) 활성화
         const authScripts = authDiv.querySelectorAll("script");
         authScripts.forEach(oldScript => {
             const newScript = document.createElement("script");
@@ -294,11 +334,9 @@ async function loadLayout() {
             document.body.appendChild(newScript).parentNode.removeChild(newScript);
         });
 
-        // [4] 푸터 로드
         const footerRes = await fetch('components/footer.html');
         document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
 
-        // [5] BGM 로드 및 스크립트 실행
         const bgmRes = await fetch('components/bgm.html');
         const bgmHTML = await bgmRes.text();
         const bgmPlaceholder = document.getElementById('bgm-placeholder');
@@ -312,7 +350,6 @@ async function loadLayout() {
             });
         }
 
-        // [6] 기능 초기화
         if (typeof initNavigation === "function") initNavigation();
         if (typeof initAdminTriggers === "function") initAdminTriggers();
         
@@ -343,13 +380,13 @@ async function loadLayout() {
         }
     }
 
-    /** 3. 관리자 페이지 트리거 (TDLiD 클릭 시 이동 대신 모달 오픈으로 수정) **/
+    /** 3. 관리자 페이지 트리거 **/
     function initAdminTriggers() {
         const triggerWord = document.getElementById('triggerWord');
         if (triggerWord) {
             triggerWord.addEventListener('click', (e) => {
                 e.preventDefault();
-                openAdminAuth(); // 클릭 시 비밀번호 모달 띄우기
+                openAdminAuth();
             });
         }
     }
@@ -357,6 +394,7 @@ async function loadLayout() {
     /** 4. 초기화 및 공통 기능 **/
     document.addEventListener("DOMContentLoaded", () => {
         loadLayout();
+        initLiveSettings(); // [추가] 실시간 설정 동기화 활성화
 
         document.querySelectorAll('.cert-link').forEach(link => {
             link.onclick = (e) => {
@@ -379,7 +417,6 @@ async function loadLayout() {
         }
     });
 
-    // 엔터키 처리
     document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') verifyAdminPassword();
     });
