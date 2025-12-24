@@ -110,17 +110,46 @@
 <div id="footer-placeholder"></div>
 
 <script>
-    async function loadLayout() {
+  async function loadLayout() {
         try {
-            const headerRes = await fetch('components/header_m.html');
-            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-            const footerRes = await fetch('components/footer_m.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            // 1. 헤더와 푸터 데이터를 동시에 가져옴
+            const [headerRes, footerRes] = await Promise.all([
+                fetch('components/header_m.html'),
+                fetch('components/footer_m.html')
+            ]);
+
+            // 2. 헤더 처리: 관리자 링크(admin.html) 제거 후 삽입
+            const headerText = await headerRes.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = headerText;
             
-           
-            initMenuToggle();
-            initFormHandler();
-            initEeggTrigger(); // 트리거 초기화
+            const adminLink = tempDiv.querySelector('a[href="admin.html"]');
+            if(adminLink) adminLink.remove();
+            
+            document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
+
+            // 3. 푸터 처리
+            const footerPlaceholder = document.getElementById('footer-placeholder');
+            footerPlaceholder.innerHTML = await footerRes.text();
+
+            // 4. [중요] 푸터 내부의 스크립트(BGM 등) 추출 및 강제 실행
+            const scripts = footerPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
+                } else {
+                    newScript.text = oldScript.text;
+                }
+                // 스크립트를 body에 추가하여 즉시 실행시킨 후 바로 제거
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+
+            // 5. 페이지 전용 초기화 함수들 실행
+            if (typeof initMenuToggle === 'function') initMenuToggle();
+            if (typeof initFormHandler === 'function') initFormHandler();
+            if (typeof initEeggTrigger === 'function') initEeggTrigger();
+            
         } catch (err) {
             console.error("Layout load failed:", err);
         }

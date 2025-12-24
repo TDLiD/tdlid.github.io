@@ -104,26 +104,51 @@
 <div id="footer-placeholder"></div>
 
 <script>
-  /**
-     * 1. 레이아웃 로드 및 메뉴 초기화 (BGM 포함)
+/**
+     * 1. 레이아웃 로드 및 메뉴 초기화 (BGM 및 관리자 링크 처리 포함)
      */
     async function loadLayout() {
         try {
-            // 헤더 로드
-            const headerRes = await fetch('components/header_m.html');
-            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+            // 헤더와 푸터를 병렬로 로드
+            const [headerRes, footerRes] = await Promise.all([
+                fetch('components/header_m.html'),
+                fetch('components/footer_m.html')
+            ]);
+
+            // 1. 헤더 처리: 관리자용 admin.html 링크가 있다면 제거
+            const headerText = await headerRes.text();
+            const headerTemp = document.createElement('div');
+            headerTemp.innerHTML = headerText;
             
-            // 푸터 로드
-            const footerRes = await fetch('components/footer_m.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            const adminLink = headerTemp.querySelector('a[href="admin.html"]');
+            if(adminLink) adminLink.remove();
             
-            
+            document.getElementById('header-placeholder').innerHTML = headerTemp.innerHTML;
+
+            // 2. 푸터 처리
+            const footerPlaceholder = document.getElementById('footer-placeholder');
+            footerPlaceholder.innerHTML = await footerRes.text();
+
+            // 3. [중요] 푸터 내 BGM 관련 script 수동 추출 및 실행
+            // (모바일에서 페이지 이동 시 BGM 연속성을 유지하기 위함)
+            const scripts = footerPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
+                } else {
+                    newScript.text = oldScript.text;
+                }
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+
+            // 4. 상단 메뉴 토글 기능 초기화
             initMenuToggle();
+            
         } catch (err) {
             console.error("Layout load failed:", err);
         }
     }
-
 
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");

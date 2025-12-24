@@ -122,12 +122,41 @@
 <script>
     async function loadLayout() {
         try {
-            const headerRes = await fetch('components/header_m.html');
-            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-            const footerRes = await fetch('components/footer_m.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            // 1. 헤더와 푸터를 동시에 불러오기
+            const [headerRes, footerRes] = await Promise.all([
+                fetch('components/header_m.html'),
+                fetch('components/footer_m.html')
+            ]);
 
-            initMenuToggle();
+            // 2. 헤더 처리: 관리자 링크(admin.html) 제거
+            const headerText = await headerRes.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = headerText;
+            
+            const adminLink = tempDiv.querySelector('a[href="admin.html"]');
+            if(adminLink) adminLink.remove();
+            
+            document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
+
+            // 3. 푸터 처리
+            const footerPlaceholder = document.getElementById('footer-placeholder');
+            footerPlaceholder.innerHTML = await footerRes.text();
+
+            // 4. [핵심] 푸터 내 BGM 스크립트 추출 및 수동 실행
+            const scripts = footerPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
+                } else {
+                    newScript.text = oldScript.text;
+                }
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+
+            // 5. 메뉴 토글 기능 초기화
+            if (typeof initMenuToggle === 'function') initMenuToggle();
+            
         } catch (err) {
             console.error("Layout load failed:", err);
         }

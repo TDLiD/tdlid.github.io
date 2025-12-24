@@ -14,7 +14,7 @@
     <style>
         /* 🌟 모바일 최적화 변수 설정 🌟 */
         :root {
-            --header-logo-font-size: 4rem; /* 모바일 대응 크기 축소 */
+            --header-logo-font-size: 4rem;
             --header-subtitle-font-size: 1.1rem;
         }
         
@@ -29,7 +29,7 @@
             z-index:0;
         }
 
-        /* 3 Image Stage - 모바일 터치 대응 */
+        /* 3 Image Stage */
         .image-stage { position: relative; z-index: 1; }
         .image-card {
             position: relative;
@@ -40,7 +40,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 160px; /* 모바일에서 너무 길지 않게 조정 */
+            min-height: 160px;
             margin-bottom: 1rem;
         }
         .image-card img {
@@ -50,7 +50,6 @@
             border-radius: 1.25rem;
         }
         
-        /* 모바일에서는 hover-expand 대신 터치 시 살짝 강조되는 효과로 대체하거나 그대로 유지 */
         .image-card.hover-expand:active img { transform: scale(1.1); }
 
         /* Floating text animation */
@@ -60,16 +59,11 @@
             to {opacity:1;transform:translateY(0)}
         }
         
-        /* 모바일용 드롭다운 스타일 최적화 */
-        .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; font-size: 15px; }
-        .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
-
         .hero-title-m { font-size: 1.875rem; line-height: 1.3; letter-spacing: -0.02em; }
     </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative overflow-x-hidden"> 
-
 
 <div id="header-placeholder"></div>
 
@@ -135,67 +129,56 @@
 <div id="footer-placeholder"></div>
 
 <script>
-  /**
-     * 1. 레이아웃 로드 및 메뉴 초기화 (BGM 포함)
+    /**
+     * 레이아웃 로드: 수정된 버전 적용
      */
     async function loadLayout() {
         try {
-            // 헤더 로드
-            const headerRes = await fetch('components/header_m.html');
-            const headerHtml = await headerRes.text();
-            document.getElementById('header-placeholder').innerHTML = headerHtml;
+            const [headerRes, footerRes] = await Promise.all([
+                fetch('components/header_m.html'),
+                fetch('components/footer_m.html')
+            ]);
+
+            // 1. 헤더 처리 (관리자 링크 제거 로직 포함)
+            const headerText = await headerRes.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = headerText;
             
-            // 푸터 로드
-            const footerRes = await fetch('components/footer_m.html');
-            const footerHtml = await footerRes.text();
-            document.getElementById('footer-placeholder').innerHTML = footerHtml;
+            const adminLink = tempDiv.querySelector('a[href="admin.html"]');
+            if(adminLink) adminLink.remove();
             
-            
-            initMenuToggle();
-        } catch (err) {
-            console.error("Layout load failed:", err);
-        }
-    }
+            document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
 
+            // 2. 푸터 처리
+            const footerPlaceholder = document.getElementById('footer-placeholder');
+            footerPlaceholder.innerHTML = await footerRes.text();
 
-    /**
-     * 2. 모바일 메뉴 제어
-     */
-    function initMenuToggle() {
-        const menuBtn = document.getElementById("menuToggleBtn");
-        const dropdown = document.getElementById("dropdownMenu");
-        const menuIcon = document.getElementById("menuIcon");
-
-        if (menuBtn && dropdown) {
-            menuBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const isOpen = dropdown.classList.contains("opacity-100");
-
-                if (!isOpen) {
-                    dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
-                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                    if(menuIcon) menuIcon.innerText = "✕";
+            // 3. [중요] 푸터 내부의 BGM 및 기타 스크립트 강제 실행
+            const scripts = footerPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
                 } else {
-                    closeMenu();
+                    newScript.text = oldScript.text;
                 }
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
 
-            function closeMenu() {
-                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
-                if(menuIcon) menuIcon.innerText = "☰";
-            }
-
-            document.addEventListener("click", (e) => {
-                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
-            });
+            // 4. 전역적으로 필요한 초기화 함수 실행 (header_m.html 등에 정의된 함수)
+            if (typeof initMenuToggle === 'function') initMenuToggle();
+            if (typeof initAdminTrigger === 'function') initAdminTrigger();
+            if (typeof initCertModal === 'function') initCertModal();
+            
+        } catch (err) {
+            console.error("Layout Load Error:", err);
         }
     }
 
     // 초기 실행
     document.addEventListener("DOMContentLoaded", loadLayout);
 
-    // 우클릭 방지 (기능 유지)
+    // 우클릭 방지 유지
     document.addEventListener('contextmenu', (e) => e.preventDefault());
 </script>
 
