@@ -322,14 +322,8 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
         }
     });
 
-    // 보안 코드
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'u')) {
-            e.preventDefault();
-            return false;
-        }
-    });
 </script>
 
 </body>
+
 </html>
