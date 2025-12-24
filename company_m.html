@@ -130,6 +130,102 @@
 
 <script>
     /**
+     * 1. 메뉴 토글 기능 (모바일 메뉴 열기/닫기)
+     */
+    function initMenuToggle() {
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const dropdown = document.getElementById("dropdownMenu");
+        const menuIcon = document.getElementById("menuIcon");
+
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                // invisible 클래스 존재 여부로 현재 상태 확인
+                const isHidden = dropdown.classList.contains("invisible");
+                
+                if (isHidden) {
+                    // 메뉴 열기: 투명도 조절 및 위치 이동(translate)
+                    dropdown.classList.remove("opacity-0", "invisible", "-translate-y-5");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-0");
+                    if(menuIcon) menuIcon.innerText = "✕";
+                } else {
+                    // 메뉴 닫기
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
+                    dropdown.classList.add("opacity-0", "invisible", "-translate-y-5");
+                    if(menuIcon) menuIcon.innerText = "☰";
+                }
+            };
+
+            // 메뉴 외부 영역 클릭 시 자동으로 닫기
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
+                    dropdown.classList.add("opacity-0", "invisible", "-translate-y-5");
+                    if(menuIcon) menuIcon.innerText = "☰";
+                }
+            });
+        }
+    }
+
+    /**
+     * 2. 레이아웃(헤더/푸터) 로드 및 초기화
+     */
+    async function loadLayout() {
+        try {
+            const [headerRes, footerRes] = await Promise.all([
+                fetch('components/header_m.html'),
+                fetch('components/footer_m.html')
+            ]);
+
+            // 헤더 처리 및 관리자 링크 제거
+            const headerText = await headerRes.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = headerText;
+            
+            const adminLink = tempDiv.querySelector('a[href="admin.html"]');
+            if(adminLink) adminLink.remove();
+            document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
+
+            // 푸터 처리
+            const footerPlaceholder = document.getElementById('footer-placeholder');
+            footerPlaceholder.innerHTML = await footerRes.text();
+
+            // 푸터 내부의 BGM 스크립트 강제 실행
+            const scripts = footerPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
+                } else {
+                    newScript.text = oldScript.text;
+                }
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+
+            // 레이아웃 로드 후 메뉴 기능 활성화
+            initMenuToggle();
+            
+            // 현재 페이지(Company) 메뉴 아이템 강조 표시
+            const navLinks = document.querySelectorAll('.nav-item-m');
+            navLinks.forEach(link => {
+                if(link.getAttribute('href') === 'company_m.html') {
+                    link.classList.add('active-m');
+                }
+            });
+            
+        } catch (err) {
+            console.error("레이아웃 로드 실패:", err);
+        }
+    }
+
+    // 문서 로드 완료 시 실행
+    document.addEventListener("DOMContentLoaded", loadLayout);
+    // 우클릭 방지
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+</script>
+
+<script>
+    /**
      * 레이아웃 로드: 수정된 버전 적용
      */
     async function loadLayout() {
