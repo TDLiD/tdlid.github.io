@@ -1,43 +1,17 @@
 <style>
-    /* WhatsApp QR 섹션 스타일 */
-    .wa-contact-wrapper-m {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 2rem;
-    }
+    /* WhatsApp QR 스타일 */
+    .wa-contact-wrapper-m { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px; margin-bottom: 2rem; }
+    .qr-container-m { background: rgba(255, 255, 255, 0.9); padding: 4px; border-radius: 8px; box-shadow: 0 0 10px rgba(34, 211, 238, 0.2); }
+    .qr-image-m { width: 48px; height: 48px; display: block; object-fit: contain; }
+    .wa-image-m { width: 32px; height: 32px; object-fit: contain; }
 
-    .qr-container-m {
-        background: rgba(255, 255, 255, 0.9);
-        padding: 4px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
-        transition: transform 0.2s;
-    }
-    
-    .qr-container-m:active { transform: scale(0.95); }
-
-    .qr-image-m {
-        width: 48px;
-        height: 48px;
-        display: block;
-        object-fit: contain;
-    }
-
-    .wa-icon-link-m {
-        display: flex;
-        align-items: center;
-        transition: transform 0.2s;
-    }
-    
-    .wa-icon-link-m:active { transform: scale(0.9); }
-
-    .wa-image-m {
-        width: 32px;
-        height: 32px;
-        object-fit: contain;
+    /* BGM 버튼 스타일 */
+    #musicToggleBtn { 
+        position: fixed; bottom: 25px; right: 25px; z-index: 10005; 
+        width: 44px; height: 44px; background: rgba(23, 23, 23, 0.8); 
+        border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 50%; 
+        display: flex; align-items: center; justify-content: center; 
+        cursor: pointer; color: #22d3ee; backdrop-filter: blur(4px); 
     }
 </style>
 
@@ -49,9 +23,6 @@
 
     <div class="flex flex-col items-center gap-4 mb-8">
         <a href="index.html?view_mode=pc" class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-neutral-700 text-neutral-400 text-xs font-medium active:bg-neutral-800">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
             View PC version
         </a>
     </div>
@@ -60,13 +31,68 @@
         <div class="qr-container-m" onclick="window.open('https://wa.me/6281296075099', '_blank')">
             <img src="images/footer/qr.png" alt="WhatsApp QR" class="qr-image-m">
         </div>
-        <a href="https://wa.me/6281296075099" target="_blank" class="wa-icon-link-m">
+        <a href="https://wa.me/6281296075099" target="_blank">
             <img src="images/footer/whatsapp.png" alt="WhatsApp" class="wa-image-m">
         </a>
     </div>
 
     <div class="text-[10px] text-neutral-600 uppercase tracking-widest space-y-1">
         <p>© 2025 TDL Energy Indonesia</p>
-        <p>Innovation · Sustainability · Future</p>
     </div>
 </footer>
+
+<audio id="bgm" src="mp3/tdlid.mp3" loop muted preload="auto" playsinline></audio>
+<button id="musicToggleBtn">
+    <span id="musicIconUI">🔇</span>
+</button>
+
+<script>
+(function() {
+    const bgm = document.getElementById('bgm');
+    const musicBtn = document.getElementById('musicToggleBtn');
+    const musicIcon = document.getElementById('musicIconUI');
+
+    // 1. 상태 복원 로직
+    const savedTime = sessionStorage.getItem('bgmTime');
+    const isMuted = sessionStorage.getItem('bgmMuted') !== 'false'; // 기본값 muted
+
+    if (savedTime) bgm.currentTime = parseFloat(savedTime);
+    bgm.muted = isMuted;
+    musicIcon.innerText = isMuted ? "🔇" : "🎵";
+
+    const playBGM = () => {
+        bgm.play().then(() => {
+            if (!bgm.muted) musicIcon.innerText = "🎵";
+            // 재생 성공 시 이벤트 제거
+            document.removeEventListener('touchstart', playBGM);
+            document.removeEventListener('click', playBGM);
+        }).catch(e => console.log("User interaction required"));
+    };
+
+    // 모바일 자동 재생 제한 해제용
+    document.addEventListener('touchstart', playBGM);
+    document.addEventListener('click', playBGM);
+
+    // 2. 버튼 클릭 제어
+    musicBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (bgm.muted || bgm.paused) {
+            bgm.muted = false;
+            bgm.play();
+            musicIcon.innerText = "🎵";
+            sessionStorage.setItem('bgmMuted', 'false');
+        } else {
+            bgm.muted = true;
+            musicIcon.innerText = "🔇";
+            sessionStorage.setItem('bgmMuted', 'true');
+        }
+    };
+
+    // 3. 현재 재생 시간 실시간 저장 (0.5초마다)
+    setInterval(() => {
+        if (!bgm.paused) {
+            sessionStorage.setItem('bgmTime', bgm.currentTime);
+        }
+    }, 500);
+})();
+</script>
