@@ -200,27 +200,75 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
         }
     }
 
+/**
+     * 1. 레이아웃 로드 및 공통 컴포넌트 초기화
+     * 헤더, 푸터, BGM 외에 공통 관리자 인증 모달(admin-auth.html)을 추가로 로드합니다.
+     */
     async function loadLayout() {
         try {
-            const [h, f, b] = await Promise.all([
-                fetch('components/header.html'),
-                fetch('components/footer.html'),
-                fetch('components/bgm.html')
-            ]);
-            document.getElementById('header-placeholder').innerHTML = await h.text();
-            document.getElementById('footer-placeholder').innerHTML = await f.text();
-            
-            const bgmP = document.getElementById('bgm-placeholder');
-            bgmP.innerHTML = await b.text();
-            
-            bgmP.querySelectorAll("script").forEach(s => {
-                const ns = document.createElement("script");
-                ns.text = s.text;
-                document.body.appendChild(ns).parentNode.removeChild(ns);
+            // [1] 헤더 로드 및 삽입
+            const headerRes = await fetch('components/header.html');
+            const headerHTML = await headerRes.text();
+            const headerPlaceholder = document.getElementById('header-placeholder');
+            headerPlaceholder.innerHTML = headerHTML;
+
+            // [2] 헤더 내 스크립트 실행 및 경로 최적화 (Admin 링크 대응)
+            const headerScripts = headerPlaceholder.querySelectorAll("script");
+            headerScripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                let scriptText = oldScript.text;
+                // admin.html 경로를 하위 폴더 구조(admin/admin.html)에 맞게 치환
+                if (scriptText.includes("admin.html")) {
+                    scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
+                }
+                newScript.text = scriptText;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
 
+            // [3] 공통 관리자 인증 모달 로드 및 삽입 (핵심 추가)
+            const authRes = await fetch('components/admin-auth.html');
+            const authHTML = await authRes.text();
+            
+            // 모달을 넣을 placeholder가 없으면 body 하단에 자동 생성
+            let authDiv = document.getElementById('admin-auth-placeholder');
+            if (!authDiv) {
+                authDiv = document.createElement('div');
+                authDiv.id = 'admin-auth-placeholder';
+                document.body.appendChild(authDiv);
+            }
+            authDiv.innerHTML = authHTML;
+
+            // 모달 내 스크립트(비밀번호 검증 로직 등) 활성화
+            const authScripts = authDiv.querySelectorAll("script");
+            authScripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+
+            // [4] 푸터 로드
+            const footerRes = await fetch('components/footer.html');
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+            // [5] BGM 로드 및 스크립트 실행
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            if (bgmPlaceholder) {
+                bgmPlaceholder.innerHTML = await bgmRes.text();
+                const bgmScripts = bgmPlaceholder.querySelectorAll("script");
+                bgmScripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
+            }
+
+            // [6] 상단 메뉴 토글 기능 초기화
             initMenuToggle();
-        } catch (err) { console.error(err); }
+
+        } catch (err) {
+            console.error("Layout Load Error:", err);
+        }
     }
 
     document.addEventListener("DOMContentLoaded", () => {

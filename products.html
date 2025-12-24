@@ -92,6 +92,17 @@
 
         body { overflow-x: hidden; -webkit-user-select: none; user-select: none; }
         .gallery-card { width: 100%; max-width: 1024px; }
+
+/* header.html <style> 구간에 추가 */
+#main-nav li {
+    position: relative;
+    z-index: 10005; /* 충분히 높은 우선순위 */
+}
+
+.nav-link {
+    pointer-events: auto !important; /* 클릭 차단 해제 */
+}
+
     </style>
 </head>
 
@@ -162,30 +173,74 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
 }
     const database = firebase.database();
 
-    async function loadLayout() {
-        try {
-            const headerRes = await fetch('components/header.html');
-            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+async function loadLayout() {
+    try {
+        // 1. 헤더 로드 및 삽입
+        const headerRes = await fetch('components/header.html');
+        const headerHTML = await headerRes.text();
+        const headerPlaceholder = document.getElementById('header-placeholder');
+        headerPlaceholder.innerHTML = headerHTML;
 
-            const footerRes = await fetch('components/footer.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+        // 2. 헤더 내 스크립트 실행 (Admin 이동 경로 수정 포함)
+        const headerScripts = headerPlaceholder.querySelectorAll("script");
+        headerScripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            let scriptText = oldScript.text;
+            if (scriptText.includes("admin.html")) {
+                scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
+            }
+            newScript.text = scriptText;
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        });
 
-            const bgmRes = await fetch('components/bgm.html');
-            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+        // 3. [추가] 관리자 전용 모달 로드 및 삽입
+        const authRes = await fetch('components/admin-auth.html');
+        const authHTML = await authRes.text();
+        
+        // 모달을 담을 공간이 없으면 생성, 있으면 삽입
+        let authPlaceholder = document.getElementById('admin-auth-placeholder');
+        if (!authPlaceholder) {
+            authPlaceholder = document.createElement('div');
+            authPlaceholder.id = 'admin-auth-placeholder';
+            document.body.appendChild(authPlaceholder);
+        }
+        authPlaceholder.innerHTML = authHTML;
+
+        // 모달 내의 스크립트(verifyAdminPassword 등) 실행 및 등록
+        const authScripts = authPlaceholder.querySelectorAll("script");
+        authScripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            newScript.text = oldScript.text;
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        });
+
+        // 4. 푸터 로드
+        const footerRes = await fetch('components/footer.html');
+        document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+        // 5. BGM 로드 및 스크립트 실행
+        const bgmRes = await fetch('components/bgm.html');
+        const bgmPlaceholder = document.getElementById('bgm-placeholder');
+        if (bgmPlaceholder) {
             bgmPlaceholder.innerHTML = await bgmRes.text();
-
-            const scripts = bgmPlaceholder.querySelectorAll("script");
-            scripts.forEach(oldScript => {
+            const bgmScripts = bgmPlaceholder.querySelectorAll("script");
+            bgmScripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
                 newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
-
-            initMenuToggle();
-        } catch (err) {
-            console.error("Layout load failed:", err);
         }
+
+        // 6. 메뉴 및 공통 기능 초기화
+        if (typeof initMenuToggle === "function") initMenuToggle();
+        
+        // Admin 트리거 버튼(TDLiD 로고 등)이 있다면 다시 바인딩
+        if (typeof initAdminTriggers === "function") initAdminTriggers();
+
+    } catch (err) {
+        console.error("Layout load failed:", err);
     }
+}
 
     const productsData = [];
     for(let i=1; i<=32; i++) {
@@ -322,8 +377,8 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
         }
     });
 
+
 </script>
 
 </body>
-
 </html>

@@ -252,14 +252,53 @@ async function verifyAdminPassword() {
 
 <script>
 /** 1. 레이아웃 로드 **/
+/** 1. 레이아웃 로드 **/
 async function loadLayout() {
     try {
+        // [1] 헤더 로드 및 삽입
         const headerRes = await fetch('components/header.html');
-        document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+        const headerPlaceholder = document.getElementById('header-placeholder');
+        headerPlaceholder.innerHTML = await headerRes.text();
 
+        // [2] 헤더 내 스크립트 강제 실행 (Admin 클릭 시 경로 문제 해결)
+        const headerScripts = headerPlaceholder.querySelectorAll("script");
+        headerScripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            let scriptText = oldScript.text;
+            // index.html은 루트에 있으므로 admin.html을 admin/admin.html로 변경
+            if (scriptText.includes("admin.html")) {
+                scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
+            }
+            newScript.text = scriptText;
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        });
+
+        // [3] 공통 관리자 인증 모달 로드 (추가된 부분)
+        const authRes = await fetch('components/admin-auth.html');
+        const authHTML = await authRes.text();
+        
+        // 모달을 넣을 placeholder가 없으면 body 끝에 생성
+        let authDiv = document.getElementById('admin-auth-placeholder');
+        if (!authDiv) {
+            authDiv = document.createElement('div');
+            authDiv.id = 'admin-auth-placeholder';
+            document.body.appendChild(authDiv);
+        }
+        authDiv.innerHTML = authHTML;
+
+        // 모달 내 스크립트(verifyAdminPassword 등) 활성화
+        const authScripts = authDiv.querySelectorAll("script");
+        authScripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            newScript.text = oldScript.text;
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        });
+
+        // [4] 푸터 로드
         const footerRes = await fetch('components/footer.html');
         document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
 
+        // [5] BGM 로드 및 스크립트 실행
         const bgmRes = await fetch('components/bgm.html');
         const bgmHTML = await bgmRes.text();
         const bgmPlaceholder = document.getElementById('bgm-placeholder');
@@ -273,10 +312,13 @@ async function loadLayout() {
             });
         }
 
+        // [6] 기능 초기화
         if (typeof initNavigation === "function") initNavigation();
         if (typeof initAdminTriggers === "function") initAdminTriggers();
         
-    } catch (err) { console.error("Layout Load Error:", err); }
+    } catch (err) { 
+        console.error("Layout Load Error:", err); 
+    }
 }
 
     /** 2. 내비게이션 **/

@@ -205,39 +205,80 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
 }
     const database = firebase.database();
 
+  // ... (중략: 기존 Firebase 설정 및 초기화 부분은 동일하게 유지) ...
+
     /**
-     * 레이아웃 Import 함수 (수정본)
+     * 레이아웃 Import 함수 (최종 수정본)
+     * 헤더, 푸터, BGM 외에 공통 관리자 인증 모달(admin-auth.html)을 추가로 로드합니다.
      */
     async function loadLayout() {
         try {
-            // 헤더 로드
+            // 1. 헤더 로드 및 삽입
             const headerRes = await fetch('components/header.html');
-            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+            const headerHTML = await headerRes.text();
+            const headerPlaceholder = document.getElementById('header-placeholder');
+            headerPlaceholder.innerHTML = headerHTML;
+
+            // 2. 헤더 내 스크립트 강제 실행 (Admin 이동 경로 및 함수 등록)
+            const headerScripts = headerPlaceholder.querySelectorAll("script");
+            headerScripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                let scriptText = oldScript.text;
+                // admin.html 경로를 admin/admin.html로 자동 치환
+                if (scriptText.includes("admin.html")) {
+                    scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
+                }
+                newScript.text = scriptText;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+
+            // 3. [핵심 추가] 공통 관리자 인증 모달 로드 및 삽입
+            const authRes = await fetch('components/admin-auth.html');
+            const authHTML = await authRes.text();
             
-            // 푸터 로드
-            const footerRes = await fetch('components/footer.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            let authPlaceholder = document.getElementById('admin-auth-placeholder');
+            if (!authPlaceholder) {
+                authPlaceholder = document.createElement('div');
+                authPlaceholder.id = 'admin-auth-placeholder';
+                document.body.appendChild(authPlaceholder);
+            }
+            authPlaceholder.innerHTML = authHTML;
 
-            // --- 추가: BGM 로드 코드 시작 ---
-            const bgmRes = await fetch('components/bgm.html');
-            const bgmHTML = await bgmRes.text();
-            const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            bgmPlaceholder.innerHTML = bgmHTML;
-
-            // 삽입된 HTML 내 스크립트 강제 실행
-            const scripts = bgmPlaceholder.querySelectorAll("script");
-            scripts.forEach(oldScript => {
+            // 모달 내 스크립트(verifyAdminPassword 등) 실행 및 등록
+            const authScripts = authPlaceholder.querySelectorAll("script");
+            authScripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
                 newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
-            // --- 추가: BGM 로드 코드 끝 ---
 
+            // 4. 푸터 로드
+            const footerRes = await fetch('components/footer.html');
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+            // 5. BGM 로드 및 스크립트 실행
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            if (bgmPlaceholder) {
+                bgmPlaceholder.innerHTML = await bgmRes.text();
+                const bgmScripts = bgmPlaceholder.querySelectorAll("script");
+                bgmScripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
+            }
+
+            // 6. 메뉴 토글 초기화
             initMenuToggle();
+
         } catch (err) {
             console.error("Layout load failed:", err);
         }
     }
+
+// ... (하위 슬라이더 및 모달 스크립트 로직 유지) ...
+
 
 
     function initMenuToggle() {
@@ -332,7 +373,7 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
         startAuto();
     });
 
+
 </script>
 </body>
-
 </html>

@@ -159,35 +159,79 @@
         database = firebase.database();
     }
 
+/**
+     * 1. 레이아웃 로드 및 공통 컴포넌트 초기화
+     * 헤더, 푸터, BGM과 함께 공통 관리자 인증 모달(admin-auth.html)을 로드합니다.
+     */
     async function loadLayout() {
         try {
+            // [1] 헤더 로드 및 삽입
             const headerRes = await fetch('components/header.html');
-            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-            const footerRes = await fetch('components/footer.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
-            const bgmRes = await fetch('components/bgm.html');
-            const bgmHTML = await bgmRes.text();
-            const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            bgmPlaceholder.innerHTML = bgmHTML;
+            const headerHTML = await headerRes.text();
+            const headerPlaceholder = document.getElementById('header-placeholder');
+            headerPlaceholder.innerHTML = headerHTML;
 
-            const scripts = bgmPlaceholder.querySelectorAll("script");
-            scripts.forEach(oldScript => {
+            // [2] 헤더 내 스크립트 실행 및 경로 최적화 (Admin 링크 대응)
+            const headerScripts = headerPlaceholder.querySelectorAll("script");
+            headerScripts.forEach(oldScript => {
+                if (oldScript.src) return; // 외부 스크립트 중복 로드 방지
+                const newScript = document.createElement("script");
+                let scriptText = oldScript.text;
+                // admin.html 경로를 루트 폴더 구조에 맞춰 admin/admin.html로 치환
+                if (scriptText.includes("admin.html")) {
+                    scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
+                }
+                newScript.text = scriptText;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
 
-// 외부 스크립트(src가 있는 경우)는 다시 추가하지 않음 (중복 로드 방지)
-                if (oldScript.src) return;
+            // [3] 공통 관리자 인증 모달 로드 및 삽입
+            const authRes = await fetch('components/admin-auth.html');
+            const authHTML = await authRes.text();
+            
+            let authDiv = document.getElementById('admin-auth-placeholder');
+            if (!authDiv) {
+                authDiv = document.createElement('div');
+                authDiv.id = 'admin-auth-placeholder';
+                document.body.appendChild(authDiv);
+            }
+            authDiv.innerHTML = authHTML;
 
+            const authScripts = authDiv.querySelectorAll("script");
+            authScripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
                 newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
-            
-            initMenuToggle();
-            initFormHandler(); 
-            initEeggTrigger();
+
+            // [4] 푸터 로드
+            const footerRes = await fetch('components/footer.html');
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+            // [5] BGM 로드 및 스크립트 실행
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            if (bgmPlaceholder) {
+                bgmPlaceholder.innerHTML = await bgmRes.text();
+                const bgmScripts = bgmPlaceholder.querySelectorAll("script");
+                bgmScripts.forEach(oldScript => {
+                    if (oldScript.src) return;
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
+            }
+
+            // [6] 페이지 전용 기능 초기화
+            initMenuToggle();   // 상단 메뉴
+            initFormHandler();  // 문의 폼 처리
+            initEeggTrigger();  // 이스터에그 기능
+
         } catch (err) {
             console.error("Layout load failed:", err);
         }
     }
+
 
     function initEeggTrigger() {
         const trigger = document.getElementById('triggerOur');

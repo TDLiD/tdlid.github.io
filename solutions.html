@@ -159,37 +159,78 @@
     const database = (typeof firebase !== 'undefined') ? firebase.database() : null;
 
 
-  /**
-     * 1. 레이아웃 로드 및 메뉴 초기화
+ /**
+     * 1. 레이아웃 로드 및 공통 컴포넌트 초기화
+     * 헤더, 푸터, BGM, 그리고 관리자 인증 모달을 공통으로 로드합니다.
      */
     async function loadLayout() {
         try {
+            // [1] 헤더 로드 및 삽입
             const headerRes = await fetch('components/header.html');
-            document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+            const headerHTML = await headerRes.text();
+            const headerPlaceholder = document.getElementById('header-placeholder');
+            headerPlaceholder.innerHTML = headerHTML;
+
+            // [2] 헤더 내 스크립트 실행 및 경로 최적화
+            const headerScripts = headerPlaceholder.querySelectorAll("script");
+            headerScripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                let scriptText = oldScript.text;
+                // Admin 페이지 이동 시 'admin/' 폴더 경로를 정확히 참조하도록 수정
+                if (scriptText.includes("admin.html")) {
+                    scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
+                }
+                newScript.text = scriptText;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+
+            // [3] 공통 관리자 인증 모달 로드 (핵심 추가 기능)
+            const authRes = await fetch('components/admin-auth.html');
+            const authHTML = await authRes.text();
             
-            const footerRes = await fetch('components/footer.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+            // 모달을 삽입할 placeholder가 없으면 생성하여 body 하단에 추가
+            let authDiv = document.getElementById('admin-auth-placeholder');
+            if (!authDiv) {
+                authDiv = document.createElement('div');
+                authDiv.id = 'admin-auth-placeholder';
+                document.body.appendChild(authDiv);
+            }
+            authDiv.innerHTML = authHTML;
 
-            // --- 추가: BGM 로드 코드 시작 ---
-            const bgmRes = await fetch('components/bgm.html');
-            const bgmHTML = await bgmRes.text();
-            const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            bgmPlaceholder.innerHTML = bgmHTML;
-
-            // 삽입된 HTML 내 script 태그를 실행시키기 위한 처리
-            const scripts = bgmPlaceholder.querySelectorAll("script");
-            scripts.forEach(oldScript => {
+            // 모달 내부의 비밀번호 검증(verifyAdminPassword) 스크립트 활성화
+            const authScripts = authDiv.querySelectorAll("script");
+            authScripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
                 newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
-            // --- 추가: BGM 로드 코드 끝 ---
 
+            // [4] 푸터 로드
+            const footerRes = await fetch('components/footer.html');
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+            // [5] BGM 로드 및 스크립트 실행
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmHTML = await bgmRes.text();
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            if (bgmPlaceholder) {
+                bgmPlaceholder.innerHTML = bgmHTML;
+                const scripts = bgmPlaceholder.querySelectorAll("script");
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
+            }
+
+            // [6] 상단 메뉴 토글 기능 활성화
             initMenuToggle();
+
         } catch (err) {
-            console.error("Layout load failed:", err);
+            console.error("Layout Load Error:", err);
         }
     }
+
 
 
     function initMenuToggle() {
@@ -349,7 +390,7 @@ function initSolutions() {
         startAuto(); 
     });
 
+
 </script>
 </body>
-
 </html>
