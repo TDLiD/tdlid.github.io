@@ -208,72 +208,63 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
      * 1. 레이아웃 로드 및 공통 컴포넌트 초기화
      * 헤더, 푸터, BGM 외에 공통 관리자 인증 모달(admin-auth.html)을 추가로 로드합니다.
      */
-    async function loadLayout() {
-        try {
-            // [1] 헤더 로드 및 삽입
-            const headerRes = await fetch('components/header.html');
+  async function loadLayout() {
+    try {
+        // [1] 헤더 로드
+        const headerRes = await fetch('components/header.html');
+        if (headerRes.ok) {
             const headerHTML = await headerRes.text();
             const headerPlaceholder = document.getElementById('header-placeholder');
             headerPlaceholder.innerHTML = headerHTML;
 
-            // [2] 헤더 내 스크립트 실행 및 경로 최적화 (Admin 링크 대응)
+            // 헤더 내 스크립트 강제 실행
             const headerScripts = headerPlaceholder.querySelectorAll("script");
             headerScripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                let scriptText = oldScript.text;
-                // 하위 폴더 구조에 맞게 admin.html 경로를 admin/admin.html로 치환
-                if (scriptText.includes("admin.html")) {
-                    scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
-                }
-                newScript.text = scriptText;
-                document.body.appendChild(newScript).parentNode.removeChild(newScript);
-            });
-
-            // [3] 공통 관리자 인증 모달 로드 및 삽입 (핵심 추가)
-            const authRes = await fetch('components/admin-auth.html');
-            const authHTML = await authRes.text();
-            
-            // 모달을 넣을 placeholder가 없으면 body 하단에 자동 생성
-            let authDiv = document.getElementById('admin-auth-placeholder');
-            if (!authDiv) {
-                authDiv = document.createElement('div');
-                authDiv.id = 'admin-auth-placeholder';
-                document.body.appendChild(authDiv);
-            }
-            authDiv.innerHTML = authHTML;
-
-            // 모달 내 스크립트(verifyAdminPassword 등) 브라우저에 등록
-            const authScripts = authDiv.querySelectorAll("script");
-            authScripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
                 newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
-
-            // [4] 푸터 로드
-            const footerRes = await fetch('components/footer.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
-
-            // [5] BGM 로드 및 스크립트 실행
-            const bgmRes = await fetch('components/bgm.html');
-            const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            if (bgmPlaceholder) {
-                bgmPlaceholder.innerHTML = await bgmRes.text();
-                const bgmScripts = bgmPlaceholder.querySelectorAll("script");
-                bgmScripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    newScript.text = oldScript.text;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-            }
-
-            // [6] 상단 메뉴 토글 기능 초기화
-            initMenuToggle();
-
-        } catch (err) {
-            console.error("Layout Load Error:", err);
         }
+
+        // [2] 관리자 인증 모달 로드 (에러가 나도 무시하고 다음 단계로 진행)
+        try {
+            const authRes = await fetch('components/admin-auth.html');
+            if (authRes.ok) {
+                const authHTML = await authRes.text();
+                let authDiv = document.getElementById('admin-auth-placeholder') || document.createElement('div');
+                authDiv.id = 'admin-auth-placeholder';
+                document.body.appendChild(authDiv);
+                authDiv.innerHTML = authHTML;
+            }
+        } catch (e) {
+            console.warn("admin-auth.html을 찾을 수 없지만 계속 진행합니다.");
+        }
+
+        // [3] 푸터 & BGM 로드
+        const footerRes = await fetch('components/footer.html');
+        if(footerRes.ok) document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+        const bgmRes = await fetch('components/bgm.html');
+        if(bgmRes.ok) {
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            bgmPlaceholder.innerHTML = await bgmRes.text();
+        }
+
+    } catch (err) {
+        console.error("Layout Load Error:", err);
+    } finally {
+        // [4] 중요: 로드가 성공하든 실패하든 메뉴 토글 함수는 반드시 마지막에 실행
+        setTimeout(() => {
+            if (typeof initNavigation === "function") {
+                initNavigation(); // header.html에 있는 함수 호출
+            } else {
+                initMenuToggle(); // 본문에 있는 함수 호출
+            }
+        }, 100); 
     }
+}
+
+
 
     /**
      * 2. 메뉴 제어 (데스크톱 최적화)
