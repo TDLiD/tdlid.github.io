@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <style>
+        body { background-color: #020617; color: #e5e7eb; font-family: 'Pretendard', sans-serif; }
+        .cyber-border { border: 1px solid rgba(34, 211, 238, 0.2); }
+    </style>
+</head>
+<body class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-cyan-400">Visitor Analytics</h2>
+        <button onclick="location.href='admin.html'" class="text-xs bg-neutral-800 px-3 py-1 rounded">Back</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-neutral-900/50 p-6 rounded-2xl cyber-border text-center">
+            <p class="text-cyan-500 text-xs font-bold uppercase">Unique Visitors</p>
+            <h2 id="uniqueCount" class="text-4xl font-bold mt-2 font-mono">0</h2>
+        </div>
+        <div class="bg-neutral-900/50 p-6 rounded-2xl cyber-border border-dashed text-center">
+            <p class="text-neutral-500 text-xs font-bold uppercase">Total Hits</p>
+            <h2 id="totalCount" class="text-4xl font-bold mt-2 font-mono text-neutral-400">0</h2>
+        </div>
+    </div>
+
+    <div class="bg-neutral-900/80 rounded-2xl cyber-border overflow-hidden shadow-2xl">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-cyan-950/40 text-cyan-300 text-[10px] uppercase tracking-wider">
+                        <th class="p-5 text-center">Hits</th><th class="p-5">Latest Access / IP</th><th class="p-5">Location</th><th class="p-5 text-center">Device</th><th class="p-5">Page</th>
+                    </tr>
+                </thead>
+                <tbody id="visitTableBody" class="divide-y divide-neutral-800 text-sm italic"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+
+
+const firebaseConfig = {
+        apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+        authDomain: "tdlid-107669.firebaseapp.com",
+        databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+        projectId: "tdlid-107669",
+        storageBucket: "tdlid-107669.firebasestorage.app",
+        messagingSenderId: "604782345004",
+        appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+    };
+
+    // 2. 초기화 (이미 초기화된 경우를 대비해 조건문 추가 권장)
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const database = firebase.database();
+
+
+        database.ref('visits').on('value', (snapshot) => {
+            const tableBody = document.getElementById('visitTableBody');
+            tableBody.innerHTML = '';
+            let rawData = [];
+            snapshot.forEach(c => { if(c.val().timestamp) rawData.push(c.val()); });
+            rawData.sort((a, b) => b.timestamp - a.timestamp);
+
+            const map = new Map();
+            const groupedData = [];
+            rawData.forEach(v => {
+                const key = `${v.ip}_${v.os}`;
+                if (!map.has(key)) {
+                    const entry = { ...v, count: 1 };
+                    map.set(key, entry);
+                    groupedData.push(entry);
+                } else { map.get(key).count += 1; }
+            });
+
+            document.getElementById('totalCount').innerText = rawData.length;
+            document.getElementById('uniqueCount').innerText = new Set(rawData.map(v => v.ip)).size;
+
+            groupedData.forEach(v => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-white/5 transition border-b border-white/5";
+                row.innerHTML = `
+                    <td class="p-5 text-center"><span class="bg-cyan-500 text-black px-2 py-0.5 rounded text-[10px] font-black">${v.count}</span></td>
+                    <td class="p-5"><div class="text-neutral-400 text-xs font-mono">${v.timeStr || '-'}</div><div class="text-cyan-500 text-sm font-black">${v.ip || '0.0.0.0'}</div></td>
+                    <td class="p-5"><div class="text-white font-bold">${v.country || 'Unknown'}</div><div class="text-neutral-500 text-xxs">${v.city || ''}</div></td>
+                    <td class="p-5 text-center"><span class="px-2 py-1 rounded text-xxs bg-neutral-800 text-neutral-300">${v.os || 'OS'}</span></td>
+                    <td class="p-5 text-cyan-400 text-xs font-bold">${v.page || '/'}</td>`;
+                tableBody.appendChild(row);
+            });
+        });
+    </script>
+</body>
+</html>

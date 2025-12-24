@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <style>
+        body { background-color: #020617; color: #e5e7eb; font-family: 'Pretendard', sans-serif; }
+        .unread-row { background-color: rgba(251, 191, 36, 0.05); }
+    </style>
+</head>
+<body class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-amber-400">Customer Inquiries</h2>
+        <span id="unreadCount" class="bg-amber-600 text-white text-[10px] px-2 py-1 rounded-full font-bold">0 NEW</span>
+    </div>
+
+    <div class="bg-neutral-900/80 rounded-2xl border border-white/5 overflow-hidden">
+        <table class="w-full text-left">
+            <thead class="bg-neutral-950 text-neutral-400 text-xs uppercase">
+                <tr>
+                    <th class="p-4">Status</th><th class="p-4">Date / Name</th><th class="p-4">Company</th><th class="p-4 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody id="inquiryTableBody" class="divide-y divide-neutral-800"></tbody>
+        </table>
+    </div>
+
+    <script>
+
+
+const firebaseConfig = {
+        apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+        authDomain: "tdlid-107669.firebaseapp.com",
+        databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+        projectId: "tdlid-107669",
+        storageBucket: "tdlid-107669.firebasestorage.app",
+        messagingSenderId: "604782345004",
+        appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+    };
+
+    // 2. 초기화 (이미 초기화된 경우를 대비해 조건문 추가 권장)
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const database = firebase.database();
+
+
+        database.ref('messages').on('value', (snapshot) => {
+            const tbody = document.getElementById('inquiryTableBody');
+            tbody.innerHTML = '';
+            let unread = 0;
+            let items = [];
+            snapshot.forEach(c => { 
+                const d = c.val();
+                if(!d.read) unread++;
+                items.push({key: c.key, ...d});
+            });
+            
+            document.getElementById('unreadCount').innerText = unread + " NEW";
+
+            items.reverse().forEach(item => {
+                const row = document.createElement('tr');
+                row.className = `hover:bg-white/5 transition ${!item.read ? 'unread-row' : ''}`;
+                row.innerHTML = `
+                    <td class="p-4 text-xs font-bold ${item.read ? 'text-neutral-600' : 'text-amber-400'}">${item.read ? 'READ' : '● NEW'}</td>
+                    <td class="p-4"><div class="text-white font-bold">${item.name || 'N/A'}</div><div class="text-[10px] text-neutral-500">${item.date}</div></td>
+                    <td class="p-4 text-cyan-400 font-bold text-sm">${item.company || '-'}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="deleteMsg('${item.key}')" class="text-red-500 text-xs uppercase font-bold">Delete</button>
+                    </td>`;
+                tbody.appendChild(row);
+            });
+        });
+
+        function deleteMsg(key) { if(confirm("Delete?")) database.ref('messages/' + key).remove(); }
+    </script>
+</body>
+</html>

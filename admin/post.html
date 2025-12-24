@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TDLiD Content Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    
+    <style>
+        body { background-color: #020617; color: #e5e7eb; font-family: 'Pretendard', sans-serif; }
+        .ql-toolbar { background: #1e293b !important; border-radius: 8px 8px 0 0; border: 1px solid #334155 !important; }
+        .ql-container { background: #0f172a !important; color: white; min-height: 300px; border: 1px solid #334155 !important; border-radius: 0 0 8px 8px; }
+        .ql-editor.ql-blank::before { color: #64748b !important; }
+        input, select { background: #0f172a !important; border: 1px solid #1e293b !important; color: white !important; outline: none; }
+        input:focus { border-color: #0891b2 !important; }
+    </style>
+</head>
+<body class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-cyan-400">Content Management</h2>
+        <button onclick="location.href='admin.html'" class="text-xs bg-neutral-800 px-4 py-2 rounded-lg hover:bg-neutral-700 transition">Back to Admin</button>
+    </div>
+    
+    <div class="bg-neutral-900/50 p-6 rounded-2xl border border-white/5 mb-8 shadow-xl">
+        <input type="hidden" id="editKey">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <select id="postCategory" class="p-3 rounded-lg text-cyan-400 font-bold">
+                <option value="notice">ANNOUNCEMENT</option>
+                <option value="news">LATEST NEWS</option>
+            </select>
+            <input type="text" id="noticeTitle" placeholder="Enter post title..." class="md:col-span-3 p-3 rounded-lg">
+        </div>
+        
+        <div id="editor-container" class="mb-4"></div>
+        
+        <div class="flex gap-3">
+            <button onclick="uploadNotice()" id="submitBtn" class="flex-grow py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-black rounded-xl uppercase transition shadow-lg shadow-cyan-900/20">
+                Register Post
+            </button>
+            <button onclick="resetForm()" id="cancelBtn" class="hidden px-6 py-4 bg-neutral-800 text-neutral-400 font-bold rounded-xl hover:bg-neutral-700 transition">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-neutral-900/80 rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
+        <table class="w-full text-left">
+            <thead class="bg-white/5 text-xxs uppercase tracking-widest text-neutral-500">
+                <tr>
+                    <th class="p-4">Category</th>
+                    <th class="p-4">Title</th>
+                    <th class="p-4">Date</th>
+                    <th class="p-4 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="noticeTableBody" class="divide-y divide-neutral-800 text-sm">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+            authDomain: "tdlid-107669.firebaseapp.com",
+            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+            projectId: "tdlid-107669",
+            storageBucket: "tdlid-107669.firebasestorage.app",
+            messagingSenderId: "604782345004",
+            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Write your content here...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        // 1. 게시글 목록 불러오기 (notices 노드만 감시)
+        function loadPosts() {
+            const tableBody = document.getElementById('noticeTableBody');
+            tableBody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-neutral-500">Loading contents...</td></tr>';
+
+            // database.ref() 대신 database.ref('notices')를 사용하여 범위를 좁힙니다.
+            database.ref('notices').on('value', (snapshot) => {
+                const noticeData = snapshot.val();
+                console.log("Current Notices:", noticeData);
+
+                let allPosts = [];
+                if (noticeData) {
+                    Object.keys(noticeData).forEach(key => {
+                        const item = noticeData[key];
+                        if (item && item.category) {
+                            allPosts.push({ 
+                                key: key, 
+                                ...item 
+                            });
+                        }
+                    });
+                }
+
+                // 최신순 정렬 (timestamp 기준)
+                allPosts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                renderTable(allPosts);
+            }, (error) => {
+                console.error("Read Error:", error);
+                tableBody.innerHTML = `<tr><td colspan="4" class="p-10 text-center text-red-500">Access Denied: ${error.message}</td></tr>`;
+            });
+        }
+
+        // 2. 테이블 렌더링
+        function renderTable(data) {
+            const tableBody = document.getElementById('noticeTableBody');
+            tableBody.innerHTML = '';
+
+            if (data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-neutral-500">No posts found in database.</td></tr>';
+                return;
+            }
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-white/5 transition border-b border-white/5";
+                row.innerHTML = `
+                    <td class="p-4"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${item.category === 'notice' ? 'bg-amber-900/30 text-amber-500' : 'bg-blue-900/30 text-blue-500'}">${item.category}</span></td>
+                    <td class="p-4 font-bold text-neutral-200">${item.title || 'Untitled'}</td>
+                    <td class="p-4 text-neutral-500 font-mono text-xs">${item.date || '-'}</td>
+                    <td class="p-4 text-center">
+                        <button onclick="editPost('${item.key}')" class="text-cyan-500 hover:text-cyan-300 mr-3">Edit</button>
+                        <button onclick="deletePost('${item.key}')" class="text-red-500 hover:text-red-300">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // 3. 데이터 업로드 (notices 하위 경로 사용)
+        async function uploadNotice() {
+            const category = document.getElementById('postCategory').value;
+            const title = document.getElementById('noticeTitle').value;
+            const content = quill.root.innerHTML;
+            const editKey = document.getElementById('editKey').value;
+
+            if (!title || quill.getText().trim().length === 0) { 
+                alert("Please enter both title and content."); 
+                return; 
+            }
+
+            const postData = {
+                category: category,
+                title: title,
+                content: content,
+                date: new Date().toISOString().split('T')[0],
+                timestamp: Date.now()
+            };
+
+            try {
+                if (editKey) {
+                    // 수정: 기존 키 유지
+                    await database.ref(`notices/${editKey}`).update(postData);
+                    alert("Post updated successfully!");
+                } else {
+                    // 신규: 새로운 키 생성 (category_timestamp)
+                    const newKey = `${category}_${Date.now()}`;
+                    await database.ref(`notices/${newKey}`).set(postData);
+                    alert("Post registered successfully!");
+                }
+                resetForm();
+            } catch (error) {
+                console.error("Upload Error:", error);
+                alert("Error: " + error.message);
+            }
+        }
+
+        // 4. 수정 모드 진입
+        async function editPost(key) {
+            try {
+                const snap = await database.ref(`notices/${key}`).once('value');
+                const data = snap.val();
+                if(!data) return;
+                
+                document.getElementById('editKey').value = key;
+                document.getElementById('postCategory').value = data.category;
+                document.getElementById('noticeTitle').value = data.title;
+                quill.root.innerHTML = data.content;
+                
+                document.getElementById('submitBtn').innerText = "Update Post";
+                document.getElementById('cancelBtn').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (e) {
+                alert("Failed to load post data.");
+            }
+        }
+
+        // 5. 삭제 기능
+        async function deletePost(key) {
+            if (confirm("Are you sure you want to delete this post?")) {
+                try {
+                    await database.ref(`notices/${key}`).remove();
+                } catch (e) {
+                    alert("Delete failed: " + e.message);
+                }
+            }
+        }
+
+        // 6. 양식 초기화
+        function resetForm() {
+            document.getElementById('editKey').value = '';
+            document.getElementById('noticeTitle').value = '';
+            quill.root.innerHTML = '';
+            document.getElementById('submitBtn').innerText = "Register Post";
+            document.getElementById('cancelBtn').classList.add('hidden');
+        }
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', loadPosts);
+    </script>
+</body>
+</html>

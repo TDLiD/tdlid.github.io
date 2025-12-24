@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TDLiD Admin - Control Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #020617; font-family: 'Pretendard', sans-serif; color: #e5e7eb; }
+        .nav-card { transition: all 0.3s ease; border: 1px solid rgba(34, 211, 238, 0.1); }
+        .nav-card:hover { transform: translateY(-5px); border-color: rgba(34, 211, 238, 0.5); background: rgba(34, 211, 238, 0.05); }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-12 border-b border-cyan-900/50 pb-6">
+            <h1 class="text-4xl font-bold text-cyan-400 tracking-tighter italic">ADMIN SYSTEM</h1>
+            <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">TDL Energy Indonesia Management</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <a href="visitor.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
+                <div class="text-4xl mb-4">📊</div>
+                <h3 class="text-xl font-bold text-white mb-2">Visitor Analysis</h3>
+                <p class="text-neutral-500 text-xs">Traffic & User Logs</p>
+            </a>
+
+            <a href="inquiry.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
+                <div class="text-4xl mb-4">📩</div>
+                <h3 class="text-xl font-bold text-amber-400 mb-2">Inquiries</h3>
+                <p class="text-neutral-500 text-xs">Customer Requests</p>
+            </a>
+
+            <a href="post.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
+                <div class="text-4xl mb-4">✍️</div>
+                <h3 class="text-xl font-bold text-cyan-400 mb-2">Manage Posts</h3>
+                <p class="text-neutral-500 text-xs">Notice & News Editor</p>
+            </a>
+
+            <a href="security.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
+                <div class="text-4xl mb-4">🛡️</div>
+                <h3 class="text-xl font-bold text-red-400 mb-2">Security</h3>
+                <p class="text-neutral-500 text-xs">Access Control</p>
+            </a>
+        </div>
+
+        <div class="mt-12 text-center">
+            <a href="../index.html" class="text-neutral-600 hover:text-cyan-400 text-sm transition">← Back to Main Website</a>
+        </div>
+    </div>
+</body>
+</html>
