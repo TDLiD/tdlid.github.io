@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
-        // 1. Firebase 설정
+        // 1. Firebase 설정 (기존 유지)
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -25,7 +25,6 @@
         }
         const database = firebase.database();
 
-        // 2. 상세 정보 수집 유틸리티
         function getOS(ua) {
             if (ua.indexOf("Windows") !== -1) return "Windows";
             if (ua.indexOf("Mac") !== -1) return "macOS";
@@ -89,29 +88,38 @@
         #header-placeholder { position: fixed; top: 0; left: 0; width: 100%; z-index: 10001; }
         .animated-logo-text-m { font-size: 3.8vw !important; white-space: nowrap; }
         @media (max-width: 380px) { .animated-logo-text-m { font-size: 11px !important; } }
+        
+        /* 모달 레이아웃 수정 */
         #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; display: none; }
-        #modalDetailImage { max-width: 95%; max-height: 80%; object-fit: contain; }
+        #modalDetailImage { max-width: 90%; max-height: 70%; object-fit: contain; }
+        
         #musicToggleBtn { position: fixed; bottom: 20px; right: 20px; z-index: 10005; width: 48px; height: 48px; background: rgba(23, 23, 23, 0.9); border: 1.5px solid rgba(34, 211, 238, 0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #22d3ee; backdrop-filter: blur(8px); }
         
-        /* 이스터에그 관련 스타일 삭제됨 */
         #triggerWord { color: inherit !important; font-weight: inherit !important; text-decoration: none !important; cursor: pointer !important; display: inline-block; position: relative; z-index: 50; -webkit-tap-highlight-color: transparent; pointer-events: auto !important; }
         
         .hero-section { position: relative; width: 100%; height: 100svh; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 1; }
         .video-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
         .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.1); }
         .video-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%); z-index: 1; }
-        .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 24px; }
-        .hero-logo-gradient { font-size: 15vw; line-height: 1; margin-bottom: 10px; font-weight: 900; background: linear-gradient(to bottom, #fff, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero-slogan-gradient { font-size: 5vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); font-weight: 600; }
-        .hero-description { font-size: 16px; line-height: 1.6; margin-top: 40px; color: #cbd5e1; }
-        .partner-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; align-items: center; justify-items: center; }
+        
+        .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 32px; }
+        .hero-logo-gradient { font-size: 18vw; line-height: 1; margin-bottom: 8px; font-weight: 900; background: linear-gradient(to bottom, #fff, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-slogan-gradient { font-size: 4vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); font-weight: 600; text-transform: uppercase; }
+        .hero-description { font-size: 15px; line-height: 1.7; margin-top: 40px; color: #cbd5e1; word-break: keep-all; }
+        
+        /* 파트너 섹션 수정 */
+        .partner-grid { display: flex; flex-wrap: wrap; gap: 30px; align-items: center; justify-content: center; opacity: 0.7; }
+        .partner-grid img { height: 28px; width: auto; filter: grayscale(1); }
+
+        /* 인증서 섹션 수정 */
+        .interactive-certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 20px; }
+        .cert-link img { width: 100%; height: auto; border-radius: 4px; }
     </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
 
 <div id="bgm-placeholder"></div>
-
 <div id="header-placeholder"></div>
 
 <main class="flex-grow">
@@ -128,26 +136,51 @@
             <h1 class="hero-logo-gradient">TDLiD</h1>
             <p class="hero-slogan-gradient">NO MORE CARBON</p>
             <p class="hero-description">
-                <span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group.
+                <span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
             </p>
         </div>
     </section>
     
-    <section class="py-12 bg-neutral-900 border-y border-neutral-800">
-        <div class="px-6">
-            <h2 class="text-lg font-light text-center mb-8 text-cyan-400 tracking-tight">A Pillar of Trust</h2>
-            <div class="partner-grid opacity-80">
-                <img src="images/home/DAVIGO.webp" alt="DAVIGO" class="h-8">
-                <img src="images/home/GESITS.webp" alt="GESITS" class="h-8">
+    <section class="py-16 bg-neutral-900 border-y border-neutral-800">
+        <div class="px-6 mb-16">
+            <h2 class="text-sm font-light text-center mb-8 text-cyan-400 tracking-widest uppercase">A Pillar of Trust</h2>
+            <div class="partner-grid">
+                <img src="images/home/DAVIGO.webp" alt="DAVIGO">
+                <img src="images/home/GESITS.webp" alt="GESITS">
+                <img src="images/home/ALESSA.webp" alt="ALESSA">
+            </div>
+        </div>
+
+        <div class="px-4">
+            <h2 class="text-lg font-light text-center mb-10 text-cyan-400">Global Compliance & Safety</h2>
+            <div id="certifications-inside-hero" class="interactive-certs">
+                <a href="#" class="cert-link" data-original-src="images/certification/CE-EMC-TEST.webp">
+                    <img src="images/certification/CE-EMC-TEST.webp" alt="CE">
+                </a>
+                <a href="#" class="cert-link" data-original-src="images/certification/CB-TEST.webp">
+                    <img src="images/certification/CB-TEST.webp" alt="CB">
+                </a>
+                <a href="#" class="cert-link" data-original-src="images/certification/EMC-COMPLIANCE.webp">
+                    <img src="images/certification/EMC-COMPLIANCE.webp" alt="EMC">
+                </a>
+                <a href="#" class="cert-link" data-original-src="images/certification/IEC-62619.webp">
+                    <img src="images/certification/IEC-62619.webp" alt="IEC">
+                </a>
+                <a href="#" class="cert-link" data-original-src="images/certification/Material-Safety.webp">
+                    <img src="images/certification/Material-Safety.webp" alt="MSDS">
+                </a>
+                <a href="#" class="cert-link" data-original-src="images/certification/UN38.3.webp">
+                    <img src="images/certification/UN38.3.webp" alt="UN38.3">
+                </a>
             </div>
         </div>
     </section>
 </main>
 
 <div id="imageModal">
-    <div class="flex flex-col items-center justify-center w-full h-full p-4">
-        <img id="modalDetailImage" src="">
-        <button class="mt-6 px-8 py-2 border border-cyan-500/50 text-cyan-400 rounded-full text-sm bg-black/50">Close</button>
+    <div class="flex flex-col items-center justify-center w-full h-full p-4" onclick="closeModal()">
+        <img id="modalDetailImage" src="" onclick="event.stopPropagation()">
+        <button class="mt-8 px-10 py-3 border border-cyan-500/50 text-cyan-400 rounded-full text-sm bg-black/80 backdrop-blur-md">Close</button>
     </div>
 </div>
 
@@ -183,17 +216,19 @@
 
             const bgmRes = await fetch('components/bgm_m.html');
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            bgmPlaceholder.innerHTML = await bgmRes.text();
-
-            const scripts = bgmPlaceholder.querySelectorAll("script");
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                newScript.text = oldScript.text;
-                document.body.appendChild(newScript).parentNode.removeChild(newScript);
-            });
+            if(bgmPlaceholder) {
+                bgmPlaceholder.innerHTML = await bgmRes.text();
+                const scripts = bgmPlaceholder.querySelectorAll("script");
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
+            }
 
             initNavigation();
             initAdminTrigger(); 
+            initCertModal();
         } catch (err) { console.error(err); }
     }
 
@@ -218,7 +253,6 @@
         }
     }
 
-    /** [수정] TDLiD 클릭 시 즉시 관리자 페이지로 이동 **/
     function initAdminTrigger() {
         const triggerWord = document.getElementById('triggerWord');
         if (triggerWord) {
@@ -229,9 +263,27 @@
         }
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadLayout();
-    });
+    // 인증서 모달 기능 활성화
+    function initCertModal() {
+        document.querySelectorAll('.cert-link').forEach(link => {
+            link.onclick = (e) => {
+                e.preventDefault();
+                const modal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('modalDetailImage');
+                modalImg.src = link.getAttribute('data-original-src');
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            };
+        });
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('imageModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener("DOMContentLoaded", loadLayout);
     document.addEventListener('contextmenu', (e) => e.preventDefault());
 </script>
 </body>
