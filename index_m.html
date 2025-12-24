@@ -50,7 +50,7 @@
 
                 if (inputPw === correctPw) {
                     sessionStorage.setItem('isAdminAuthenticated', 'true');
-                    window.location.href = "admin.html";
+                    window.location.href = "admin/admin.html";
                 } else {
                     alert("Invalid Administrator Password.");
                     document.getElementById('adminPasswordInput').value = '';
@@ -262,7 +262,7 @@ async function loadLayout() {
         tempDiv.innerHTML = headerText;
         
         // 헤더에서 관리자 링크 제거 (모바일 전용 로직 유지)
-        const adminLink = tempDiv.querySelector('a[href="admin.html"]');
+        const adminLink = tempDiv.querySelector('a[href="admin/admin.html"]');
         if(adminLink) adminLink.remove();
         document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
         
