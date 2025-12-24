@@ -12,53 +12,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 🌟 모바일 최적화 변수 설정 🌟 */
         :root {
             --header-logo-font-size: 4rem;
             --header-subtitle-font-size: 1.1rem;
         }
-        
-        /* Spotlight background */
         .company-bg {
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(circle at 50% 20%, rgba(34,211,238,.15), transparent 70%),
-                radial-gradient(circle at 20% 80%, rgba(124,58,237,.1), transparent 70%);
-            pointer-events:none;
-            z-index:0;
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at 50% 20%, rgba(34,211,238,.15), transparent 70%),
+                        radial-gradient(circle at 20% 80%, rgba(124,58,237,.1), transparent 70%);
+            pointer-events:none; z-index:0;
         }
-
-        /* 3 Image Stage */
         .image-stage { position: relative; z-index: 1; }
         .image-card {
-            position: relative;
-            border-radius: 1.25rem;
-            overflow: hidden; 
-            border: 1px solid rgba(255,255,255,.1);
-            background: #020617;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 160px;
-            margin-bottom: 1rem;
+            position: relative; border-radius: 1.25rem; overflow: hidden; 
+            border: 1px solid rgba(255,255,255,.1); background: #020617;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 160px; margin-bottom: 1rem;
         }
         .image-card img {
-            width: 100%; height: auto;
-            display: block; transition: transform 0.6s ease;
-            transform-origin: center center;
-            border-radius: 1.25rem;
+            width: 100%; height: auto; display: block; transition: transform 0.6s ease;
+            transform-origin: center center; border-radius: 1.25rem;
         }
-        
         .image-card.hover-expand:active img { transform: scale(1.1); }
-
-        /* Floating text animation */
         .float-in { animation: floatIn 0.8s ease-out both; }
         @keyframes floatIn {
             from {opacity:0;transform:translateY(30px)}
             to {opacity:1;transform:translateY(0)}
         }
-        
         .hero-title-m { font-size: 1.875rem; line-height: 1.3; letter-spacing: -0.02em; }
     </style>
 </head>
@@ -102,25 +82,17 @@
             <div class="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/40 hover:border-cyan-400/40 transition">
                 <div class="w-10 h-1 bg-cyan-400 mx-auto mb-4 rounded-full"></div>
                 <h3 class="text-lg font-bold text-cyan-300 mb-3">MISSION</h3>
-                <p class="text-sm text-neutral-300 leading-relaxed">
-                    “NO MORE CARBON” <br>Deliver the best products and services to our customers. Promote leadership consistently. Create and Innovate value.
-                </p>
+                <p class="text-sm text-neutral-300 leading-relaxed">“NO MORE CARBON” <br>Deliver the best products and services to our customers. Promote leadership consistently. Create and Innovate value.</p>
             </div>
-
             <div class="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/40 hover:border-purple-400/40 transition">
                 <div class="w-10 h-1 bg-purple-400 mx-auto mb-4 rounded-full"></div>
                 <h3 class="text-lg font-bold text-purple-300 mb-3">TECHNOLOGY</h3>
-                <p class="text-sm text-neutral-300 leading-relaxed">
-                    High-density lithium-ion batteries with AI-based BMS optimize performance, improve power and range, and maintain thermal stability.
-                </p>
+                <p class="text-sm text-neutral-300 leading-relaxed">High-density lithium-ion batteries with AI-based BMS optimize performance, improve power and range, and maintain thermal stability.</p>
             </div>
-
             <div class="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/40 hover:border-blue-400/40 transition">
                 <div class="w-10 h-1 bg-blue-400 mx-auto mb-4 rounded-full"></div>
                 <h3 class="text-lg font-bold text-blue-300 mb-3">VISION</h3>
-                <p class="text-sm text-neutral-300 leading-relaxed">
-                    To provide EV motors and batteries that enhance lifestyles and contribute to a better environment for future generations.
-                </p>
+                <p class="text-sm text-neutral-300 leading-relaxed">To provide EV motors and batteries that enhance lifestyles and contribute to a better environment for future generations.</p>
             </div>
         </div>
     </section>
@@ -130,7 +102,7 @@
 
 <script>
     /**
-     * 1. 메뉴 토글 기능 (모바일 메뉴 열기/닫기)
+     * 1. 메뉴 토글 기능
      */
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
@@ -140,23 +112,17 @@
         if (menuBtn && dropdown) {
             menuBtn.onclick = (e) => {
                 e.stopPropagation();
-                // invisible 클래스 존재 여부로 현재 상태 확인
                 const isHidden = dropdown.classList.contains("invisible");
-                
                 if (isHidden) {
-                    // 메뉴 열기: 투명도 조절 및 위치 이동(translate)
                     dropdown.classList.remove("opacity-0", "invisible", "-translate-y-5");
                     dropdown.classList.add("opacity-100", "visible", "translate-y-0");
                     if(menuIcon) menuIcon.innerText = "✕";
                 } else {
-                    // 메뉴 닫기
                     dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
                     dropdown.classList.add("opacity-0", "invisible", "-translate-y-5");
                     if(menuIcon) menuIcon.innerText = "☰";
                 }
             };
-
-            // 메뉴 외부 영역 클릭 시 자동으로 닫기
             document.addEventListener('click', (e) => {
                 if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
                     dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
@@ -168,7 +134,7 @@
     }
 
     /**
-     * 2. 레이아웃(헤더/푸터) 로드 및 초기화
+     * 2. 레이아웃 로드 및 초기화
      */
     async function loadLayout() {
         try {
@@ -177,11 +143,10 @@
                 fetch('components/footer_m.html')
             ]);
 
-            // 헤더 처리 및 관리자 링크 제거
+            // 헤더 처리
             const headerText = await headerRes.text();
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = headerText;
-            
             const adminLink = tempDiv.querySelector('a[href="admin.html"]');
             if(adminLink) adminLink.remove();
             document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
@@ -190,22 +155,19 @@
             const footerPlaceholder = document.getElementById('footer-placeholder');
             footerPlaceholder.innerHTML = await footerRes.text();
 
-            // 푸터 내부의 BGM 스크립트 강제 실행
+            // BGM 스크립트 실행
             const scripts = footerPlaceholder.querySelectorAll("script");
             scripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
-                if (oldScript.src) {
-                    newScript.src = oldScript.src;
-                } else {
-                    newScript.text = oldScript.text;
-                }
+                if (oldScript.src) newScript.src = oldScript.src;
+                else newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
 
-            // 레이아웃 로드 후 메뉴 기능 활성화
+            // 기능 초기화
             initMenuToggle();
             
-            // 현재 페이지(Company) 메뉴 아이템 강조 표시
+            // 현재 페이지 강조
             const navLinks = document.querySelectorAll('.nav-item-m');
             navLinks.forEach(link => {
                 if(link.getAttribute('href') === 'company_m.html') {
@@ -214,69 +176,12 @@
             });
             
         } catch (err) {
-            console.error("레이아웃 로드 실패:", err);
-        }
-    }
-
-    // 문서 로드 완료 시 실행
-    document.addEventListener("DOMContentLoaded", loadLayout);
-    // 우클릭 방지
-    document.addEventListener('contextmenu', (e) => e.preventDefault());
-</script>
-
-<script>
-    /**
-     * 레이아웃 로드: 수정된 버전 적용
-     */
-    async function loadLayout() {
-        try {
-            const [headerRes, footerRes] = await Promise.all([
-                fetch('components/header_m.html'),
-                fetch('components/footer_m.html')
-            ]);
-
-            // 1. 헤더 처리 (관리자 링크 제거 로직 포함)
-            const headerText = await headerRes.text();
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = headerText;
-            
-            const adminLink = tempDiv.querySelector('a[href="admin.html"]');
-            if(adminLink) adminLink.remove();
-            
-            document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
-
-            // 2. 푸터 처리
-            const footerPlaceholder = document.getElementById('footer-placeholder');
-            footerPlaceholder.innerHTML = await footerRes.text();
-
-            // 3. [중요] 푸터 내부의 BGM 및 기타 스크립트 강제 실행
-            const scripts = footerPlaceholder.querySelectorAll("script");
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                if (oldScript.src) {
-                    newScript.src = oldScript.src;
-                } else {
-                    newScript.text = oldScript.text;
-                }
-                document.body.appendChild(newScript).parentNode.removeChild(newScript);
-            });
-
-            // 4. 전역적으로 필요한 초기화 함수 실행 (header_m.html 등에 정의된 함수)
-            if (typeof initMenuToggle === 'function') initMenuToggle();
-            if (typeof initAdminTrigger === 'function') initAdminTrigger();
-            if (typeof initCertModal === 'function') initCertModal();
-            
-        } catch (err) {
             console.error("Layout Load Error:", err);
         }
     }
 
-    // 초기 실행
     document.addEventListener("DOMContentLoaded", loadLayout);
-
-    // 우클릭 방지 유지
     document.addEventListener('contextmenu', (e) => e.preventDefault());
 </script>
-
 </body>
 </html>
