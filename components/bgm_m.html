@@ -17,34 +17,44 @@
 </button>
 
 <script>
-    (function() {
-        const bgm = document.getElementById('bgm');
-        const musicBtn = document.getElementById('musicToggleBtn');
-        const musicIcon = document.getElementById('musicIconUI');
 
-        // 1. 상태 복원
-        const initBGM = () => {
-            const savedTime = sessionStorage.getItem('bgmTime');
-            const isMuted = sessionStorage.getItem('bgmMuted'); // 'true' 또는 'false'
+  (function() {
+    const bgm = document.getElementById('bgm');
+    const musicBtn = document.getElementById('musicToggleBtn');
+    const musicIcon = document.getElementById('musicIconUI');
 
-            if (savedTime) bgm.currentTime = parseFloat(savedTime);
+    const initBGM = () => {
+        const savedTime = sessionStorage.getItem('bgmTime');
+        const isMuted = sessionStorage.getItem('bgmMuted') === 'true';
 
-            // [모바일 핵심] 사용자가 이전에 켰던 기록이 있다면 클릭 시 재생 예약
-            if (isMuted === 'false') {
+        if (savedTime) bgm.currentTime = parseFloat(savedTime);
+
+        if (!isMuted) {
+            bgm.muted = false;
+            // 1. 우선 재생 시도
+            bgm.play().then(() => {
+                musicIcon.innerText = "🎵";
+            }).catch(err => {
+                // 2. 자동 재생이 차단된 경우 (모바일 페이지 이동 시 발생)
+                console.log("Autoplay blocked. Waiting for touch...");
+                musicIcon.innerText = "🎵"; // 버튼은 플레이 상태로 표시
+
+                // 화면 터치 시 재생시키는 일회성 이벤트 리스너 등록
                 const playOnGesture = () => {
-                    bgm.muted = false;
                     bgm.play().then(() => {
-                        musicIcon.innerText = "🎵";
-                        // 재생 성공 시 이벤트 제거
                         document.removeEventListener('touchstart', playOnGesture);
                         document.removeEventListener('click', playOnGesture);
-                    }).catch(e => console.log("Waiting for user gesture..."));
+                    });
                 };
-                // 모바일은 click보다 touchstart가 더 빠르고 확실합니다.
                 document.addEventListener('touchstart', playOnGesture);
                 document.addEventListener('click', playOnGesture);
-            }
-        };
+            });
+        } else {
+            bgm.muted = true;
+            musicIcon.innerText = "🔇";
+        }
+    };
+
 
         if (musicBtn && bgm) {
             initBGM();
