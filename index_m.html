@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
-        // 1. Firebase 설정 (기존 유지)
+        // 1. Firebase 설정
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -25,29 +25,42 @@
         }
         const database = firebase.database();
 
-        function getOS(ua) {
-            if (ua.indexOf("Windows") !== -1) return "Windows";
-            if (ua.indexOf("Mac") !== -1) return "macOS";
-            if (ua.indexOf("Android") !== -1) return "Android";
-            if (ua.indexOf("iPhone") !== -1 || ua.indexOf("iPad") !== -1) return "iOS";
-            return "Unknown";
+        // 2. 관리자 인증 로직 (PC 버전과 동일하게 적용)
+        function openAdminAuth() {
+            const modal = document.getElementById('adminAuthModal');
+            modal.classList.remove('hidden');
+            document.getElementById('adminPasswordInput').focus();
+            document.body.style.overflow = 'hidden';
         }
 
-        function getBrowser(ua) {
-            if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) return "Edge";
-            if (ua.indexOf("Chrome") !== -1) return "Chrome";
-            if (ua.indexOf("Safari") !== -1) return "Safari";
-            if (ua.indexOf("Firefox") !== -1) return "Firefox";
-            return "Others";
+        function closeAdminAuth() {
+            const modal = document.getElementById('adminAuthModal');
+            modal.classList.add('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+            document.body.style.overflow = '';
         }
 
-        function getSessionId() {
-            if (!sessionStorage.getItem('session_id')) {
-                sessionStorage.setItem('session_id', 's_' + Math.random().toString(36).substr(2, 9));
+        async function verifyAdminPassword() {
+            const inputPw = document.getElementById('adminPasswordInput').value;
+            if (!inputPw) return;
+
+            try {
+                const snapshot = await database.ref('adminConfig/password').once('value');
+                const correctPw = snapshot.val();
+
+                if (inputPw === correctPw) {
+                    sessionStorage.setItem('isAdminAuthenticated', 'true');
+                    window.location.href = "admin.html";
+                } else {
+                    alert("Invalid Administrator Password.");
+                    document.getElementById('adminPasswordInput').value = '';
+                }
+            } catch (e) {
+                console.error("Auth Error:", e);
             }
-            return sessionStorage.getItem('session_id');
         }
 
+        // 3. 접속 기록 함수
         async function recordVisit() {
             try {
                 let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
@@ -75,6 +88,30 @@
                 database.ref('visits').push(visitData);
             } catch(e) { console.error("History error:", e); }
         }
+
+        function getOS(ua) {
+            if (ua.indexOf("Windows") !== -1) return "Windows";
+            if (ua.indexOf("Mac") !== -1) return "macOS";
+            if (ua.indexOf("Android") !== -1) return "Android";
+            if (ua.indexOf("iPhone") !== -1 || ua.indexOf("iPad") !== -1) return "iOS";
+            return "Unknown";
+        }
+
+        function getBrowser(ua) {
+            if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) return "Edge";
+            if (ua.indexOf("Chrome") !== -1) return "Chrome";
+            if (ua.indexOf("Safari") !== -1) return "Safari";
+            if (ua.indexOf("Firefox") !== -1) return "Firefox";
+            return "Others";
+        }
+
+        function getSessionId() {
+            if (!sessionStorage.getItem('session_id')) {
+                sessionStorage.setItem('session_id', 's_' + Math.random().toString(36).substr(2, 9));
+            }
+            return sessionStorage.getItem('session_id');
+        }
+
         recordVisit();
     </script>
 
@@ -89,7 +126,7 @@
         .animated-logo-text-m { font-size: 3.8vw !important; white-space: nowrap; }
         @media (max-width: 380px) { .animated-logo-text-m { font-size: 11px !important; } }
         
-        /* 모달 레이아웃 수정 */
+        /* 모달 레이아웃 */
         #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; display: none; }
         #modalDetailImage { max-width: 90%; max-height: 70%; object-fit: contain; }
         
@@ -107,11 +144,9 @@
         .hero-slogan-gradient { font-size: 4vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); font-weight: 600; text-transform: uppercase; }
         .hero-description { font-size: 15px; line-height: 1.7; margin-top: 40px; color: #cbd5e1; word-break: keep-all; }
         
-        /* 파트너 섹션 수정 */
         .partner-grid { display: flex; flex-wrap: wrap; gap: 30px; align-items: center; justify-content: center; opacity: 0.7; }
         .partner-grid img { height: 28px; width: auto; filter: grayscale(1); }
 
-        /* 인증서 섹션 수정 */
         .interactive-certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 20px; }
         .cert-link img { width: 100%; height: auto; border-radius: 4px; }
     </style>
@@ -128,7 +163,7 @@
             <div class="video-overlay"></div> 
             <video autoplay loop muted playsinline poster="images/home/flag.webp" class="video-bg">
                 <source src="videos/background.webm" type="video/webm">
-                <source src="videos/battery17.mp4" type="video/mp4">
+                //<source src="videos/battery17.mp4" type="video/mp4">
             </video>
         </div>
 
@@ -177,6 +212,20 @@
     </section>
 </main>
 
+<div id="adminAuthModal" class="hidden fixed inset-0 bg-black/95 z-[30000] flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-neutral-900 border border-cyan-500/30 p-8 rounded-2xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(0,0,0,1)]">
+        <h3 class="text-cyan-400 font-bold text-xl mb-1 uppercase tracking-tighter">Admin Access</h3>
+        <p class="text-neutral-500 text-xs mb-6">Database Authentication Required</p>
+        <input type="password" id="adminPasswordInput" 
+               class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white mb-6 focus:border-cyan-500 outline-none transition-all text-center tracking-widest"
+               placeholder="••••••••">
+        <div class="flex gap-3">
+            <button onclick="closeAdminAuth()" class="flex-1 py-3 bg-neutral-800 text-neutral-400 rounded-xl font-semibold text-sm">Cancel</button>
+            <button onclick="verifyAdminPassword()" class="flex-1 py-3 bg-cyan-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-900/20 hover:bg-cyan-500 transition-colors">Verify</button>
+        </div>
+    </div>
+</div>
+
 <div id="imageModal">
     <div class="flex flex-col items-center justify-center w-full h-full p-4" onclick="closeModal()">
         <img id="modalDetailImage" src="" onclick="event.stopPropagation()">
@@ -207,8 +256,11 @@
             const headerText = await headerRes.text();
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = headerText;
+            
+            // 헤더에서 admin.html 링크가 있는 요소 제거
             const adminLink = tempDiv.querySelector('a[href="admin.html"]');
             if(adminLink) adminLink.remove();
+            
             document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
             
             const footerRes = await fetch('components/footer_m.html');
@@ -253,17 +305,22 @@
         }
     }
 
+    // TDLiD 단어 클릭 시 모달 오픈으로 변경
     function initAdminTrigger() {
         const triggerWord = document.getElementById('triggerWord');
         if (triggerWord) {
             triggerWord.addEventListener('click', (e) => {
                 e.preventDefault();
-                location.href = "admin.html";
+                openAdminAuth(); 
             });
         }
     }
 
-    // 인증서 모달 기능 활성화
+    // 엔터키 처리
+    document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') verifyAdminPassword();
+    });
+
     function initCertModal() {
         document.querySelectorAll('.cert-link').forEach(link => {
             link.onclick = (e) => {

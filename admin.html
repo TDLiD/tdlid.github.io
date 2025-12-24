@@ -25,26 +25,51 @@
 
         .unread-row { background-color: rgba(34, 211, 238, 0.05); }
 
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
-            display: none; justify-content: center; align-items: center; z-index: 9999;
-        }
+       /* 기존 .modal-overlay 찾아서 수정 */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+    display: none; 
+    justify-content: center; 
+    align-items: flex-start; /* center에서 flex-start로 변경 */
+    padding-top: 15vh;        /* 화면 높이의 15%만큼 아래로 내림 */
+    z-index: 9999;
+}
+
         .modal-content {
             background: #0f172a; border: 1px solid rgba(34, 211, 238, 0.3);
             width: 90%; max-width: 600px; border-radius: 1rem; overflow: hidden;
             box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
 
-/* Quill 에디터 플레이스홀더 색상 변경 */
-.ql-editor.ql-blank::before {
-    color: rgba(255, 255, 255, 0.6) !important; /* 반투명한 흰색 */
-    font-style: normal; /* 기울임 해제 (선택사항) */
-}
+        .ql-editor.ql-blank::before {
+            color: rgba(255, 255, 255, 0.6) !important;
+            font-style: normal;
+        }
+        
+        /* [추가] 헤더 스타일 보정 */
+        #header-placeholder { margin-bottom: 2rem; }
 
     </style>
+
+
 </head>
-<body class="text-neutral-200 p-5 md:p-10">
+<body class="text-neutral-200 p-0"> <div id="header-placeholder"></div>
+
+<div id="pwModal" class="modal-overlay" onclick="closePwModal()">
+    <div class="modal-content max-w-sm" onclick="event.stopPropagation()">
+        <div class="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
+            <h4 class="font-bold text-cyan-400">Change Admin Password</h4>
+            <button onclick="closePwModal()" class="text-neutral-400 hover:text-white">✕</button>
+        </div>
+        <div class="p-6 space-y-4">
+<input type="text" id="inlineNewPw" placeholder="Enter New Admin Password" 
+       class="flex-1 bg-black/40 border border-neutral-700 p-2 rounded-lg text-sm outline-none focus:border-cyan-500 transition">
+            <button onclick="updateAdminPassword()" class="w-full py-3 bg-cyan-600 text-white font-bold rounded-lg hover:bg-cyan-500 transition">UPDATE PASSWORD</button>
+        </div>
+    </div>
+</div>
+
 
     <div id="inquiryModal" class="modal-overlay" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
@@ -54,30 +79,12 @@
             </div>
             <div class="p-6 space-y-4">
                 <div class="grid grid-cols-2 gap-4 text-xs">
-                    <div>
-                        <p class="text-neutral-500 uppercase font-bold">Name</p>
-                        <p id="modalName" class="text-white text-base font-bold"></p>
-                    </div>
-                    <div>
-                        <p class="text-neutral-500 uppercase font-bold">Date</p>
-                        <p id="modalDate" class="text-white"></p>
-                    </div>
-                    <div>
-                        <p class="text-neutral-500 uppercase font-bold">Company</p>
-                        <p id="modalCompany" class="text-cyan-400 text-base font-bold"></p>
-                    </div>
-                    <div>
-                        <p class="text-neutral-500 uppercase font-bold">Product</p>
-                        <p id="modalProduct" class="text-amber-400 font-bold"></p>
-                    </div>
-                    <div>
-                        <p class="text-neutral-500 uppercase font-bold">Email</p>
-                        <p id="modalEmail" class="text-white"></p>
-                    </div>
-                    <div>
-                        <p class="text-neutral-500 uppercase font-bold">Phone</p>
-                        <p id="modalPhone" class="text-white"></p>
-                    </div>
+                    <div><p class="text-neutral-500 uppercase font-bold">Name</p><p id="modalName" class="text-white text-base font-bold"></p></div>
+                    <div><p class="text-neutral-500 uppercase font-bold">Date</p><p id="modalDate" class="text-white"></p></div>
+                    <div><p class="text-neutral-500 uppercase font-bold">Company</p><p id="modalCompany" class="text-cyan-400 text-base font-bold"></p></div>
+                    <div><p class="text-neutral-500 uppercase font-bold">Product</p><p id="modalProduct" class="text-amber-400 font-bold"></p></div>
+                    <div><p class="text-neutral-500 uppercase font-bold">Email</p><p id="modalEmail" class="text-white"></p></div>
+                    <div><p class="text-neutral-500 uppercase font-bold">Phone</p><p id="modalPhone" class="text-white"></p></div>
                 </div>
                 <div class="pt-4 border-t border-white/5">
                     <p class="text-neutral-500 uppercase text-xs font-bold mb-2">Message</p>
@@ -90,14 +97,37 @@
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto">
-        <header class="flex justify-between items-center mb-10 border-b border-cyan-900/50 pb-6">
-            <div>
-                <h1 class="text-3xl font-bold text-cyan-400 tracking-tighter italic">ADMIN CONTROL CENTER</h1>
-                <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">Notice & News & Analytics</p>
-            </div>
-            <button onclick="location.reload()" class="px-4 py-2 bg-cyan-900/30 border border-cyan-500/50 text-cyan-400 rounded-lg hover:bg-cyan-500 hover:text-black transition font-bold">REFRESH</button>
-        </header>
+    <div class="max-w-7xl mx-auto px-5 md:px-10 pb-20">
+      <header class="mb-10 border-b border-cyan-900/50 pb-6">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-cyan-400 tracking-tighter italic">ADMIN CONTROL CENTER</h1>
+            <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">Notice & News & Analytics</p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="location.reload()" class="px-4 py-2 bg-cyan-900/30 border border-cyan-500/50 text-cyan-400 rounded-lg hover:bg-cyan-500 hover:text-black transition font-bold text-sm">REFRESH</button>
+        </div>
+    </div>
+
+<div class="bg-neutral-900/40 border border-white/5 rounded-xl p-4 flex flex-wrap items-center gap-4">
+    <div class="flex items-center gap-2">
+        <span class="text-cyan-500 text-xs font-black uppercase tracking-widest">Security</span>
+        <div class="h-4 w-[1px] bg-white/10 mx-2"></div>
+    </div>
+    <div class="flex-1 min-w-[200px] flex gap-2">
+        <input type="text" id="adminNewPassword" placeholder="Enter New Admin Password" 
+               class="flex-1 bg-black/40 border border-neutral-700 p-2 rounded-lg text-sm outline-none focus:border-cyan-500 transition">
+        <button onclick="updateAdminPassword()" 
+                class="px-6 py-2 bg-neutral-800 hover:bg-cyan-600 text-white text-xs font-bold rounded-lg transition border border-neutral-600 hover:border-cyan-500 whitespace-nowrap">
+            CHANGE PASSWORD
+        </button>
+    </div>
+    <p class="text-neutral-600 text-[10px] w-full md:w-auto">* This password is used for the 'Admin' button in the header.</p>
+</div>
+
+
+</header>
+
 
         <section id="inquirySection" class="mb-12 bg-neutral-900/80 rounded-2xl cyber-border overflow-hidden shadow-2xl">
             <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
@@ -125,7 +155,6 @@
                 <span class="w-2 h-2 bg-cyan-500 rounded-full animate-ping"></span>
                 POST NEW CONTENT (NOTICE / NEWS)
             </h3>
-            
             <input type="hidden" id="editKey"> 
             <div class="grid grid-cols-1 gap-4">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -135,13 +164,9 @@
                     </select>
                     <input type="text" id="noticeTitle" placeholder="Enter title here..." class="md:col-span-3 p-3 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                 </div>
-                
                 <div id="editor-container"></div>
-                
                 <div class="flex gap-2">
-                    <button id="submitBtn" onclick="uploadNotice()" class="flex-1 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition shadow-lg uppercase">
-                        Register Post
-                    </button>
+                    <button id="submitBtn" onclick="uploadNotice()" class="flex-1 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition shadow-lg uppercase">Register Post</button>
                     <button id="cancelBtn" onclick="resetForm()" class="hidden px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white font-bold rounded-lg transition">CANCEL</button>
                 </div>
             </div>
@@ -153,10 +178,7 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-neutral-950 text-neutral-400 text-[10px] uppercase tracking-wider">
-                            <th class="p-4">Category</th>
-                            <th class="p-4">Date</th>
-                            <th class="p-4">Title</th>
-                            <th class="p-4 text-right">Actions</th>
+                            <th class="p-4">Category</th><th class="p-4">Date</th><th class="p-4">Title</th><th class="p-4 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="noticeTableBody" class="divide-y divide-neutral-800 text-sm"></tbody>
@@ -181,11 +203,7 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-cyan-950/40 text-cyan-300 text-[10px] uppercase tracking-[0.2em]">
-                            <th class="p-5 text-center">Hits</th>
-                            <th class="p-5">Latest Access / IP</th>
-                            <th class="p-5">Location / Session</th>
-                            <th class="p-5 text-center">OS & Browser</th>
-                            <th class="p-5">Current Page</th>
+                            <th class="p-5 text-center">Hits</th><th class="p-5">Latest Access / IP</th><th class="p-5">Location / Session</th><th class="p-5 text-center">OS & Browser</th><th class="p-5">Current Page</th>
                         </tr>
                     </thead>
                     <tbody id="visitTableBody" class="divide-y divide-neutral-800 text-sm italic"></tbody>
@@ -195,7 +213,7 @@
     </div>
 
     <script>
-        // Firebase Configuration
+        // [기존 Firebase 설정 동일]
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -205,16 +223,49 @@
             messagingSenderId: "604782345004",
             appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
         };
-
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // 1. Inquiry Logic
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text ? String(text).replace(/[&<>"']/g, m => map[m]) : '';
+        // [추가] 헤더 로드 기능
+        async function loadHeader() {
+            try {
+                const res = await fetch('components/header.html');
+                const html = await res.text();
+                document.getElementById('header-placeholder').innerHTML = html;
+                if (typeof initNavigation === "function") initNavigation();
+            } catch (e) { console.error("Header load failed", e); }
         }
 
+        // [추가] 비밀번호 변경 로직
+        function openPwModal() { document.getElementById('pwModal').style.display = 'flex'; }
+        function closePwModal() { document.getElementById('pwModal').style.display = 'none'; }
+
+// 비밀번호 업데이트 함수 (통합)
+async function updateAdminPassword() {
+    const passwordInput = document.getElementById('adminNewPassword');
+    const newPw = passwordInput.value;
+    
+    if(!newPw) {
+        alert("Please enter a new password.");
+        return;
+    }
+
+    if(confirm("Are you sure you want to change the admin password?")) {
+        try {
+            await database.ref('adminConfig/password').set(newPw);
+            alert("Password has been updated successfully.");
+            // 선택 사항: 저장 후 입력창을 비우고 싶지 않다면 아래 줄 주석 처리
+            // passwordInput.value = ''; 
+        } catch(e) {
+            console.error(e);
+            alert("Failed to update password. Check Firebase permissions.");
+        }
+    }
+}
+
+
+        // [기존 Inquiry, Notice, Analytics 로직 동일 유지]
+        function escapeHtml(text) { const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return text ? String(text).replace(/[&<>"']/g, m => map[m]) : ''; }
         function openInquiry(key, name, date, company, email, details, phone, product) {
             document.getElementById('modalName').innerText = name;
             document.getElementById('modalDate').innerText = date;
@@ -226,7 +277,6 @@
             document.getElementById('inquiryModal').style.display = 'flex';
             database.ref('messages/' + key).update({ read: true });
         }
-
         function closeModal() { document.getElementById('inquiryModal').style.display = 'none'; }
 
         function loadInquiries() {
@@ -242,9 +292,7 @@
                     if(!data.read) unreadCount++;
                     items.push({ key: child.key, ...data });
                 });
-                items.reverse();
-                unreadEl.innerText = unreadCount + " NEW";
-                items.forEach(item => {
+                items.reverse().forEach(item => {
                     const row = document.createElement('tr');
                     row.className = "hover:bg-white/10 cursor-pointer transition " + (!item.read ? 'unread-row' : '');
                     const safeName = escapeHtml(item.name || 'N/A');
@@ -264,24 +312,22 @@
                         </td>`;
                     tbody.appendChild(row);
                 });
+                unreadEl.innerText = unreadCount + " NEW";
             });
         }
 
         function deleteInquiry(key) { if(confirm("Delete?")) database.ref('messages/' + key).remove(); }
 
-        // 2. Notice & News Logic
         const quill = new Quill('#editor-container', {
             theme: 'snow',
             modules: { toolbar: [[{'header': [1, 2, 3, false]}], ['bold', 'italic', 'underline'], ['image', 'link'], [{'list': 'ordered'}, {'list': 'bullet'}], ['clean']] },
             placeholder: 'Write content here...'
         });
 
-        // UI 텍스트 업데이트 (카테고리 선택 시)
         function updateFormText() {
             const cat = document.getElementById('postCategory').value;
             const btn = document.getElementById('submitBtn');
             const editKey = document.getElementById('editKey').value;
-            
             if(!editKey) {
                 document.getElementById('formTitle').innerHTML = `<span class="w-2 h-2 bg-cyan-500 rounded-full animate-ping"></span> POST NEW ${cat.toUpperCase()}`;
                 btn.innerText = `REGISTER ${cat.toUpperCase()} (POST)`;
@@ -293,22 +339,10 @@
             const title = document.getElementById('noticeTitle').value;
             const content = quill.root.innerHTML;
             const editKey = document.getElementById('editKey').value;
-            
             if(!title || quill.getText().trim().length === 0) return alert("Enter title and content.");
-
-            const data = {
-                category: category,
-                title: title,
-                content: content,
-                date: new Date().toLocaleDateString(),
-                timestamp: Date.now()
-            };
-
+            const data = { category, title, content, date: new Date().toLocaleDateString(), timestamp: Date.now() };
             const targetPath = 'notices/' + (editKey || database.ref('notices').push().key);
-            database.ref(targetPath).set(data).then(() => {
-                alert("Saved successfully.");
-                resetForm();
-            });
+            database.ref(targetPath).set(data).then(() => { alert("Saved."); resetForm(); });
         }
 
         function resetForm() {
@@ -321,7 +355,6 @@
             updateFormText();
         }
 
-        // 목록 로드 (Badge 추가)
         database.ref('notices').orderByChild('timestamp').on('value', (snapshot) => {
             const tbody = document.getElementById('noticeTableBody');
             tbody.innerHTML = '';
@@ -333,9 +366,7 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-white/5 transition";
                 tr.innerHTML = `
-                    <td class="p-4">
-                        <span class="px-2 py-0.5 border text-[10px] font-bold rounded ${badgeClass}">${(item.category || 'notice').toUpperCase()}</span>
-                    </td>
+                    <td class="p-4"><span class="px-2 py-0.5 border text-[10px] font-bold rounded ${badgeClass}">${(item.category || 'notice').toUpperCase()}</span></td>
                     <td class="p-4 text-neutral-500 text-xs">${item.date}</td>
                     <td class="p-4 font-bold text-neutral-200">${item.title}</td>
                     <td class="p-4 text-right space-x-2">
@@ -349,111 +380,68 @@
         function handleEditClick(key, category, title, content) {
             document.getElementById('editKey').value = key;
             document.getElementById('postCategory').value = category;
-            document.getElementById('postCategory').disabled = true; // 수정 시 카테고리 변경 방지
+            document.getElementById('postCategory').disabled = true;
             document.getElementById('noticeTitle').value = title;
             quill.root.innerHTML = decodeURIComponent(content);
-            
             document.getElementById('formTitle').innerText = "EDIT " + category.toUpperCase();
             document.getElementById('submitBtn').innerText = "UPDATE " + category.toUpperCase() + " (SAVE)";
             document.getElementById('noticeFormSection').classList.add('edit-mode');
             document.getElementById('cancelBtn').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
         function deleteNotice(key) { if(confirm("Delete this?")) database.ref('notices/' + key).remove(); }
 
-        // 3. Analytics Logic (Same as before)
-function loadAnalytics() {
-    database.ref('visits').orderByChild('timestamp').on('value', (snapshot) => {
-        const tableBody = document.getElementById('visitTableBody');
-        if (!tableBody) return;
-        
-        tableBody.innerHTML = '';
-        let rawData = [];
-        
-        if (snapshot.exists()) {
-            snapshot.forEach(c => {
-                const val = c.val();
-                if (val && val.timestamp) {
-                    rawData.push(val);
-                }
+        function loadAnalytics() {
+            database.ref('visits').orderByChild('timestamp').on('value', (snapshot) => {
+                const tableBody = document.getElementById('visitTableBody');
+                if (!tableBody) return;
+                tableBody.innerHTML = '';
+                let rawData = [];
+                if (snapshot.exists()) { snapshot.forEach(c => { const val = c.val(); if (val && val.timestamp) rawData.push(val); }); }
+                rawData.sort((a, b) => b.timestamp - a.timestamp);
+                const groupedData = [];
+                const map = new Map();
+                rawData.forEach(v => {
+                    const key = `${v.ip}_${v.os}`;
+                    if (!map.has(key)) {
+                        const entry = { ...v, count: 1, lastAccess: v.timeStr };
+                        map.set(key, entry);
+                        groupedData.push(entry);
+                    } else { map.get(key).count += 1; }
+                });
+                document.getElementById('totalCount').innerText = rawData.length;
+                document.getElementById('uniqueCount').innerText = new Set(rawData.map(v => v.ip)).size;
+                groupedData.forEach(v => {
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-white/5 transition border-b border-white/5";
+                    row.innerHTML = `
+                        <td class="p-5 text-center"><div class="flex flex-col items-center"><span class="bg-cyan-500 text-black px-2 py-0.5 rounded text-[10px] font-black mb-1">${v.count}</span><span class="text-[9px] text-neutral-500 uppercase tracking-tighter">Hits</span></div></td>
+                        <td class="p-5"><div class="text-neutral-400 text-xs font-mono">${v.lastAccess || '-'}</div><div class="text-cyan-500 text-sm font-black">${v.ip || '0.0.0.0'}</div></td>
+                        <td class="p-5"><div class="text-white font-bold">${v.country || 'Unknown'}</div><div class="text-neutral-500 text-xxs">${v.city || ''}</div></td>
+                        <td class="p-5 text-center"><div class="flex flex-col gap-1 items-center"><span class="px-2 py-1 rounded text-xxs bg-neutral-800 text-neutral-300 w-24 truncate">${v.os || 'OS'}</span><span class="px-2 py-1 rounded text-xxs bg-cyan-900/20 text-cyan-500 w-24 truncate">${v.browser || v.device || 'Device'}</span></div></td>
+                        <td class="p-5"><div class="font-bold text-cyan-400 text-xs">${v.page || '/'}</div><div class="text-neutral-600 text-[10px] truncate max-w-[150px]">${v.referrer ? 'via ' + new URL(v.referrer).hostname : 'Direct'}</div></td>`;
+                    tableBody.appendChild(row);
+                });
             });
         }
-        
-        // 최신 데이터가 위로 오도록 정렬
-        rawData.sort((a, b) => b.timestamp - a.timestamp);
 
-        // --- 그룹화 로직 시작 ---
-        const groupedData = [];
-        const map = new Map();
+// 초기 로드 시 현재 비밀번호 불러오기 (window.onload 안에 배치)
+window.onload = () => { 
+    loadHeader();
+    loadInquiries(); 
+    loadAnalytics(); 
+    updateFormText(); 
 
-        rawData.forEach(v => {
-            // IP + OS 조합을 고유 키로 사용
-            const key = `${v.ip}_${v.os}`;
-            
-            if (!map.has(key)) {
-                // 처음 발견된 조합이면 객체 생성
-                const entry = {
-                    ...v,
-                    count: 1, // 접속 횟수 초기화
-                    lastAccess: v.timeStr // 가장 최근 시간 저장
-                };
-                map.set(key, entry);
-                groupedData.push(entry);
-            } else {
-                // 이미 존재하는 조합이면 카운트만 증가
-                const existing = map.get(key);
-                existing.count += 1;
-                // 이미 정렬되어 있으므로 처음 만난 시간이 가장 최신 시간임
-            }
-        });
-        // --- 그룹화 로직 끝 ---
-
-        // 상단 대시보드 업데이트 (전체 히트 수와 순 방문자 수)
-        const uniqueIps = new Set(rawData.map(v => v.ip).filter(ip => ip)).size;
-        document.getElementById('totalCount').innerText = rawData.length;
-        document.getElementById('uniqueCount').innerText = uniqueIps;
-
-        if (groupedData.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-neutral-500">No visitor logs found.</td></tr>`;
-            return;
+    // Firebase에서 현재 저장된 비밀번호 가져와서 입력창에 표시
+    database.ref('adminConfig/password').once('value', (snapshot) => {
+        if (snapshot.exists()) {
+            const currentPw = snapshot.val();
+            const inputField = document.getElementById('adminNewPassword');
+            if(inputField) inputField.value = currentPw;
         }
-
-        groupedData.forEach(v => {
-            const row = document.createElement('tr');
-            row.className = "hover:bg-white/5 transition border-b border-white/5";
-            row.innerHTML = `
-                <td class="p-5 text-center">
-                    <div class="flex flex-col items-center">
-                        <span class="bg-cyan-500 text-black px-2 py-0.5 rounded text-[10px] font-black mb-1">${v.count}</span>
-                        <span class="text-[9px] text-neutral-500 uppercase tracking-tighter">Hits</span>
-                    </div>
-                </td>
-                <td class="p-5">
-                    <div class="text-neutral-400 text-xs font-mono">${v.lastAccess || '-'}</div>
-                    <div class="text-cyan-500 text-sm font-black">${v.ip || '0.0.0.0'}</div>
-                </td>
-                <td class="p-5">
-                    <div class="text-white font-bold">${v.country || 'Unknown'}</div>
-                    <div class="text-neutral-500 text-xxs">${v.city || ''}</div>
-                </td>
-                <td class="p-5 text-center">
-                    <div class="flex flex-col gap-1 items-center">
-                        <span class="px-2 py-1 rounded text-xxs bg-neutral-800 text-neutral-300 w-24 truncate">${v.os || 'OS'}</span>
-                        <span class="px-2 py-1 rounded text-xxs bg-cyan-900/20 text-cyan-500 w-24 truncate">${v.browser || v.device || 'Device'}</span>
-                    </div>
-                </td>
-                <td class="p-5">
-                    <div class="font-bold text-cyan-400 text-xs">${v.page || '/'}</div>
-                    <div class="text-neutral-600 text-[10px] truncate max-w-[150px]">${v.referrer ? 'via ' + new URL(v.referrer).hostname : 'Direct'}</div>
-                </td>`;
-            tableBody.appendChild(row);
-        });
     });
-}
+};
 
-
-        window.onload = () => { loadInquiries(); loadAnalytics(); updateFormText(); };
     </script>
 </body>
 </html>

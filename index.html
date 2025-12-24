@@ -99,6 +99,44 @@
   }
 
   recordVisit();
+
+ /* [추가] 관리자 인증 로직 */
+function openAdminAuth() {
+    const modal = document.getElementById('adminAuthModal');
+    modal.classList.remove('hidden');
+    document.getElementById('adminPasswordInput').focus();
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAdminAuth() {
+    const modal = document.getElementById('adminAuthModal');
+    modal.classList.add('hidden');
+    document.getElementById('adminPasswordInput').value = '';
+    document.body.style.overflow = '';
+}
+
+async function verifyAdminPassword() {
+    const inputPw = document.getElementById('adminPasswordInput').value;
+    if (!inputPw) return;
+
+    try {
+        // Firebase database의 adminConfig/password 경로 참조
+        const snapshot = await database.ref('adminConfig/password').once('value');
+        const correctPw = snapshot.val();
+
+        if (inputPw === correctPw) {
+            sessionStorage.setItem('isAdminAuthenticated', 'true');
+            window.location.href = "admin.html";
+        } else {
+            alert("Invalid Administrator Password.");
+            document.getElementById('adminPasswordInput').value = '';
+        }
+    } catch (e) {
+        console.error("Auth Error:", e);
+    }
+}
+
+
 </script>
 
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
@@ -122,11 +160,9 @@
         .dropdown-quote-btn:hover { background: #67e8f9; }
         .whitespace-nowrap { white-space: nowrap !important; }
 
-        /* 뮤직 플레이어 컨트롤 */
         #musicToggleBtn { position: fixed; bottom: 25px; right: 25px; z-index: 10005; width: 44px; height: 44px; background: rgba(23, 23, 23, 0.8); border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #22d3ee; backdrop-filter: blur(4px); transition: all 0.3s; }
         #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
 
-        /* [수정] cursor 속성을 pointer에서 text로 변경 */
         #triggerWord {
             color: inherit !important; font-weight: inherit !important; text-decoration: none !important; cursor: text !important; display: inline; position: relative; z-index: 9998; pointer-events: auto !important;
         }
@@ -142,7 +178,6 @@
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
 
 <div id="bgm-placeholder"></div>
-
 <div id="header-placeholder"></div>
 
 <main class="flex-grow">
@@ -151,7 +186,7 @@
             <div class="video-overlay"></div> 
             <video autoplay loop muted playsinline poster="images/home/flag.webp" class="video-bg">
                 <source src="videos/background.webm" type="video/webm">
-                <source src="videos/battery17.mp4" type="video/mp4">
+                //<source src="videos/battery17.mp4" type="video/mp4">
             </video>
         </div>
 
@@ -181,29 +216,31 @@
                     <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CE-EMC-TEST.webp">
                         <img src="images/certification/CE-EMC-TEST.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
                     </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CB-TEST.webp">
-                        <img src="images/certification/CB-TEST.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
-                    </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/EMC-COMPLIANCE.webp">
-                        <img src="images/certification/EMC-COMPLIANCE.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
-                    </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/IEC-62619.webp">
-                        <img src="images/certification/IEC-62619.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
-                    </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Material-Safety.webp">
-                        <img src="images/certification/Material-Safety.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
-                    </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/UN38.3.webp">
-                        <img src="images/certification/UN38.3.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
-                    </a>
-                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Dangerous-Goods.webp">
-                        <img src="images/certification/Dangerous-Goods.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
-                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CB-TEST.webp"><img src="images/certification/CB-TEST.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/EMC-COMPLIANCE.webp"><img src="images/certification/EMC-COMPLIANCE.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/IEC-62619.webp"><img src="images/certification/IEC-62619.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Material-Safety.webp"><img src="images/certification/Material-Safety.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/UN38.3.webp"><img src="images/certification/UN38.3.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Dangerous-Goods.webp"><img src="images/certification/Dangerous-Goods.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
                 </div>
             </div>
         </div>
     </section>
 </main>
+
+<div id="adminAuthModal" class="hidden fixed inset-0 bg-black/95 z-[30000] flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-neutral-900 border border-cyan-500/30 p-8 rounded-2xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(0,0,0,1)]">
+        <h3 class="text-cyan-400 font-bold text-xl mb-1 uppercase tracking-tighter">Admin Access</h3>
+        <p class="text-neutral-500 text-xs mb-6">Database Authentication Required</p>
+        <input type="password" id="adminPasswordInput" 
+               class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white mb-6 focus:border-cyan-500 outline-none transition-all text-center tracking-widest"
+               placeholder="••••••••">
+        <div class="flex gap-3">
+            <button onclick="closeAdminAuth()" class="flex-1 py-3 bg-neutral-800 text-neutral-400 rounded-xl font-semibold text-sm">Cancel</button>
+            <button onclick="verifyAdminPassword()" class="flex-1 py-3 bg-cyan-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-900/20 hover:bg-cyan-500 transition-colors">Verify</button>
+        </div>
+    </div>
+</div>
 
 <div id="imageModal" class="hidden">
     <div class="flex items-center justify-center w-full h-full">
@@ -264,13 +301,13 @@ async function loadLayout() {
         }
     }
 
-    /** 3. 관리자 페이지 트리거 (TDLiD 클릭) **/
+    /** 3. 관리자 페이지 트리거 (TDLiD 클릭 시 이동 대신 모달 오픈으로 수정) **/
     function initAdminTriggers() {
         const triggerWord = document.getElementById('triggerWord');
         if (triggerWord) {
             triggerWord.addEventListener('click', (e) => {
                 e.preventDefault();
-                window.location.href = "admin.html"; // 클릭 시 이동
+                openAdminAuth(); // 클릭 시 비밀번호 모달 띄우기
             });
         }
     }
@@ -300,19 +337,9 @@ async function loadLayout() {
         }
     });
 
-    // 키보드 입력 관리 (tdlid 타이핑 시 admin.html 이동)
-    let inputBuffer = "";
-
-    document.addEventListener("keydown", (e) => {
-        const key = e.key.toLowerCase();
-        inputBuffer += key;
-        if (inputBuffer.length > 5) inputBuffer = inputBuffer.slice(-5);
-        
-        // "tdlid" 또는 "admin" 입력 시 즉시 이동
-        if (inputBuffer === "tdlid" || inputBuffer === "admin") {
-            window.location.href = "admin.html";
-            inputBuffer = "";
-        }
+    // 엔터키 처리
+    document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') verifyAdminPassword();
     });
 
     // 보안 기능
