@@ -186,7 +186,27 @@
     <style>
         /* [추가] 실시간 제어 UI 스타일 */
         #emergencyBanner { display: none; background: #ef4444; color: white; text-align: center; padding: 12px; font-weight: bold; position: fixed; top: 0; width: 100%; z-index: 99999; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        #mainPopup { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+
+
+/* 1. 메인 공지 팝업 수정 */
+    #mainPopup { 
+        display: none; 
+        position: fixed; 
+        inset: 0; 
+        /* 배경 투명도를 0.9에서 0.7로 낮추어 배경이 더 잘 보이게 하고, blur를 제거했습니다 */
+        background: rgba(0,0,0,0.7); 
+        z-index: 100000; 
+        align-items: center; 
+        justify-content: center; 
+        /* backdrop-filter: blur(5px);  <-- 이 부분을 제거하여 배경을 선명하게 만듭니다 */
+    }
+
+    /* 2. 관리자 인증 모달도 동일하게 수정 (선택 사항) */
+    #adminAuthModal {
+        /* 기존 backdrop-blur-sm 클래스 대신 선명한 배경 유지 */
+        background: rgba(0,0,0,0.8);
+    }
+
         .popup-box { background: #0a0a0a; border: 1px solid #22d3ee; padding: 40px; border-radius: 24px; max-width: 420px; width: 90%; text-align: center; }
 
         /* 기존 스타일 */
