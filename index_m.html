@@ -249,28 +249,44 @@
         }
     }
 
-    async function loadLayout() {
-        try {
-            const headerRes = await fetch('components/header_m.html');
-            const headerText = await headerRes.text();
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = headerText;
-            
-            // 헤더에서 admin.html 링크가 있는 요소 제거
-            const adminLink = tempDiv.querySelector('a[href="admin.html"]');
-            if(adminLink) adminLink.remove();
-            
-            document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
-            
-            const footerRes = await fetch('components/footer_m.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+async function loadLayout() {
+    try {
+        const [headerRes, footerRes] = await Promise.all([
+            fetch('components/header_m.html'),
+            fetch('components/footer_m.html')
+        ]);
 
+        // 1. 헤더 처리
+        const headerText = await headerRes.text();
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = headerText;
+        
+        // 헤더에서 관리자 링크 제거 (모바일 전용 로직 유지)
+        const adminLink = tempDiv.querySelector('a[href="admin.html"]');
+        if(adminLink) adminLink.remove();
+        document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
+        
+        // 2. 푸터 처리 및 스크립트 강제 실행
+        const footerPlaceholder = document.getElementById('footer-placeholder');
+        footerPlaceholder.innerHTML = await footerRes.text();
 
-            initNavigation();
-            initAdminTrigger(); 
-            initCertModal();
-        } catch (err) { console.error(err); }
+        // [중요] 푸터 내부의 BGM 스크립트 추출 및 실행
+        const scripts = footerPlaceholder.querySelectorAll("script");
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            newScript.text = oldScript.text;
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        });
+
+        // 3. 기존 초기화 함수들 실행
+        initNavigation();
+        initAdminTrigger(); 
+        initCertModal();
+        
+    } catch (err) { 
+        console.error("Layout Load Error:", err); 
     }
+}
 
     function initNavigation() {
         const menuBtn = document.getElementById("menuToggleBtn");
