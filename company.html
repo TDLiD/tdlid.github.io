@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
 
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
 <script>
     (function() {
         // 1. iPad를 제외하고 iPhone, Android 폰만 감지
@@ -183,6 +186,24 @@ body {
 <div id="footer-placeholder"></div>
 
 <script>
+
+// 이 부분을 복사해서 다른 파일의 동일한 위치에 넣으시면 됩니다.
+const firebaseConfig = {
+    apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+    authDomain: "tdlid-107669.firebaseapp.com",
+    databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+    projectId: "tdlid-107669",
+    storageBucket: "tdlid-107669.firebasestorage.app",
+    messagingSenderId: "604782345004",
+    appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+};
+
+// 수정 후 (안전함)
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+    const database = firebase.database();
+
  /**
      * 1. 레이아웃 로드 및 메뉴 초기화
      */

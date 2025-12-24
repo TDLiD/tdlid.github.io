@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
 <script>
     (function() {
         // 1. iPad를 제외하고 iPhone, Android 폰만 감지
@@ -139,7 +140,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
 <script>
-    // Firebase 및 기본 레이아웃 로직 (이전과 동일)
     const firebaseConfig = {
         apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
         authDomain: "tdlid-107669.firebaseapp.com",
@@ -150,8 +150,14 @@
         appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
     };
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    // Firebase 중복 초기화 방지 및 안전한 데이터베이스 참조
+    let database;
+    if (typeof firebase !== 'undefined') {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        database = firebase.database();
+    }
 
     async function loadLayout() {
         try {
@@ -166,6 +172,10 @@
 
             const scripts = bgmPlaceholder.querySelectorAll("script");
             scripts.forEach(oldScript => {
+
+// 외부 스크립트(src가 있는 경우)는 다시 추가하지 않음 (중복 로드 방지)
+                if (oldScript.src) return;
+
                 const newScript = document.createElement("script");
                 newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
