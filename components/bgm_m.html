@@ -10,7 +10,7 @@
     #musicToggleBtn:active { transform: scale(0.9); } /* 모바일 터치 피드백 */
 </style>
 
-<audio id="bgm" src="mp3/tdlid.mp3" loop muted preload="auto" playsinline></audio>
+<audio id="bgm" src="mp3/tdlid.mp3" loop preload="auto" playsinline></audio>
 
 <button id="musicToggleBtn" title="Play/Pause Music">
     <span id="musicIconUI">🔇</span>
@@ -23,37 +23,43 @@
     const musicBtn = document.getElementById('musicToggleBtn');
     const musicIcon = document.getElementById('musicIconUI');
 
-    const initBGM = () => {
-        const savedTime = sessionStorage.getItem('bgmTime');
-        const isMuted = sessionStorage.getItem('bgmMuted') === 'true';
+ const initBGM = () => {
+    const savedTime = sessionStorage.getItem('bgmTime');
+    const isMuted = sessionStorage.getItem('bgmMuted') === 'true';
 
-        if (savedTime) bgm.currentTime = parseFloat(savedTime);
+    if (savedTime) bgm.currentTime = parseFloat(savedTime);
+    
+    // 핵심: 일단 음소거 상태를 세션 스토리지에 따라 명시적으로 설정
+    bgm.muted = isMuted;
 
-        if (!isMuted) {
-            bgm.muted = false;
-            // 1. 우선 재생 시도
+    if (!isMuted) {
+      // 재생 시도
+      const playPromise = bgm.play();
+
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          musicIcon.innerText = "🎵";
+        }).catch(err => {
+          // 자동 재생 차단 시: 버튼은 재생 중으로 보여주고 터치 대기
+          console.log("Autoplay blocked. Waiting for interaction...");
+          musicIcon.innerText = "🎵";
+
+          const forcePlay = () => {
             bgm.play().then(() => {
-                musicIcon.innerText = "🎵";
-            }).catch(err => {
-                // 2. 자동 재생이 차단된 경우 (모바일 페이지 이동 시 발생)
-                console.log("Autoplay blocked. Waiting for touch...");
-                musicIcon.innerText = "🎵"; // 버튼은 플레이 상태로 표시
-
-                // 화면 터치 시 재생시키는 일회성 이벤트 리스너 등록
-                const playOnGesture = () => {
-                    bgm.play().then(() => {
-                        document.removeEventListener('touchstart', playOnGesture);
-                        document.removeEventListener('click', playOnGesture);
-                    });
-                };
-                document.addEventListener('touchstart', playOnGesture);
-                document.addEventListener('click', playOnGesture);
+              // 성공 시 이벤트 제거
+              document.removeEventListener('touchstart', forcePlay);
+              document.removeEventListener('click', forcePlay);
             });
-        } else {
-            bgm.muted = true;
-            musicIcon.innerText = "🔇";
-        }
-    };
+          };
+          // 사용자가 페이지 어디든 터치하는 순간 바로 재생되도록 함
+          document.addEventListener('touchstart', forcePlay, { once: true });
+          document.addEventListener('click', forcePlay, { once: true });
+        });
+      }
+    } else {
+      musicIcon.innerText = "🔇";
+    }
+  };
 
 
         if (musicBtn && bgm) {
