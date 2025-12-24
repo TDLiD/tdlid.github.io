@@ -154,7 +154,6 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
 
-<div id="bgm-placeholder"></div>
 <div id="header-placeholder"></div>
 
 <main class="flex-grow">
@@ -266,17 +265,6 @@
             const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
 
-            const bgmRes = await fetch('components/bgm_m.html');
-            const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            if(bgmPlaceholder) {
-                bgmPlaceholder.innerHTML = await bgmRes.text();
-                const scripts = bgmPlaceholder.querySelectorAll("script");
-                scripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    newScript.text = oldScript.text;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-            }
 
             initNavigation();
             initAdminTrigger(); 

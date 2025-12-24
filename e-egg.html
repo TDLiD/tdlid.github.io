@@ -2,6 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+
+
+<script>
+    (function() {
+        // 1. iPad를 제외하고 iPhone, iPod, Android 폰만 감지
+        const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const isPCMode = urlParams.get('view_mode') === 'pc';
+
+        // 2. 모바일일 경우 모바일 전용 이스터에그 페이지(또는 index_m.html)로 리다이렉트
+        // 여기서는 이스터에그의 모바일 파일명이 별도로 없다면 index_m.html 등으로 보낼 수 있습니다.
+        if (isMobileOnly && !isPCMode) {
+            // 모바일용 이스터에그 파일이 따로 있다면 해당 파일명을 적어주세요.
+            // 예: window.location.href = "e-egg_m.html";
+            window.location.href = "e-egg_m.html"; 
+        }
+    })();
+</script>
+
 <title>TDLiD // Secure Node</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>

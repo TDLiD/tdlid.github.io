@@ -69,7 +69,6 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard]">
 
-<div id="bgm-placeholder"></div>
 <div id="header-placeholder"></div>
 
 <main class="pt-24 pb-12 px-5 min-h-screen">
@@ -186,18 +185,7 @@
             const footerRes = await fetch('components/footer_m.html');
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
             
-            const bgmRes = await fetch('components/bgm_m.html');
-            const bgmHTML = await bgmRes.text();
-            const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            bgmPlaceholder.innerHTML = bgmHTML;
-
-            const scripts = bgmPlaceholder.querySelectorAll("script");
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                newScript.text = oldScript.text;
-                document.body.appendChild(newScript).parentNode.removeChild(newScript);
-            });
-            
+           
             initMenuToggle();
         } catch (err) {
             console.error("Layout load failed:", err);

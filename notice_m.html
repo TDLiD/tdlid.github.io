@@ -87,7 +87,6 @@
 </head>
 
 <body class="min-h-screen flex flex-col">
-    <div id="bgm-placeholder"></div>
     <div id="header-placeholder"></div>
 
     <main class="pt-24 pb-12 px-5 flex-grow">
@@ -115,29 +114,20 @@
 
     <script>
         // 레이아웃 로드
-        async function loadLayout() {
-            try {
-                const [h, f, b] = await Promise.all([
-                    fetch('components/header_m.html'),
-                    fetch('components/footer_m.html'),
-                    fetch('components/bgm_m.html')
-                ]);
-                document.getElementById('header-placeholder').innerHTML = await h.text();
-                document.getElementById('footer-placeholder').innerHTML = await f.text();
-                
-                const bgmP = document.getElementById('bgm-placeholder');
-                bgmP.innerHTML = await b.text();
-                bgmP.querySelectorAll("script").forEach(s => {
-                    const ns = document.createElement("script");
-                    ns.text = s.text;
-                    document.body.appendChild(ns).parentNode.removeChild(ns);
-                });
-                
-                if (typeof initMenuToggle === 'function') initMenuToggle();
-            } catch (e) {
-                console.error("Layout load failed:", e);
-            }
-        }
+       async function loadLayout() {
+    try {
+        const [h, f] = await Promise.all([
+            fetch('components/header_m.html'),
+            fetch('components/footer_m.html')
+        ]);
+        document.getElementById('header-placeholder').innerHTML = await h.text();
+        document.getElementById('footer-placeholder').innerHTML = await f.text();
+        
+        if (typeof initMenuToggle === 'function') initMenuToggle();
+    } catch (e) {
+        console.error("Layout load failed:", e);
+    }
+}
 
         // Firebase 설정
         const firebaseConfig = {

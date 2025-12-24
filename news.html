@@ -2,20 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script>
-        (function() {
-            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPCMode = urlParams.get('view_mode') === 'pc';
-            if (isMobileOnly && !isPCMode) {
-                let path = window.location.pathname;
-                let page = path.split("/").pop();
-                if (page === "news.html" || page === "") {
-                    // window.location.href = "news_m.html";
-                }
+<script>
+    (function() {
+        // 1. iPad를 제외하고 iPhone, Android 폰만 감지
+        const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const isPCMode = urlParams.get('view_mode') === 'pc';
+
+        // 2. 리다이렉트 실행
+        if (isMobileOnly && !isPCMode) {
+            let path = window.location.pathname;
+            let page = path.split("/").pop();
+            
+            // 메인 페이지(index) 처리
+            if (page === "" || page === "news.html") {
+                window.location.href = "news_m.html";
+            } 
+            // 그 외 페이지들 (예: products.html -> products_m.html)
+            else if (page.endsWith(".html") && !page.includes("_m.html")) {
+                window.location.href = page.replace(".html", "_m.html");
             }
-        })();
-    </script>
+        }
+    })();
+</script>
 
     <title>Latest News | TDL Energy Indonesia</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

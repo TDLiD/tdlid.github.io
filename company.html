@@ -2,22 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
- <script>
+
+<script>
     (function() {
-        // 1. [수정] iPad를 제외하고 iPhone, Android 폰만 감지
+        // 1. iPad를 제외하고 iPhone, Android 폰만 감지
         const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
         
         const urlParams = new URLSearchParams(window.location.search);
         const isPCMode = urlParams.get('view_mode') === 'pc';
 
-        // 2. [수정] 모바일 폰으로 접속했을 때만 products_m.html로 이동
+        // 2. 리다이렉트 실행
         if (isMobileOnly && !isPCMode) {
             let path = window.location.pathname;
             let page = path.split("/").pop();
             
-            // 현재 페이지가 products.html이거나 빈 값일 때 모바일 버전으로 리다이렉트
-            if (page === "products.html" || page === "") {
-                window.location.href = "products_m.html";
+            // 메인 페이지(index) 처리
+            if (page === "" || page === "company.html") {
+                window.location.href = "company_m.html";
+            } 
+            // 그 외 페이지들 (예: products.html -> products_m.html)
+            else if (page.endsWith(".html") && !page.includes("_m.html")) {
+                window.location.href = page.replace(".html", "_m.html");
             }
         }
     })();

@@ -70,7 +70,6 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative overflow-x-hidden"> 
 
-<div id="bgm-placeholder"></div>
 
 <div id="header-placeholder"></div>
 
@@ -151,20 +150,6 @@
             const footerHtml = await footerRes.text();
             document.getElementById('footer-placeholder').innerHTML = footerHtml;
             
-            // --- BGM 추가 코드 시작 ---
-            const bgmRes = await fetch('components/bgm_m.html');
-            const bgmHTML = await bgmRes.text();
-            const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            bgmPlaceholder.innerHTML = bgmHTML;
-
-            // BGM 내부에 포함된 스크립트를 수동으로 추출하여 실행
-            const scripts = bgmPlaceholder.querySelectorAll("script");
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                newScript.text = oldScript.text;
-                document.body.appendChild(newScript).parentNode.removeChild(newScript);
-            });
-            // --- BGM 추가 코드 끝 ---
             
             initMenuToggle();
         } catch (err) {

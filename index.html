@@ -17,6 +17,7 @@
             
             if (page === "" || page === "index.html") {
                 window.location.href = "index_m.html";
+
             } else if (page.endsWith(".html") && !page.includes("_m.html")) {
                 window.location.href = page.replace(".html", "_m.html");
             }
