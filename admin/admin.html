@@ -4,32 +4,27 @@
     <meta charset="UTF-8">
     <title>TDLiD Admin - Control Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { background-color: #020617; font-family: 'Pretendard', sans-serif; color: #e5e7eb; }
-        
-        /* 네비게이션 탭 스타일 */
-        .tab-item {
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .tab-item.active {
-            color: #22d3ee;
-        }
+        .tab-item { transition: all 0.3s ease; position: relative; }
+        .tab-item.active { color: #22d3ee; }
         .tab-item.active::after {
-            content: '';
-            position: absolute;
-            bottom: -25px; /* 헤더 border-b 위치에 맞춤 */
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #22d3ee;
-            box-shadow: 0 0 10px #22d3ee;
+            content: ''; position: absolute; bottom: -25px; left: 0; width: 100%; height: 2px;
+            background: #22d3ee; box-shadow: 0 0 10px #22d3ee;
         }
-
-        /* 기존 카드 스타일 유지 */
         .nav-card { transition: all 0.3s ease; border: 1px solid rgba(34, 211, 238, 0.1); }
         .nav-card:hover { transform: translateY(-5px); border-color: rgba(34, 211, 238, 0.5); background: rgba(34, 211, 238, 0.05); }
+        
+        /* 토글 스위치 스타일 */
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #22d3ee; }
+        input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
 <body class="p-8">
@@ -39,7 +34,6 @@
                 <h1 class="text-4xl font-bold text-cyan-400 tracking-tighter italic">ADMIN SYSTEM</h1>
                 <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">TDL Energy Indonesia Management</p>
             </div>
-
             <nav class="flex gap-8 text-sm font-bold uppercase tracking-wider text-neutral-500">
                 <a href="admin.html" class="tab-item active hover:text-white transition">Dashboard</a>
                 <a href="visitor.html" class="tab-item hover:text-white transition">Visitor</a>
@@ -49,30 +43,83 @@
             </nav>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             <a href="visitor.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
                 <div class="text-4xl mb-4">📊</div>
                 <h3 class="text-xl font-bold text-white mb-2">Visitor Analysis</h3>
                 <p class="text-neutral-500 text-xs">Traffic & User Logs</p>
             </a>
-
             <a href="inquiry.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
                 <div class="text-4xl mb-4">📩</div>
                 <h3 class="text-xl font-bold text-amber-400 mb-2">Inquiries</h3>
                 <p class="text-neutral-500 text-xs">Customer Requests</p>
             </a>
-
             <a href="post.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
                 <div class="text-4xl mb-4">✍️</div>
                 <h3 class="text-xl font-bold text-cyan-400 mb-2">Manage Posts</h3>
                 <p class="text-neutral-500 text-xs">Notice & News Editor</p>
             </a>
-
             <a href="security.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
                 <div class="text-4xl mb-4">🛡️</div>
                 <h3 class="text-xl font-bold text-red-400 mb-2">Security</h3>
                 <p class="text-neutral-500 text-xs">Access Control</p>
             </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 bg-neutral-900/80 p-8 rounded-3xl border border-white/5 shadow-2xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl">🔍</span>
+                    <h3 class="text-xl font-bold text-white">Search Engine Optimization (SEO)</h3>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-2">Site Description</label>
+                        <textarea id="seoDesc" class="w-full bg-black border border-neutral-800 rounded-xl p-4 text-sm text-neutral-300 focus:border-cyan-500 outline-none transition h-20" placeholder="Enter site description for Google search..."></textarea>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-2">Keywords (Comma separated)</label>
+                        <input type="text" id="seoKeywords" class="w-full bg-black border border-neutral-800 rounded-xl p-4 text-sm text-neutral-300 focus:border-cyan-500 outline-none transition" placeholder="energy, indonesia, tdl, battery...">
+                    </div>
+                    <button onclick="saveSEO()" class="w-full py-4 bg-cyan-600/20 hover:bg-cyan-600 text-cyan-400 hover:text-white font-bold rounded-xl transition uppercase tracking-widest text-xs">Update Meta Data</button>
+                </div>
+            </div>
+
+            <div class="bg-neutral-900/80 p-8 rounded-3xl border border-white/5 shadow-2xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl">📢</span>
+                    <h3 class="text-xl font-bold text-white">Notice & Popups</h3>
+                </div>
+                <div class="space-y-8">
+                    <div class="flex justify-between items-center p-4 bg-black/40 rounded-2xl border border-white/5">
+                        <div>
+                            <p class="text-sm font-bold text-white">Main Page Popup</p>
+                            <p class="text-[10px] text-neutral-500">Show floating modal on entry</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="popupActive">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex justify-between items-center p-4 bg-black/40 rounded-2xl border border-white/5">
+                        <div>
+                            <p class="text-sm font-bold text-amber-500">Emergency Banner</p>
+                            <p class="text-[10px] text-neutral-500">Red banner on top of header</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="bannerActive">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="pt-2">
+                        <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-2">Notice Content</label>
+                        <input type="text" id="noticeText" class="w-full bg-black border border-neutral-800 rounded-xl p-3 text-xs text-neutral-300 mb-4" placeholder="Emergency message here...">
+                        <button onclick="saveNotice()" class="w-full py-3 bg-neutral-800 hover:bg-neutral-700 text-white text-[10px] font-bold rounded-lg transition uppercase">Save Notice Settings</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="mt-12 text-center flex justify-center items-center gap-4">
@@ -81,5 +128,61 @@
             <span class="w-8 h-[1px] bg-neutral-800"></span>
         </div>
     </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+            authDomain: "tdlid-107669.firebaseapp.com",
+            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+            projectId: "tdlid-107669",
+            storageBucket: "tdlid-107669.firebasestorage.app",
+            messagingSenderId: "604782345004",
+            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // 설정 불러오기
+        async function loadSettings() {
+            const seoSnap = await database.ref('siteSettings/seo').once('value');
+            if(seoSnap.exists()) {
+                const data = seoSnap.val();
+                document.getElementById('seoDesc').value = data.description || '';
+                document.getElementById('seoKeywords').value = data.keywords || '';
+            }
+
+            const noticeSnap = await database.ref('siteSettings/notice').once('value');
+            if(noticeSnap.exists()) {
+                const data = noticeSnap.val();
+                document.getElementById('popupActive').checked = data.popupActive || false;
+                document.getElementById('bannerActive').checked = data.bannerActive || false;
+                document.getElementById('noticeText').value = data.text || '';
+            }
+        }
+
+        // SEO 저장
+        async function saveSEO() {
+            const description = document.getElementById('seoDesc').value;
+            const keywords = document.getElementById('seoKeywords').value;
+            try {
+                await database.ref('siteSettings/seo').set({ description, keywords });
+                alert("SEO settings updated.");
+            } catch (e) { alert(e.message); }
+        }
+
+        // 공지/팝업 저장
+        async function saveNotice() {
+            const popupActive = document.getElementById('popupActive').checked;
+            const bannerActive = document.getElementById('bannerActive').checked;
+            const text = document.getElementById('noticeText').value;
+            try {
+                await database.ref('siteSettings/notice').set({ popupActive, bannerActive, text });
+                alert("Notice settings updated.");
+            } catch (e) { alert(e.message); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadSettings);
+    </script>
 </body>
 </html>
