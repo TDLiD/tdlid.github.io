@@ -41,7 +41,7 @@
 
         .skull-scare {
             position: absolute;
-            width: 80px; /* 모바일용 기본 크기 */
+            width: 80px;
             opacity: 0;
             filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.4));
             animation: skullZoomMobile 7s infinite;
@@ -87,19 +87,21 @@
             100% { text-shadow: 2px 0 #22d3ee, -2px 0 #f0f; }
         }
 
-        /* 반응형 컨테이너 및 이미지 */
+        /* [수정] 반응형 컨테이너 및 이미지 크기 최적화 */
         .staff-container { 
-            display: flex; flex-wrap: wrap; gap: 15px; 
+            display: flex; flex-direction: row; gap: 15px; 
             justify-content: center; margin-top: 20px; 
-            width: 100%; max-width: 400px;
+            width: 100%; max-width: 500px; /* 모바일 가로모드 대응 */
             perspective: 1000px;
         }
 
         .staff-img { 
-            width: calc(50% - 10px); max-width: 160px; height: auto; 
+            width: calc(50% - 10px); /* 화면 너비의 절반씩 차지 */
+            max-width: 220px; /* 너무 커지는 것 방지 */
+            height: auto; 
             border-radius: 8px; border: 1px solid #22d3ee; 
             background: rgba(0,0,0,0.6);
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); 
+            box-shadow: 0 0 25px rgba(34, 211, 238, 0.4); 
             opacity: 0; transform: rotateX(45deg) translateY(50px);
             transition: all 1.2s cubic-bezier(.2,1,.3,1); 
         }
@@ -110,9 +112,9 @@
 
         /* 하단 데이터 장식 */
         .bottom-info {
-            position: absolute; bottom: 20px; width: 100%;
+            position: absolute; bottom: 30px; width: 100%;
             display: flex; justify-content: space-between;
-            padding: 0 20px; font-size: 9px; opacity: 0.4;
+            padding: 0 30px; font-size: 10px; opacity: 0.5;
         }
     </style>
 </head>
@@ -128,13 +130,13 @@
     <div id="easterEggOverlay">
         <div class="scanning-line"></div>
         
-        <div class="border border-cyan-500 bg-cyan-950/40 px-6 py-3 mb-6 backdrop-blur-sm">
+        <div class="border border-cyan-500 bg-cyan-950/40 px-6 py-4 mb-6 backdrop-blur-sm">
             <h1 class="text-xl font-black tracking-tighter glitch text-center">
                 TDLiD SECURE TERMINAL
             </h1>
         </div>
         
-        <div id="statusLog" class="status-text text-cyan-200 mb-8 text-center text-sm italic">
+        <div id="statusLog" class="status-text text-cyan-200 mb-8 text-center text-base italic font-bold">
             CONNECTING...
         </div>
 
@@ -158,31 +160,31 @@
                 "> BYPASSING BMS...", 
                 "> SCANNING...", 
                 "> ACCESS GRANTED",
-                "MR. RAY 🧔", 
-                "MR. EZA 😎", 
-                "MR. REZY 👨‍🦰", 
-                "MISS. ETNO 🧕"
+                "AUTH: RAY // OK", 
+                "AUTH: EZA // OK", 
+                "AUTH: REZY // OK", 
+                "AUTH: ETNO // OK"
             ];
             
             msgs.forEach((msg, i) => {
                 setTimeout(() => {
                     log.innerText = msg;
                     
-                    // 특정 시점에 이미지 등장 (데스크톱 스타일 트랜지션)
+                    // 이미지 등장 시점 조정 (ACCESS GRANTED 이후)
                     if (i === 4) {
                         staffImgs.forEach((img, idx) => {
-                            setTimeout(() => img.classList.add('reveal'), idx * 400);
+                            setTimeout(() => img.classList.add('reveal'), idx * 500);
                         });
                     }
                     
-                    // 모든 메시지 종료 후 리다이렉트
+                    // 마지막 메시지 이후 리다이렉트 시간 연장
                     if (i === msgs.length - 1) {
                         setTimeout(() => {
                             if(document.referrer) window.history.back();
-                            else window.location.href = "index.html";
-                        }, 3000);
+                            else window.location.href = "index_m.html";
+                        }, 4000);
                     }
-                }, i * 700);
+                }, i * 800);
             });
         };
     </script>

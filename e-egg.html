@@ -14,13 +14,12 @@ body{
     background:#000;
     color:#22d3ee;
     font-family:'Courier New', monospace;
-    overflow:hidden;
+    overflow-x:hidden; /* 가로 스크롤 방지 */
 }
 
 /* ===============================
-    HACKING SCREEN EFFECTS (NEW)
+    HACKING SCREEN EFFECTS
 ================================ */
-/* 화면 전체가 미세하게 흔들리는 효과 */
 @keyframes shake {
     0% { transform: translate(0,0); }
     10% { transform: translate(-1px, -1px); }
@@ -29,7 +28,6 @@ body{
     100% { transform: translate(0,0); }
 }
 
-/* 가로 노이즈 라인 효과 */
 .hacker-lines {
     position: fixed; inset: 0;
     background: repeating-linear-gradient(
@@ -41,15 +39,6 @@ body{
     );
     pointer-events: none;
     z-index: 10;
-}
-
-/* 무작위로 나타나는 데이터 글리치 조각 */
-@keyframes glitch-slice {
-    0% { clip-path: inset(80% 0 0 0); transform: translateX(-5px); }
-    10% { clip-path: inset(10% 0 70% 0); transform: translateX(5px); }
-    20% { clip-path: inset(50% 0 30% 0); transform: translateX(-3px); }
-    30% { opacity: 0; }
-    100% { opacity: 0; }
 }
 
 .screen-glitch-overlay {
@@ -160,26 +149,36 @@ body{
 }
 
 /* ===============================
-    IMAGES
+    IMAGES (Responsive Fixed)
 ================================ */
 .staff-container{
     display:flex;
-    gap:40px;
+    gap:20px;
     flex-wrap:wrap;
     justify-content:center;
     perspective:1400px;
     z-index: 20;
+    width: 100%;
+    max-width: 1000px; /* 너무 퍼지지 않게 제한 */
 }
 
-.staff-img{
-    width:400px;
-height: auto;  /* 비율 유지 */
-    border:2px solid #22d3ee;
-    background:rgba(0,0,0,.6);
-    box-shadow:0 0 30px rgba(34,211,238,.4);
-    opacity:0;
-    transform:rotateX(55deg) translateY(80px);
-    transition:1.2s cubic-bezier(.2,1,.3,1);
+.staff-img {
+    width: calc(45% - 10px); /* 2열 배치 기본 */
+    max-width: 400px;
+    min-width: 280px; /* 모바일에서도 너무 작아지지 않게 */
+    height: auto;
+    border: 2px solid #22d3ee;
+    background: rgba(0,0,0,.6);
+    box-shadow: 0 0 30px rgba(34,211,238,.4);
+    opacity: 0;
+    transform: rotateX(55deg) translateY(80px);
+    transition: 1.2s cubic-bezier(.2,1,.3,1);
+}
+
+@media (max-width: 640px) {
+    .staff-img {
+        width: 80%; /* 모바일에서는 거의 꽉 차게 */
+    }
 }
 
 .staff-img.reveal{
@@ -219,30 +218,30 @@ height: auto;  /* 비율 유지 */
 <div class="noise"></div>
 <div class="vignette"></div>
 
-<div class="relative z-10 h-screen flex flex-col items-center justify-center px-8">
+<div class="relative z-10 min-h-screen flex flex-col items-center justify-center py-20 px-4">
     <div class="scan"></div>
 
-    <div class="mb-8 border border-cyan-500 px-10 py-4 backdrop-blur bg-cyan-950/40">
-        <h1 class="text-4xl font-black tracking-widest glitch">
+    <div class="mb-8 border border-cyan-500 px-6 md:px-10 py-4 backdrop-blur bg-cyan-950/40 text-center">
+        <h1 class="text-2xl md:text-4xl font-black tracking-widest glitch">
             TDLiD SECURE TERMINAL
         </h1>
     </div>
 
-    <div id="terminal" class="text-xl mb-10 cursor min-h-[32px]"></div>
+    <div id="terminal" class="text-lg md:text-xl mb-10 cursor min-h-[32px] text-center"></div>
 
     <div class="staff-container">
         <img class="staff-img" src="images/easter_egg/staff1.webp">
         <img class="staff-img" src="images/easter_egg/staff2.webp">
     </div>
 
-    <div class="absolute bottom-8 left-8 text-[11px] opacity-40 hidden lg:block">
+    <div class="fixed bottom-4 left-4 text-[10px] opacity-40 hidden sm:block">
         CORE_TEMP: 31.8C<br>
         BMS_STATE: OVERRIDE<br>
         SIGNAL: CLEAN<br>
         <span class="text-red-500 font-bold animate-pulse">> WARNING: UNAUTHORIZED ACCESS DETECTED</span>
     </div>
 
-    <div class="absolute bottom-8 right-8 text-[11px] opacity-40 text-right hidden lg:block">
+    <div class="fixed bottom-4 right-4 text-[10px] opacity-40 text-right hidden sm:block">
         ENCRYPTION v4.0.2<br>
         ACCESS LEVEL █████<br>
         IP_ORIGIN: TRACED
@@ -282,7 +281,6 @@ function typeLine(text){
 
 const seq = setInterval(()=>{
     typeLine(lines[i]);
-    // 특정 라인(IDENTITIES CONFIRMED)에서 이미지 공개 시작
     if(i === 5){
         imgs.forEach((img,idx)=>{
             setTimeout(()=>img.classList.add("reveal"), idx*500);
@@ -291,7 +289,7 @@ const seq = setInterval(()=>{
     i++;
     if(i >= lines.length){
         clearInterval(seq);
-        setTimeout(()=>history.back(), 3500);
+        setTimeout(()=>history.back(), 5000); // 이미지 볼 수 있게 시간을 좀 더 늘림
     }
 },900);
 </script>
