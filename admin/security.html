@@ -2,27 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>TDLiD Admin - Security Setting</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { background-color: #020617; color: #e5e7eb; font-family: 'Pretendard', sans-serif; }
+        
+        /* 네비게이션 탭 스타일 */
+        .tab-item {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .tab-item.active {
+            color: #22d3ee;
+        }
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #22d3ee;
+            box-shadow: 0 0 10px #22d3ee;
+        }
     </style>
 </head>
-<body class="p-10 flex flex-col items-center">
-    <div class="max-w-md w-full bg-neutral-900/80 p-8 rounded-3xl border border-red-900/30">
-        <div class="text-red-500 text-4xl mb-4">🛡️</div>
-        <h2 class="text-2xl font-bold text-white mb-2">Security Setting</h2>
-        <p class="text-neutral-500 text-sm mb-8">Update the administrative password for header access.</p>
-
-        <div class="space-y-4">
+<body class="p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-12 border-b border-cyan-900/50 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-                <label class="text-xxs font-bold text-neutral-500 uppercase tracking-widest">Current / New Admin Password</label>
-                <input type="text" id="adminNewPassword" class="w-full bg-black border border-neutral-800 p-4 rounded-xl mt-2 outline-none focus:border-red-500 transition" placeholder="Loading password...">
+                <h1 class="text-4xl font-bold text-cyan-400 tracking-tighter italic">ADMIN SYSTEM</h1>
+                <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">TDL Energy Indonesia Management</p>
             </div>
-            <button onclick="updatePw()" class="w-full py-4 bg-red-600/20 hover:bg-red-600 border border-red-600/50 text-red-500 hover:text-white font-bold rounded-xl transition">
-                CONFIRM CHANGE
-            </button>
+
+            <nav class="flex gap-8 text-sm font-bold uppercase tracking-wider text-neutral-500">
+                <a href="admin.html" class="tab-item hover:text-white transition">Dashboard</a>
+                <a href="visitor.html" class="tab-item hover:text-white transition">Visitor</a>
+                <a href="inquiry.html" class="tab-item hover:text-white transition">Inquiry</a>
+                <a href="post.html" class="tab-item hover:text-white transition">Posts</a>
+                <a href="security.html" class="tab-item active hover:text-white transition">Security</a>
+            </nav>
+        </header>
+
+        <div class="flex flex-col items-center py-10">
+            <div class="max-w-md w-full bg-neutral-900/50 p-8 rounded-3xl border border-red-900/30 shadow-2xl shadow-red-900/10">
+                <div class="text-red-500 text-4xl mb-4">🛡️</div>
+                <h2 class="text-2xl font-bold text-white mb-2">Security Setting</h2>
+                <p class="text-neutral-500 text-sm mb-8">Update the administrative password for header access.</p>
+
+                <div class="space-y-4 text-left">
+                    <div>
+                        <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest ml-1">Current / New Admin Password</label>
+                        <input type="text" id="adminNewPassword" class="w-full bg-black border border-neutral-800 p-4 rounded-xl mt-2 outline-none focus:border-red-500 transition font-mono text-red-400" placeholder="Loading password...">
+                    </div>
+                    <button onclick="updatePw()" class="w-full py-4 bg-red-600/10 hover:bg-red-600 border border-red-600/50 text-red-500 hover:text-white font-black rounded-xl transition uppercase tracking-widest">
+                        Confirm Change
+                    </button>
+                </div>
+            </div>
+            
+            <button onclick="location.href='admin.html'" class="mt-8 text-xs text-neutral-600 hover:text-neutral-400 transition">Return to Dashboard</button>
+        </div>
+
+        <div class="mt-12 text-center">
+            <a href="../index.html" class="text-neutral-600 hover:text-cyan-400 text-xs transition">← Exit to Public Website</a>
         </div>
     </div>
 
@@ -42,38 +88,34 @@
         }
         const database = firebase.database();
 
-        // 페이지 로드 시 현재 저장된 패스워드 불러오기
         async function loadCurrentPw() {
             const pwInput = document.getElementById('adminNewPassword');
             try {
                 const snapshot = await database.ref('adminConfig/password').once('value');
                 if (snapshot.exists()) {
-                    pwInput.value = snapshot.val(); // 입력창에 패스워드 표시
+                    pwInput.value = snapshot.val();
                 } else {
                     pwInput.placeholder = "No password set";
                 }
             } catch (error) {
-                console.error("Load Error:", error);
                 pwInput.placeholder = "Error loading password";
             }
         }
 
-        // 패스워드 업데이트
         async function updatePw() {
             const newPw = document.getElementById('adminNewPassword').value;
-            if(!newPw) return alert("Enter password");
+            if(!newPw) return alert("Please enter a new password.");
             
-            if(confirm("Change Security Password?")) {
+            if(confirm("Are you sure you want to change the security password?")) {
                 try {
                     await database.ref('adminConfig/password').set(newPw);
-                    alert("Updated successfully.");
+                    alert("Security password updated successfully.");
                 } catch (error) {
                     alert("Update failed: " + error.message);
                 }
             }
         }
 
-        // 실행
         document.addEventListener('DOMContentLoaded', loadCurrentPw);
     </script>
 </body>
