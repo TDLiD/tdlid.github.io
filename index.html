@@ -117,25 +117,18 @@
         document.body.style.overflow = '';
     }
 
-    async function verifyAdminPassword() {
-        const inputPw = document.getElementById('adminPasswordInput').value;
-        if (!inputPw) return;
-
-        try {
-            const snapshot = await database.ref('adminConfig/password').once('value');
-            const correctPw = snapshot.val();
-
-            if (inputPw === correctPw) {
-                sessionStorage.setItem('isAdminAuthenticated', 'true');
-                window.location.href = "./admin/admin.html";
-            } else {
-                alert("Invalid Administrator Password.");
-                document.getElementById('adminPasswordInput').value = '';
-            }
-        } catch (e) {
-            console.error("Auth Error:", e);
-        }
+/** 2. 관리자 인증 (로직 단순화) **/
+function verifyAdminPassword() {
+    const inputPw = document.getElementById('adminPasswordInput').value;
+    
+    // index.html에서는 복잡한 체크 없이 바로 로그인 페이지로 이동시킵니다.
+    // 실제 보안 체크는 admin.html이나 login.html에 도달했을 때 수행됩니다.
+    if (inputPw.length > 0) {
+        window.location.href = "admin/login.html"; 
+    } else {
+        alert("Please enter password.");
     }
+}
 
     /* [추가] 실시간 공지/팝업/SEO 감지 함수 */
     function initLiveSettings() {
@@ -183,49 +176,173 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        /* [추가] 실시간 제어 UI 스타일 */
-        #emergencyBanner { display: none; background: #ef4444; color: white; text-align: center; padding: 12px; font-weight: bold; position: fixed; top: 0; width: 100%; z-index: 99999; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+<style>
+    /* [수정] BGM 토글 버튼 - 최상단 우선순위 부여 */
+    #musicToggleBtn { 
+        position: fixed; 
+        bottom: 25px; 
+        right: 25px; 
+        z-index: 999999 !important; /* 다른 레이어에 가려지지 않도록 대폭 상향 */
+        width: 44px; 
+        height: 44px; 
+        background: rgba(23, 23, 23, 0.8); 
+        border: 1px solid rgba(34, 211, 238, 0.4); 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        cursor: pointer; 
+        color: #22d3ee; 
+        backdrop-filter: blur(4px); 
+        transition: all 0.3s; 
+        pointer-events: auto !important; /* 클릭 이벤트 강제 활성화 */
+    }
 
+    #musicToggleBtn:hover { 
+        transform: scale(1.1); 
+        border-color: #22d3ee; 
+    }
 
-/* 1. 메인 공지 팝업 수정 */
+    /* [추가] 실시간 제어 UI 스타일 */
+    #emergencyBanner { 
+        display: none; 
+        background: #ef4444; 
+        color: white; 
+        text-align: center; 
+        padding: 12px; 
+        font-weight: bold; 
+        position: fixed; 
+        top: 0; 
+        width: 100%; 
+        z-index: 99999; 
+        font-size: 14px; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+    }
+
+    /* 1. 메인 공지 팝업 */
     #mainPopup { 
         display: none; 
         position: fixed; 
         inset: 0; 
-        /* 배경 투명도를 0.9에서 0.7로 낮추어 배경이 더 잘 보이게 하고, blur를 제거했습니다 */
         background: rgba(0,0,0,0.7); 
         z-index: 100000; 
         align-items: center; 
         justify-content: center; 
-        /* backdrop-filter: blur(5px);  <-- 이 부분을 제거하여 배경을 선명하게 만듭니다 */
     }
 
-    /* 2. 관리자 인증 모달도 동일하게 수정 (선택 사항) */
+    /* 2. 관리자 인증 모달 */
     #adminAuthModal {
-        /* 기존 backdrop-blur-sm 클래스 대신 선명한 배경 유지 */
         background: rgba(0,0,0,0.8);
     }
 
-        .popup-box { background: #0a0a0a; border: 1px solid #22d3ee; padding: 40px; border-radius: 24px; max-width: 420px; width: 90%; text-align: center; }
+    .popup-box { 
+        background: #0a0a0a; 
+        border: 1px solid #22d3ee; 
+        padding: 40px; 
+        border-radius: 24px; 
+        max-width: 420px; 
+        width: 90%; 
+        text-align: center; 
+    }
 
-        /* 기존 스타일 */
-        #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; }
-        #modalDetailImage { max-width: 90%; max-height: 90%; object-fit: contain; }
-        .dropdown-link { padding: 12px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; transition: all 0.2s; text-align: left; }
-        .dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
-        .dropdown-quote-btn { padding: 12px 20px; display: block; background: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; transition: background 0.2s; }
-        .dropdown-quote-btn:hover { background: #67e8f9; }
-        .whitespace-nowrap { white-space: nowrap !important; }
-        #musicToggleBtn { position: fixed; bottom: 25px; right: 25px; z-index: 10005; width: 44px; height: 44px; background: rgba(23, 23, 23, 0.8); border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #22d3ee; backdrop-filter: blur(4px); transition: all 0.3s; }
-        #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
-        #triggerWord { color: inherit !important; font-weight: inherit !important; text-decoration: none !important; cursor: text !important; display: inline; position: relative; z-index: 9998; pointer-events: auto !important; }
-        .hero-section { position: relative; width: 100%; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .video-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; }
-        .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4) contrast(1.1); }
-        .video-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%); z-index: 1; }
-        .hero-content { position: relative; z-index: 10; }
-    </style>
+    /* 기존 스타일 정렬 */
+    #imageModal { 
+        position: fixed; 
+        inset: 0; 
+        background: rgba(0,0,0,.9); 
+        z-index: 10000; 
+    }
+
+    #modalDetailImage { 
+        max-width: 90%; 
+        max-height: 90%; 
+        object-fit: contain; 
+    }
+
+    .dropdown-link { 
+        padding: 12px 20px; 
+        display: block; 
+        color: #ccc; 
+        border-bottom: 1px solid #262626; 
+        transition: all 0.2s; 
+        text-align: left; 
+    }
+
+    .dropdown-link:hover { 
+        background-color: #1a1a1a; 
+        color: #22d3ee; 
+    }
+
+    .dropdown-quote-btn { 
+        padding: 12px 20px; 
+        display: block; 
+        background: #22d3ee; 
+        color: #000; 
+        font-weight: 600; 
+        text-align: center; 
+        border-radius: 0 0 11px 11px; 
+        transition: background 0.2s; 
+    }
+
+    .dropdown-quote-btn:hover { 
+        background: #67e8f9; 
+    }
+
+    .whitespace-nowrap { 
+        white-space: nowrap !important; 
+    }
+
+    #triggerWord { 
+        color: inherit !important; 
+        font-weight: inherit !important; 
+        text-decoration: none !important; 
+        cursor: text !important; 
+        display: inline; 
+        position: relative; 
+        z-index: 9998; 
+        pointer-events: auto !important; 
+    }
+
+    .hero-section { 
+        position: relative; 
+        width: 100%; 
+        height: 100vh; 
+        overflow: hidden; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+    }
+
+    .video-bg-container { 
+        position: absolute; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        z-index: 0; 
+        overflow: hidden; 
+    }
+
+    .video-bg { 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+        filter: brightness(0.4) contrast(1.1); 
+    }
+
+    .video-overlay { 
+        position: absolute; 
+        inset: 0; 
+        background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%); 
+        z-index: 1; 
+    }
+
+    .hero-content { 
+        position: relative; 
+        z-index: 10; 
+    }
+</style>
+
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
@@ -340,12 +457,22 @@ async function loadLayout() {
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
         }
 
-        // 4. BGM 로드
+// 4. BGM 로드
         const bgmRes = await fetch('components/bgm.html');
         if (bgmRes.ok) {
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            bgmPlaceholder.innerHTML = await bgmRes.text();
-            // 스크립트 실행 로직... (기존 코드 유지)
+            const htmlText = await bgmRes.text();
+            bgmPlaceholder.innerHTML = htmlText;
+
+            // 중요: innerHTML로 삽입된 <script> 태그는 자동으로 실행되지 않습니다.
+            // script 태그를 찾아 강제로 재실행하거나, 초기화 함수를 호출해야 합니다.
+            const scripts = bgmPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.textContent = oldScript.textContent;
+                document.body.appendChild(newScript);
+                oldScript.remove();
+            });
         }
 
         // 초기화 실행
