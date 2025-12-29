@@ -60,6 +60,24 @@
 
         .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; }
         .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
+
+.hero-slogan-gradient {
+    display: inline-block !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+    padding-bottom: 0.1em;
+    
+    /* contact.html과 동일한 반전 그라데이션 설정 */
+    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    
+    /* 안전장치 */
+    color: transparent !important; 
+}
+
+
     </style>
 </head>
 
@@ -70,7 +88,8 @@
 <main class="flex-grow pt-24 pb-12 px-5 flex flex-col justify-center">
     <div class="max-w-full mx-auto w-full">
         <div class="flex flex-col items-center mb-8">
-            <h3 class="text-3xl font-bold tracking-tight hero-slogan-gradient text-center mb-6">TDLiD Products</h3>
+            <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient">
+                TDLiD Products</h3>
             
             <div class="grid grid-cols-2 gap-3 w-full max-w-sm">
                 <a href="data/catalog/comparison.pdf" target="_blank" class="flex items-center justify-center py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs font-semibold active:bg-neutral-800 transition shadow-lg">

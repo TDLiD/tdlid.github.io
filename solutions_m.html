@@ -74,6 +74,22 @@
         /* 드롭다운 스타일 */
         .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #222; }
         .dropdown-quote-btn { padding: 16px 20px; display: block; background-color: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
+
+/* [수정] 타이틀 그라데이션 및 중앙 정렬 강화 */
+.hero-slogan-gradient {
+    display: inline-block !important;
+    font-weight: 900 !important; /* font-black과 동일 */
+    line-height: 1.2 !important;
+    padding-bottom: 0.1em; /* pb-1과 유사한 효과 */
+    margin: 0 auto;
+    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    color: transparent !important; 
+}
+
+
     </style>
 </head>
 
@@ -85,7 +101,8 @@
 
 <main class="flex-grow pt-24 pb-12">
     <div class="px-6 mb-6">
-        <h3 class="text-3xl font-bold tracking-tight hero-slogan-gradient mb-1">Custom Solutions</h3>
+        <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient pb-1">
+        Custom Solutions</h3>
         <p class="text-neutral-500 text-xs">Innovation for Sustainable Mobility</p>
     </div>
 

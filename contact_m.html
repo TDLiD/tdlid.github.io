@@ -60,6 +60,24 @@
         -webkit-tap-highlight-color: transparent;
         user-select: none;
     }
+
+/* [수정] 모든 페이지 공통 헤드라인 스타일 적용 */
+.hero-slogan-gradient {
+    display: inline-block !important;
+    font-weight: 900 !important; /* font-black */
+    line-height: 1.2 !important;
+    padding-bottom: 0.1em;
+    
+    /* 타 페이지와 동일한 청록-화이트 그라데이션 */
+    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    
+    color: transparent !important; 
+}
+
+
 </style>
 </head>
 
@@ -70,7 +88,7 @@
 
 <main class="pt-24 pb-12 px-5 contact-form-container">
     <div class="form-card bg-neutral-900/80 border border-neutral-800 p-6 rounded-2xl shadow-2xl relative">
-        <h2 class="text-3xl font-bold tracking-tight hero-slogan-gradient mb-2">
+        <h2 class="text-5xl font-black tracking-tight hero-slogan-gradient mb-4">
             Request a <span>Quote</span>
         </h2>
         <p class="text-sm text-neutral-400 mb-8 leading-relaxed">

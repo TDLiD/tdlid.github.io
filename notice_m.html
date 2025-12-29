@@ -83,6 +83,24 @@
             margin: 0.75rem 0;
             display: block;
         }
+
+/* Core Technology와 동일한 스타일 유지 */
+.hero-slogan-gradient {
+    display: inline-block !important;
+    font-weight: 900 !important; /* font-black 효과 */
+    line-height: 1.2 !important;
+    padding-bottom: 0.1em;
+    
+    /* 타 페이지와 동일한 청록-화이트 그라데이션 */
+    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    
+    color: transparent !important; 
+}
+
+
     </style>
 </head>
 
@@ -91,7 +109,7 @@
 
     <main class="pt-24 pb-12 px-5 flex-grow">
         <div class="max-w-full mx-auto pt-4">
-            <h2 class="text-3xl font-black tracking-tight hero-slogan-gradient mb-8 px-1 italic uppercase">
+    <h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
                 Notice
             </h2>
 

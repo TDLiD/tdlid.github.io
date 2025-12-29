@@ -64,6 +64,23 @@
         transform: scale(0.98);
     }
     .arrow-icon { color: rgba(6, 182, 212, 0.5); }
+
+/* [수정] Core Technology와 동일한 폰트 효과 적용 */
+.hero-slogan-gradient {
+    display: inline-block !important;
+    font-weight: 900 !important; /* font-black 효과 */
+    line-height: 1.2 !important;
+    padding-bottom: 0.1em;
+    
+    /* 타 페이지와 동일한 청록-화이트 그라데이션 */
+    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    
+    color: transparent !important; 
+}
+
 </style>
 </head>
 
@@ -73,7 +90,7 @@
 
 <main class="pt-24 pb-12 px-5 min-h-screen">
     <div class="max-w-full mx-auto pt-6 text-left">
-        <h2 class="text-3xl font-black tracking-tight hero-slogan-gradient mb-8 italic uppercase">
+<h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
             Latest News
         </h2>
         

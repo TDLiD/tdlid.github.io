@@ -79,6 +79,23 @@
         
         .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #222; }
         .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
+
+        /* [수정] 타이틀 그라데이션 및 중앙 정렬 설정 */
+        .hero-slogan-gradient {
+            display: inline-block !important; /* 텍스트 너비만큼만 영역 차지 */
+            font-weight: 900 !important;
+            line-height: 1.2 !important;
+            padding-bottom: 0.1em;
+            margin: 0 auto; /* 수평 마진 자동 설정 */
+            
+            background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            color: transparent !important; 
+        }
+
+
     </style>
 </head>
 
@@ -89,7 +106,8 @@
 <main class="flex-grow pt-24 pb-12 px-5">
     <div class="max-w-xl mx-auto">
         <div class="mb-8">
-            <h3 class="text-3xl font-bold tracking-tight hero-slogan-gradient mb-1">Core Technology</h3>
+            <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient pb-1">
+               Core Technology</h3>
             <p class="text-neutral-500 text-xs">High-Density Battery Architecture</p>
         </div>
 
