@@ -136,10 +136,23 @@ async function verifyAdminPassword() {
         // 1. SEO 설정 감지
         database.ref('siteSettings/seo').on('value', (snapshot) => {
             const data = snapshot.val();
-            if (data) {
-                document.getElementById('metaDescription').content = data.description || "";
-                document.getElementById('metaKeywords').content = data.keywords || "";
-            }
+if (data) {
+        const now = new Date().toISOString().split('T')[0]; // 현재 날짜 (YYYY-MM-DD)
+        
+        // 날짜 범위 체크 함수
+        const isExpired = (data.startDate && now < data.startDate) || (data.endDate && now > data.endDate);
+
+        // 팝업 표시 (날짜가 기한 내에 있을 때만)
+        const popup = document.getElementById('mainPopup');
+        if (data.popupActive && !isExpired) {
+            popup.style.display = 'flex';
+            document.getElementById('popupText').innerText = data.text;
+        } else {
+            popup.style.display = 'none';
+        }
+        
+        // 배너 표시 로직도 위와 동일하게 isExpired를 활용하여 적용...
+    }
         });
 
         // 2. 공지/팝업 설정 감지
