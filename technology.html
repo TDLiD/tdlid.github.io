@@ -3,34 +3,27 @@
 <head>
     <meta charset="UTF-8">
 
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script>
+        (function() {
+            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPCMode = urlParams.get('view_mode') === 'pc';
 
-<script>
-    (function() {
-        // 1. iPad를 제외하고 iPhone, Android 폰만 감지
-        const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const isPCMode = urlParams.get('view_mode') === 'pc';
-
-        // 2. 리다이렉트 실행
-        if (isMobileOnly && !isPCMode) {
-            let path = window.location.pathname;
-            let page = path.split("/").pop();
-            
-            // 메인 페이지(index) 처리
-            if (page === "" || page === "technology.html") {
-                window.location.href = "technology_m.html";
-            } 
-            // 그 외 페이지들 (예: products.html -> products_m.html)
-            else if (page.endsWith(".html") && !page.includes("_m.html")) {
-                window.location.href = page.replace(".html", "_m.html");
+            if (isMobileOnly && !isPCMode) {
+                let path = window.location.pathname;
+                let page = path.split("/").pop();
+                if (page === "" || page === "technology.html") {
+                    window.location.href = "technology_m.html";
+                } 
+                else if (page.endsWith(".html") && !page.includes("_m.html")) {
+                    window.location.href = page.replace(".html", "_m.html");
+                }
             }
-        }
-    })();
-</script>
+        })();
+    </script>
 
     <title>Technology | TDLiD</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,9 +32,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* [수정] 고정 너비 제거 및 반응형 설정 */
         body {
-            /* min-width: 1280px; 제거 */
             overflow-x: hidden;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -49,7 +40,6 @@
             user-select: none;
         }
 
-        /* 1. 팝업 모달 스타일 (확대 시 스크롤 가능하도록 개선) */
         .modal-backdrop {
             position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.95);
             display: flex; justify-content: center; align-items: center; z-index: 10002;
@@ -63,14 +53,13 @@
         .modal-image { max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 12px; margin: 0 auto 25px; }
         .modal-close-btn { margin-top: 20px; padding: 12px 32px; background: #06b6d4; color: black; font-weight: 700; border-radius: 50px; cursor: pointer; transition: 0.2s; }
 
-        /* 2. 슬라이딩 캐러셀 구조 - 반응형 너비로 변경 */
         #technologyContainer {
             perspective: 2000px; 
             width: 100%;
-            max-width: 1000px; /* 최대 너비 제한 */
+            max-width: 1000px; 
             margin: 40px auto 60px;
             position: relative;
-            padding: 0 80px; /* 버튼 공간 확보 */
+            padding: 0 80px; 
         }
         #carousel { 
             width: 100%; 
@@ -82,7 +71,7 @@
             grid-area: 1 / 1 / 2 / 2;
             width: 100%; 
             height: auto; 
-            padding: 2.5rem; /* 확대 대비 패딩 유연화 */
+            padding: 2.5rem; 
             border: 1px solid #222; 
             border-radius: 2.5rem; 
             background-color: #0f0f0f;
@@ -104,7 +93,6 @@
             box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), 0 0 40px rgba(6, 182, 212, 0.15); 
         }
 
-        /* 3. 내비게이션 버튼 - 화면 안쪽으로 배치 */
         .nav-btn { 
             position: absolute; top: 50%; transform: translateY(-50%); z-index: 30; 
             width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;
@@ -116,13 +104,28 @@
         #prevBtn { left: 0; } 
         #nextBtn { right: 0; }
 
-        /* 공통 스타일 유지 */
         .dropdown-link { padding: 12px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; transition: all 0.2s; }
         .dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
         .dropdown-quote-btn { padding: 12px 20px; display: block; background: #22d3ee; color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+
+        /* [수정] 타이틀 그라데이션 및 중앙 정렬 설정 */
+        .hero-slogan-gradient {
+            display: inline-block !important; /* 텍스트 너비만큼만 영역 차지 */
+            font-weight: 900 !important;
+            line-height: 1.2 !important;
+            padding-bottom: 0.1em;
+            margin: 0 auto; /* 수평 마진 자동 설정 */
+            
+            background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            color: transparent !important; 
+        }
+
     </style>
 </head>
 
@@ -138,7 +141,12 @@
 
 <main class="flex-grow pt-32 lg:pt-40 pb-24 px-6">
     <div class="max-w-7xl mx-auto">
-        <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient text-center mb-12">Core Technology</h3>
+        
+        <div class="text-center mb-4">
+            <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient pb-1 uppercase">
+                Core Technology
+            </h3>
+        </div>
 
         <div id="technologyContainer">
             <button id="prevBtn" class="nav-btn" aria-label="Previous">
@@ -185,9 +193,6 @@
 <div id="footer-placeholder"></div>
 
 <script>
-
-
-// 이 부분을 복사해서 다른 파일의 동일한 위치에 넣으시면 됩니다.
 const firebaseConfig = {
     apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
     authDomain: "tdlid-107669.firebaseapp.com",
@@ -198,182 +203,156 @@ const firebaseConfig = {
     appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
 };
 
-
-// 수정 후 (안전함)
 if (typeof firebase !== 'undefined' && !firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
-    const database = firebase.database();
+const database = firebase.database();
 
-  // ... (중략: 기존 Firebase 설정 및 초기화 부분은 동일하게 유지) ...
+async function loadLayout() {
+    try {
+        const headerRes = await fetch('components/header.html');
+        const headerHTML = await headerRes.text();
+        const headerPlaceholder = document.getElementById('header-placeholder');
+        headerPlaceholder.innerHTML = headerHTML;
 
-    /**
-     * 레이아웃 Import 함수 (최종 수정본)
-     * 헤더, 푸터, BGM 외에 공통 관리자 인증 모달(admin-auth.html)을 추가로 로드합니다.
-     */
-    async function loadLayout() {
-        try {
-            // 1. 헤더 로드 및 삽입
-            const headerRes = await fetch('components/header.html');
-            const headerHTML = await headerRes.text();
-            const headerPlaceholder = document.getElementById('header-placeholder');
-            headerPlaceholder.innerHTML = headerHTML;
-
-            // 2. 헤더 내 스크립트 강제 실행 (Admin 이동 경로 및 함수 등록)
-            const headerScripts = headerPlaceholder.querySelectorAll("script");
-            headerScripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                let scriptText = oldScript.text;
-                // admin.html 경로를 admin/admin.html로 자동 치환
-                if (scriptText.includes("admin.html")) {
-                    scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
-                }
-                newScript.text = scriptText;
-                document.body.appendChild(newScript).parentNode.removeChild(newScript);
-            });
-
-            // 3. [핵심 추가] 공통 관리자 인증 모달 로드 및 삽입
-            const authRes = await fetch('components/admin-auth.html');
-            const authHTML = await authRes.text();
-            
-            let authPlaceholder = document.getElementById('admin-auth-placeholder');
-            if (!authPlaceholder) {
-                authPlaceholder = document.createElement('div');
-                authPlaceholder.id = 'admin-auth-placeholder';
-                document.body.appendChild(authPlaceholder);
+        const headerScripts = headerPlaceholder.querySelectorAll("script");
+        headerScripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            let scriptText = oldScript.text;
+            if (scriptText.includes("admin.html")) {
+                scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
             }
-            authPlaceholder.innerHTML = authHTML;
+            newScript.text = scriptText;
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        });
 
-            // 모달 내 스크립트(verifyAdminPassword 등) 실행 및 등록
-            const authScripts = authPlaceholder.querySelectorAll("script");
-            authScripts.forEach(oldScript => {
+        const authRes = await fetch('components/admin-auth.html');
+        const authHTML = await authRes.text();
+        
+        let authPlaceholder = document.getElementById('admin-auth-placeholder');
+        if (!authPlaceholder) {
+            authPlaceholder = document.createElement('div');
+            authPlaceholder.id = 'admin-auth-placeholder';
+            document.body.appendChild(authPlaceholder);
+        }
+        authPlaceholder.innerHTML = authHTML;
+
+        const authScripts = authPlaceholder.querySelectorAll("script");
+        authScripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            newScript.text = oldScript.text;
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        });
+
+        const footerRes = await fetch('components/footer.html');
+        document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+
+        const bgmRes = await fetch('components/bgm.html');
+        const bgmPlaceholder = document.getElementById('bgm-placeholder');
+        if (bgmPlaceholder) {
+            bgmPlaceholder.innerHTML = await bgmRes.text();
+            const bgmScripts = bgmPlaceholder.querySelectorAll("script");
+            bgmScripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
                 newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
+        }
+        initMenuToggle();
+    } catch (err) {
+        console.error("Layout load failed:", err);
+    }
+}
 
-            // 4. 푸터 로드
-            const footerRes = await fetch('components/footer.html');
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
-
-            // 5. BGM 로드 및 스크립트 실행
-            const bgmRes = await fetch('components/bgm.html');
-            const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            if (bgmPlaceholder) {
-                bgmPlaceholder.innerHTML = await bgmRes.text();
-                const bgmScripts = bgmPlaceholder.querySelectorAll("script");
-                bgmScripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    newScript.text = oldScript.text;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
+function initMenuToggle() {
+    const menuBtn = document.getElementById("menuToggleBtn");
+    const dropdown = document.getElementById("dropdownMenu");
+    const menuIcon = document.getElementById("menuIcon");
+    if (menuBtn && dropdown) {
+        menuBtn.onclick = (e) => {
+            e.stopPropagation();
+            const isOpen = dropdown.classList.contains("visible");
+            if (isOpen) {
+                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                dropdown.classList.add("opacity-0", "invisible");
+                if(menuIcon) menuIcon.innerText = "☰";
+            } else {
+                dropdown.classList.remove("opacity-0", "invisible");
+                dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                if(menuIcon) menuIcon.innerText = "✕";
             }
-
-            // 6. 메뉴 토글 초기화
-            initMenuToggle();
-
-        } catch (err) {
-            console.error("Layout load failed:", err);
-        }
+        };
     }
+}
 
-// ... (하위 슬라이더 및 모달 스크립트 로직 유지) ...
+let currentIndex = 0;
+const cards = document.querySelectorAll('.tech-card');
+const CARD_COUNT = cards.length;
+let isAnimating = false;
+let autoTimer;
 
+function showCard(newIndex, direction) {
+    if (isAnimating) return;
+    isAnimating = true;
 
+    const oldIndex = currentIndex;
+    currentIndex = newIndex;
+    const prevCard = cards[oldIndex];
+    const currentCard = cards[currentIndex];
+    
+    const slideDistance = document.getElementById('technologyContainer').offsetWidth;
 
-    function initMenuToggle() {
-        const menuBtn = document.getElementById("menuToggleBtn");
-        const dropdown = document.getElementById("dropdownMenu");
-        const menuIcon = document.getElementById("menuIcon");
-        if (menuBtn && dropdown) {
-            menuBtn.onclick = (e) => {
-                e.stopPropagation();
-                const isOpen = dropdown.classList.contains("visible");
-                if (isOpen) {
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                    dropdown.classList.add("opacity-0", "invisible");
-                    if(menuIcon) menuIcon.innerText = "☰";
-                } else {
-                    dropdown.classList.remove("opacity-0", "invisible");
-                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                    if(menuIcon) menuIcon.innerText = "✕";
-                }
-            };
-        }
-    }
+    prevCard.style.zIndex = '15';
+    currentCard.style.zIndex = '10';
+    currentCard.style.opacity = '1';
+    currentCard.classList.add('is-active');
 
-    let currentIndex = 0;
-    const cards = document.querySelectorAll('.tech-card');
-    const CARD_COUNT = cards.length;
-    let isAnimating = false;
-    let autoTimer;
-
-    function showCard(newIndex, direction) {
-        if (isAnimating) return;
-        isAnimating = true;
-
-        const oldIndex = currentIndex;
-        currentIndex = newIndex;
-        const prevCard = cards[oldIndex];
-        const currentCard = cards[currentIndex];
-        
-        // 브라우저 너비에 맞춘 동적 슬라이드 거리 계산
-        const slideDistance = document.getElementById('technologyContainer').offsetWidth;
-
-        prevCard.style.zIndex = '15';
-        currentCard.style.zIndex = '10';
-        currentCard.style.opacity = '1';
-        currentCard.classList.add('is-active');
-
-        requestAnimationFrame(() => {
-            prevCard.style.transform = direction === 'next' ? `translateX(-${slideDistance}px)` : `translateX(${slideDistance}px)`;
-            prevCard.style.opacity = '0';
-        });
-
-        setTimeout(() => {
-            prevCard.classList.remove('is-active');
-            prevCard.style.transform = 'translateX(0)';
-            isAnimating = false;
-        }, 800);
-    }
-
-    const startAuto = () => { stopAuto(); autoTimer = setInterval(() => showCard((currentIndex + 1) % CARD_COUNT, 'next'), 5000); };
-    const stopAuto = () => clearInterval(autoTimer);
-
-    document.getElementById('prevBtn').onclick = () => { stopAuto(); showCard((currentIndex - 1 + CARD_COUNT) % CARD_COUNT, 'prev'); startAuto(); };
-    document.getElementById('nextBtn').onclick = () => { stopAuto(); showCard((currentIndex + 1) % CARD_COUNT, 'next'); startAuto(); };
-
-    // 이미지 팝업 모달 이벤트
-    cards.forEach(card => {
-        card.querySelectorAll('img').forEach(img => {
-            img.onclick = function() {
-                stopAuto();
-                const popupImgTarget = this.dataset.popupSrc || this.src;
-                const modal = document.createElement('div');
-                modal.className = 'modal-backdrop';
-                modal.innerHTML = `
-                    <div class="modal-content custom-scrollbar">
-                        <span class="absolute top-5 right-6 text-3xl cursor-pointer opacity-50 hover:opacity-100" id="closeX">✕</span>
-                        <img src="${popupImgTarget}" class="modal-image">
-                        <p class="mt-4 text-neutral-300 text-lg px-4">${this.dataset.detail || ''}</p>
-                        <button class="modal-close-btn">Close</button>
-                    </div>`;
-                
-                const close = () => { if(modal.parentNode) document.body.removeChild(modal); startAuto(); };
-                modal.querySelector('.modal-close-btn').onclick = close;
-                modal.querySelector('#closeX').onclick = close;
-                modal.onclick = (e) => { if(e.target === modal) close(); };
-                document.body.appendChild(modal);
-            };
-        });
+    requestAnimationFrame(() => {
+        prevCard.style.transform = direction === 'next' ? `translateX(-${slideDistance}px)` : `translateX(${slideDistance}px)`;
+        prevCard.style.opacity = '0';
     });
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadLayout();
-        startAuto();
+    setTimeout(() => {
+        prevCard.classList.remove('is-active');
+        prevCard.style.transform = 'translateX(0)';
+        isAnimating = false;
+    }, 800);
+}
+
+const startAuto = () => { stopAuto(); autoTimer = setInterval(() => showCard((currentIndex + 1) % CARD_COUNT, 'next'), 5000); };
+const stopAuto = () => clearInterval(autoTimer);
+
+document.getElementById('prevBtn').onclick = () => { stopAuto(); showCard((currentIndex - 1 + CARD_COUNT) % CARD_COUNT, 'prev'); startAuto(); };
+document.getElementById('nextBtn').onclick = () => { stopAuto(); showCard((currentIndex + 1) % CARD_COUNT, 'next'); startAuto(); };
+
+cards.forEach(card => {
+    card.querySelectorAll('img').forEach(img => {
+        img.onclick = function() {
+            stopAuto();
+            const popupImgTarget = this.dataset.popupSrc || this.src;
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.innerHTML = `
+                <div class=\"modal-content custom-scrollbar\">
+                    <span class=\"absolute top-5 right-6 text-3xl cursor-pointer opacity-50 hover:opacity-100\" id=\"closeX\">✕</span>
+                    <img src=\"${popupImgTarget}\" class=\"modal-image\">
+                    <p class=\"mt-4 text-neutral-300 text-lg px-4\">${this.dataset.detail || ''}</p>
+                    <button class=\"modal-close-btn\">Close</button>
+                </div>`;
+            
+            const close = () => { if(modal.parentNode) document.body.removeChild(modal); startAuto(); };
+            modal.querySelector('.modal-close-btn').onclick = close;
+            modal.querySelector('#closeX').onclick = close;
+            modal.onclick = (e) => { if(e.target === modal) close(); };
+            document.body.appendChild(modal);
+        };
     });
+});
 
-
+document.addEventListener("DOMContentLoaded", () => {
+    loadLayout();
+    startAuto();
+});
 </script>
 </body>
 </html>

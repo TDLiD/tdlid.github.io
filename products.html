@@ -103,6 +103,24 @@
     pointer-events: auto !important; /* 클릭 차단 해제 */
 }
 
+/* index.html의 style 태그 내 추가 또는 수정 */
+/* notice.html의 <style> 구역에 있는 기존 관련 클래스를 지우고 아래로 교체 */
+.hero-slogan-gradient {
+    display: inline-block !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+    padding-bottom: 0.1em;
+    
+    /* contact.html과 동일한 반전 그라데이션 설정 */
+    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    
+    /* 안전장치 */
+    color: transparent !important; 
+}
+
     </style>
 </head>
 
@@ -118,10 +136,12 @@
 
 <main class="flex-grow pt-32 lg:pt-40 pb-24 px-6">
     <div class="max-w-7xl mx-auto">
-        <div class="relative flex flex-col md:flex-row items-center justify-center mb-16 gap-8">
-            <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient text-center">TDLiD Products</h3>
+        <div class="relative flex flex-col items-center justify-center mb-16">
+            <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient uppercase">
+                TDLiD Products
+            </h3>
             
-            <div class="flex gap-4 md:absolute md:right-0">
+            <div class="flex gap-4 mt-6 md:mt-0 md:absolute md:right-0">
                 <a href="data/catalog/comparison.pdf" target="_blank" class="whitespace-nowrap px-5 py-3 rounded-xl bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform font-bold text-sm">Compare Models</a>
                 <a href="data/catalog/tei-catalog-2025.pdf" target="_blank" class="whitespace-nowrap px-5 py-3 rounded-xl bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform font-bold text-sm">View Catalog</a>
             </div>

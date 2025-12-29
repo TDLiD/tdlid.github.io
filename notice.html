@@ -105,7 +105,24 @@
             margin: 1rem 0;
             display: block;
         }
-    </style>
+
+/* Core Technology와 동일한 스타일 유지 */
+.hero-slogan-gradient {
+    display: inline-block !important;
+    font-weight: 900 !important; /* font-black 효과 */
+    line-height: 1.2 !important;
+    padding-bottom: 0.1em;
+    
+    /* 타 페이지와 동일한 청록-화이트 그라데이션 */
+    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    
+    color: transparent !important; 
+}
+
+</style>
 </head>
 
 <body class="min-h-screen flex flex-col">
@@ -113,10 +130,10 @@
     <div id="header-placeholder"></div>
 
     <main class="pt-32 lg:pt-40 pb-20 px-6 flex-grow">
-        <div class="max-w-6xl mx-auto pt-10 px-4 text-center">
-            <h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16 italic uppercase pr-2">
-                Notice
-            </h2>
+<div class="max-w-6xl mx-auto pt-10 px-4 text-center uppercase">
+    <h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
+        Notice
+    </h2>
 
             <div id="noticeList" class="flex flex-col gap-1 text-left">
                 <div class="text-center py-20 text-neutral-500 animate-pulse tracking-widest uppercase">
