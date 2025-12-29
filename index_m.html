@@ -246,7 +246,7 @@ async function verifyAdminPassword() {
             <h1 class="hero-logo-gradient">TDLiD</h1>
             <p class="hero-slogan-gradient">NO MORE CARBON</p>
             <p class="hero-description">
-                <span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
+                <span>TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
             </p>
         </div>
     </section>
@@ -355,7 +355,6 @@ async function loadLayout() {
         });
 
         initNavigation();
-        initAdminTrigger(); 
         initCertModal();
         initLiveSettings(); // [추가] 실시간 설정 활성화
         
@@ -386,13 +385,7 @@ async function loadLayout() {
     }
 
     function initAdminTrigger() {
-        const triggerWord = document.getElementById('triggerWord');
-        if (triggerWord) {
-            triggerWord.addEventListener('click', (e) => {
-                e.preventDefault();
-                openAdminAuth(); 
-            });
-        }
+
     }
 
     document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
