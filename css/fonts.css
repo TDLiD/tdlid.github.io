@@ -1,0 +1,37 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300..900&family=Red+Hat+Text:wght@300..700&display=swap');
+
+/* 공통 폰트 설정 */
+:root {
+    --font-main: 'Red Hat Text', sans-serif;
+    --font-display: 'Red Hat Display', sans-serif;
+}
+
+body {
+    font-family: var(--font-main);
+    letter-spacing: -0.01em;
+}
+
+/* 제목 및 헤드라인 전용 */
+h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+}
+
+/* 폼 요소 폰트 통일 */
+input, textarea, select, button {
+    font-family: var(--font-main) !important;
+}
+
+/* 샘플의 그라데이션 및 타이포 스타일 */
+.hero-slogan-gradient {
+    display: inline-block !important;
+    font-family: var(--font-display) !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.04em !important;
+    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    color: transparent !important; 
+}
