@@ -79,25 +79,19 @@
             document.body.style.overflow = '';
         }
 
-        async function verifyAdminPassword() {
-            const inputPw = document.getElementById('adminPasswordInput').value;
-            if (!inputPw) return;
+async function verifyAdminPassword() {
+    const inputPw = document.getElementById('adminPasswordInput').value;
+    const errorMsg = document.getElementById('adminErrorMsg');
 
-            try {
-                const snapshot = await database.ref('adminConfig/password').once('value');
-                const correctPw = snapshot.val();
-
-                if (inputPw === correctPw) {
-                    sessionStorage.setItem('isAdminAuthenticated', 'true');
-                    window.location.href = "admin/admin.html";
-                } else {
-                    alert("Invalid Administrator Password.");
-                    document.getElementById('adminPasswordInput').value = '';
-                }
-            } catch (e) {
-                console.error("Auth Error:", e);
-            }
-        }
+    if (inputPw.length > 0) {
+        // DB 조회를 하지 않고, 일단 로그인 페이지로 보냅니다.
+        // 실제 보안은 login.html과 그 이후 admin 페이지의 Auth 체크에서 담당합니다.
+        sessionStorage.setItem('admin_pre_auth', 'true');
+        window.location.href = "admin/login.html"; // 경로가 다를 경우 "login.html"로 수정
+    } else {
+        alert("Please enter password.");
+    }
+}
 
         // 3. 접속 기록 함수
         async function recordVisit() {
