@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDLiD Admin - Secure Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #020617; color: #e5e7eb; font-family: 'Pretendard', sans-serif; }
+        .login-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(34, 211, 238, 0.2); backdrop-filter: blur(12px); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div class="login-card w-full max-w-md p-10 rounded-3xl shadow-2xl">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-cyan-400 tracking-tighter italic">ADMIN LOGIN</h1>
+            <p class="text-neutral-500 text-xs mt-2 uppercase tracking-widest">Authorized Personnel Only</p>
+        </div>
+
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label class="block text-xs font-bold text-neutral-400 uppercase tracking-widest mb-2">Email Address</label>
+                <input type="email" id="email" required 
+                    class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none transition">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-neutral-400 uppercase tracking-widest mb-2">Password</label>
+                <input type="password" id="password" required 
+                    class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none transition">
+            </div>
+            
+            <button type="submit" 
+                class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-cyan-900/20 uppercase tracking-widest mt-4">
+                Sign In
+            </button>
+        </form>
+
+        <div class="mt-8 text-center">
+            <a href="index.html" class="text-neutral-600 hover:text-neutral-400 text-xs transition">← Back to Public Website</a>
+        </div>
+    </div>
+
+    <script>
+        // 1. Firebase 설정 (index.html에서 사용하신 설정을 그대로 복사하세요)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+            authDomain: "tdlid-107669.firebaseapp.com",
+            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+            projectId: "tdlid-107669",
+            storageBucket: "tdlid-107669.firebasestorage.app",
+            messagingSenderId: "604782345004",
+            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // 2. 로그인 이벤트 처리
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // 로그인 성공 시 어드민 메인 페이지로 이동
+                    window.location.href = "admin.html";
+                })
+                .catch((error) => {
+                    console.error("Login Error:", error.code);
+                    alert("Invalid email or password.");
+                });
+        });
+
+        // 이미 로그인된 사용자인지 확인
+        auth.onAuthStateChanged((user) => {
+            if (user) window.location.href = "admin.html";
+        });
+    </script>
+</body>
+</html>

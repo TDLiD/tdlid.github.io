@@ -5,6 +5,7 @@
     <title>TDLiD Admin - Security & Audit Logs</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -17,9 +18,16 @@
         }
         .log-container::-webkit-scrollbar { width: 4px; }
         .log-container::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+
+        /* [추가] 로딩 오버레이 스타일 */
+        #authOverlay { position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="p-8">
+    <div id="authOverlay">
+        <p class="text-cyan-400 font-bold tracking-widest animate-pulse">CHECKING AUTHORITY...</p>
+    </div>
+
     <div class="max-w-6xl mx-auto">
         <header class="mb-12 border-b border-cyan-900/50 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -27,13 +35,16 @@
                 <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">TDL Energy Indonesia Management</p>
             </div>
 
-            <nav class="flex gap-8 text-sm font-bold uppercase tracking-wider text-neutral-500">
-                <a href="admin.html" class="tab-item hover:text-white transition">Dashboard</a>
-                <a href="visitor.html" class="tab-item hover:text-white transition">Visitor</a>
-                <a href="inquiry.html" class="tab-item hover:text-white transition">Inquiry</a>
-                <a href="post.html" class="tab-item hover:text-white transition">Posts</a>
-                <a href="security.html" class="tab-item active hover:text-white transition">Security</a>
-            </nav>
+            <div class="flex flex-col items-end gap-4">
+                <button onclick="logout()" class="text-[10px] text-neutral-500 hover:text-red-400 transition uppercase tracking-widest">Logout Account</button>
+                <nav class="flex gap-8 text-sm font-bold uppercase tracking-wider text-neutral-500">
+                    <a href="admin.html" class="tab-item hover:text-white transition">Dashboard</a>
+                    <a href="visitor.html" class="tab-item hover:text-white transition">Visitor</a>
+                    <a href="inquiry.html" class="tab-item hover:text-white transition">Inquiry</a>
+                    <a href="post.html" class="tab-item hover:text-white transition">Posts</a>
+                    <a href="security.html" class="tab-item active hover:text-white transition">Security</a>
+                </nav>
+            </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
@@ -100,29 +111,43 @@
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        const auth = firebase.auth(); // [추가] Auth 초기화
+
+        // [추가] 관리자 인증 체크 로직
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('authOverlay').style.display = 'none';
+                loadCurrentPw();
+                loadAuditLogs();
+                recordAdminAction("ACCESS", "Security Management Page Viewed");
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // [추가] 로그아웃 함수
+        function logout() {
+            if(confirm("Do you want to logout?")) {
+                auth.signOut().then(() => {
+                    window.location.href = "login.html";
+                });
+            }
+        }
 
         // --- 보안 기능 1: 세션 만료 로직 (30분 무활동 시 로그아웃) ---
-        const SESSION_TIMEOUT = 30 * 60 * 1000; // 30분
+        const SESSION_TIMEOUT = 30 * 60 * 1000;
         let lastActivity = Date.now();
 
         function checkSession() {
             if (Date.now() - lastActivity > SESSION_TIMEOUT) {
-                alert("Session expired due to inactivity. Please log in again.");
-                sessionStorage.removeItem('isAdminAuthenticated');
-                window.location.href = "../index.html";
+                alert("Session expired due to inactivity.");
+                auth.signOut().then(() => { window.location.href = "login.html"; });
             }
         }
 
-        window.onload = () => {
-
-            loadCurrentPw();
-            loadAuditLogs();
-            recordAdminAction("ACCESS", "Security Management Page Viewed");
-        };
-
         document.onmousemove = () => lastActivity = Date.now();
         document.onkeypress = () => lastActivity = Date.now();
-        setInterval(checkSession, 10000); // 10초마다 세션 체크
+        setInterval(checkSession, 10000);
 
         // --- 보안 기능 2: 로그 기록 함수 ---
         async function recordAdminAction(type, detail) {
@@ -135,7 +160,7 @@
                 } catch(e) {}
 
                 await database.ref('adminLogs').push({
-                    type: type, // PASSWORD_CHANGE, ACCESS, DELETE_POST 등
+                    type: type,
                     detail: detail,
                     ip: ip,
                     timestamp: firebase.database.ServerValue.TIMESTAMP,
@@ -144,7 +169,6 @@
             } catch (err) { console.error("Log Error:", err); }
         }
 
-        // --- 기존 기능 강화: 패스워드 변경 및 로그 연동 ---
         async function loadCurrentPw() {
             const pwInput = document.getElementById('adminNewPassword');
             try {
@@ -167,7 +191,6 @@
             }
         }
 
-        // --- 보안 기능 3: 로그 리스트 표시 ---
         function loadAuditLogs() {
             const logTbody = document.getElementById('auditLogList');
             database.ref('adminLogs').limitToLast(50).on('value', (snapshot) => {

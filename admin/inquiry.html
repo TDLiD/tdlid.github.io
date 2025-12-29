@@ -5,6 +5,7 @@
     <title>TDLiD Admin - Customer Inquiries</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -18,22 +19,31 @@
         }
         /* 모달 애니메이션 */
         #detailModal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+        /* [추가] 로딩 오버레이 스타일 */
+        #authOverlay { position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="p-8">
+    <div id="authOverlay">
+        <p class="text-cyan-400 font-bold tracking-widest animate-pulse">CHECKING AUTHORITY...</p>
+    </div>
+
     <div class="max-w-6xl mx-auto">
         <header class="mb-12 border-b border-cyan-900/50 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
                 <h1 class="text-4xl font-bold text-cyan-400 tracking-tighter italic">ADMIN SYSTEM</h1>
                 <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">TDL Energy Indonesia Management</p>
             </div>
-            <nav class="flex gap-8 text-sm font-bold uppercase tracking-wider text-neutral-500">
-                <a href="admin.html" class="tab-item hover:text-white transition">Dashboard</a>
-                <a href="visitor.html" class="tab-item hover:text-white transition">Visitor</a>
-                <a href="inquiry.html" class="tab-item active hover:text-white transition">Inquiry</a>
-                <a href="post.html" class="tab-item hover:text-white transition">Posts</a>
-                <a href="security.html" class="tab-item hover:text-white transition">Security</a>
-            </nav>
+            <div class="flex flex-col items-end gap-4">
+                <button onclick="logout()" class="text-[10px] text-neutral-500 hover:text-red-400 transition uppercase tracking-widest">Logout Account</button>
+                <nav class="flex gap-8 text-sm font-bold uppercase tracking-wider text-neutral-500">
+                    <a href="admin.html" class="tab-item hover:text-white transition">Dashboard</a>
+                    <a href="visitor.html" class="tab-item hover:text-white transition">Visitor</a>
+                    <a href="inquiry.html" class="tab-item active hover:text-white transition">Inquiry</a>
+                    <a href="post.html" class="tab-item hover:text-white transition">Posts</a>
+                    <a href="security.html" class="tab-item hover:text-white transition">Security</a>
+                </nav>
+            </div>
         </header>
 
         <div class="flex justify-between items-center mb-6">
@@ -58,6 +68,10 @@
                     <tbody id="inquiryTableBody" class="divide-y divide-neutral-800 text-sm italic"></tbody>
                 </table>
             </div>
+        </div>
+
+        <div class="mt-12 text-center">
+            <a href="../index.html" class="text-neutral-600 hover:text-cyan-400 text-xs transition">← Exit to Public Website</a>
         </div>
     </div>
 
@@ -121,49 +135,73 @@
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        const auth = firebase.auth(); // [추가] Auth 초기화
         let currentInquiryKey = null;
 
-        database.ref('messages').on('value', (snapshot) => {
-            const tbody = document.getElementById('inquiryTableBody');
-            tbody.innerHTML = '';
-            let unread = 0;
-            let items = [];
-            snapshot.forEach(c => { 
-                const d = c.val();
-                if(d.read === false || d.read === undefined) unread++;
-                items.push({key: c.key, ...d});
-            });
-            
-            document.getElementById('unreadCount').innerText = unread + " NEW";
-
-            items.reverse().forEach(item => {
-                const isRead = item.read === true || item.read === "true";
-                const isProcessing = item.read === "processing";
-                
-                let statusHtml = `<span class="text-amber-400 font-bold">● NEW</span>`;
-                if(isProcessing) statusHtml = `<span class="text-cyan-400 font-bold italic underline">PROCESSING</span>`;
-                else if(isRead) statusHtml = `<span class="text-neutral-600 font-bold uppercase tracking-widest">COMPLETED</span>`;
-
-                const row = document.createElement('tr');
-                row.className = `hover:bg-white/5 transition border-b border-white/5 cursor-pointer ${(!isRead && !isProcessing) ? 'unread-row' : ''}`;
-                row.onclick = () => openModal(item);
-                row.innerHTML = `
-                    <td class="p-5 text-[10px]">${statusHtml}</td>
-                    <td class="p-5">
-                        <div class="text-white font-bold">${item.name || 'N/A'}</div>
-                        <div class="text-[10px] text-neutral-500 font-mono">${item.date}</div>
-                    </td>
-                    <td class="p-5">
-                        <div class="text-cyan-400 font-bold text-sm">${item.company || '-'}</div>
-                        <div class="text-neutral-500 text-[10px] italic">${item.email || ''}</div>
-                    </td>
-                    <td class="p-5 text-right" onclick="event.stopPropagation()">
-                        <button onclick="deleteMsg('${item.key}')" class="text-red-500 hover:text-red-300 text-[10px] font-black uppercase tracking-tighter transition">Delete</button>
-                    </td>`;
-                tbody.appendChild(row);
-            });
+        // [추가] 관리자 인증 체크 로직
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('authOverlay').style.display = 'none';
+                startInquiryLoad();
+            } else {
+                window.location.href = "login.html";
+            }
         });
 
+        // [추가] 로그아웃 함수
+        function logout() {
+            if(confirm("Do you want to logout?")) {
+                auth.signOut().then(() => {
+                    window.location.href = "login.html";
+                });
+            }
+        }
+
+        // 기존 데이터 로드 로직을 함수화
+        function startInquiryLoad() {
+            database.ref('messages').on('value', (snapshot) => {
+                const tbody = document.getElementById('inquiryTableBody');
+                tbody.innerHTML = '';
+                let unread = 0;
+                let items = [];
+                snapshot.forEach(c => { 
+                    const d = c.val();
+                    if(d.read === false || d.read === undefined) unread++;
+                    items.push({key: c.key, ...d});
+                });
+                
+                document.getElementById('unreadCount').innerText = unread + " NEW";
+
+                items.reverse().forEach(item => {
+                    const isRead = item.read === true || item.read === "true";
+                    const isProcessing = item.read === "processing";
+                    
+                    let statusHtml = `<span class="text-amber-400 font-bold">● NEW</span>`;
+                    if(isProcessing) statusHtml = `<span class="text-cyan-400 font-bold italic underline">PROCESSING</span>`;
+                    else if(isRead) statusHtml = `<span class="text-neutral-600 font-bold uppercase tracking-widest">COMPLETED</span>`;
+
+                    const row = document.createElement('tr');
+                    row.className = `hover:bg-white/5 transition border-b border-white/5 cursor-pointer ${(!isRead && !isProcessing) ? 'unread-row' : ''}`;
+                    row.onclick = () => openModal(item);
+                    row.innerHTML = `
+                        <td class="p-5 text-[10px]">${statusHtml}</td>
+                        <td class="p-5">
+                            <div class="text-white font-bold">${item.name || 'N/A'}</div>
+                            <div class="text-[10px] text-neutral-500 font-mono">${item.date}</div>
+                        </td>
+                        <td class="p-5">
+                            <div class="text-cyan-400 font-bold text-sm">${item.company || '-'}</div>
+                            <div class="text-neutral-500 text-[10px] italic">${item.email || ''}</div>
+                        </td>
+                        <td class="p-5 text-right" onclick="event.stopPropagation()">
+                            <button onclick="deleteMsg('${item.key}')" class="text-red-500 hover:text-red-300 text-[10px] font-black uppercase tracking-tighter transition">Delete</button>
+                        </td>`;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+
+        // (이하 모달 및 데이터 처리 함수 동일)
         function openModal(item) {
             currentInquiryKey = item.key;
             document.getElementById('modalName').innerText = item.name || 'N/A';
@@ -188,7 +226,6 @@
             const status = document.getElementById('modalStatus').value;
             const memo = document.getElementById('modalMemo').value;
 
-            // 문자열 "true"/"false"를 불리언으로 변환하여 저장 (기존 로직 호환)
             let valToSave = status;
             if(status === "true") valToSave = true;
             if(status === "false") valToSave = false;
