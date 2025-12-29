@@ -169,7 +169,7 @@ async function verifyAdminPassword() {
 
     <style>
         /* [추가] 실시간 공지/팝업 스타일 (모바일 최적화) */
-        #emergencyBanner { display: none; background: #ef4444; color: white; text-align: center; padding: 10px 15px; font-weight: bold; position: fixed; top: 0; width: 100%; z-index: 99999; font-size: 13px; line-height: 1.4; }
+        #emergencyBanner { display: none; background: #ef4444; color: white; text-align: center; padding: 10px 15px; font-weight: bold; position: fixed; bottom: 0; width: 100%; z-index: 99999; font-size: 13px; line-height: 1.4; }
 
 
 
@@ -219,10 +219,6 @@ async function verifyAdminPassword() {
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
-
-<div id="emergencyBanner">
-    📢 <span id="bannerText">Notice</span>
-</div>
 
 <div id="mainPopup">
     <div class="popup-box">
@@ -313,6 +309,10 @@ async function verifyAdminPassword() {
 </div>
 
 <div id="footer-placeholder"></div>
+
+<div id="emergencyBanner">
+    📢 <span id="bannerText">Notice</span>
+</div>
 
 <script>
     const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
