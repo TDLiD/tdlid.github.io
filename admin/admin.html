@@ -24,7 +24,6 @@
         .nav-card { transition: all 0.3s ease; border: 1px solid rgba(34, 211, 238, 0.1); }
         .nav-card:hover { transform: translateY(-5px); border-color: rgba(34, 211, 238, 0.5); background: rgba(34, 211, 238, 0.05); }
         
-        /* 토글 스위치 스타일 */
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
@@ -32,10 +31,7 @@
         input:checked + .slider { background-color: #22d3ee; }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* 로딩 오버레이 */
         #authOverlay { position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-
-        /* Flatpickr 커스텀 스타일 (다크 테마 최적화) */
         .flatpickr-input { cursor: pointer; }
     </style>
 </head>
@@ -101,6 +97,34 @@
                         <input type="text" id="seoKeywords" class="w-full bg-black border border-neutral-800 rounded-xl p-4 text-sm text-neutral-300 focus:border-cyan-500 outline-none transition" placeholder="energy, indonesia, tdl, battery...">
                     </div>
                     <button onclick="saveSEO()" class="w-full py-4 bg-cyan-600/20 hover:bg-cyan-600 text-cyan-400 hover:text-white font-bold rounded-xl transition uppercase tracking-widest text-xs">Update Meta Data</button>
+
+                    <div class="mt-4 p-5 bg-black/40 rounded-2xl border border-white/5 space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-cyan-500 text-xs">💡</span>
+                            <p class="text-[11px] font-bold text-cyan-400 uppercase tracking-widest">SEO Management Guide</p>
+                        </div>
+                        
+                        <ul class="space-y-2">
+                            <li class="flex gap-2">
+                                <span class="text-cyan-500 text-[11px] mt-0.5">•</span>
+                                <p class="text-[11px] text-neutral-400 leading-relaxed">
+                                    <strong class="text-neutral-300">Site Description:</strong> This is the description that appears below the title in Google search results. It's best to keep it to 150-160 characters.
+                                </p>
+                            </li>
+                            <li class="flex gap-2">
+                                <span class="text-cyan-500 text-[11px] mt-0.5">•</span>
+                                <p class="text-[11px] text-neutral-400 leading-relaxed">
+                                    <strong class="text-neutral-300">Keywords:</strong> Enter key words related to your site, separated by commas (e.g., Battery, TDL Energy, Indonesia)
+                                </p>
+                            </li>
+                            <li class="flex gap-2">
+                                <span class="text-cyan-500 text-[11px] mt-0.5">•</span>
+                                <p class="text-[11px] text-neutral-500 italic leading-relaxed">
+                                    * It may take several days to several weeks for metadata modifications to be reflected in search engines such as Google.
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -140,18 +164,12 @@
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="startDate" class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-2">
-                                    Display Start
-                                </label>
-                                <input type="text" id="startDate" 
-                                       class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-xs text-white outline-none focus:border-cyan-500 transition-colors uppercase" placeholder="Select Date">
+                                <label for="startDate" class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-2">Display Start</label>
+                                <input type="text" id="startDate" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-xs text-white outline-none focus:border-cyan-500 transition-colors uppercase" placeholder="Select Date">
                             </div>
                             <div>
-                                <label for="endDate" class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-2">
-                                    Display End
-                                </label>
-                                <input type="text" id="endDate" 
-                                       class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-xs text-white outline-none focus:border-cyan-500 transition-colors uppercase" placeholder="Select Date">
+                                <label for="endDate" class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-2">Display End</label>
+                                <input type="text" id="endDate" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-xs text-white outline-none focus:border-cyan-500 transition-colors uppercase" placeholder="Select Date">
                             </div>
                         </div>
                         
@@ -194,12 +212,11 @@
         const database = firebase.database();
         const auth = firebase.auth();
 
-        // [추가] Flatpickr 영문 달력 초기화
         document.addEventListener('DOMContentLoaded', function() {
             const dateConfig = {
                 dateFormat: "Y-m-d",
-                locale: "default", // 영문 고정
-                disableMobile: "true" // 모바일에서도 커스텀 UI 사용
+                locale: "default",
+                disableMobile: "true"
             };
             flatpickr("#startDate", dateConfig);
             flatpickr("#endDate", dateConfig);
@@ -238,7 +255,6 @@
                     document.getElementById('bannerActive').checked = data.bannerActive || false;
                     document.getElementById('noticeText').value = data.text || '';
                     
-                    // Flatpickr 인스턴스를 통해 날짜 값 설정
                     if(data.startDate) document.getElementById('startDate')._flatpickr.setDate(data.startDate);
                     if(data.endDate) document.getElementById('endDate')._flatpickr.setDate(data.endDate);
                 }
