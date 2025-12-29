@@ -117,14 +117,15 @@
         document.body.style.overflow = '';
     }
 
-/** 2. 관리자 인증 (로직 단순화) **/
-function verifyAdminPassword() {
+async function verifyAdminPassword() {
     const inputPw = document.getElementById('adminPasswordInput').value;
-    
-    // index.html에서는 복잡한 체크 없이 바로 로그인 페이지로 이동시킵니다.
-    // 실제 보안 체크는 admin.html이나 login.html에 도달했을 때 수행됩니다.
+    const errorMsg = document.getElementById('adminErrorMsg');
+
     if (inputPw.length > 0) {
-        window.location.href = "admin/login.html"; 
+        // DB 조회를 하지 않고, 일단 로그인 페이지로 보냅니다.
+        // 실제 보안은 login.html과 그 이후 admin 페이지의 Auth 체크에서 담당합니다.
+        sessionStorage.setItem('admin_pre_auth', 'true');
+        window.location.href = "admin/login.html"; // 경로가 다를 경우 "login.html"로 수정
     } else {
         alert("Please enter password.");
     }
