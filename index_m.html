@@ -251,31 +251,45 @@ async function verifyAdminPassword() {
         .interactive-certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 20px; }
         .cert-link img { width: 100%; height: auto; border-radius: 4px; }
 
-/* 수정: 오버레이가 슬라이드보다는 위, 콘텐츠보다는 아래에 위치 */
-.video-overlay { 
-    position: absolute; 
-    inset: 0; 
-    background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%); 
-    z-index: 2; /* 슬라이드(1)보다 높게 */
-}
-
-.hero-content { 
-    position: relative; 
-    z-index: 10; /* 모든 배경 요소보다 위 */
-    width: 100%; 
-    padding: 0 32px; 
-}
-
-/* 슬라이드 기본 z-index 설정 */
+/* [수정] 배경 슬라이드: 모바일 화면 중앙 최적화 및 효과 수정 */
 .bg-slide {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center center; /* 이미지를 항상 중앙에 배치 */
+    background-repeat: no-repeat;
+    opacity: 0;
+    filter: brightness(0.35) contrast(1.1) blur(4px);
+    
+    /* 효과 수정: 아래에서 위가 아닌, 중앙에서 살짝 커지며 나타나도록 변경 */
+    clip-path: circle(0% at 50% 50%); 
+    transform: scale(1.15); 
+    
+    transition: 
+        opacity 2.5s ease-in-out, 
+        clip-path 3s cubic-bezier(0.25, 1, 0.5, 1), 
+        transform 10s linear, 
+        filter 3s ease-in-out;
     z-index: 1;
-    /* ...기존 transition 속성들... */
 }
 
+/* 활성화 상태: 중앙에서 원형으로 퍼지며 선명해짐 */
 .bg-slide.active {
-    z-index: 3; /* 활성화 시 오버레이(2) 위로 일시적으로 올라와 선명하게 보임 */
+    opacity: 1;
+    clip-path: circle(100% at 50% 50%);
+    transform: scale(1.03);
+    filter: brightness(0.35) contrast(1.1) blur(0px);
+    z-index: 3;
+}
+
+/* 퇴장 상태: 잔잔하게 사라짐 */
+.bg-slide.exit {
+    opacity: 0;
+    transform: scale(1.05);
+    filter: blur(8px);
+    transition: opacity 3s ease-in-out, transform 3s ease-in-out, filter 3s ease-in-out;
 }
 
     </style>
