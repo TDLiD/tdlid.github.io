@@ -273,15 +273,21 @@ async function verifyAdminPassword() {
     .interactive-certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; }
     .cert-link img { width: 100%; height: auto; border-radius: 4px; }
 
-    /* 6. 배경 슬라이드 애니메이션 */
+ /* 6. 배경 슬라이드 애니메이션 (반응형 최적화) */
     .bg-slide {
-        position: absolute; inset: 0; width: 100%; height: 100%;
-        background-size: cover; /* 80% 대신 cover를 사용하여 기기 전체를 빈틈없이 채움 */
+        position: absolute; 
+        inset: 0; 
+        width: 100%; 
+        height: 100%;
+        /* background-size: cover를 통해 가로/세로 어느 쪽이든 빈틈없이 채움 */
+        background-size: cover; 
         background-repeat: no-repeat;
-        background-position: center; 
-        opacity: 0; filter: brightness(0.35) contrast(1.1) blur(10px);
+        background-position: center center;  
+        opacity: 0; 
+        filter: brightness(0.35) contrast(1.1) blur(10px);
         clip-path: inset(0 100% 0 0);
-        transform: scale(1.1); 
+        /* 이미지가 너무 커 보이지 않도록 기본 스케일 조정 */
+        transform: scale(1.05); 
         transition: 
             opacity 2s ease-in-out, 
             clip-path 2.5s cubic-bezier(0.645, 0.045, 0.355, 1.000),
@@ -290,21 +296,32 @@ async function verifyAdminPassword() {
         z-index: 1;
     }
 
+    /* 가로 모드이거나 화면 높이가 낮은 경우 배경 위치를 약간 위로 조정 (인물/제품 중심) */
+    @media (orientation: landscape) and (max-height: 500px) {
+        .bg-slide {
+            background-position: center 30%; 
+        }
+    }
+
     .bg-slide.active {
-        opacity: 1; clip-path: inset(0 0 0 0);
-        transform: scale(1.02);
+        opacity: 1; 
+        clip-path: inset(0 0 0 0);
+        transform: scale(1.0); /* 서서히 줌아웃되는 효과 */
         filter: brightness(0.35) contrast(1.1) blur(0px);
         z-index: 3;
     }
 
     .bg-slide.exit {
-        opacity: 0; clip-path: inset(0 0 0 100%);
-        transform: scale(1.05);
+        opacity: 0; 
+        clip-path: inset(0 0 0 100%);
+        transform: scale(1.02) translateX(-10px);
         filter: blur(10px);
         transition: opacity 2.5s ease-in-out, clip-path 2.5s ease-in-out, transform 3s ease-in-out, filter 2.5s ease-in-out;
     }
 
     body, .hero-section, .video-bg-container, .bg-slide { background-color: #000000 !important; }
+
+
 </style>
 
 
