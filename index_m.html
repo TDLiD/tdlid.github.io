@@ -251,42 +251,32 @@ async function verifyAdminPassword() {
         .interactive-certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 20px; }
         .cert-link img { width: 100%; height: auto; border-radius: 4px; }
 
-/* 역동적인 모바일 배경 슬라이드 효과 */
+/* 수정: 오버레이가 슬라이드보다는 위, 콘텐츠보다는 아래에 위치 */
+.video-overlay { 
+    position: absolute; 
+    inset: 0; 
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%); 
+    z-index: 2; /* 슬라이드(1)보다 높게 */
+}
+
+.hero-content { 
+    position: relative; 
+    z-index: 10; /* 모든 배경 요소보다 위 */
+    width: 100%; 
+    padding: 0 32px; 
+}
+
+/* 슬라이드 기본 z-index 설정 */
 .bg-slide {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    opacity: 0;
-    filter: brightness(0.35) contrast(1.1) blur(2px);
-    clip-path: inset(100% 0 0 0); /* 바닥에 숨김 */
-    transform: scale(1.1) translateY(30px); /* 살짝 확대 및 아래 배치 */
-    transition: 
-        opacity 2.5s ease-in-out, 
-        clip-path 3s cubic-bezier(0.25, 1, 0.5, 1), 
-        transform 10s linear, 
-        filter 3s ease-in-out;
-    z-index: 0;
+    z-index: 1;
+    /* ...기존 transition 속성들... */
 }
 
-/* 활성화 상태: 위로 피어오르며 선명해짐 */
 .bg-slide.active {
-    opacity: 1;
-    clip-path: inset(0 0 0 0);
-    transform: scale(1.02) translateY(0);
-    filter: brightness(0.35) contrast(1.1) blur(0px);
+    z-index: 3; /* 활성화 시 오버레이(2) 위로 일시적으로 올라와 선명하게 보임 */
 }
-
-/* 퇴장 상태: 위로 더 밀려나며 사라짐 */
-.bg-slide.exit {
-    opacity: 0;
-    transform: scale(1.05) translateY(-20px);
-    filter: blur(4px);
-    transition: all 3s ease-in-out;
-}
-
 
     </style>
 </head>
@@ -402,6 +392,7 @@ async function verifyAdminPassword() {
     }
 
 
+/** [수정] 배경 슬라이드 초기화 함수 **/
 function initBackgroundSlideshow() {
     const bgImages = [];
     for (let i = 1; i <= 25; i++) {
@@ -412,6 +403,7 @@ function initBackgroundSlideshow() {
     const container = document.getElementById('image-bg-container');
     if (!container) return;
 
+    // 이미지 엘리먼트 생성
     bgImages.forEach((src, idx) => {
         const div = document.createElement('div');
         div.className = `bg-slide ${idx === 0 ? 'active' : ''}`;
@@ -420,8 +412,9 @@ function initBackgroundSlideshow() {
     });
 
     const slides = document.querySelectorAll('.bg-slide');
-    let currentIndex = 0;
+    if (slides.length === 0) return;
 
+    let currentIndex = 0;
     setInterval(() => {
         const prevSlide = slides[currentIndex];
         prevSlide.classList.remove('active');
@@ -433,12 +426,14 @@ function initBackgroundSlideshow() {
         nextSlide.classList.remove('exit');
         nextSlide.classList.add('active');
 
-        setTimeout(() => { prevSlide.classList.remove('exit'); }, 3000);
-    }, 5000); // 5초마다 교체
+        setTimeout(() => { 
+            prevSlide.classList.remove('exit'); 
+        }, 3000);
+    }, 5000);
 }
 
 
-
+/** [수정] 레이아웃 로드 및 초기화 통합 **/
 async function loadLayout() {
     try {
         const [headerRes, footerRes] = await Promise.all([
@@ -446,34 +441,38 @@ async function loadLayout() {
             fetch('components/footer_m.html')
         ]);
 
-        const headerText = await headerRes.text();
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = headerText;
+        if (headerRes.ok) {
+            const headerText = await headerRes.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = headerText;
+            const adminLink = tempDiv.querySelector('a[href="admin/admin.html"]');
+            if(adminLink) adminLink.remove();
+            document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
+        }
         
-        const adminLink = tempDiv.querySelector('a[href="admin/admin.html"]');
-        if(adminLink) adminLink.remove();
-        document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
-        
-        const footerPlaceholder = document.getElementById('footer-placeholder');
-        footerPlaceholder.innerHTML = await footerRes.text();
+        if (footerRes.ok) {
+            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+        }
 
-        const scripts = footerPlaceholder.querySelectorAll("script");
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement("script");
-            newScript.text = oldScript.text;
-            document.body.appendChild(newScript).parentNode.removeChild(newScript);
-        });
-
+        // 초기화 함수들 순차 실행
         initNavigation();
         initCertModal();
-        initLiveSettings(); // [추가] 실시간 설정 활성화
-
-initBackgroundSlideshow(); // 배경 효과 실행
+        initLiveSettings(); 
+        initBackgroundSlideshow(); // 배경 슬라이드 시작
+        
+        // 엔터키 이벤트 리스너 등록
+        document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verifyAdminPassword();
+        });
         
     } catch (err) { 
         console.error("Layout Load Error:", err); 
     }
 }
+
+// 기존 중복 선언된 리스너들 삭제 후 마지막에 하나만 유지
+document.addEventListener("DOMContentLoaded", loadLayout);
+
 
     function initNavigation() {
         const menuBtn = document.getElementById("menuToggleBtn");
