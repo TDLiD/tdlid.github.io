@@ -1,512 +1,148 @@
 /* --------------------------------------------
-   GLOBAL VARIABLE: Header logo/subtitle controls
+   1. GLOBAL VARIABLES & RESET
    -------------------------------------------- */
 :root {
-    /* 모바일 기본 크기 (축소) */
-    --header-logo-font-size: 4rem; 
+    /* 모바일 최적화 폰트 크기 */
+    --header-logo-font-size: clamp(2.2rem, 12vw, 4rem); 
     --header-logo-font-weight: 900;
     --header-subtitle-font-size: 1.1rem;
     --header-subtitle-font-weight: 800;
+    --primary-cyan: #22d3ee;
 }
 
-/* 기존 내용은 그대로 (파일 상단에서 유지) */
-/* 아래는 새로 추가 / 덮어쓰기 되는 스타일 섹션입니다 */
-
-/* CTA primary/secondary */
-.cta-primary { 
-    background: linear-gradient(90deg, #06b6d4, #7c3aed); 
-    color: #020617; 
-}
-.cta-secondary { 
-    background: transparent; 
-    border: 1px solid rgba(255,255,255,0.06); 
-    color: #e6eef8; 
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #050505;
+    color: #f8fafc;
 }
 
-/* Sticky CTA bar visibility */
-#stickyCTABar.hidden { 
-    display: none; 
+/* --------------------------------------------
+   2. HERO SECTION (메인 상단)
+   -------------------------------------------- */
+.hero-section {
+    position: relative;
+    height: 100svh; /* Mobile viewport height fix */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
 
-/* Modal base */
+.hero-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    padding: 0 24px;
+    text-align: center;
+    pointer-events: auto; /* 클릭 가능하게 수정 */
+}
+
+/* [핵심 수정] TDLiD 로고 가독성 강화 */
+.hero-logo-gradient {
+    font-family: "Arial Black", "Impact", "Segoe UI Black", sans-serif;
+    font-size: var(--header-logo-font-size) !important;
+    font-weight: var(--header-logo-font-weight);
+    letter-spacing: 0.15em !important; /* 자간 축소로 화면 이탈 방지 */
+    line-height: 1.1;
+    margin-bottom: 12px;
+    
+    background: linear-gradient(90deg, #0a1f44, #1e40af, #22d3ee, #4ade80, #00140c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.3));
+    text-shadow: 0 0 16px rgba(37, 99, 235, 0.2);
+}
+
+/* [핵심 수정] 서브 슬로건 반응형 크기 */
+.hero-slogan-gradient {
+    font-family: "Arial Black", "Impact", "Segoe UI Black", sans-serif;
+    font-size: clamp(1rem, 5.5vw, 1.4rem) !important;
+    font-weight: 800;
+    letter-spacing: 0.2em !important;
+    margin-top: 8px;
+    margin-bottom: 40px;
+    
+    background: linear-gradient(90deg, #1e40af, #22d3ee, #4ade80);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#heroIntroText {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    max-width: 90%;
+    margin: 0 auto;
+}
+
+/* --------------------------------------------
+   3. COMPONENTS & MODALS
+   -------------------------------------------- */
+/* 모달 공통 */
 #compareModal, #quoteModal, #newsModal {
     display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0,0,0,0.9);
     align-items: center;
     justify-content: center;
 }
 
-/* NEW: News Modal Scrollbar */
-/* Customize for Webkit browsers (Chrome, Safari) */
-#newsList::-webkit-scrollbar {
-    width: 8px;
-}
-#newsList::-webkit-scrollbar-track {
-    background: #0a0a0a;
-    border-radius: 10px;
-}
-#newsList::-webkit-scrollbar-thumb {
-    background: #0f172a; /* neutral-900 */
-    border-radius: 10px;
-    border: 2px solid #0a0a0a; /* Add border for inner color effect */
-}
+#compareModal.show, #quoteModal.show { display: flex; }
 
-#compareModal.show, #quoteModal.show {
-    display: flex;
-}
+/* 뉴스 리스트 스크롤바 */
+#newsList::-webkit-scrollbar { width: 4px; }
+#newsList::-webkit-scrollbar-thumb { background: var(--primary-cyan); border-radius: 10px; }
 
-/* Compare table */
-#compareTableContainer table {
-    width: 100%;
-    border-collapse: collapse;
-}
-#compareTableContainer th, #compareTableContainer td {
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 12px;
-    text-align: left;
-}
+/* CTA Buttons */
+.cta-primary { background: linear-gradient(90deg, #06b6d4, #7c3aed); color: #020617; font-weight: bold; }
+.cta-secondary { border: 1px solid rgba(255,255,255,0.1); color: #e6eef8; }
 
-/* Product card tweaks */
-.product-datasheet {
-    display: inline-block;
-    margin-right: 8px;
-    font-size: 0.85rem;
-}
-
-/* 태블릿 및 데스크톱 크기 (확대) */
-@media (min-width: 1024px) {
-    :root {
-        --header-logo-font-size: 9.2rem;
-        --header-subtitle-font-size: 1.50rem;
-    }
-}
-
-/* 이미지 카드 호버 효과 모바일 제외 */
+/* --------------------------------------------
+   4. INTERACTIVE & ANIMATIONS
+   -------------------------------------------- */
+/* 이미지 카드 호버 - 모바일은 터치 시에만 가볍게 확대 */
+.image-card img { transition: transform 0.4s ease; }
 @media (hover: hover) {
-    .image-card:hover img {
-        transform: scale(1.2); /* 모바일에서는 터치 시 화면을 너무 가리지 않게 축소 */
-    }
+    .image-card:hover img { transform: scale(1.1); }
 }
 
-/* Focus */
-button:focus, a:focus, input:focus, textarea:focus {
-    outline: 3px solid rgba(34,211,238,0.18);
-    outline-offset: 2px;
+/* 히어로 텍스트 진입 애니메이션 */
+.hero-slogan-gradient, #heroIntroText {
+    animation: heroTextIn 1s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+.hero-slogan-gradient { animation-delay: 0.3s; }
+#heroIntroText { animation-delay: 0.5s; }
+
+@keyframes heroTextIn {
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Hero text animation */
-.hero-slogan-gradient,
-#heroIntroText { 
-    animation: heroTextIn 1s ease forwards; 
-    opacity: 0; 
-    transform: translateY(24px); 
-}
-.hero-slogan-gradient { animation-delay: .25s; }
-#heroIntroText { animation-delay: .5s; }
+/* --------------------------------------------
+   5. MOBILE UI OPTIMIZATION
+   -------------------------------------------- */
+/* 불필요한 데스크톱 효과 제거 */
+#cursor-spotlight { display: none !important; } /* 모바일에서는 마우스가 없으므로 제거 */
 
-@keyframes heroTextIn { 
-    to { opacity: 1; transform: translateY(0); } 
-}
-
-/* Logos row */
-#trust img { object-fit: contain; }
-
-/* product grid optimization */
-#productGrid img { 
-    width: 100%; 
-    height: auto; 
-    display: block; 
+/* 푸터 공간 최적화 */
+footer {
+    padding: 1.5rem 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    background: #0a0a0a;
 }
 
-.hero-section {
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;     /* 🔥 핵심: 세로 중앙 */
-    padding-top: 0;          /* 기존 padding-top 제거 */
-}
-
-.hero-video { 
-    position: absolute; 
-    inset: 0; 
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
-    z-index: 0; 
-    filter: brightness(0.45) blur(1.6px); 
-    transform: scale(1.05); 
-    pointer-events: none;
-
-}
-.hero-content { 
-    position: relative; 
-    z-index: 2; 
-    padding: 2.5rem 2.5rem 0; /* 👈 하단 패딩(2.5rem)을 0으로 줄입니다. */
-    border-radius: 20px; 
-    background: transparent; /* 수정: 배경색 제거 */
-    backdrop-filter: none;   /* 수정: 블러 효과 제거 */
-    pointer-events: none;
-/* 👈 이 줄을 추가합니다. */
-    text-align: center;     /* 텍스트 중앙 */
-
-}
-
-/* WA btn */
-#waBtn { transition: transform .12s ease; }
-#waBtn:active { transform: scale(.98); }
-
-/* file link helper */
-a.fileLink { 
-    color: #86efac; 
-    text-decoration: underline; 
-}
-
-/* Product cards */
-#productGrid > div { 
-    transition: transform .45s cubic-bezier(.19,1,.22,1), box-shadow .45s; 
-}
-
-/* Modals */
-#compareModal { z-index: 9999; }
-#quoteModal { z-index: 10000; }
-
-/* ============================================
-   HERO MAIN LOGO — TDLiD (NO MORE CARBON 동일 스타일)
-   ============================================ */
-.hero-logo-gradient {
-    font-family: "Arial Black", "Impact", "Segoe UI Black", sans-serif;
-    font-size: var(--header-logo-font-size);   /* <<<<<<<<< 핵심 변경 */
-    font-weight: var(--header-logo-font-weight); /* <<<<<< 핵심 변경 */
-    letter-spacing: 0.38em;
-    text-align: center;
-    line-height: 1;
-
-    background: linear-gradient(
-        90deg,
-        #0a1f44,
-        #1e40af,
-        #22d3ee,
-        #4ade80,
-        #00140c
-    );
-
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-
-    filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.35));
-    text-shadow:
-        0 0 16px rgba(37, 99, 235, 0.35),
-        0 0 32px rgba(134, 239, 172, 0.22);
-
-    margin-bottom: 18px;
-}
-
-/* ============================================
-   HERO SUB SLOGAN — NO MORE CARBON
-   ============================================ */
-.hero-slogan-gradient {
-    font-family: "Arial Black", "Impact", "Segoe UI Black", sans-serif;
-    font-size: clamp(1.9rem, 2.5vw, 2.6rem);
-    font-weight: 900;
-    letter-spacing: 0.38em;
-    text-align: center;
-
-    background: linear-gradient(
-        90deg,
-        #0a1f44,
-        #1e40af,
-        #22d3ee,
-        #4ade80,
-        #00140c
-    );
-
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-
-    filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.35));
-    text-shadow:
-        0 0 16px rgba(37, 99, 235, 0.35),
-        0 0 32px rgba(134, 239, 172, 0.22);
-
-    margin-top: 14px;
-    margin-bottom: 64px;
-}
-
-/* ============================================
-   HEADER SUBTITLE — "TDL ENERGY INDONESIA"
-   ============================================ */
-.header-subtitle {
-    font-size: var(--header-subtitle-font-size);       /* <<<<<< 추가됨 */
-    font-weight: var(--header-subtitle-font-weight);   /* <<<<<< 추가됨 */
-    color: #e5e7eb;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    display: block;
-    margin-top: 4px;
-}
-
-
-.animated-logo-text { /* <--- 변경: .header-subtitle 대신 이 클래스를 사용하도록 수정 */
-    font-size: var(--header-subtitle-font-size);
-    font-weight: var(--header-subtitle-font-weight);
-    color: #e5e7eb;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    display: block;
-    margin-top: 4px;
-}
-
-/* (기존 .header-subtitle 정의는 삭제하거나 주석 처리합니다.) */
-
-/* Header logo image */
-.header-logo {
-    height: 70px;
-    width: auto;
-}
-
-/* hover invert effect */
-.invert-on-hover {
-    position: relative;
-    transition: color 0.2s ease;
-}
-.invert-active {
-    color: #000 !important;
-    mix-blend-mode: difference;
-}
-
-/* Hero 섹션 소개 텍스트 폰트 크기 조정 */
-#heroIntroText {
-    font-size: 1.5rem; /* 원하는 크기로 변경 */
-    line-height: 1.6;
-}
-
-
-
-
-/* ===== HEADER TITLE CONTROL (force override) ===== */
-
-.animated-logo-text {
-    font-size: var(--header-subtitle-font-size, 2rem) !important;
-    font-weight: var(--header-subtitle-font-weight, 700) !important;
-    display: inline-flex;
-    gap: 2px;
-}
-
-/* 알파벳 별 색상 */
-.animated-logo-text span:nth-child(1) { color: #3b82f6; } /* T - 파란색 */
-.animated-logo-text span:nth-child(2) { color: #38bdf8; } /* D - 하늘색 */
-.animated-logo-text span:nth-child(3) { color: #22d3ee; } /* L */
-.animated-logo-text span:nth-child(4) { color: #2dd4bf; } /* space or E */
-.animated-logo-text span:last-child   { color: #4ade80; } /* 마지막 글자 D - 밝은 녹색 */
-
-
-/* Desktop Menu Hover Line */
-.nav-link {
-    position: relative;
-    font-weight: 500;
-}
-
-.nav-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -6px;
-    width: 0%;
-    height: 2px;
-    background: #22d3ee;
-    transition: 0.3s ease;
-}
-
-.nav-link:hover::after {
-    width: 100%;
-}
-
-/* Mobile menu animation */
-#mobileMenu {
-    animation: fadeInMenu 0.25s ease-in-out;
-}
-
-@keyframes fadeInMenu {
-    from { opacity: 0; transform: scale(0.98); }
-    to   { opacity: 1; transform: scale(1); }
-}
-
-/* ================================
-   CURSOR SPOTLIGHT EFFECT
-================================ */
-#cursor-spotlight {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 420px;
-    height: 420px;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-
-    background: radial-gradient(
-        circle at center,
-        rgba(34,211,238,0.18) 0%,
-        rgba(34,211,238,0.12) 25%,
-        rgba(34,211,238,0.06) 45%,
-        rgba(34,211,238,0.02) 60%,
-        rgba(0,0,0,0) 70%
-    );
-
-    filter: blur(25px);
-    transform: translate(-50%, -50%);
-    transition: transform 0.04s linear;
-    mix-blend-mode: screen; /* 밝기 반전 느낌 */
-}
-
-/* 모든 이미지 확대 효과 */
-/* 기본 상태: 원본 크기 유지 */
-.zoom-hover img {
-    transition: transform 1.2s ease;
-    transform: scale(1);
-}
-
-/* hover 시에만 확대 */
-.zoom-hover:hover img {
-    transform: scale(1.25);
-}
-
-#imageModal .modal-content-cert {
-    width: 90%; /* 모바일 대응 */
-    max-width: 1000px; /* 데스크톱 최대 사이즈 */
-}
-
-
-
-
-/* 🌟 FIX: Re-enable interaction for certification images inside the non-interactive .hero-content */
-.interactive-certs {
-    pointer-events: auto; /* .hero-content의 'pointer-events: none;'를 재정의하여 클릭 이벤트 활성화 */
+/* 이미지 모달 */
+#imageModal {
+    z-index: 20000;
+    background: rgba(0,0,0,0.95);
 }
 
 .cert-link {
-    cursor: pointer; /* 마우스 오버 시 손바닥 모양 커서 표시 */
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
-
-/* ============================================
-   FIX: Image Modal Fixed Positioning Override
-   ============================================ */
-#imageModal {
-    /* HTML에 fixed inset-0가 있지만, 혹시 모를 간섭을 방지 */
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    align-items: center;
-    justify-content: center;
-}
-
-
-
-/* 인증 이미지 확대 효과를 위한 컨테이너 스타일 */
-.cert-zoom-wrapper {
-    /* h-20 크기를 기준으로 이미지의 확대가 다른 요소에 영향을 주지 않도록 숨김 처리 */
-    overflow: visible;  /* 👈 hidden을 visible로 변경 */
-    display: inline-block; 
-    cursor: pointer;
-    border-radius: 0.5rem; 
-    position: relative; /* 👈 z-index를 위해 position 설정 */
-    z-index: 1; /* 기본 z-index */
-    transition: z-index 0s 0.3s; /* 호버 종료 후 z-index가 바로 낮아지도록 transition 추가 */
-}
-
-/* 마우스 오버 시 컨테이너의 z-index를 높여서 이미지가 다른 요소 위에 표시되게 함 */
-.cert-zoom-wrapper:hover {
-    z-index: 10; 
-    transition: z-index 0s; /* 호버 시 z-index를 바로 높임 */
-}
-
-/* 마우스 오버 시 이미지 확대 */
-.cert-zoom-wrapper:hover img {
-    /* transform-transition-duration-300 (Tailwind)에 따라 0.3초 동안 부드럽게 1.1배 확대 */
-    transform: scale(1.1); 
-}
-
-.image-stage {
-    position: relative;
-    overflow: visible !important;
-}
-
-.image-card {
-    position: relative;
-    overflow: visible !important;
-    z-index: 1;
-}
-
-.image-card:hover {
-    z-index: 999;
-}
-
-.image-card img {
-    transition: transform 0.6s ease;
-}
-
-.image-card:hover img {
-    transform: scale(1.6);
-}
-
-/* main.css 파일 하단에 추가 */
-
-/* main.css 파일 수정 */
-
-footer {
-    padding: 1rem 0;  /* 세로 공간을 최소화 (기존 padding 10rem에서 1rem로 줄임) */
-}
-
-/* 전체 페이지를 flexbox로 설정하고 세로로 정렬 */
-body {
-    display: flex;
-    flex-direction: column; /* 세로 정렬 */
-    min-height: 100vh; /* 뷰포트 높이의 최소 100%를 차지 */
-}
-
-/* 본문 콘텐츠가 남은 공간을 차지하도록 flex-grow를 적용 */
-section {
-    flex-grow: 1; /* 본문 영역이 남은 세로 공간을 차지하도록 설정 */
-}
-
-/* 기존 hero-section, footer의 padding을 수정하여 본문이 늘어나게 만듬 */
-.hero-section {
-    padding-bottom: 4rem; /* 기존 padding보다 좁게 설정하여 공간 확보 */
-}
-
-footer {
-    padding: 1rem 0;  /* 세로 공간 최소화 */
-}
-
-/* 팝업 창 */
-.popup-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 90%;
-    max-height: 70%; /* 팝업 세로 크기 제한 */
-    overflow: hidden;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: none;  /* 팝업 기본적으로 숨김 */
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    z-index: 1000;
-}
-
-/* 팝업 이미지 */
-.popup-image {
-    max-height: 100%;  /* 팝업 창 내에서 이미지 세로 크기 조정 */
-    width: auto;  /* 비율에 맞게 이미지 가로 크기 자동 조정 */
-    object-fit: contain; /* 이미지 비율 유지 */
-}
-
-
-
