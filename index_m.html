@@ -251,45 +251,54 @@ async function verifyAdminPassword() {
         .interactive-certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 20px; }
         .cert-link img { width: 100%; height: auto; border-radius: 4px; }
 
-/* [수정] 배경 슬라이드: 모바일 화면 중앙 최적화 및 효과 수정 */
+/* [수정] 배경 슬라이드: 좌측에서 우측으로 밀려오는 파도 효과 */
 .bg-slide {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     background-size: cover;
-    background-position: center center; /* 이미지를 항상 중앙에 배치 */
+    background-position: center center;
     background-repeat: no-repeat;
     opacity: 0;
-    filter: brightness(0.35) contrast(1.1) blur(4px);
+    filter: brightness(0.35) contrast(1.1) blur(10px);
     
-    /* 효과 수정: 아래에서 위가 아닌, 중앙에서 살짝 커지며 나타나도록 변경 */
-    clip-path: circle(0% at 50% 50%); 
-    transform: scale(1.15); 
+    /* 시작 상태: 왼쪽 끝에 완전히 가려진 상태 (상 우 하 좌 순서) */
+    /* 왼쪽(좌측)에서 0% 지점까지만 보이게 설정 */
+    clip-path: inset(0 100% 0 0); 
+    
+    /* 효과를 극대화하기 위해 약간 오른쪽으로 치우친 상태에서 시작 */
+    transform: scale(1.1) translateX(20px); 
     
     transition: 
-        opacity 2.5s ease-in-out, 
-        clip-path 3s cubic-bezier(0.25, 1, 0.5, 1), 
-        transform 10s linear, 
-        filter 3s ease-in-out;
+        opacity 2s ease-in-out, 
+        clip-path 2.5s cubic-bezier(0.645, 0.045, 0.355, 1.000), /* 파도처럼 부드러운 가속도 */
+        transform 8s linear, 
+        filter 2.5s ease-in-out;
     z-index: 1;
 }
 
-/* 활성화 상태: 중앙에서 원형으로 퍼지며 선명해짐 */
+/* 활성화 상태: 좌측에서 우측으로 파도치듯 이미지가 드러남 */
 .bg-slide.active {
     opacity: 1;
-    clip-path: circle(100% at 50% 50%);
-    transform: scale(1.03);
+    clip-path: inset(0 0 0 0); /* 가려진 부분 없이 전체 노출 */
+    transform: scale(1.02) translateX(0);
     filter: brightness(0.35) contrast(1.1) blur(0px);
     z-index: 3;
 }
 
-/* 퇴장 상태: 잔잔하게 사라짐 */
+/* 퇴장 상태: 우측으로 살짝 밀려나며 잔잔하게 사라짐 */
 .bg-slide.exit {
     opacity: 0;
-    transform: scale(1.05);
-    filter: blur(8px);
-    transition: opacity 3s ease-in-out, transform 3s ease-in-out, filter 3s ease-in-out;
+    /* 사라질 때도 반대 방향(우측)으로 가려지며 파도 효과 유지 */
+    clip-path: inset(0 0 0 100%); 
+    transform: scale(1.05) translateX(-10px);
+    filter: blur(10px);
+    transition: 
+        opacity 2.5s ease-in-out, 
+        clip-path 2.5s ease-in-out, 
+        transform 3s ease-in-out, 
+        filter 2.5s ease-in-out;
 }
 
     </style>
