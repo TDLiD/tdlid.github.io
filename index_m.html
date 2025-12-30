@@ -213,7 +213,7 @@ async function verifyAdminPassword() {
 .hero-logo-gradient {
     /* 폰트 설정 */
     font-family: "Arial Black", "Impact", "Segoe UI Black", sans-serif;
-    font-size: 18vw; /* 모바일 전용 크기 유지 */
+    font-size: 8vw; /* 모바일 전용 크기 유지 */
     font-weight: 900;
     letter-spacing: 0.38em; /* 데스크탑과 동일한 자간 */
     text-align: center;
@@ -244,7 +244,7 @@ async function verifyAdminPassword() {
 }
 
 
-        .hero-slogan-gradient { font-size: 4vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); font-weight: 600; text-transform: uppercase; }
+        .hero-slogan-gradient { font-size: 8vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); font-weight: 600; text-transform: uppercase; }
         .hero-description { font-size: 15px; line-height: 1.7; margin-top: 40px; color: #cbd5e1; word-break: keep-all; }
         .partner-grid { display: flex; flex-wrap: wrap; gap: 30px; align-items: center; justify-content: center; opacity: 0.7; }
         .partner-grid img { height: 28px; width: auto; filter: grayscale(1); }
@@ -327,8 +327,8 @@ async function verifyAdminPassword() {
         </div>
 
     <div class="hero-content text-center">
-        <h1 class="hero-logo-gradient">TDLiD</h1>
-        <p class="hero-slogan-gradient">NO MORE CARBON</p>
+        <h1 class="hero-logo-gradient">NO MORE FOSSIL FUEL</h1>
+        <p class="hero-slogan-gradient">NO MORE PURCHASEMENT</p>
         <p class="hero-description">
             <span>TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
         </p>
@@ -419,7 +419,9 @@ async function verifyAdminPassword() {
 function initBackgroundSlideshow() {
     const bgImages = [];
     for (let i = 1; i <= 25; i++) {
-        const fileName = i < 10 ? `bg-0${i}.jpg` : `bg-${i}.jpg`;
+        /* const fileName = i < 10 ? `bg-0${i}.jpg` : `bg-${i}.jpg`; */
+        const fileName = i < 10 ? `bg-1.gif` : `bg-1.gif`;
+
         bgImages.push(`images/bg/${fileName}`);
     }
 
