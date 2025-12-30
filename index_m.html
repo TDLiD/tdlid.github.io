@@ -162,169 +162,60 @@ async function verifyAdminPassword() {
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/main_m.css">
+    <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<style>
-    /* 1. 글로벌 모바일 레이아웃 및 헤더 설정 */
-    #header-placeholder { position: fixed; top: 0; left: 0; width: 100%; z-index: 10001; }
-    .animated-logo-text-m { font-size: 3.8vw !important; white-space: nowrap; }
-    @media (max-width: 380px) { .animated-logo-text-m { font-size: 11px !important; } }
+    <style>
+        /* [추가] 실시간 공지/팝업 스타일 (모바일 최적화) */
+        #emergencyBanner { display: none; background: #ef4444; color: white; text-align: center; padding: 10px 15px; font-weight: bold; position: fixed; bottom: 0; width: 100%; z-index: 99999; font-size: 13px; line-height: 1.4; }
 
-    /* 2. 실시간 긴급 배너 및 팝업 (모바일 최적화) */
-    #emergencyBanner { 
-        display: none; background: #ef4444; color: white; text-align: center; 
-        padding: 10px 15px; font-weight: bold; position: fixed; bottom: 0; 
-        width: 100%; z-index: 99999; font-size: 13px; line-height: 1.4; 
-    }
 
-    #mainPopup, #adminAuthModal { 
-        display: none; position: fixed; inset: 0; z-index: 100000; 
-        align-items: center; justify-content: center; 
-    }
-    
-    #mainPopup { background: rgba(0,0,0,0.7); }
-    #adminAuthModal { background: rgba(0,0,0,0.8); }
 
-    .popup-box { 
-        background: #0a0a0a; border: 1px solid #22d3ee; padding: 30px 20px; 
-        border-radius: 20px; width: 100%; max-width: 320px; text-align: center; 
-    }
-
-    /* 3. 이미지 모달 및 뮤직 컨트롤 */
-    #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; display: none; }
-    #modalDetailImage { max-width: 90%; max-height: 70%; object-fit: contain; }
-    #musicToggleBtn { 
-        position: fixed; bottom: 20px; right: 20px; z-index: 10005; width: 48px; height: 48px; 
-        background: rgba(23, 23, 23, 0.9); border: 1.5px solid rgba(34, 211, 238, 0.6); 
-        border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-        color: #22d3ee; backdrop-filter: blur(8px); 
-    }
-
-    /* 4. 히어로 섹션 (Hero Section) - 모든 모바일 대응 개선 */
-    .hero-section { 
-        position: relative; 
-        width: 100%; 
-        min-height: 100svh; /* height를 min-height로 변경하여 내용이 많을 때 확장 허용 */
-        overflow: hidden; 
-        display: flex; 
-        flex-direction: column; /* 세로 정렬 보장 */
+/* 1. 메인 공지 팝업 수정 */
+    #mainPopup { 
+        display: none; 
+        position: fixed; 
+        inset: 0; 
+        /* 배경 투명도를 0.9에서 0.7로 낮추어 배경이 더 잘 보이게 하고, blur를 제거했습니다 */
+        background: rgba(0,0,0,0.7); 
+        z-index: 100000; 
         align-items: center; 
         justify-content: center; 
-        z-index: 1; 
-    }
-    .video-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-    .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.1); }
-    .video-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%); z-index: 1; }
-    .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 24px; text-align: center; }
-
-    /* [반응형 폰트] clamp를 사용하여 최소/최대 크기 제한 */
-    .hero-logo-gradient, 
-    .hero-slogan-gradient {
-        font-family: "Pretendard", sans-serif !important;
-        font-size: clamp(20px, 6.5vw, 36px) !important; /* 최소 20px, 가변 6.5vw, 최대 36px */
-        font-weight: 700 !important; 
-        letter-spacing: 0.2em !important; 
-        line-height: 1.3;
-        text-transform: uppercase;
-        text-align: center;
-        display: inline-block;
-        background: linear-gradient(90deg, #0a1f44, #1e40af, #22d3ee, #4ade80, #00140c);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        color: transparent;
-        filter: drop-shadow(0 0 5px rgba(34, 211, 238, 0.15)); 
+        /* backdrop-filter: blur(5px);  <-- 이 부분을 제거하여 배경을 선명하게 만듭니다 */
     }
 
-    .hero-logo-gradient { margin-bottom: 4px; }
-
-    .hero-description { 
-        font-size: clamp(14px, 4vw, 16px); 
-        line-height: 1.7; 
-        margin-top: clamp(40px, 10vh, 80px); /* 화면 높이에 따라 유연한 여백 */
-        color: #cbd5e1; 
-        word-break: keep-all; 
-        max-width: 90%;
-        margin-left: auto;
-        margin-right: auto;
+    /* 2. 관리자 인증 모달도 동일하게 수정 (선택 사항) */
+    #adminAuthModal {
+        /* 기존 backdrop-blur-sm 클래스 대신 선명한 배경 유지 */
+        background: rgba(0,0,0,0.8);
     }
 
-    /* --------------------------------------------
-       특수 환경 대응 (가로 모드 및 작은 화면)
-       -------------------------------------------- */
-    @media (max-height: 500px) {
-        .hero-section {
-            padding-top: 80px;
-            padding-bottom: 40px;
-        }
-        .hero-description { margin-top: 20px !important; }
-    }
 
-    @media (max-width: 360px) {
-        .hero-logo-gradient, .hero-slogan-gradient { letter-spacing: 0.1em !important; }
-    }
-
-    /* 5. 파트너 및 인증 이미지 섹션 */
-    .partner-grid { display: flex; flex-wrap: wrap; gap: clamp(15px, 5vw, 30px); align-items: center; justify-content: center; opacity: 0.7; }
-    .partner-grid img { height: clamp(20px, 5vw, 28px); width: auto; filter: grayscale(1); }
-    .interactive-certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; }
-    .cert-link img { width: 100%; height: auto; border-radius: 4px; }
-
- /* 6. 배경 슬라이드 애니메이션 (반응형 최적화) */
-    .bg-slide {
-        position: absolute; 
-        inset: 0; 
-        width: 100%; 
-        height: 100%;
-        /* background-size: cover를 통해 가로/세로 어느 쪽이든 빈틈없이 채움 */
-        background-size: cover; 
-        background-repeat: no-repeat;
-        background-position: center center;  
-        opacity: 0; 
-        filter: brightness(0.35) contrast(1.1) blur(10px);
-        clip-path: inset(0 100% 0 0);
-        /* 이미지가 너무 커 보이지 않도록 기본 스케일 조정 */
-        transform: scale(1.05); 
-        transition: 
-            opacity 2s ease-in-out, 
-            clip-path 2.5s cubic-bezier(0.645, 0.045, 0.355, 1.000),
-            transform 8s linear, 
-            filter 2.5s ease-in-out;
-        z-index: 1;
-    }
-
-    /* 가로 모드이거나 화면 높이가 낮은 경우 배경 위치를 약간 위로 조정 (인물/제품 중심) */
-    @media (orientation: landscape) and (max-height: 500px) {
-        .bg-slide {
-            background-position: center 30%; 
-        }
-    }
-
-    .bg-slide.active {
-        opacity: 1; 
-        clip-path: inset(0 0 0 0);
-        transform: scale(1.0); /* 서서히 줌아웃되는 효과 */
-        filter: brightness(0.35) contrast(1.1) blur(0px);
-        z-index: 3;
-    }
-
-    .bg-slide.exit {
-        opacity: 0; 
-        clip-path: inset(0 0 0 100%);
-        transform: scale(1.02) translateX(-10px);
-        filter: blur(10px);
-        transition: opacity 2.5s ease-in-out, clip-path 2.5s ease-in-out, transform 3s ease-in-out, filter 2.5s ease-in-out;
-    }
-
-    body, .hero-section, .video-bg-container, .bg-slide { background-color: #000000 !important; }
-
-
-</style>
-
-
+        .popup-box { background: #0a0a0a; border: 1px solid #22d3ee; padding: 30px 20px; border-radius: 20px; width: 100%; max-width: 320px; text-align: center; }
+        
+        /* 기존 스타일 */
+        #header-placeholder { position: fixed; top: 0; left: 0; width: 100%; z-index: 10001; }
+        .animated-logo-text-m { font-size: 3.8vw !important; white-space: nowrap; }
+        @media (max-width: 380px) { .animated-logo-text-m { font-size: 11px !important; } }
+        #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; display: none; }
+        #modalDetailImage { max-width: 90%; max-height: 70%; object-fit: contain; }
+        #musicToggleBtn { position: fixed; bottom: 20px; right: 20px; z-index: 10005; width: 48px; height: 48px; background: rgba(23, 23, 23, 0.9); border: 1.5px solid rgba(34, 211, 238, 0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #22d3ee; backdrop-filter: blur(8px); }
+        #triggerWord { color: inherit !important; font-weight: inherit !important; text-decoration: none !important; cursor: pointer !important; display: inline-block; position: relative; z-index: 50; -webkit-tap-highlight-color: transparent; pointer-events: auto !important; }
+        .hero-section { position: relative; width: 100%; height: 100svh; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 1; }
+        .video-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.1); }
+        .video-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%); z-index: 1; }
+        .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 32px; }
+        .hero-logo-gradient { font-size: 18vw; line-height: 1; margin-bottom: 8px; font-weight: 900; background: linear-gradient(to bottom, #fff, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-slogan-gradient { font-size: 4vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); font-weight: 600; text-transform: uppercase; }
+        .hero-description { font-size: 15px; line-height: 1.7; margin-top: 40px; color: #cbd5e1; word-break: keep-all; }
+        .partner-grid { display: flex; flex-wrap: wrap; gap: 30px; align-items: center; justify-content: center; opacity: 0.7; }
+        .partner-grid img { height: 28px; width: auto; filter: grayscale(1); }
+        .interactive-certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 20px; }
+        .cert-link img { width: 100%; height: auto; border-radius: 4px; }
+    </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
@@ -343,23 +234,22 @@ async function verifyAdminPassword() {
 <div id="header-placeholder"></div>
 
 <main class="flex-grow">
-
-  <section class="hero-section">
-    <div id="image-bg-container" class="video-bg-container">
-        <div class="video-overlay" style="z-index: 2;"></div> 
+    <section class="hero-section">
+        <div class="video-bg-container">
+            <div class="video-overlay"></div> 
+            <video autoplay loop muted playsinline poster="images/home/flag.webp" class="video-bg">
+                <source src="videos/battery17.mp4" type="video/mp4">
+            </video>
         </div>
 
-    <div class="hero-content text-center">
-        <h1 class="hero-logo-gradient">NO MORE FOSSIL FUEL</h1>
-
-        <p class="hero-slogan-gradient">NO MORE PURCHASEMENT</p>
-
-        <p class="hero-description">
-            <span>TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
-        </p>
-    </div>
-</section>
-
+        <div class="hero-content text-center">
+            <h1 class="hero-logo-gradient">TDLiD</h1>
+            <p class="hero-slogan-gradient">NO MORE CARBON</p>
+            <p class="hero-description">
+                <span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
+            </p>
+        </div>
+    </section>
     
     <section class="py-16 bg-neutral-900 border-y border-neutral-800">
         <div class="px-6 mb-16">
@@ -439,51 +329,6 @@ async function verifyAdminPassword() {
         }
     }
 
-
-/** [수정] 배경 슬라이드 초기화 함수 **/
-function initBackgroundSlideshow() {
-    const bgImages = [];
-    for (let i = 1; i <= 25; i++) {
-        /* const fileName = i < 10 ? `bg-0${i}.jpg` : `bg-${i}.jpg`; */
-        const fileName = i < 10 ? `bg-1.png` : `bg-1.png`;
-
-        bgImages.push(`images/bg/${fileName}`);
-    }
-
-    const container = document.getElementById('image-bg-container');
-    if (!container) return;
-
-    // 이미지 엘리먼트 생성
-    bgImages.forEach((src, idx) => {
-        const div = document.createElement('div');
-        div.className = `bg-slide ${idx === 0 ? 'active' : ''}`;
-        div.style.backgroundImage = `url('${src}')`;
-        container.appendChild(div);
-    });
-
-    const slides = document.querySelectorAll('.bg-slide');
-    if (slides.length === 0) return;
-
-    let currentIndex = 0;
-    setInterval(() => {
-        const prevSlide = slides[currentIndex];
-        prevSlide.classList.remove('active');
-        prevSlide.classList.add('exit');
-
-        currentIndex = (currentIndex + 1) % slides.length;
-
-        const nextSlide = slides[currentIndex];
-        nextSlide.classList.remove('exit');
-        nextSlide.classList.add('active');
-
-        setTimeout(() => { 
-            prevSlide.classList.remove('exit'); 
-        }, 3000);
-    }, 5000);
-}
-
-
-/** [수정] 레이아웃 로드 및 초기화 통합 **/
 async function loadLayout() {
     try {
         const [headerRes, footerRes] = await Promise.all([
@@ -491,38 +336,33 @@ async function loadLayout() {
             fetch('components/footer_m.html')
         ]);
 
-        if (headerRes.ok) {
-            const headerText = await headerRes.text();
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = headerText;
-            const adminLink = tempDiv.querySelector('a[href="admin/admin.html"]');
-            if(adminLink) adminLink.remove();
-            document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
-        }
+        const headerText = await headerRes.text();
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = headerText;
         
-        if (footerRes.ok) {
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
-        }
+        const adminLink = tempDiv.querySelector('a[href="admin/admin.html"]');
+        if(adminLink) adminLink.remove();
+        document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
+        
+        const footerPlaceholder = document.getElementById('footer-placeholder');
+        footerPlaceholder.innerHTML = await footerRes.text();
 
-        // 초기화 함수들 순차 실행
-        initNavigation();
-        initCertModal();
-        initLiveSettings(); 
-        initBackgroundSlideshow(); // 배경 슬라이드 시작
-        
-        // 엔터키 이벤트 리스너 등록
-        document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') verifyAdminPassword();
+        const scripts = footerPlaceholder.querySelectorAll("script");
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            newScript.text = oldScript.text;
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
         });
+
+        initNavigation();
+        initAdminTrigger(); 
+        initCertModal();
+        initLiveSettings(); // [추가] 실시간 설정 활성화
         
     } catch (err) { 
         console.error("Layout Load Error:", err); 
     }
 }
-
-// 기존 중복 선언된 리스너들 삭제 후 마지막에 하나만 유지
-document.addEventListener("DOMContentLoaded", loadLayout);
-
 
     function initNavigation() {
         const menuBtn = document.getElementById("menuToggleBtn");
@@ -542,6 +382,16 @@ document.addEventListener("DOMContentLoaded", loadLayout);
                     if(menuIcon) menuIcon.innerText = "☰";
                 }
             };
+        }
+    }
+
+    function initAdminTrigger() {
+        const triggerWord = document.getElementById('triggerWord');
+        if (triggerWord) {
+            triggerWord.addEventListener('click', (e) => {
+                e.preventDefault();
+                openAdminAuth(); 
+            });
         }
     }
 
