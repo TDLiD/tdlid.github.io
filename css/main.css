@@ -1,10 +1,6 @@
-@import url('fonts.css'); /* fonts.css 내용이 main.css에 합쳐짐 */
-
-
 /* --------------------------------------------
    GLOBAL VARIABLE: Header logo/subtitle controls
    -------------------------------------------- */
-
 :root {
     --header-logo-font-size: 9.2rem;       /* 상단 TDLiD 크기 */
     --header-logo-font-weight: 990;        /* 상단 TDLiD 두께 */
