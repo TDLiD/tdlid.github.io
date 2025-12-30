@@ -214,39 +214,37 @@ async function verifyAdminPassword() {
     .video-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%); z-index: 1; }
     .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 32px; text-align: center; }
 
-    /* [TDLiD 메인 로고 스타일] main.css와 통일 */
-/* 1번 라인(로고)을 2번 라인(슬로건)과 똑같은 스타일로 맞춤 */
+/* [TDLiD 메인 로고 스타일] 아래 슬로건의 작은 느낌에 맞춰 강제 조정 */
 .hero-logo-gradient {
-    /* 슬로건과 동일한 폰트 설정 */
-    font-family: "Pretendard", sans-serif; /* 폰트 일치 */
-    font-size: 6vw;                       /* 크기 일치 */
-    font-weight: 600;                     /* 두께 일치 (기존 900에서 하향) */
-    letter-spacing: 0.3em;                /* 자간 일치 (기존 0.38em에서 축소) */
+    font-family: "Pretendard", sans-serif; 
+    /* 아래 라인(슬로건)과 시각적 균형을 위해 로고 사이즈를 5.5vw로 살짝 더 낮춤 */
+    font-size: 5.5vw !important;         
+    font-weight: 600 !important;          /* 슬로건과 동일한 두께 */
+    letter-spacing: 0.3em !important;     /* 슬로건과 동일한 자간 */
     line-height: 1.2;
     text-transform: uppercase;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;                   /* 간격 살짝 좁힘 */
 
-    /* 그라데이션 효과는 유지하거나 슬로건처럼 단색으로 바꿀 수 있습니다 */
-    /* 아래는 기존 로고의 그라데이션을 유지하면서 스타일만 맞춘 설정입니다 */
+    /* 그라데이션 및 효과 */
     background: linear-gradient(90deg, #0a1f44, #1e40af, #22d3ee, #4ade80, #00140c);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
-    
-    /* 그림자 효과가 너무 강하면 아래 줄을 삭제하세요 */
-    filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.2)); 
+    filter: drop-shadow(0 0 5px rgba(34, 211, 238, 0.15)); 
 }
 
-/* 참고용: 기존 슬로건 설정 (변경 없음) */
+/* 아래 라인: 슬로건 설정 (기준점) */
 .hero-slogan-gradient { 
-    font-size: 6vw; 
-    letter-spacing: 0.3em; 
+    display: inline-block;
+    font-size: 5.5vw !important;          /* 로고와 동일하게 5.5vw로 통일 */
+    letter-spacing: 0.3em !important; 
     color: rgba(34, 211, 238, 0.8); 
-    font-weight: 600; 
+    font-weight: 600 !important; 
     text-transform: uppercase; 
 }
+
 
     .hero-description { font-size: 15px; line-height: 1.7; margin-top: 80px; color: #cbd5e1; word-break: keep-all; }
 
