@@ -243,7 +243,9 @@ async function verifyAdminPassword() {
     /* 6. 배경 슬라이드 애니메이션 (좌->우 파도 효과) */
     .bg-slide {
         position: absolute; inset: 0; width: 100%; height: 100%;
-        background-size: cover; background-position: center center; background-repeat: no-repeat;
+    background-size: 50%; /* 이미지가 화면의 80% 크기로 나옵니다 */
+    background-repeat: no-repeat; /* 이미지 반복 방지 */
+    background-position: center;  /* 중앙 정렬 */
         opacity: 0; filter: brightness(0.35) contrast(1.1) blur(10px);
         clip-path: inset(0 100% 0 0); /* 시작 시 좌측으로 가려짐 */
         transform: scale(1.1) translateX(20px); 
