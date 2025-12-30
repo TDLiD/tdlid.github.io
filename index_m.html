@@ -214,37 +214,33 @@ async function verifyAdminPassword() {
     .video-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%); z-index: 1; }
     .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 32px; text-align: center; }
 
-/* [TDLiD 메인 로고 스타일] 아래 슬로건의 작은 느낌에 맞춰 강제 조정 */
-.hero-logo-gradient {
-    font-family: "Pretendard", sans-serif; 
-    /* 아래 라인(슬로건)과 시각적 균형을 위해 로고 사이즈를 5.5vw로 살짝 더 낮춤 */
-    font-size: 5.5vw !important;         
-    font-weight: 600 !important;          /* 슬로건과 동일한 두께 */
-    letter-spacing: 0.3em !important;     /* 슬로건과 동일한 자간 */
+/* [공통 스타일] 두 라인 모두 동일한 폰트와 그라데이션 적용 */
+.hero-logo-gradient, 
+.hero-slogan-gradient {
+    font-family: "Pretendard", sans-serif !important;
+    font-size: 5vw !important;          /* 크기 통일 */
+    font-weight: 600 !important;        /* 두께 통일 */
+    letter-spacing: 0.3em !important;   /* 자간 통일 */
     line-height: 1.2;
     text-transform: uppercase;
     text-align: center;
-    margin-bottom: 8px;                   /* 간격 살짝 좁힘 */
+    display: inline-block;
 
-    /* 그라데이션 및 효과 */
+    /* 상단 라인 기준 그라데이션 동일 적용 */
     background: linear-gradient(90deg, #0a1f44, #1e40af, #22d3ee, #4ade80, #00140c);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
+    
+    /* 미세한 광채 효과 */
     filter: drop-shadow(0 0 5px rgba(34, 211, 238, 0.15)); 
 }
 
-/* 아래 라인: 슬로건 설정 (기준점) */
-.hero-slogan-gradient { 
-    display: inline-block;
-    font-size: 5.5vw !important;          /* 로고와 동일하게 5.5vw로 통일 */
-    letter-spacing: 0.3em !important; 
-    color: rgba(34, 211, 238, 0.8); 
-    font-weight: 600 !important; 
-    text-transform: uppercase; 
+/* 상단 라인 하단 간격만 별도 유지 */
+.hero-logo-gradient {
+    margin-bottom: 8px;
 }
-
 
     .hero-description { font-size: 15px; line-height: 1.7; margin-top: 80px; color: #cbd5e1; word-break: keep-all; }
 
