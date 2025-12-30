@@ -364,34 +364,31 @@ if (data) {
     z-index: 5; /* 슬라이드보다 높게 */
 }
 
-.bg-slide {
+/* 단일 배경 이미지 스타일 및 애니메이션 */
+.single-bg-effect {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    background-size: 50%; /* 이미지가 화면의 80% 크기로 나옵니다 */
-    background-repeat: no-repeat; /* 이미지 반복 방지 */
-    background-position: center;  /* 중앙 정렬 */
-    opacity: 0;
-    clip-path: inset(0 100% 0 0); 
-    transform: scale(1.1);
-    transition: opacity 1.5s ease-in-out, clip-path 2.5s cubic-bezier(0.65, 0, 0.35, 1), transform 12s linear;
-    z-index: 1; /* 기본값 */
-/* 아래 코드를 추가하세요 */
+    background-image: url('images/bg/bg-1.png'); /* 이미지 경로 */
+    background-size: 50%; /* 기존 설정 유지 */
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #000000;
+    filter: brightness(0.6); /* 이미지 밝기 조절 */
+    animation: pulseFade 8s ease-in-out infinite; /* 8초 주기로 무한 반복 */
+    z-index: 1;
 }
 
-.bg-slide.active {
-    opacity: 1;
-    clip-path: inset(0 0 0 0) !important;
-    transform: scale(1.0);
-    z-index: 3; /* 활성화 시 위로 */
+@keyframes pulseFade {
+    0% { opacity: 0; transform: scale(1.0); }   /* 어둠 속에서 시작 */
+    50% { opacity: 1; transform: scale(1.05); } /* 서서히 나타나며 살짝 커짐 */
+    100% { opacity: 0; transform: scale(1.1); }  /* 다시 서서히 사라짐 */
 }
 
-.bg-slide.exit {
-    opacity: 0;
-    clip-path: inset(0 0 0 100%);
-    z-index: 2; /* 나갈 때 중간 순위 */
-}
+/* 기존 슬라이더 관련 불필요한 클래스는 삭제해도 됩니다 */
+
+
 
 body, .hero-section, .video-bg-container, .bg-slide {
     background-color: #000000 !important;
@@ -572,43 +569,12 @@ async function loadLayout() {
     /** 4. 초기화 및 공통 기능 **/
 /** 4. 초기화 및 공통 기능 **/
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. 이미지 슬라이드 생성 로직
-    const bgImages = [];
-    for (let i = 1; i <= 25; i++) {
-       /* const fileName = i < 10 ? `bg-0${i}.jpg` : `bg-${i}.jpg`; */
-        const fileName = i < 10 ? `bg-1.png` : `bg-1.png`;
 
-        bgImages.push(`images/bg/${fileName}`);
-    }
-
+ // 1. 단일 배경 이미지 효과 적용
     const bgContainer = document.getElementById('image-bg-container');
     if (bgContainer) {
-        bgImages.forEach((src, idx) => {
-            const div = document.createElement('div');
-            div.className = `bg-slide ${idx === 0 ? 'active' : ''}`;
-            div.style.backgroundImage = `url('${src}')`;
-            bgContainer.appendChild(div);
-        });
-
-        const slides = document.querySelectorAll('.bg-slide');
-        let currentIndex = 0;
-
-        function waveTransition() {
-            const prevSlide = slides[currentIndex];
-            prevSlide.classList.remove('active');
-            prevSlide.classList.add('exit');
-
-            currentIndex = (currentIndex + 1) % slides.length;
-
-            const nextSlide = slides[currentIndex];
-            nextSlide.classList.remove('exit');
-            nextSlide.classList.add('active');
-
-            setTimeout(() => {
-                prevSlide.classList.remove('exit');
-            }, 2500);
-        }
-        setInterval(waveTransition, 5000);
+        // 기존 내용을 비우고 단일 효과 div 삽입
+        bgContainer.innerHTML = '<div class="single-bg-effect"></div><div class="video-overlay" style="z-index: 2;"></div>';
     }
 
     // 2. 인증 및 기타 함수 호출 (중괄호 누락 주의)
