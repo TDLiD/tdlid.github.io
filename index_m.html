@@ -242,6 +242,40 @@ async function verifyAdminPassword() {
     margin-bottom: 8px;
 }
 
+/* --------------------------------------------
+   가로 모드(Landscape) 대응 최적화
+   -------------------------------------------- */
+@media (max-height: 450px) and (orientation: landscape) {
+    .hero-section {
+        height: auto !important;      /* 높이를 고정하지 않고 콘텐츠에 맞춤 */
+        min-height: 120svh;           /* 최소 높이를 확보하여 스크롤 가능하게 함 */
+        padding-top: 80px;            /* 헤더에 가려지지 않도록 상단 여백 추가 */
+        padding-bottom: 40px;
+    }
+
+    .hero-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-logo-gradient, 
+    .hero-slogan-gradient {
+        font-size: 7vh !important;    /* 가로 모드에서는 높이(vh) 기준으로 폰트 크기 재설정 */
+        letter-spacing: 0.15em !important; /* 자간을 조금 줄여 가로 폭 확보 */
+    }
+
+    .hero-description {
+        margin-top: 30px !important;  /* 텍스트 간격 축소 */
+        font-size: 13px !important;
+        max-width: 80%;               /* 설명 문구 폭 제한 */
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+
     .hero-description { font-size: 15px; line-height: 1.7; margin-top: 80px; color: #cbd5e1; word-break: keep-all; }
 
     /* 5. 파트너 및 인증 이미지 섹션 */
