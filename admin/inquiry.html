@@ -17,9 +17,7 @@
             content: ''; position: absolute; bottom: -25px; left: 0; width: 100%; height: 2px;
             background: #22d3ee; box-shadow: 0 0 10px #22d3ee;
         }
-        /* 모달 애니메이션 */
         #detailModal { transition: opacity 0.3s ease, visibility 0.3s ease; }
-        /* [추가] 로딩 오버레이 스타일 */
         #authOverlay { position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
@@ -65,13 +63,11 @@
                             <th class="p-5 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="inquiryTableBody" class="divide-y divide-neutral-800 text-sm italic"></tbody>
+                    <tbody id="inquiryTableBody" class="divide-y divide-neutral-800 text-sm italic">
+                        <tr><td colspan="4" class="p-10 text-center text-neutral-600">Loading data...</td></tr>
+                    </tbody>
                 </table>
             </div>
-        </div>
-
-        <div class="mt-12 text-center">
-            <a href="../index.html" class="text-neutral-600 hover:text-cyan-400 text-xs transition">← Exit to Public Website</a>
         </div>
     </div>
 
@@ -83,37 +79,20 @@
             </div>
             <div class="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
                 <div class="grid grid-cols-2 gap-4 text-xs">
-                    <div>
-                        <p class="text-neutral-500 uppercase font-bold tracking-widest mb-1">Customer Name</p>
-                        <p id="modalName" class="text-lg text-white font-bold">-</p>
-                    </div>
+                    <div><p class="text-neutral-500 uppercase font-bold tracking-widest mb-1">Company</p><p id="modalName" class="text-lg text-white font-bold">-</p></div>
                     <div>
                         <p class="text-neutral-500 uppercase font-bold tracking-widest mb-1">Status</p>
                         <select id="modalStatus" class="bg-black border border-white/10 text-amber-400 rounded px-2 py-1 outline-none">
-                            <option value="false">NEW (Unread)</option>
+                            <option value="false">NEW</option>
                             <option value="processing">PROCESSING</option>
                             <option value="true">COMPLETED</option>
                         </select>
                     </div>
-                    <div>
-                        <p class="text-neutral-500 uppercase font-bold tracking-widest mb-1">Email</p>
-                        <p id="modalEmail" class="text-cyan-400">-</p>
-                    </div>
-                    <div>
-                        <p class="text-neutral-500 uppercase font-bold tracking-widest mb-1">Company</p>
-                        <p id="modalCompany" class="text-white">-</p>
-                    </div>
+                    <div><p class="text-neutral-500 uppercase font-bold tracking-widest mb-1">Email</p><p id="modalEmail" class="text-cyan-400">-</p></div>
+                    <div><p class="text-neutral-500 uppercase font-bold tracking-widest mb-1">Product</p><p id="modalCompany" class="text-white">-</p></div>
                 </div>
-                
-                <div class="bg-black/50 p-6 rounded-xl border border-white/5">
-                    <p class="text-neutral-500 text-[10px] uppercase font-bold tracking-widest mb-3 italic">Message Content</p>
-                    <div id="modalMessage" class="text-neutral-200 leading-relaxed whitespace-pre-wrap italic"></div>
-                </div>
-
-                <div class="space-y-2">
-                    <p class="text-neutral-500 text-[10px] uppercase font-bold tracking-widest italic">Admin Memo (Reply History)</p>
-                    <textarea id="modalMemo" class="w-full bg-black border border-white/10 rounded-xl p-4 text-sm text-neutral-300 outline-none focus:border-cyan-500 transition h-24" placeholder="Write internal memo or reply history here..."></textarea>
-                </div>
+                <div class="bg-black/50 p-6 rounded-xl border border-white/5"><div id="modalMessage" class="text-neutral-200 leading-relaxed whitespace-pre-wrap italic"></div></div>
+                <textarea id="modalMemo" class="w-full bg-black border border-white/10 rounded-xl p-4 text-sm text-neutral-300 outline-none h-24" placeholder="Admin Memo..."></textarea>
             </div>
             <div class="p-6 bg-white/5 border-t border-white/5 flex gap-3">
                 <button onclick="updateInquiry()" class="flex-grow bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl transition uppercase tracking-widest">Save Changes</button>
@@ -135,10 +114,9 @@
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const auth = firebase.auth(); // [추가] Auth 초기화
+        const auth = firebase.auth();
         let currentInquiryKey = null;
 
-        // [추가] 관리자 인증 체크 로직
         auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById('authOverlay').style.display = 'none';
@@ -148,34 +126,39 @@
             }
         });
 
-        // [추가] 로그아웃 함수
         function logout() {
             if(confirm("Do you want to logout?")) {
-                auth.signOut().then(() => {
-                    window.location.href = "login.html";
-                });
+                auth.signOut().then(() => { window.location.href = "login.html"; });
             }
         }
 
-        // 기존 데이터 로드 로직을 함수화
+        // [가장 중요한 수정] 경로를 'messages'로 지정
         function startInquiryLoad() {
             database.ref('messages').on('value', (snapshot) => {
                 const tbody = document.getElementById('inquiryTableBody');
+                if(!tbody) return;
+                
                 tbody.innerHTML = '';
                 let unread = 0;
                 let items = [];
-                snapshot.forEach(c => { 
+
+                if (!snapshot.exists()) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="p-20 text-center text-neutral-500 italic">No inquiries found in database.</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach(c => {
                     const d = c.val();
+                    // messages 폴더 안의 데이터이므로 바로 추가
                     if(d.read === false || d.read === undefined) unread++;
                     items.push({key: c.key, ...d});
                 });
-                
+
                 document.getElementById('unreadCount').innerText = unread + " NEW";
 
                 items.reverse().forEach(item => {
                     const isRead = item.read === true || item.read === "true";
                     const isProcessing = item.read === "processing";
-                    
                     let statusHtml = `<span class="text-amber-400 font-bold">● NEW</span>`;
                     if(isProcessing) statusHtml = `<span class="text-cyan-400 font-bold italic underline">PROCESSING</span>`;
                     else if(isRead) statusHtml = `<span class="text-neutral-600 font-bold uppercase tracking-widest">COMPLETED</span>`;
@@ -186,11 +169,11 @@
                     row.innerHTML = `
                         <td class="p-5 text-[10px]">${statusHtml}</td>
                         <td class="p-5">
-                            <div class="text-white font-bold">${item.name || 'N/A'}</div>
-                            <div class="text-[10px] text-neutral-500 font-mono">${item.date}</div>
+                            <div class="text-white font-bold">${item.company || 'N/A'}</div>
+                            <div class="text-[10px] text-neutral-500 font-mono">${item.date || '-'}</div>
                         </td>
                         <td class="p-5">
-                            <div class="text-cyan-400 font-bold text-sm">${item.company || '-'}</div>
+                            <div class="text-cyan-400 font-bold text-sm">${item.product || '-'}</div>
                             <div class="text-neutral-500 text-[10px] italic">${item.email || ''}</div>
                         </td>
                         <td class="p-5 text-right" onclick="event.stopPropagation()">
@@ -201,34 +184,12 @@
             });
         }
 
-        // (이하 모달 및 데이터 처리 함수 동일)
-        function openModal(item) {
-            currentInquiryKey = item.key;
-            document.getElementById('modalName').innerText = item.name || 'N/A';
-            document.getElementById('modalEmail').innerText = item.email || '-';
-            document.getElementById('modalCompany').innerText = item.company || '-';
-            document.getElementById('modalMessage').innerText = item.message || 'No message content.';
-            document.getElementById('modalStatus').value = item.read;
-            document.getElementById('modalMemo').value = item.adminMemo || '';
-            
-            const modal = document.getElementById('detailModal');
-            modal.classList.remove('invisible', 'opacity-0');
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('detailModal');
-            modal.classList.add('invisible', 'opacity-0');
-            currentInquiryKey = null;
-        }
-
+        // 업데이트 및 삭제 경로도 'messages/'로 수정
         async function updateInquiry() {
             if(!currentInquiryKey) return;
             const status = document.getElementById('modalStatus').value;
             const memo = document.getElementById('modalMemo').value;
-
-            let valToSave = status;
-            if(status === "true") valToSave = true;
-            if(status === "false") valToSave = false;
+            let valToSave = status === "true" ? true : (status === "false" ? false : status);
 
             try {
                 await database.ref('messages/' + currentInquiryKey).update({
@@ -237,15 +198,28 @@
                 });
                 alert("Updated Successfully");
                 closeModal();
-            } catch (e) {
-                alert("Error: " + e.message);
-            }
+            } catch (e) { alert("Error: " + e.message); }
         }
 
         function deleteMsg(key) { 
-            if(confirm("Are you sure you want to delete this inquiry?")) {
+            if(confirm("Are you sure?")) {
                 database.ref('messages/' + key).remove();
             }
+        }
+
+        function openModal(item) {
+            currentInquiryKey = item.key;
+            document.getElementById('modalName').innerText = item.company || 'N/A';
+            document.getElementById('modalEmail').innerText = item.email || '-';
+            document.getElementById('modalCompany').innerText = item.product || '-';
+            document.getElementById('modalMessage').innerText = item.details || '';
+            document.getElementById('modalStatus').value = (item.read === true || item.read === "true") ? "true" : (item.read === "processing" ? "processing" : "false");
+            document.getElementById('modalMemo').value = item.adminMemo || '';
+            document.getElementById('detailModal').classList.remove('invisible', 'opacity-0');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('invisible', 'opacity-0');
         }
     </script>
 </body>
