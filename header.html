@@ -1,0 +1,255 @@
+<style>
+    /* 1. 상/하 라인 강조형 오픈 3D 헤더 */
+    .glass-header {
+        background: rgba(2, 6, 23, 0.75) !important;
+        backdrop-filter: blur(15px) saturate(180%);
+        -webkit-backdrop-filter: blur(15px) saturate(180%);
+        border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-bottom: 1px solid rgba(34, 211, 238, 0.2) !important;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        transition: all 0.3s ease;
+    }
+
+    /* 하단 네온 장식 라인 */
+    .header-frame-deco {
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, rgba(34, 211, 238, 0.8) 50%, transparent 100%);
+        width: 100%;
+        opacity: 0.7;
+    }
+
+    /* 로고 애니메이션 */
+    .animated-logo-text {
+        letter-spacing: 0.15em;
+        background: linear-gradient(90deg, #fff, #22d3ee, #fff);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shine 3s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+
+    /* 메뉴 순차 등장 애니메이션 */
+    @keyframes zoomInEntrance {
+        from {
+            opacity: 0;
+            transform: scale(1.5) translateY(-10px);
+            filter: blur(5px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            filter: blur(0);
+        }
+    }
+
+    /* 초기 상태 숨김 처리 및 애니메이션 */
+    #main-nav li, .nav-btn-container {
+        opacity: 0;
+        animation: zoomInEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    /* 순차적 지연 시간 */
+    #main-nav li:nth-child(1) { animation-delay: 0.1s; }
+    #main-nav li:nth-child(2) { animation-delay: 0.2s; }
+    #main-nav li:nth-child(3) { animation-delay: 0.3s; }
+    #main-nav li:nth-child(4) { animation-delay: 0.4s; }
+    #main-nav li:nth-child(5) { animation-delay: 0.5s; }
+    #main-nav li:nth-child(6) { animation-delay: 0.6s; }
+    #main-nav li:nth-child(7) { animation-delay: 0.7s; }
+    #main-nav li:nth-child(8) { animation-delay: 0.8s; } /* Admin */
+    .nav-btn-container { animation-delay: 0.9s; }
+
+    .nav-link {
+        position: relative;
+        color: #94a3b8;
+        transition: all 0.3s ease;
+        padding: 4px 0;
+        white-space: nowrap;
+        display: inline-block;
+    }
+    .nav-link:hover, .nav-link.active-tab {
+        color: #22d3ee !important;
+        transform: translateY(-2px);
+        text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+    }
+
+    .btn-neon {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 150px !important; 
+        height: 42px !important;
+        background: rgba(15, 23, 42, 0.6) !important;
+        border: 1px solid rgba(34, 211, 238, 0.5);
+        transition: all 0.3s ease;
+    }
+    .btn-neon:hover {
+        background: #22d3ee !important;
+        color: #000 !important;
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
+    }
+
+    #dropdownMenu { background: rgba(15, 23, 42, 0.98) !important; border: 1px solid rgba(34, 211, 238, 0.3); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8); }
+    .nav-item-m { transition: all 0.2s; border: 1px solid transparent; }
+    .nav-item-m:hover { background: rgba(34, 211, 238, 0.1); color: #22d3ee; }
+
+
+/* Admin 클릭 문제 해결 */
+#main-nav li:last-child,
+#main-nav li:last-child a {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 10010;
+}
+
+/* 장식 요소 클릭 차단 */
+.header-frame-deco {
+    pointer-events: none;
+}
+
+/* 헤더 클릭 우선권 확보 */
+.glass-header {
+    position: relative;
+    z-index: 10001;
+}
+
+
+
+</style>
+
+<script>
+    // 관리자 인증 함수
+  // header.html의 <script> 부분 수정
+function openAdminAuth() {
+    // 1. 페이지 내에 모달이 있는지 확인 (index.html 케이스)
+    const modal = document.getElementById('adminAuthModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.getElementById('adminPasswordInput').focus();
+        return;
+    }
+
+    // 2. 모달이 없는 일반 페이지(products 등)에서는 prompt 사용
+    const pw = prompt("관리자 비밀번호를 입력하세요:");
+    if (!pw) return;
+
+    const db = (typeof database !== 'undefined') ? database : firebase.database();
+    
+    db.ref('adminConfig/password').once('value').then((snapshot) => {
+        if (pw === snapshot.val()) {
+            // 경로 주의: 현재 위치가 루트인지 하위인지에 따라 조절 필요
+            window.location.href = "admin.html"; 
+        } else {
+            alert("비밀번호가 틀렸습니다.");
+        }
+    }).catch(err => {
+        console.error("Auth Error:", err);
+        // DB 연결 실패 시 직접 이동 시도
+        window.location.href = "admin.html";
+    });
+}
+
+
+    // [필수 추가] 메뉴 작동 로직: fetch 이후에도 작동하도록 함수화
+    function initNavigation() {
+        const menuBtn = document.getElementById('menuToggleBtn');
+        const dropdown = document.getElementById('dropdownMenu');
+        const menuIcon = document.getElementById('menuIcon');
+
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation(); // 클릭 이벤트 전파 방지
+                const isVisible = !dropdown.classList.contains('invisible');
+                if (isVisible) {
+                    dropdown.classList.add('opacity-0', 'invisible', '-translate-y-5');
+                    dropdown.classList.remove('opacity-100', 'visible', 'translate-y-0');
+                    if(menuIcon) menuIcon.innerText = "☰";
+                } else {
+                    dropdown.classList.remove('opacity-0', 'invisible', '-translate-y-5');
+                    dropdown.classList.add('opacity-100', 'visible', 'translate-y-0');
+                    if(menuIcon) menuIcon.innerText = "✕";
+                }
+            };
+        }
+
+        // 바깥 클릭 시 메뉴 닫기
+        document.addEventListener('click', (e) => {
+            if (dropdown && !dropdown.contains(e.target) && !dropdown.classList.contains('invisible')) {
+                dropdown.classList.add('opacity-0', 'invisible', '-translate-y-5');
+                if(menuIcon) menuIcon.innerText = "☰";
+            }
+        });
+
+        // 현재 페이지 활성화 표시
+        const path = window.location.pathname.split("/").pop() || 'index.html';
+        const cleanPath = path.split('?')[0];
+        document.querySelectorAll('.nav-link, .nav-item-m').forEach(link => {
+            if (link.getAttribute('href') === cleanPath) {
+                link.classList.add('active-tab');
+                if(link.classList.contains('nav-item-m')) link.style.color = "#22d3ee";
+            }
+        });
+    }
+
+    // 일반 로드와 fetch 로드 양쪽 모두 대응
+    if (document.readyState === 'complete') initNavigation();
+    else document.addEventListener('DOMContentLoaded', initNavigation);
+</script>
+
+
+<header class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-[10001] glass-header rounded-2xl px-6 py-3 flex justify-between items-center">
+    <a href="index.html" class="flex items-center gap-3 shrink-0">
+        <div class="relative">
+            <img src="images/logo/logo-3d.png" class="h-10 w-auto" alt="Logo">
+        </div>
+        <div class="flex flex-col gap-1">
+        </div>
+    </a>
+
+    <nav class="hidden lg:flex items-center justify-center flex-1 px-4">
+        <ul id="main-nav" class="flex items-center text-[11px] xl:text-[12px] font-semibold uppercase tracking-wider whitespace-nowrap gap-6 xl:gap-8">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="products.html" class="nav-link">Products</a></li>
+            <li><a href="technology.html" class="nav-link">Technology</a></li>
+            <li><a href="solutions.html" class="nav-link">Solutions</a></li>
+            <li><a href="company.html" class="nav-link">Company</a></li>
+            <li><a href="news.html" class="nav-link">News</a></li>
+            <li><a href="notice.html" class="nav-link">Notice</a></li> 
+            <li><a href="javascript:void(0)" onclick="openAdminAuth()" class="nav-link text-[10px] opacity-50 hover:opacity-100 border border-neutral-700 px-2 rounded">Admin</a></li>
+        </ul>
+    </nav>
+
+    <div class="hidden lg:flex shrink-0 nav-btn-container">
+        <a href="contact.html" class="btn-neon rounded-xl text-cyan-400 font-bold text-[11px] uppercase">
+            Talk to Us
+       </a>
+    </div>
+
+    <div class="flex items-center gap-3 lg:hidden">
+        <button id="menuToggleBtn" class="w-10 h-10 border border-cyan-500/50 rounded-xl flex flex-col items-center justify-center gap-1.5 flex-shrink-0 transition-all active:scale-95">
+            <span id="menuIcon" class="text-cyan-400 text-xl font-bold">☰</span>
+        </button>
+    </div>
+
+    <div id="dropdownMenu" class="absolute top-[calc(100%+15px)] right-0 w-64 rounded-2xl opacity-0 invisible -translate-y-5 transition-all duration-300 z-[10002] backdrop-blur-xl overflow-hidden">
+        <div id="mobile-nav-container" class="p-3 space-y-1">
+            <a href="index.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Home</a>
+            <a href="products.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Products</a>
+            <a href="technology.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Technology</a>
+            <a href="solutions.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Solutions</a>
+            <a href="company.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Company</a>
+            <a href="news.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">News</a>
+            <a href="notice.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm text-cyan-400">Notice</a> 
+            <a href="javascript:void(0)" onclick="openAdminAuth()" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-500 font-bold text-[10px] uppercase">Admin Access</a>
+            <div class="pt-2">
+                <a href="contact.html" class="flex items-center justify-center p-4 rounded-xl bg-cyan-400 text-black font-black uppercase text-xs tracking-tighter hover:bg-white transition-colors">Request Quote</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-frame-deco"></div>
+</header>
