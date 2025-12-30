@@ -162,146 +162,114 @@ async function verifyAdminPassword() {
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/main_m.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        /* [추가] 실시간 공지/팝업 스타일 (모바일 최적화) */
-        #emergencyBanner { display: none; background: #ef4444; color: white; text-align: center; padding: 10px 15px; font-weight: bold; position: fixed; bottom: 0; width: 100%; z-index: 99999; font-size: 13px; line-height: 1.4; }
+<style>
+    /* 1. 글로벌 모바일 레이아웃 및 헤더 설정 */
+    #header-placeholder { position: fixed; top: 0; left: 0; width: 100%; z-index: 10001; }
+    .animated-logo-text-m { font-size: 3.8vw !important; white-space: nowrap; }
+    @media (max-width: 380px) { .animated-logo-text-m { font-size: 11px !important; } }
 
-
-
-/* 1. 메인 공지 팝업 수정 */
-    #mainPopup { 
-        display: none; 
-        position: fixed; 
-        inset: 0; 
-        /* 배경 투명도를 0.9에서 0.7로 낮추어 배경이 더 잘 보이게 하고, blur를 제거했습니다 */
-        background: rgba(0,0,0,0.7); 
-        z-index: 100000; 
-        align-items: center; 
-        justify-content: center; 
-        /* backdrop-filter: blur(5px);  <-- 이 부분을 제거하여 배경을 선명하게 만듭니다 */
+    /* 2. 실시간 긴급 배너 및 팝업 (모바일 최적화) */
+    #emergencyBanner { 
+        display: none; background: #ef4444; color: white; text-align: center; 
+        padding: 10px 15px; font-weight: bold; position: fixed; bottom: 0; 
+        width: 100%; z-index: 99999; font-size: 13px; line-height: 1.4; 
     }
 
-    /* 2. 관리자 인증 모달도 동일하게 수정 (선택 사항) */
-    #adminAuthModal {
-        /* 기존 backdrop-blur-sm 클래스 대신 선명한 배경 유지 */
-        background: rgba(0,0,0,0.8);
+    #mainPopup, #adminAuthModal { 
+        display: none; position: fixed; inset: 0; z-index: 100000; 
+        align-items: center; justify-content: center; 
+    }
+    
+    /* 배경 선명도 유지 (blur 제거 버전) */
+    #mainPopup { background: rgba(0,0,0,0.7); }
+    #adminAuthModal { background: rgba(0,0,0,0.8); }
+
+    .popup-box { 
+        background: #0a0a0a; border: 1px solid #22d3ee; padding: 30px 20px; 
+        border-radius: 20px; width: 100%; max-width: 320px; text-align: center; 
     }
 
+    /* 3. 이미지 모달 및 뮤직 컨트롤 */
+    #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; display: none; }
+    #modalDetailImage { max-width: 90%; max-height: 70%; object-fit: contain; }
+    #musicToggleBtn { 
+        position: fixed; bottom: 20px; right: 20px; z-index: 10005; width: 48px; height: 48px; 
+        background: rgba(23, 23, 23, 0.9); border: 1.5px solid rgba(34, 211, 238, 0.6); 
+        border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+        color: #22d3ee; backdrop-filter: blur(8px); 
+    }
 
-        .popup-box { background: #0a0a0a; border: 1px solid #22d3ee; padding: 30px 20px; border-radius: 20px; width: 100%; max-width: 320px; text-align: center; }
-        
-        /* 기존 스타일 */
-        #header-placeholder { position: fixed; top: 0; left: 0; width: 100%; z-index: 10001; }
-        .animated-logo-text-m { font-size: 3.8vw !important; white-space: nowrap; }
-        @media (max-width: 380px) { .animated-logo-text-m { font-size: 11px !important; } }
-        #imageModal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 10000; display: none; }
-        #modalDetailImage { max-width: 90%; max-height: 70%; object-fit: contain; }
-        #musicToggleBtn { position: fixed; bottom: 20px; right: 20px; z-index: 10005; width: 48px; height: 48px; background: rgba(23, 23, 23, 0.9); border: 1.5px solid rgba(34, 211, 238, 0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #22d3ee; backdrop-filter: blur(8px); }
-        #triggerWord { color: inherit !important; font-weight: inherit !important; text-decoration: none !important; cursor: pointer !important; display: inline-block; position: relative; z-index: 50; -webkit-tap-highlight-color: transparent; pointer-events: auto !important; }
-        .hero-section { position: relative; width: 100%; height: 100svh; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 1; }
-        .video-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-        .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.1); }
-        .video-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%); z-index: 1; }
-        .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 32px; }
+    /* 4. 히어로 섹션 (Hero Section) 구성 */
+    .hero-section { 
+        position: relative; width: 100%; height: 100svh; overflow: hidden; 
+        display: flex; align-items: center; justify-content: center; z-index: 1; 
+    }
+    .video-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+    .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.1); }
+    .video-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%); z-index: 1; }
+    .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 32px; text-align: center; }
 
-/* [수정] main.css와 동일한 TDLiD 로고 스타일 적용 */
-.hero-logo-gradient {
-    /* 폰트 설정 */
-    font-family: "Arial Black", "Impact", "Segoe UI Black", sans-serif;
-    font-size: 8vw; /* 모바일 전용 크기 유지 */
-    font-weight: 900;
-    letter-spacing: 0.38em; /* 데스크탑과 동일한 자간 */
-    text-align: center;
-    line-height: 1;
-    margin-bottom: 18px;
+    /* [TDLiD 메인 로고 스타일] main.css와 통일 */
+    .hero-logo-gradient {
+        font-family: "Arial Black", "Impact", "Segoe UI Black", sans-serif;
+        font-size: 8vw; font-weight: 900; letter-spacing: 0.38em; line-height: 1;
+        margin-bottom: 18px; text-align: center;
+        background: linear-gradient(90deg, #0a1f44, #1e40af, #22d3ee, #4ade80, #00140c);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text; color: transparent;
+        filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.35));
+        text-shadow: 0 0 16px rgba(37, 99, 235, 0.35), 0 0 32px rgba(134, 239, 172, 0.22);
+    }
 
-    /* 다중 색상 그라데이션 효과 */
-    background: linear-gradient(
-        90deg,
-        #0a1f44,
-        #1e40af,
-        #22d3ee,
-        #4ade80,
-        #00140c
-    );
+    .hero-slogan-gradient { font-size: 8vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); font-weight: 600; text-transform: uppercase; }
+    .hero-description { font-size: 15px; line-height: 1.7; margin-top: 40px; color: #cbd5e1; word-break: keep-all; }
 
-    /* 텍스트 클리핑 */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
+    /* 5. 파트너 및 인증 이미지 섹션 */
+    .partner-grid { display: flex; flex-wrap: wrap; gap: 30px; align-items: center; justify-content: center; opacity: 0.7; }
+    .partner-grid img { height: 28px; width: auto; filter: grayscale(1); }
+    .interactive-certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 20px; }
+    .cert-link img { width: 100%; height: auto; border-radius: 4px; }
+    #triggerWord { 
+        color: inherit !important; font-weight: inherit !important; text-decoration: none !important; 
+        cursor: pointer !important; display: inline-block; position: relative; z-index: 50; 
+        -webkit-tap-highlight-color: transparent; pointer-events: auto !important; 
+    }
 
-    /* 네온 발광 효과 (Filter & Shadow) */
-    filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.35));
-    text-shadow:
-        0 0 16px rgba(37, 99, 235, 0.35),
-        0 0 32px rgba(134, 239, 172, 0.22);
-}
+    /* 6. 배경 슬라이드 애니메이션 (좌->우 파도 효과) */
+    .bg-slide {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        background-size: cover; background-position: center center; background-repeat: no-repeat;
+        opacity: 0; filter: brightness(0.35) contrast(1.1) blur(10px);
+        clip-path: inset(0 100% 0 0); /* 시작 시 좌측으로 가려짐 */
+        transform: scale(1.1) translateX(20px); 
+        transition: 
+            opacity 2s ease-in-out, 
+            clip-path 2.5s cubic-bezier(0.645, 0.045, 0.355, 1.000),
+            transform 8s linear, 
+            filter 2.5s ease-in-out;
+        z-index: 1;
+    }
 
+    .bg-slide.active {
+        opacity: 1; clip-path: inset(0 0 0 0); /* 전체 노출 */
+        transform: scale(1.02) translateX(0);
+        filter: brightness(0.35) contrast(1.1) blur(0px);
+        z-index: 3;
+    }
 
-        .hero-slogan-gradient { font-size: 8vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); font-weight: 600; text-transform: uppercase; }
-        .hero-description { font-size: 15px; line-height: 1.7; margin-top: 40px; color: #cbd5e1; word-break: keep-all; }
-        .partner-grid { display: flex; flex-wrap: wrap; gap: 30px; align-items: center; justify-content: center; opacity: 0.7; }
-        .partner-grid img { height: 28px; width: auto; filter: grayscale(1); }
-        .interactive-certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 20px; }
-        .cert-link img { width: 100%; height: auto; border-radius: 4px; }
+    .bg-slide.exit {
+        opacity: 0; clip-path: inset(0 0 0 100%); /* 우측으로 가려짐 */
+        transform: scale(1.05) translateX(-10px);
+        filter: blur(10px);
+        transition: opacity 2.5s ease-in-out, clip-path 2.5s ease-in-out, transform 3s ease-in-out, filter 2.5s ease-in-out;
+    }
+</style>
 
-/* [수정] 배경 슬라이드: 좌측에서 우측으로 밀려오는 파도 효과 */
-.bg-slide {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    opacity: 0;
-    filter: brightness(0.35) contrast(1.1) blur(10px);
-    
-    /* 시작 상태: 왼쪽 끝에 완전히 가려진 상태 (상 우 하 좌 순서) */
-    /* 왼쪽(좌측)에서 0% 지점까지만 보이게 설정 */
-    clip-path: inset(0 100% 0 0); 
-    
-    /* 효과를 극대화하기 위해 약간 오른쪽으로 치우친 상태에서 시작 */
-    transform: scale(1.1) translateX(20px); 
-    
-    transition: 
-        opacity 2s ease-in-out, 
-        clip-path 2.5s cubic-bezier(0.645, 0.045, 0.355, 1.000), /* 파도처럼 부드러운 가속도 */
-        transform 8s linear, 
-        filter 2.5s ease-in-out;
-    z-index: 1;
-}
-
-/* 활성화 상태: 좌측에서 우측으로 파도치듯 이미지가 드러남 */
-.bg-slide.active {
-    opacity: 1;
-    clip-path: inset(0 0 0 0); /* 가려진 부분 없이 전체 노출 */
-    transform: scale(1.02) translateX(0);
-    filter: brightness(0.35) contrast(1.1) blur(0px);
-    z-index: 3;
-}
-
-/* 퇴장 상태: 우측으로 살짝 밀려나며 잔잔하게 사라짐 */
-.bg-slide.exit {
-    opacity: 0;
-    /* 사라질 때도 반대 방향(우측)으로 가려지며 파도 효과 유지 */
-    clip-path: inset(0 0 0 100%); 
-    transform: scale(1.05) translateX(-10px);
-    filter: blur(10px);
-    transition: 
-        opacity 2.5s ease-in-out, 
-        clip-path 2.5s ease-in-out, 
-        transform 3s ease-in-out, 
-        filter 2.5s ease-in-out;
-}
-
-    </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
@@ -543,7 +511,7 @@ document.addEventListener("DOMContentLoaded", loadLayout);
         document.body.style.overflow = '';
     }
 
-    document.addEventListener("DOMContentLoaded", loadLayout); 
+    document.addEventListener("DOMContentLoaded", loadLayout);
 </script>
 </body>
 </html>
