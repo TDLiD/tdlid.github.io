@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="description" id="metaDescription" content=""> 
+    <meta name="description" id="metaDescription" content="">
     <meta name="keywords" id="metaKeywords" content="">
 
     <script>
@@ -369,13 +369,15 @@ if (data) {
     inset: 0;
     width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: center;
+    background-size: 50%; /* 이미지가 화면의 80% 크기로 나옵니다 */
+    background-repeat: no-repeat; /* 이미지 반복 방지 */
+    background-position: center;  /* 중앙 정렬 */
     opacity: 0;
     clip-path: inset(0 100% 0 0); 
     transform: scale(1.1);
     transition: opacity 1.5s ease-in-out, clip-path 2.5s cubic-bezier(0.65, 0, 0.35, 1), transform 12s linear;
     z-index: 1; /* 기본값 */
+/* 아래 코드를 추가하세요 */
 }
 
 .bg-slide.active {
@@ -391,6 +393,9 @@ if (data) {
     z-index: 2; /* 나갈 때 중간 순위 */
 }
 
+body, .hero-section, .video-bg-container, .bg-slide {
+    background-color: #000000 !important;
+}
 
 </style>
 
@@ -414,19 +419,23 @@ if (data) {
 
 <main class="flex-grow">
 
-<section class="hero-section">
-        <div id="image-bg-container" class="video-bg-container">
-            <div class="video-overlay" style="z-index: 2;"></div> 
-            </div>
+<section class="hero-section flex flex-col items-center justify-center min-h-screen">
+    <div id="image-bg-container" class="video-bg-container">
+        <div class="video-overlay" style="z-index: 2;"></div> 
+    </div>
 
-        <div class="hero-content max-w-6xl w-full px-12 text-center">
-            <h1 class="hero-logo-gradient" style="font-size: 2rem; line-height: 1;">NO MORE FOSSIL FUEL</h1>
-            <p class="hero-slogan-gradient" style="font-size: 2rem; letter-spacing: 0.5em; margin-top: 1rem;">NO MORE PURCHASEMENT</p>
-            <p class="hero-description text-2xl mt-96 mb-24 max-w-4xl mx-auto leading-relaxed style="margin-top: 450px;">
-                <span>TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
-            </p>
+    <div class="hero-content max-w-6xl w-full px-12 text-center flex flex-col items-center justify-center h-full">
+        
+        <div class="flex flex-col items-center justify-center">
+            <h1 class="hero-logo-gradient" style="font-size: 2.5rem; line-height: 1.2;">NO MORE FOSSIL FUEL</h1>
+            <p class="hero-slogan-gradient" style="font-size: 1.8rem; letter-spacing: 0.5em; margin-top: 1.5rem;">NO MORE PURCHASEMENT</p>
         </div>
-    </section>
+
+        <p class="hero-description text-xl md:text-2xl mt-80 mb-12 max-w-4xl mx-auto leading-relaxed">
+            <span>TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
+        </p>
+    </div>
+</section>
 
     <section id="trust-certs-showcase" class="py-24 bg-neutral-900 border-t border-b border-neutral-800 relative z-10">
         <div class="max-w-7xl mx-auto">
@@ -567,7 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const bgImages = [];
     for (let i = 1; i <= 25; i++) {
        /* const fileName = i < 10 ? `bg-0${i}.jpg` : `bg-${i}.jpg`; */
-        const fileName = i < 10 ? `bg-11.jpg` : `bg-11.jpg`;
+        const fileName = i < 10 ? `bg-1.png` : `bg-1.png`;
 
         bgImages.push(`images/bg/${fileName}`);
     }
