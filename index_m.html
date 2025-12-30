@@ -215,29 +215,39 @@ async function verifyAdminPassword() {
     .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 32px; text-align: center; }
 
     /* [TDLiD 메인 로고 스타일] main.css와 통일 */
-/* 1번 라인: 메인 로고 (기존보다 크기와 두께를 줄임) */
+/* 1번 라인(로고)을 2번 라인(슬로건)과 똑같은 스타일로 맞춤 */
 .hero-logo-gradient {
-    font-family: "Arial Black", "Impact", "Segoe UI Black", sans-serif;
-    font-size: 6vw;            /* 8vw -> 6vw로 축소 */
-    font-weight: 700;         /* 900 -> 700으로 얇게 조정 */
-    letter-spacing: 0.2em;    /* 자간을 좁혀서 전체 부피 축소 */
+    /* 슬로건과 동일한 폰트 설정 */
+    font-family: "Pretendard", sans-serif; /* 폰트 일치 */
+    font-size: 8vw;                       /* 크기 일치 */
+    font-weight: 600;                     /* 두께 일치 (기존 900에서 하향) */
+    letter-spacing: 0.3em;                /* 자간 일치 (기존 0.38em에서 축소) */
     line-height: 1.2;
-    margin-bottom: 10px;      /* 아래 라인과의 간격도 줄임 */
-    /* 그라데이션 설정은 그대로 유지 */
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 10px;
+
+    /* 그라데이션 효과는 유지하거나 슬로건처럼 단색으로 바꿀 수 있습니다 */
+    /* 아래는 기존 로고의 그라데이션을 유지하면서 스타일만 맞춘 설정입니다 */
     background: linear-gradient(90deg, #0a1f44, #1e40af, #22d3ee, #4ade80, #00140c);
     -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
+    
+    /* 그림자 효과가 너무 강하면 아래 줄을 삭제하세요 */
+    filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.2)); 
 }
 
-/* 2번 라인: 슬로건 (1번과 크기를 맞춤) */
-.hero-slogan-gradient {
-    font-size: 6vw;            /* 8vw -> 6vw로 축소 */
-    font-weight: 600;
-    letter-spacing: 0.2em;    /* 자간 통일 */
-    color: rgba(34, 211, 238, 0.8);
-    text-transform: uppercase;
+/* 참고용: 기존 슬로건 설정 (변경 없음) */
+.hero-slogan-gradient { 
+    font-size: 8vw; 
+    letter-spacing: 0.3em; 
+    color: rgba(34, 211, 238, 0.8); 
+    font-weight: 600; 
+    text-transform: uppercase; 
 }
+
     .hero-description { font-size: 15px; line-height: 1.7; margin-top: 80px; color: #cbd5e1; word-break: keep-all; }
 
     /* 5. 파트너 및 인증 이미지 섹션 */
