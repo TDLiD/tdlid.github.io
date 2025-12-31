@@ -616,14 +616,16 @@ if (bgContainer) {
 
 
 /* ==========================================
-    TDLiD -> BIG HEART ANIMATION SCRIPT
+    TDLiD -> BIG HEART ANIMATION SCRIPT (수정본)
    ========================================== */
-let isHeartRunning = false;
-let inputBuffer = ""; 
+var isHeartRunning = false;
+var inputBuffer = ""; 
 const secretWord = "awesome";
 
+// [오류 해결] e.key 존재 여부를 먼저 체크하여 toLowerCase 오류 방지
 document.addEventListener('keydown', (e) => {
-    if (isHeartRunning) return;
+    if (isHeartRunning || !e.key) return; 
+    
     inputBuffer += e.key.toLowerCase();
     if (inputBuffer.length > secretWord.length) {
         inputBuffer = inputBuffer.substring(inputBuffer.length - secretWord.length);
@@ -634,94 +636,93 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-function activateTdlidHeart() {
+// 전역에서 접근 가능하도록 window 객체에 할당 (푸터 클릭용)
+window.activateTdlidHeart = function() {
     if (isHeartRunning) return;
     isHeartRunning = true;
 
-    // 1. TDLiD 철자 좌표 (원본 유지)
     const points = [
-        // T
-        {x:0, y:0}, {x:1, y:0}, {x:2, y:0}, {x:1, y:1}, {x:1, y:2}, {x:1, y:3}, {x:1, y:4},
-        // D
-        {x:3.5, y:0}, {x:3.5, y:1}, {x:3.5, y:2}, {x:3.5, y:3}, {x:3.5, y:4}, {x:4.5, y:0}, {x:5.5, y:1}, {x:5.5, y:2}, {x:5.5, y:3}, {x:4.5, y:4},
-        // L
-        {x:7, y:0}, {x:7, y:1}, {x:7, y:2}, {x:7, y:3}, {x:7, y:4}, {x:8, y:4}, {x:9, y:4},
-        // i
-        {x:10.5, y:0.5}, {x:10.5, y:2}, {x:10.5, y:3}, {x:10.5, y:4},
-        // D
-        {x:12, y:0}, {x:12, y:1}, {x:12, y:2}, {x:12, y:3}, {x:12, y:4}, {x:13, y:0}, {x:14, y:1}, {x:14, y:2}, {x:14, y:3}, {x:13, y:4}
+        {x:0, y:0}, {x:1, y:0}, {x:2, y:0}, {x:1, y:1}, {x:1, y:2}, {x:1, y:3}, {x:1, y:4}, // T
+        {x:3.5, y:0}, {x:3.5, y:1}, {x:3.5, y:2}, {x:3.5, y:3}, {x:3.5, y:4}, {x:4.5, y:0}, {x:5.5, y:1}, {x:5.5, y:2}, {x:5.5, y:3}, {x:4.5, y:4}, // D
+        {x:7, y:0}, {x:7, y:1}, {x:7, y:2}, {x:7, y:3}, {x:7, y:4}, {x:8, y:4}, {x:9, y:4}, // L
+        {x:10.5, y:0.5}, {x:10.5, y:2}, {x:10.5, y:3}, {x:10.5, y:4}, // i
+        {x:12, y:0}, {x:12, y:1}, {x:12, y:2}, {x:12, y:3}, {x:12, y:4}, {x:13, y:0}, {x:14, y:1}, {x:14, y:2}, {x:14, y:3}, {x:13, y:4} // D
     ];
 
     const hearts = [];
-    const container = document.body;
     const sw = window.innerWidth;
     const sh = window.innerHeight;
 
-    // 하트 생성 및 초기 랜덤 배치
     points.forEach((p, i) => {
         const heart = document.createElement('div');
         heart.innerHTML = '❤️';
         heart.style.cssText = `
-            position: fixed; 
-            left: ${Math.random() * 100}vw; 
-            top: ${Math.random() * 100}vh;
-            font-size: 20px; 
-            z-index: 100000; 
-            opacity: 0;
-            pointer-events: none; 
-            transition: all 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+            position: fixed; left: ${Math.random() * 100}vw; top: ${Math.random() * 100}vh;
+            font-size: 22px; z-index: 2147483647; opacity: 0; pointer-events: none;
+            transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
         `;
-        container.appendChild(heart);
+        document.body.appendChild(heart);
         hearts.push({ el: heart, target: p });
-
         setTimeout(() => { heart.style.opacity = '1'; }, i * 10);
     });
 
-    // [1단계] TDLiD 텍스트 형성
+    // TDLiD 형성
     setTimeout(() => {
-        const fontSize = Math.min(sw / 20, 45); 
-        const totalWidth = 14 * fontSize;
-        const startX = (sw - totalWidth) / 2;
-        const startY = (sh / 2) - (2 * fontSize);
-
+        const gapSize = Math.min(sw / 20, 45);
+        const startX = (sw - (14 * gapSize)) / 2;
+        const startY = (sh / 2) - (2 * gapSize);
         hearts.forEach((obj) => {
-            obj.el.style.left = (startX + obj.target.x * fontSize) + 'px';
-            obj.el.style.top = (startY + obj.target.y * fontSize) + 'px';
-            obj.el.style.transform = `scale(1.2)`;
+            obj.el.style.left = (startX + obj.target.x * gapSize) + 'px';
+            obj.el.style.top = (startY + obj.target.y * gapSize) + 'px';
+            obj.el.style.transform = `scale(1.5)`;
+            obj.el.style.textShadow = "0 0 15px rgba(34, 211, 238, 0.6)";
         });
     }, 1200);
 
-    // [2단계] 커다란 하트 모양으로 재정렬
+    // 하트 형성
     setTimeout(() => {
         const centerX = sw / 2;
         const centerY = sh / 2;
-        const heartScale = Math.min(sw, sh) / 30; // 하트 크기 조절
-
+        const heartScale = Math.min(sw, sh) / 28;
         hearts.forEach((obj, i) => {
-            // 수학적 하트 곡선 공식 사용
             const t = (i / hearts.length) * 2 * Math.PI;
             const hx = 16 * Math.pow(Math.sin(t), 3);
             const hy = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
-
-            obj.el.style.transition = "all 2s cubic-bezier(0.68, -0.55, 0.265, 1.55)";
+            obj.el.style.transition = "all 2s cubic-bezier(0.25, 1, 0.5, 1)";
             obj.el.style.left = (centerX + hx * heartScale) + 'px';
             obj.el.style.top = (centerY + hy * heartScale) + 'px';
-            obj.el.style.transform = `scale(1.8)`; // 하트일 때 더 크게
+            obj.el.style.transform = `scale(2.2)`;
             obj.el.style.textShadow = "0 0 20px rgba(255, 0, 0, 0.8)";
         });
-    }, 4500); // 텍스트를 보여준 후 4.5초 뒤에 하트 형성
+    }, 4500);
 
-    // [3단계] 최종 소멸
+    // 제거
     setTimeout(() => {
         hearts.forEach(obj => {
             obj.el.style.transition = "all 1.5s ease-in";
             obj.el.style.opacity = '0';
-            obj.el.style.transform = `scale(0) translate(${(Math.random()-0.5)*500}px, ${(Math.random()-0.5)*500}px)`;
+            obj.el.style.transform = `translate(${(Math.random()-0.5)*500}px, ${(Math.random()-0.5)*500}px) scale(0)`;
             setTimeout(() => obj.el.remove(), 1500);
         });
         isHeartRunning = false;
-    }, 8000);
+    }, 8500);
+};
+
+// [중요] 푸터 로드 후 이벤트 바인딩 로직 추가
+function bindHeartTrigger() {
+    const trigger = document.getElementById('pcHeartTrigger') || document.getElementById('mobileHeartTrigger');
+    if (trigger) {
+        trigger.onclick = (e) => {
+            e.preventDefault();
+            window.activateTdlidHeart();
+        };
+    } else {
+        // 푸터가 비동기로 로드되므로, 아직 없으면 잠시 후 다시 시도
+        setTimeout(bindHeartTrigger, 500);
+    }
 }
+bindHeartTrigger();
+
 
 // 모바일용 트리거
 const mobileTrigger = document.getElementById('mobileHeartTrigger');
