@@ -614,6 +614,80 @@ if (bgContainer) {
         if (e.key === 'Enter') verifyAdminPassword();
     });
 
+
+/* ==========================================
+   AWESOME HEART EASTER EGG (PC ONLY)
+   ========================================== */
+let inputBuffer = ""; 
+const secretWord = "awesome";
+let isHeartActive = false;
+
+document.addEventListener('keydown', (e) => {
+    // 1. 에러 방지: e.key가 없거나 문자열이 아닌 경우 무시
+    if (!e || !e.key || typeof e.key !== 'string') return;
+
+    // 2. 입력된 키를 버퍼에 추가 (소문자로 변환)
+    inputBuffer += e.key.toLowerCase();
+
+    // 3. 버퍼 길이를 비밀 단어 길이에 맞춰 유지
+    if (inputBuffer.length > secretWord.length) {
+        inputBuffer = inputBuffer.substring(inputBuffer.length - secretWord.length);
+    }
+
+    // 4. "awesome" 일치 확인 및 중복 실행 방지
+    if (inputBuffer === secretWord && !isHeartActive) {
+        activateHeartCursor();
+    }
+});
+
+function activateHeartCursor() {
+    isHeartActive = true;
+    
+    // 마우스 커서를 하트 SVG로 변경
+    const heartSVG = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' style='font-size:24px;'><text y='24'>❤️</text></svg>`;
+    document.body.style.cursor = `url("${heartSVG}"), auto`;
+    
+    // 콘솔 확인용
+    console.log("💖 PC Easter Egg Activated: Heart Cursor!");
+
+    // (선택 사항) 화면에 하트 입자가 떨어지는 시각 효과 추가
+    createHeartRain();
+
+    // 10초 후 원래대로 복구
+    setTimeout(() => {
+        document.body.style.cursor = 'default';
+        isHeartActive = false;
+        inputBuffer = ""; // 버퍼 초기화
+    }, 10000);
+}
+
+// 하트 입자 효과 (PC 화면 연출용)
+function createHeartRain() {
+    for (let i = 0; i < 30; i++) {
+        const heart = document.createElement('div');
+        heart.innerText = '❤️';
+        heart.style.cssText = `
+            position: fixed;
+            left: ${Math.random() * 100}vw;
+            top: -50px;
+            font-size: ${Math.random() * 20 + 10}px;
+            z-index: 100000;
+            pointer-events: none;
+            transition: transform ${Math.random() * 3 + 2}s linear, opacity 2s;
+        `;
+        document.body.appendChild(heart);
+
+        setTimeout(() => {
+            heart.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`;
+            heart.style.opacity = '0';
+        }, 100);
+
+        setTimeout(() => heart.remove(), 5000);
+    }
+}
+
+
+
 </script>
 </body>
 </html>
