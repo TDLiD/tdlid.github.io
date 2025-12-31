@@ -616,76 +616,90 @@ if (bgContainer) {
 
 
 /* ==========================================
-   AWESOME HEART EASTER EGG (PC ONLY)
+    UPGRADED HEART FORMATION EFFECT (PC)
    ========================================== */
 let inputBuffer = ""; 
 const secretWord = "awesome";
 let isHeartActive = false;
 
 document.addEventListener('keydown', (e) => {
-    // 1. 에러 방지: e.key가 없거나 문자열이 아닌 경우 무시
     if (!e || !e.key || typeof e.key !== 'string') return;
-
-    // 2. 입력된 키를 버퍼에 추가 (소문자로 변환)
     inputBuffer += e.key.toLowerCase();
-
-    // 3. 버퍼 길이를 비밀 단어 길이에 맞춰 유지
     if (inputBuffer.length > secretWord.length) {
         inputBuffer = inputBuffer.substring(inputBuffer.length - secretWord.length);
     }
 
-    // 4. "awesome" 일치 확인 및 중복 실행 방지
     if (inputBuffer === secretWord && !isHeartActive) {
-        activateHeartCursor();
+        activateHeartFormationPC();
     }
 });
 
-function activateHeartCursor() {
+function activateHeartFormationPC() {
     isHeartActive = true;
+    inputBuffer = ""; // 버퍼 초기화
     
-    // 마우스 커서를 하트 SVG로 변경
+    // 마우스 커서를 하트로 임시 변경
     const heartSVG = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' style='font-size:24px;'><text y='24'>❤️</text></svg>`;
     document.body.style.cursor = `url("${heartSVG}"), auto`;
-    
-    // 콘솔 확인용
-    console.log("💖 PC Easter Egg Activated: Heart Cursor!");
 
-    // (선택 사항) 화면에 하트 입자가 떨어지는 시각 효과 추가
-    createHeartRain();
+    const heartCount = 80; // PC는 화면이 넓으므로 개수를 조금 늘림
+    const container = document.body;
+    const hearts = [];
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
 
-    // 10초 후 원래대로 복구
-    setTimeout(() => {
-        document.body.style.cursor = 'default';
-        isHeartActive = false;
-        inputBuffer = ""; // 버퍼 초기화
-    }, 10000);
-}
-
-// 하트 입자 효과 (PC 화면 연출용)
-function createHeartRain() {
-    for (let i = 0; i < 30; i++) {
+    // 1단계: 하트 비 생성 및 쏟아지기
+    for (let i = 0; i < heartCount; i++) {
         const heart = document.createElement('div');
-        heart.innerText = '❤️';
+        heart.innerHTML = '❤️';
         heart.style.cssText = `
             position: fixed;
             left: ${Math.random() * 100}vw;
-            top: -50px;
-            font-size: ${Math.random() * 20 + 10}px;
+            top: -10vh;
+            font-size: ${Math.random() * 15 + 15}px;
             z-index: 100000;
             pointer-events: none;
-            transition: transform ${Math.random() * 3 + 2}s linear, opacity 2s;
+            transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         `;
-        document.body.appendChild(heart);
+        container.appendChild(heart);
+        hearts.push(heart);
 
         setTimeout(() => {
-            heart.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`;
-            heart.style.opacity = '0';
-        }, 100);
-
-        setTimeout(() => heart.remove(), 5000);
+            heart.style.top = (Math.random() * 70 + 10) + 'vh';
+        }, 50);
     }
-}
 
+    // 2단계: 중앙으로 모여 큰 하트 형성 (약 1.5초 후 시작)
+    setTimeout(() => {
+        hearts.forEach((heart, idx) => {
+            const t = (idx / heartCount) * 2 * Math.PI;
+            // PC 화면에 맞게 스케일 조정 (가로/세로 중 작은 쪽 기준)
+            const scale = Math.min(window.innerWidth, window.innerHeight) / 35; 
+            
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+            heart.style.transition = "all 2s ease-in-out";
+            heart.style.left = (centerX + x * scale) + 'px';
+            heart.style.top = (centerY + y * scale) + 'px';
+            heart.style.transform = `scale(1.8) rotate(${(Math.random() - 0.5) * 30}deg)`;
+        });
+    }, 1500);
+
+    // 3단계: 흩어지며 소멸 (약 4.5초 후 시작)
+    setTimeout(() => {
+        hearts.forEach(heart => {
+            heart.style.transition = "all 2s ease-in";
+            heart.style.opacity = '0';
+            heart.style.transform = `translate(${(Math.random() - 0.5) * 500}px, -200px) scale(0) rotate(360deg)`;
+            setTimeout(() => heart.remove(), 2000);
+        });
+        
+        // 커서 원상복구 및 상태 리셋
+        document.body.style.cursor = 'default';
+        setTimeout(() => { isHeartActive = false; }, 2000);
+    }, 4500);
+}
 
 
 </script>
