@@ -17,7 +17,7 @@
 
 <footer class="bg-[#020617] py-12 px-6 border-t border-cyan-900/30 text-center">
     <div class="mb-8">
-        <p class="text-cyan-400 font-bold text-sm mb-2">TDL Energy Indonesia</p>
+        <p id="mobileHeartTrigger" class="text-cyan-400 font-bold text-sm mb-2" style="cursor: pointer; -webkit-tap-highlight-color: transparent;">TDL Energy Indonesia</p>
         <p class="text-neutral-500 text-xs">Driving the Future of Mobility</p>
     </div>
 
@@ -48,13 +48,13 @@
 
 <script>
 (function() {
+    /* --- 1. BGM 컨트롤 로직 --- */
     const bgm = document.getElementById('bgm');
     const musicBtn = document.getElementById('musicToggleBtn');
     const musicIcon = document.getElementById('musicIconUI');
 
-    // 1. 상태 복원 로직
     const savedTime = sessionStorage.getItem('bgmTime');
-    const isMuted = sessionStorage.getItem('bgmMuted') !== 'false'; // 기본값 muted
+    const isMuted = sessionStorage.getItem('bgmMuted') !== 'false'; 
 
     if (savedTime) bgm.currentTime = parseFloat(savedTime);
     bgm.muted = isMuted;
@@ -63,17 +63,14 @@
     const playBGM = () => {
         bgm.play().then(() => {
             if (!bgm.muted) musicIcon.innerText = "🎵";
-            // 재생 성공 시 이벤트 제거
             document.removeEventListener('touchstart', playBGM);
             document.removeEventListener('click', playBGM);
-        }).catch(e => console.log("User interaction required"));
+        }).catch(e => console.log("Interaction required"));
     };
 
-    // 모바일 자동 재생 제한 해제용
     document.addEventListener('touchstart', playBGM);
     document.addEventListener('click', playBGM);
 
-    // 2. 버튼 클릭 제어
     musicBtn.onclick = (e) => {
         e.stopPropagation();
         if (bgm.muted || bgm.paused) {
@@ -88,11 +85,75 @@
         }
     };
 
-    // 3. 현재 재생 시간 실시간 저장 (0.5초마다)
     setInterval(() => {
         if (!bgm.paused) {
             sessionStorage.setItem('bgmTime', bgm.currentTime);
         }
     }, 500);
+
+
+    /* --- 2. 하트 이스터에그 로직 --- */
+    let isHeartRunning = false;
+    const trigger = document.getElementById('mobileHeartTrigger');
+
+    if (trigger) {
+        trigger.onclick = (e) => {
+            e.preventDefault();
+            if (isHeartRunning) return;
+            isHeartRunning = true;
+            
+            // 햅틱 피드백
+            if (navigator.vibrate) navigator.vibrate(50);
+
+            const heartCount = 60;
+            const hearts = [];
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            // 단계 A: 생성 및 낙하
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.style.cssText = `
+                    position: fixed; left: ${Math.random() * 100}vw; top: -10vh;
+                    font-size: ${Math.random() * 10 + 15}px; z-index: 99999;
+                    pointer-events: none; transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                `;
+                document.body.appendChild(heart);
+                hearts.push(heart);
+
+                setTimeout(() => { 
+                    heart.style.top = (Math.random() * 60 + 10) + 'vh'; 
+                }, 50);
+            }
+
+            // 단계 B: 하트 대형 형성
+            setTimeout(() => {
+                hearts.forEach((heart, idx) => {
+                    const t = (idx / heartCount) * 2 * Math.PI;
+                    const scale = Math.min(window.innerWidth, window.innerHeight) / 25; 
+                    
+                    const x = 16 * Math.pow(Math.sin(t), 3);
+                    const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+                    heart.style.transition = "all 2s ease-in-out";
+                    heart.style.left = (centerX + x * scale) + 'px';
+                    heart.style.top = (centerY + y * scale) + 'px';
+                    heart.style.transform = `scale(1.5) rotate(${(Math.random() - 0.5) * 30}deg)`;
+                });
+            }, 1800);
+
+            // 단계 C: 흩어지며 제거
+            setTimeout(() => {
+                hearts.forEach(heart => {
+                    heart.style.transition = "all 1.5s ease-in";
+                    heart.style.opacity = '0';
+                    heart.style.transform = `translateY(-100px) scale(0)`;
+                    setTimeout(() => heart.remove(), 1500);
+                });
+                isHeartRunning = false;
+            }, 4500);
+        };
+    }
 })();
 </script>
