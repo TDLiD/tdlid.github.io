@@ -196,7 +196,7 @@ if (data) {
         position: fixed; 
         bottom: 25px; 
         right: 25px; 
-        z-index: 999999 !important; /* 다른 레이어에 가려지지 않도록 대폭 상향 */
+        z-index: 999999 !important;
         width: 44px; 
         height: 44px; 
         background: rgba(23, 23, 23, 0.8); 
@@ -209,7 +209,7 @@ if (data) {
         color: #22d3ee; 
         backdrop-filter: blur(4px); 
         transition: all 0.3s; 
-        pointer-events: auto !important; /* 클릭 이벤트 강제 활성화 */
+        pointer-events: auto !important;
     }
 
     #musicToggleBtn:hover { 
@@ -217,7 +217,7 @@ if (data) {
         border-color: #22d3ee; 
     }
 
-    /* [추가] 실시간 제어 UI 스타일 */
+    /* 실시간 제어 UI & 모달 스타일 */
     #emergencyBanner { 
         display: none; 
         background: #ef4444; 
@@ -233,7 +233,6 @@ if (data) {
         box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
     }
 
-    /* 1. 메인 공지 팝업 */
     #mainPopup { 
         display: none; 
         position: fixed; 
@@ -244,10 +243,7 @@ if (data) {
         justify-content: center; 
     }
 
-    /* 2. 관리자 인증 모달 */
-    #adminAuthModal {
-        background: rgba(0,0,0,0.8);
-    }
+    #adminAuthModal { background: rgba(0,0,0,0.8); }
 
     .popup-box { 
         background: #0a0a0a; 
@@ -259,7 +255,6 @@ if (data) {
         text-align: center; 
     }
 
-    /* 기존 스타일 정렬 */
     #imageModal { 
         position: fixed; 
         inset: 0; 
@@ -273,6 +268,7 @@ if (data) {
         object-fit: contain; 
     }
 
+    /* 드롭다운 및 유틸리티 */
     .dropdown-link { 
         padding: 12px 20px; 
         display: block; 
@@ -298,13 +294,9 @@ if (data) {
         transition: background 0.2s; 
     }
 
-    .dropdown-quote-btn:hover { 
-        background: #67e8f9; 
-    }
+    .dropdown-quote-btn:hover { background: #67e8f9; }
 
-    .whitespace-nowrap { 
-        white-space: nowrap !important; 
-    }
+    .whitespace-nowrap { white-space: nowrap !important; }
 
     #triggerWord { 
         color: inherit !important; 
@@ -315,6 +307,11 @@ if (data) {
         position: relative; 
         z-index: 9998; 
         pointer-events: auto !important; 
+    }
+
+    /* 레이아웃 구조 */
+    body, .hero-section, .video-bg-container {
+        background-color: #000000 !important;
     }
 
     .hero-section { 
@@ -329,12 +326,8 @@ if (data) {
 
     .video-bg-container { 
         position: absolute; 
-        top: 0; 
-        left: 0; 
-        width: 100%; 
-        height: 100%; 
+        inset: 0; 
         z-index: 0; 
-        overflow: hidden; 
     }
 
     .video-bg { 
@@ -348,7 +341,7 @@ if (data) {
         position: absolute; 
         inset: 0; 
         background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%); 
-        z-index: 1; 
+        z-index: 5; 
     }
 
     .hero-content { 
@@ -356,52 +349,25 @@ if (data) {
         z-index: 10; 
     }
 
-/* 수정된 부분: z-index 값을 명확히 분리 */
-.video-overlay {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
-    z-index: 5; /* 슬라이드보다 높게 */
-}
-
-/* 단일 배경 이미지 스타일 및 애니메이션 */
-.single-bg-effect {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('images/bg/bg-3.gif'); /* 이미지 경로 */
-    background-size: 50%; /* 기존 설정 유지 */
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: #000000;
-    filter: brightness(0.6); /* 이미지 밝기 조절 */
-    animation: pulseFade 8s ease-in-out infinite; /* 8초 주기로 무한 반복 */
-    z-index: 1;
-}
-
-@keyframes pulseFade {
-    0% { opacity: 0; transform: scale(1.0); }   /* 어둠 속에서 시작 */
-    50% { opacity: 1; transform: scale(10.05); } /* 서서히 나타나며 살짝 커짐 */
-    100% { opacity: 0; transform: scale(1.1); }  /* 다시 서서히 사라짐 */
-}
-
-/* 배경 슬라이드 설정 수정: 단일 이미지 고정 */
+ /* --------------------------------------------------
+    배경 이미지 설정 (bg-3.gif)
+-------------------------------------------------- */
 .bg-slide {
     position: absolute;
     inset: 0;
-    opacity: 1; /* 단일 이미지이므로 항상 표시 */
     z-index: 1;
-    background-color: #000000; 
-    background-image: url('images/bg/bg-2.gif'); /* 고정 이미지 경로 */
-    background-size: cover; 
+    background-color: #000000;
+    background-image: url('images/bg/bg-3.gif'); /* 이미지 경로 */
+    background-size: 60%;
     background-repeat: no-repeat;
     background-position: center;
+    opacity: 1;
+    
     /* 외곽 경계선 제거를 위한 마스크 */
     mask-image: radial-gradient(circle, black 70%, transparent 100%);
     -webkit-mask-image: radial-gradient(circle, black 70%, transparent 100%);
     
-    /* 선택 사항: 미세한 줌 효과를 유지하고 싶을 경우 사용 */
+    /* 줌 애니메이션 */
     animation: smoothZoom 15s ease-in-out infinite alternate;
 }
 
@@ -410,12 +376,21 @@ if (data) {
     to { transform: scale(1.05); }
 }
 
-/* 1. 바디 및 주요 섹션의 배경색을 완전한 블랙으로 통일 */
-body, .hero-section, .video-bg-container {
-    background-color: #000000 !important;
+/* 펄스 효과가 필요할 때만 추가로 사용하는 클래스 (선택 사항) */
+.single-bg-effect {
+    filter: brightness(0.6);
+    animation: pulseFade 8s ease-in-out infinite;
 }
 
+@keyframes pulseFade {
+    0% { opacity: 0; transform: scale(1.0); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0; transform: scale(1.1); }
+}
+
+
 </style>
+
 
 </head>
 
@@ -592,15 +567,14 @@ async function loadLayout() {
 document.addEventListener("DOMContentLoaded", () => {
 
 // [수정] 다중 슬라이드 제거 후 단일 배경 설정
-    const bgContainer = document.getElementById('image-bg-container');
-    if (bgContainer) {
-        // 기존 내용 비우고 오버레이와 단일 슬라이드 요소만 생성
-        bgContainer.innerHTML = `
-            <div class="video-overlay" style="z-index: 5;"></div>
-            <div class="bg-slide active"></div>
-        `;
-    }
-
+const bgContainer = document.getElementById('image-bg-container');
+if (bgContainer) {
+    // 내부를 비우고 오버레이(z-index:5)와 배경슬라이드(z-index:1)를 생성
+    bgContainer.innerHTML = `
+        <div class="video-overlay" style="z-index: 5;"></div>
+        <div class="bg-slide"></div>
+    `;
+}
 
     // 2. 인증 및 기타 함수 호출 (중괄호 누락 주의)
     loadLayout();
