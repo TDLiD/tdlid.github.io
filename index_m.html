@@ -647,14 +647,12 @@ function initImageSlider() {
 }
 
 /* ==========================================
-    MOBILE PILLAR TEXT TRIGGER
-    (Click "A Pillar of Trust" to Activate)
+    ADVANCED HEART FORMATION EFFECT
    ========================================== */
 let isHeartActive = false;
 
 function initPillarEgg() {
     const pillar = document.getElementById('pillarTrigger');
-
     if (pillar) {
         pillar.addEventListener('click', () => {
             if (isHeartActive) return;
@@ -665,24 +663,22 @@ function initPillarEgg() {
 
 function activateHeartEasterEgg() {
     isHeartActive = true;
-    
-    // 햅틱 진동
-    if (navigator.vibrate) {
-        navigator.vibrate([50, 30, 50]);
-    }
+    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
 
-    createMobileHeartRain(); // 하트 생성 함수
+    createHeartFormation();
 
-    // 7초 후 다시 클릭 가능하도록 리셋
-    setTimeout(() => {
-        isHeartActive = false;
-    }, 7000);
+    // 효과 재생 시간(약 6초) 동안 재클릭 방지
+    setTimeout(() => { isHeartActive = false; }, 6000);
 }
 
-// 하트 생성 로직 (기존과 동일)
-function createMobileHeartRain() {
-    const heartCount = 35; 
+function createHeartFormation() {
+    const heartCount = 60; // 하트 개수 (밀도)
     const container = document.body;
+    const hearts = [];
+    
+    // 화면 중앙 좌표
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
 
     for (let i = 0; i < heartCount; i++) {
         const heart = document.createElement('div');
@@ -691,35 +687,57 @@ function createMobileHeartRain() {
             position: fixed;
             left: ${Math.random() * 100}vw;
             top: -10vh;
-            font-size: ${Math.random() * 15 + 20}px;
+            font-size: ${Math.random() * 10 + 15}px;
             z-index: 999999;
             pointer-events: none;
-            opacity: 1;
-            transition: transform ${Math.random() * 2 + 3}s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 2s;
+            transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         `;
         container.appendChild(heart);
+        hearts.push(heart);
 
-        const sideMovement = (Math.random() - 0.5) * 200; 
+        // 1단계: 하트가 비처럼 쏟아짐
         setTimeout(() => {
-            heart.style.transform = `translate(${sideMovement}px, ${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`;
-            heart.style.opacity = '0';
-        }, 50);
-
-        setTimeout(() => { heart.remove(); }, 5000);
+            heart.style.top = (Math.random() * 80 + 10) + 'vh';
+        }, 100);
     }
+
+    // 2단계: 1.5초 후 중앙으로 모여 큰 하트 형성
+    setTimeout(() => {
+        hearts.forEach((heart, idx) => {
+            // 하트 곡선 공식 (Parametric Heart Equation)
+            const t = (idx / heartCount) * 2 * Math.PI;
+            const scale = Math.min(window.innerWidth, window.innerHeight) / 25; 
+            
+            // 공식을 이용한 x, y 좌표 계산
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+            heart.style.transition = "all 2s ease-in-out";
+            heart.style.left = (centerX + x * scale) + 'px';
+            heart.style.top = (centerY + y * scale) + 'px';
+            heart.style.transform = `scale(1.5) rotate(${(Math.random() - 0.5) * 20}deg)`;
+        });
+    }, 1800);
+
+    // 3단계: 4.5초 후 흩어지며 소멸
+    setTimeout(() => {
+        hearts.forEach(heart => {
+            heart.style.transition = "all 1.5s ease-in";
+            heart.style.opacity = '0';
+            heart.style.transform = `translate(${(Math.random() - 0.5) * 300}px, -100px) scale(0)`;
+            setTimeout(() => heart.remove(), 1500);
+        });
+    }, 4500);
 }
 
-// 초기화 부분 수정
+// DOMContentLoaded 내부 호출 확인
 document.addEventListener("DOMContentLoaded", () => {
     loadLayout().then(() => {
-        // 레이아웃 로드 후에 실행 (만약 pillarTrigger가 레이아웃 안에 있다면)
         initPillarEgg(); 
     });
     initImageSlider();
-    // 만약 pillarTrigger가 index_m.html 본문에 직접 있다면 바로 실행해도 됩니다.
     initPillarEgg(); 
 });
-
 
 </script>
 </body>
