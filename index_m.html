@@ -647,72 +647,54 @@ function initImageSlider() {
 }
 
 /* ==========================================
-    MOBILE SHAKE EASTER EGG
-    (Shake device to Activate Heart Rain)
+    MOBILE TRIPLE TAP EASTER EGG
+    (Tap Header Logo 3 times to Activate)
    ========================================== */
+let tapCount = 0;
+let tapTimer;
 let isHeartActive = false;
-let lastShakeUpdate = 0;
-let lastX, lastY, lastZ;
-const SHAKE_THRESHOLD = 200; // 흔들기 감도 (숫자가 낮을수록 예민함)
 
-function initShakeDetection() {
-    // 1. 가속도 센서 권한 요청 (iOS 13+ 대응)
-    if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        // 사용자의 첫 터치 시 권한 요청 팝업을 띄우기 위해 한 번만 실행
-        document.body.addEventListener('click', () => {
-            DeviceMotionEvent.requestPermission()
-                .then(permissionState => {
-                    if (permissionState === 'granted') {
-                        window.addEventListener('devicemotion', handleShake, false);
-                    }
-                })
-                .catch(console.error);
-        }, { once: true });
-    } else {
-        // 일반적인 안드로이드 및 구형 iOS
-        window.addEventListener('devicemotion', handleShake, false);
+function initTripleTapEgg() {
+    const headerPlaceholder = document.getElementById('header-placeholder');
+    // 헤더 내의 로고 이미지 또는 링크 선택
+    const logoTrigger = headerPlaceholder.querySelector('img') || headerPlaceholder.querySelector('a');
+
+    if (logoTrigger) {
+        // 모바일에서 더블탭 시 줌 방지 및 선택 방지
+        logoTrigger.style.touchAction = 'manipulation';
+        logoTrigger.style.userSelect = 'none';
+        logoTrigger.style.webkitUserSelect = 'none';
+
+        logoTrigger.addEventListener('click', (e) => {
+            if (isHeartActive) return;
+
+            tapCount++;
+            clearTimeout(tapTimer);
+
+            // 0.5초 이내에 다음 탭이 들어와야 인정
+            tapTimer = setTimeout(() => {
+                tapCount = 0;
+            }, 500);
+
+            if (tapCount === 3) {
+                tapCount = 0;
+                activateHeartEasterEgg();
+            }
+        });
     }
 }
 
-function handleShake(event) {
-    if (isHeartActive) return;
-
-    const acceleration = event.accelerationIncludingGravity;
-    const curTime = Date.now();
-
-    // 100ms마다 한 번씩 체크
-    if ((curTime - lastShakeUpdate) > 100) {
-        const diffTime = curTime - lastShakeUpdate;
-        lastShakeUpdate = curTime;
-
-        const x = acceleration.x;
-        const y = acceleration.y;
-        const z = acceleration.z;
-
-        // 흔들림 속도 계산
-        const speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
-
-        if (speed > SHAKE_THRESHOLD) {
-            activateShakeEasterEgg();
-        }
-
-        lastX = x;
-        lastY = y;
-        lastZ = z;
-    }
-}
-
-function activateShakeEasterEgg() {
+function activateHeartEasterEgg() {
     isHeartActive = true;
     
-    // 햅틱 진동 (성공 알림)
+    // 햅틱 진동
     if (navigator.vibrate) {
-        navigator.vibrate([100, 50, 100]);
+        navigator.vibrate([50, 30, 50]);
     }
 
-    createMobileHeartRain(); // 하트 쏟아지는 기능 실행
+    createMobileHeartRain(); // 기존 하트 생성 함수 호출
 
-    // 7초 후 다시 흔들면 실행 가능하도록 리셋
+    // 7초 후 리셋
     setTimeout(() => {
         isHeartActive = false;
     }, 7000);
@@ -748,12 +730,15 @@ function createMobileHeartRain() {
     }
 }
 
-// 페이지 로드 시 초기화
+// 초기화 로직 수정
 document.addEventListener("DOMContentLoaded", () => {
-    loadLayout();      
-    initImageSlider(); 
-    initShakeDetection(); // 흔들기 감지 시작
+    // loadLayout이 비동기이므로 완료 후 트리거 설정
+    loadLayout().then(() => {
+        initTripleTapEgg();
+    });
+    initImageSlider();
 });
+
 
 </script>
 </body>
