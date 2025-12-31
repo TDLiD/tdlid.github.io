@@ -1,124 +1,187 @@
 <style>
-    .glass-footer {
-        background: linear-gradient(to top, rgba(2, 6, 23, 0.95), rgba(2, 6, 23, 0.8));
-        backdrop-filter: blur(15px);
-        border-top: 1px solid rgba(34, 211, 238, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
+    /* WhatsApp QR 스타일 */
+    .wa-contact-wrapper-m { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px; margin-bottom: 2rem; }
+    .qr-container-m { background: rgba(255, 255, 255, 0.9); padding: 4px; border-radius: 8px; box-shadow: 0 0 10px rgba(34, 211, 238, 0.2); }
+    .qr-image-m { width: 48px; height: 48px; display: block; object-fit: contain; }
+    .wa-image-m { width: 32px; height: 32px; object-fit: contain; }
 
-    /* 상단 네온 라인 */
-    .footer-neon-line {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 180px;
-        height: 2px;
-        background: #22d3ee;
-        box-shadow: 0 0 20px #22d3ee, 0 0 40px #22d3ee;
-    }
-
-    /* 관리자 트리거 스타일 삭제 및 일반 텍스트 설정 */
-    .footer-bottom-text {
-        cursor: default;
-        user-select: none;
-    }
-
-    .wa-contact-wrapper {
-        position: absolute;
-        left: 24px;
-        bottom: 15px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 12px;
-        z-index: 20;
-    }
-
-    .qr-container {
-        background: rgba(255, 255, 255, 0.9);
-        padding: 4px;
-        border-radius: 8px;
-        box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        cursor: pointer;
-    }
-
-    .qr-container:hover {
-        transform: scale(1.05) translateY(-3px);
-        background: #ffffff;
-        box-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
-    }
-
-    .qr-image {
-        width: 60px;
-        height: 60px;
-        display: block;
-        object-fit: contain;
-    }
-
-    .wa-icon-link {
-        transition: transform 0.3s ease;
-        display: flex;
-        align-items: center;
-    }
-
-    .wa-icon-link:hover {
-        transform: scale(1.1);
-    }
-
-    .wa-image {
-        width: 60px;
-        height: 60px;
-        object-fit: contain;
-    }
-
-    @media (max-width: 768px) {
-        .wa-contact-wrapper {
-            position: static;
-            margin: 20px auto 10px;
-            justify-content: center;
-            gap: 15px;
-        }
-        .qr-image, .wa-image {
-            width: 48px;
-            height: 48px;
-        }
+    /* BGM 버튼 스타일 */
+    #musicToggleBtn { 
+        position: fixed; bottom: 25px; right: 25px; z-index: 10005; 
+        width: 44px; height: 44px; background: rgba(23, 23, 23, 0.8); 
+        border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 50%; 
+        display: flex; align-items: center; justify-content: center; 
+        cursor: pointer; color: #22d3ee; backdrop-filter: blur(4px); 
     }
 </style>
 
-<footer class="glass-footer py-6 px-6 mt-10">
-    <div class="footer-neon-line"></div>
-
-    <div class="max-w-7xl mx-auto flex flex-col gap-4">
-        <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
-            <p class="text-neutral-300 text-sm font-medium tracking-tight">
-                TDL Energy Indonesia <span class="mx-2 text-neutral-600">|</span> Driving the Future of Mobility
-            </p>
-        </div>
-
-        <div class="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6 border-t border-white/5 pt-4">
-            <p class="text-neutral-500 text-[11px] font-light">
-                © 2025 TDL Energy Indonesia. All rights reserved.
-            </p>
-            
-            <div class="hidden md:block w-1 h-1 rounded-full bg-cyan-500/30"></div>
-            
-            <p class="text-[10px] text-neutral-600 uppercase tracking-[0.2em] font-light footer-bottom-text">
-                No More Carbon <span class="text-cyan-900 mx-1">·</span> 
-                Innovation 
-                <span class="text-cyan-900 mx-1">·</span> Sustainability
-            </p>
-        </div>
+<footer class="bg-[#020617] py-12 px-6 border-t border-cyan-900/30 text-center">
+    <div class="mb-8">
+        <p id="mobileHeartTrigger" class="text-cyan-400 font-bold text-sm mb-2" style="cursor: pointer; -webkit-tap-highlight-color: transparent;">TDL Energy Indonesia</p>
+        <p class="text-neutral-500 text-xs">Driving the Future of Mobility</p>
     </div>
 
-    <div class="wa-contact-wrapper">
-        <div class="qr-container" onclick="window.open('https://wa.me/6281296075099', '_blank')">
-            <img src="images/footer/qr.png" alt="WhatsApp QR" class="qr-image">
-        </div>
-        <a href="https://wa.me/6281296075099" target="_blank" class="wa-icon-link">
-            <img src="images/footer/whatsapp.png" alt="WhatsApp" class="wa-image">
+    <div class="flex flex-col items-center gap-4 mb-8">
+        <a href="index.html?view_mode=pc" class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-neutral-700 text-neutral-400 text-xs font-medium active:bg-neutral-800">
+            View PC version
         </a>
     </div>
+
+    <div class="wa-contact-wrapper-m">
+        <div class="qr-container-m" onclick="window.open('https://wa.me/6281296075099', '_blank')">
+            <img src="images/footer/qr.png" alt="WhatsApp QR" class="qr-image-m">
+        </div>
+        <a href="https://wa.me/6281296075099" target="_blank">
+            <img src="images/footer/whatsapp.png" alt="WhatsApp" class="wa-image-m">
+        </a>
+    </div>
+
+    <div class="text-[10px] text-neutral-600 uppercase tracking-widest space-y-1">
+        <p>© 2025 TDL Energy Indonesia</p>
+    </div>
 </footer>
+
+<audio id="bgm" src="mp3/tdlid.mp3" loop muted preload="auto" playsinline></audio>
+<button id="musicToggleBtn">
+    <span id="musicIconUI">🔇</span>
+</button>
+
+<script>
+(function() {
+    /* --- 1. BGM 컨트롤 로직 --- */
+    const bgm = document.getElementById('bgm');
+    const musicBtn = document.getElementById('musicToggleBtn');
+    const musicIcon = document.getElementById('musicIconUI');
+
+    const savedTime = sessionStorage.getItem('bgmTime');
+    const isMuted = sessionStorage.getItem('bgmMuted') !== 'false'; 
+
+    if (savedTime) bgm.currentTime = parseFloat(savedTime);
+    bgm.muted = isMuted;
+    musicIcon.innerText = isMuted ? "🔇" : "🎵";
+
+    const playBGM = () => {
+        bgm.play().then(() => {
+            if (!bgm.muted) musicIcon.innerText = "🎵";
+            document.removeEventListener('touchstart', playBGM);
+            document.removeEventListener('click', playBGM);
+        }).catch(e => console.log("Interaction required"));
+    };
+
+    document.addEventListener('touchstart', playBGM);
+    document.addEventListener('click', playBGM);
+
+    musicBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (bgm.muted || bgm.paused) {
+            bgm.muted = false;
+            bgm.play();
+            musicIcon.innerText = "🎵";
+            sessionStorage.setItem('bgmMuted', 'false');
+        } else {
+            bgm.muted = true;
+            musicIcon.innerText = "🔇";
+            sessionStorage.setItem('bgmMuted', 'true');
+        }
+    };
+
+    setInterval(() => {
+        if (!bgm.paused) {
+            sessionStorage.setItem('bgmTime', bgm.currentTime);
+        }
+    }, 500);
+
+
+/* --- 2. 하트 이스터에그 로직 (수정됨: TDLiD -> BIG HEART) --- */
+    let isHeartRunning = false;
+    const trigger = document.getElementById('mobileHeartTrigger');
+
+    // TDLiD 좌표 데이터 (원본 기반)
+    const points = [
+        // T
+        {x:0, y:0}, {x:1, y:0}, {x:2, y:0}, {x:1, y:1}, {x:1, y:2}, {x:1, y:3}, {x:1, y:4},
+        // D
+        {x:3.5, y:0}, {x:3.5, y:1}, {x:3.5, y:2}, {x:3.5, y:3}, {x:3.5, y:4}, {x:4.5, y:0}, {x:5.5, y:1}, {x:5.5, y:2}, {x:5.5, y:3}, {x:4.5, y:4},
+        // L
+        {x:7, y:0}, {x:7, y:1}, {x:7, y:2}, {x:7, y:3}, {x:7, y:4}, {x:8, y:4}, {x:9, y:4},
+        // i
+        {x:10.5, y:0.5}, {x:10.5, y:2}, {x:10.5, y:3}, {x:10.5, y:4},
+        // D
+        {x:12, y:0}, {x:12, y:1}, {x:12, y:2}, {x:12, y:3}, {x:12, y:4}, {x:13, y:0}, {x:14, y:1}, {x:14, y:2}, {x:14, y:3}, {x:13, y:4}
+    ];
+
+    if (trigger) {
+        trigger.onclick = (e) => {
+            e.preventDefault();
+            if (isHeartRunning) return;
+            isHeartRunning = true;
+            
+            if (navigator.vibrate) navigator.vibrate(50);
+
+            const hearts = [];
+            const sw = window.innerWidth;
+            const sh = window.innerHeight;
+
+            // [단계 A] 생성 및 랜덤 배치
+            points.forEach((p, i) => {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.style.cssText = `
+                    position: fixed; left: ${Math.random() * 100}vw; top: ${Math.random() * 100}vh;
+                    font-size: 18px; z-index: 99999; opacity: 0;
+                    pointer-events: none; transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+                `;
+                document.body.appendChild(heart);
+                hearts.push({ el: heart, target: p });
+
+                setTimeout(() => { heart.style.opacity = '1'; }, i * 10);
+            });
+
+            // [단계 B] TDLiD 형성
+            setTimeout(() => {
+                const fontSize = Math.min(sw / 18, 30); // 모바일용 폰트 사이즈 조정
+                const totalWidth = 14 * fontSize;
+                const startX = (sw - totalWidth) / 2;
+                const startY = (sh / 2) - (2 * fontSize);
+
+                hearts.forEach((obj) => {
+                    obj.el.style.transition = "all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)";
+                    obj.el.style.left = (startX + obj.target.x * fontSize) + 'px';
+                    obj.el.style.top = (startY + obj.target.y * fontSize) + 'px';
+                    obj.el.style.transform = `scale(1.2)`;
+                });
+            }, 1200);
+
+            // [단계 C] 커다란 하트로 재집결
+            setTimeout(() => {
+                const centerX = sw / 2;
+                const centerY = sh / 2;
+                const heartScale = Math.min(sw, sh) / 28; // 모바일 화면에 맞춘 하트 크기
+
+                hearts.forEach((obj, i) => {
+                    const t = (i / hearts.length) * 2 * Math.PI;
+                    const hx = 16 * Math.pow(Math.sin(t), 3);
+                    const hy = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+
+                    obj.el.style.transition = "all 2s cubic-bezier(0.25, 1, 0.5, 1)";
+                    obj.el.style.left = (centerX + hx * heartScale) + 'px';
+                    obj.el.style.top = (centerY + hy * heartScale) + 'px';
+                    obj.el.style.transform = `scale(1.8) rotate(${(Math.random()-0.5)*20}deg)`;
+                    obj.el.style.textShadow = "0 0 15px rgba(255, 0, 0, 0.7)";
+                });
+            }, 4500);
+
+            // [단계 D] 흩어지며 제거
+            setTimeout(() => {
+                hearts.forEach(obj => {
+                    obj.el.style.transition = "all 1.5s ease-in";
+                    obj.el.style.opacity = '0';
+                    obj.el.style.transform = `translate(${(Math.random()-0.5)*300}px, ${(Math.random()-0.5)*300}px) scale(0)`;
+                    setTimeout(() => obj.el.remove(), 1500);
+                });
+                isHeartRunning = false;
+            }, 8000);
+        };
+    }
+})();
+</script>
