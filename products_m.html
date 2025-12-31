@@ -332,64 +332,6 @@
     });
 
     document.addEventListener('contextmenu', e => e.preventDefault());
-
-
-// 1. 메뉴 순서 설정
-const pageOrder = [
-    'index_m.html',
-    'company_m.html',
-    'technology_m.html',
-    'products_m.html',
-    'solutions_m.html',
-    'news_m.html',
-    'notice_m.html',
-    'contact_m.html'
-];
-
-// 2. 현재 페이지 파악
-let currentPath = window.location.pathname.split('/').pop() || 'index_m.html';
-if (currentPath === '' || currentPath === 'index.html') currentPath = 'index_m.html'; // 기본값 처리 강화
-currentPath = currentPath.split(/[?#]/)[0];
-
-const currentIndex = pageOrder.indexOf(currentPath);
-
-let touchStartX = 0;
-let touchStartY = 0;
-
-// 3. 스와이프 이벤트 리스너
-document.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-}, { passive: true });
-
-document.addEventListener('touchend', (e) => {
-    const touchEndX = e.changedTouches[0].screenX;
-    const touchEndY = e.changedTouches[0].screenY;
-    handleSwipe(touchStartX, touchEndX, touchStartY, touchEndY);
-}, { passive: true });
-
-function handleSwipe(startX, endX, startY, endY) {
-    const diffX = startX - endX;
-    const diffY = startY - endY;
-    
-    // 수평 이동 거리가 수직 이동 거리보다 크고, 일정 거리(100px) 이상일 때만 작동
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 100) {
-        if (diffX > 0) {
-            // 왼쪽으로 밀기 -> 다음 페이지
-            if (currentIndex < pageOrder.length - 1) {
-                window.location.href = pageOrder[currentIndex + 1];
-            }
-        } else {
-            // 오른쪽으로 밀기 -> 이전 페이지
-            if (currentIndex > 0) {
-                window.location.href = pageOrder[currentIndex - 1];
-            }
-        }
-    }
-}
-
-
-
 </script>
 
 </body>
