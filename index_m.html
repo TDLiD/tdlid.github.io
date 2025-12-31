@@ -434,7 +434,7 @@ async function verifyAdminPassword() {
     
     <section class="py-16 bg-neutral-900 border-y border-neutral-800">
         <div class="px-6 mb-16">
-            <h2 class="text-sm font-light text-center mb-8 text-cyan-400 tracking-widest uppercase">A Pillar of Trust</h2>
+<h2 id="pillarTrigger" class="text-sm font-light text-center mb-8 text-cyan-400 tracking-widest uppercase cursor-pointer" style="padding: 10px; -webkit-tap-highlight-color: transparent;">A Pillar of Trust</h2>
             <div class="partner-grid">
                 <img src="images/home/DAVIGO.webp" alt="DAVIGO">
                 <img src="images/home/GESITS.webp" alt="GESITS">
@@ -647,39 +647,18 @@ function initImageSlider() {
 }
 
 /* ==========================================
-    MOBILE TRIPLE TAP EASTER EGG
-    (Tap Header Logo 3 times to Activate)
+    MOBILE PILLAR TEXT TRIGGER
+    (Click "A Pillar of Trust" to Activate)
    ========================================== */
-let tapCount = 0;
-let tapTimer;
 let isHeartActive = false;
 
-function initTripleTapEgg() {
-    const headerPlaceholder = document.getElementById('header-placeholder');
-    // 헤더 내의 로고 이미지 또는 링크 선택
-    const logoTrigger = headerPlaceholder.querySelector('img') || headerPlaceholder.querySelector('a');
+function initPillarEgg() {
+    const pillar = document.getElementById('pillarTrigger');
 
-    if (logoTrigger) {
-        // 모바일에서 더블탭 시 줌 방지 및 선택 방지
-        logoTrigger.style.touchAction = 'manipulation';
-        logoTrigger.style.userSelect = 'none';
-        logoTrigger.style.webkitUserSelect = 'none';
-
-        logoTrigger.addEventListener('click', (e) => {
+    if (pillar) {
+        pillar.addEventListener('click', () => {
             if (isHeartActive) return;
-
-            tapCount++;
-            clearTimeout(tapTimer);
-
-            // 0.5초 이내에 다음 탭이 들어와야 인정
-            tapTimer = setTimeout(() => {
-                tapCount = 0;
-            }, 500);
-
-            if (tapCount === 3) {
-                tapCount = 0;
-                activateHeartEasterEgg();
-            }
+            activateHeartEasterEgg();
         });
     }
 }
@@ -692,15 +671,15 @@ function activateHeartEasterEgg() {
         navigator.vibrate([50, 30, 50]);
     }
 
-    createMobileHeartRain(); // 기존 하트 생성 함수 호출
+    createMobileHeartRain(); // 하트 생성 함수
 
-    // 7초 후 리셋
+    // 7초 후 다시 클릭 가능하도록 리셋
     setTimeout(() => {
         isHeartActive = false;
     }, 7000);
 }
 
-// 하트 생성 로직 (동일)
+// 하트 생성 로직 (기존과 동일)
 function createMobileHeartRain() {
     const heartCount = 35; 
     const container = document.body;
@@ -730,13 +709,15 @@ function createMobileHeartRain() {
     }
 }
 
-// 초기화 로직 수정
+// 초기화 부분 수정
 document.addEventListener("DOMContentLoaded", () => {
-    // loadLayout이 비동기이므로 완료 후 트리거 설정
     loadLayout().then(() => {
-        initTripleTapEgg();
+        // 레이아웃 로드 후에 실행 (만약 pillarTrigger가 레이아웃 안에 있다면)
+        initPillarEgg(); 
     });
     initImageSlider();
+    // 만약 pillarTrigger가 index_m.html 본문에 직접 있다면 바로 실행해도 됩니다.
+    initPillarEgg(); 
 });
 
 
