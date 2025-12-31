@@ -2,315 +2,224 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-
-
-<script>
-    (function() {
-        // 1. iPad를 제외하고 iPhone, iPod, Android 폰만 감지
-        const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const isPCMode = urlParams.get('view_mode') === 'pc';
-
-        // 2. 모바일일 경우 모바일 전용 이스터에그 페이지(또는 index_m.html)로 리다이렉트
-        // 여기서는 이스터에그의 모바일 파일명이 별도로 없다면 index_m.html 등으로 보낼 수 있습니다.
-        if (isMobileOnly && !isPCMode) {
-            // 모바일용 이스터에그 파일이 따로 있다면 해당 파일명을 적어주세요.
-            // 예: window.location.href = "e-egg_m.html";
-            window.location.href = "e-egg_m.html"; 
-        }
-    })();
-</script>
-
 <title>TDLiD // Secure Node</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
 /* ===============================
-    GLOBAL
+    GLOBAL & RESPONSIVE FIX
 ================================ */
-body{
-    background:#000;
-    color:#22d3ee;
-    font-family:'Courier New', monospace;
-    overflow-x:hidden; /* 가로 스크롤 방지 */
+body {
+    background: #000;
+    color: #22d3ee;
+    font-family: 'Courier New', monospace;
+    /* 스크롤 허용 및 가로 오버플로우 방지 */
+    overflow-x: hidden; 
+    overflow-y: auto; 
+    cursor: crosshair;
+    min-height: 100vh;
 }
 
-/* ===============================
-    HACKING SCREEN EFFECTS
-================================ */
-@keyframes shake {
-    0% { transform: translate(0,0); }
-    10% { transform: translate(-1px, -1px); }
-    20% { transform: translate(1px, 1px); }
-    30% { transform: translate(-2px, 0); }
-    100% { transform: translate(0,0); }
+/* 마우스 추적 레이저 레이어 */
+#laser-guide {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 50;
 }
 
 .hacker-lines {
     position: fixed; inset: 0;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0) 0px,
-        rgba(0, 0, 0, 0) 1px,
-        rgba(34, 211, 238, 0.05) 2px,
-        rgba(0, 0, 0, 0) 3px
-    );
-    pointer-events: none;
-    z-index: 10;
+    background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(34, 211, 238, 0.05) 2px, transparent 3px);
+    pointer-events: none; z-index: 10;
 }
 
-.screen-glitch-overlay {
-    position: fixed; inset: 0;
-    background: rgba(34, 211, 238, 0.03);
-    animation: shake 0.2s infinite;
-    z-index: 5;
-    pointer-events: none;
+/* 스크린 글리치 */
+.glitch-heavy {
+    animation: shake 0.1s infinite !important;
+    background: rgba(255, 0, 0, 0.05) !important;
 }
 
-/* ===============================
-    BACKGROUND LAYERS
-================================ */
-.cyber-bg{
-    position:fixed; inset:0;
-    background:
-        linear-gradient(rgba(34,211,238,.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(34,211,238,.07) 1px, transparent 1px);
-    background-size:40px 40px;
-    animation:gridMove 4s linear infinite;
-    z-index:1;
-}
-
-@keyframes gridMove{
-    from{background-position:0 0}
-    to{background-position:40px 40px}
+@keyframes shake {
+    0% { transform: translate(0,0); }
+    10% { transform: translate(-2px, -2px); }
+    20% { transform: translate(2px, 2px); }
+    100% { transform: translate(0,0); }
 }
 
 /* ===============================
-    SCARY SKULL ZOOM EFFECT
+    STAFF IMAGES (Responsive Size)
 ================================ */
-.skull-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.skull-scare {
-    position: absolute;
-    width: 100px;
-    opacity: 0;
-    filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.5));
-    animation: skullZoom 8s infinite;
-}
-
-.skull-scare-2 {
-    position: absolute;
-    width: 80px;
-    opacity: 0;
-    animation: skullZoom 12s infinite;
-    animation-delay: 4s;
-}
-
-@keyframes skullZoom {
-    0% { transform: scale(0.1) rotate(0deg); opacity: 0; filter: blur(10px) brightness(0); }
-    20% { opacity: 0.3; filter: blur(5px) brightness(0.5); }
-    50% { opacity: 0.6; filter: blur(2px) brightness(1); }
-    80% { transform: scale(5) rotate(15deg); opacity: 0; filter: blur(0px) brightness(2); }
-    100% { transform: scale(8) rotate(30deg); opacity: 0; }
-}
-
-.noise{
-    position:fixed; inset:0;
-    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
-    pointer-events:none;
-    z-index:3;
-}
-
-.vignette{
-    position:fixed; inset:0;
-    background:radial-gradient(circle,transparent 30%,rgba(0,0,0,.95) 100%);
-    z-index:4;
-}
-
-/* ===============================
-    SCAN LINE
-================================ */
-.scan{
-    position:absolute;
-    width:100%; height:3px;
-    background:linear-gradient(to right,transparent,#22d3ee,transparent);
-    box-shadow:0 0 40px #22d3ee;
-    animation:scan 2.8s linear infinite;
-    z-index: 15;
-}
-
-@keyframes scan{
-    from{top:-5%}
-    to{top:105%}
-}
-
-/* ===============================
-    TERMINAL TEXT
-================================ */
-.glitch{
-    position:relative;
-    animation:glitch .4s infinite;
-}
-
-@keyframes glitch{
-    0%{text-shadow:2px 0 #22d3ee,-2px 0 #f0f; transform: skewX(1deg);}
-    50%{text-shadow:-2px 0 #22d3ee,2px 0 #f0f; transform: skewX(-1deg);}
-    100%{text-shadow:2px 0 #22d3ee,-2px 0 #f0f; transform: skewX(0deg);}
-}
-
-/* ===============================
-    IMAGES (Responsive Fixed)
-================================ */
-.staff-container{
-    display:flex;
-    gap:20px;
-    flex-wrap:wrap;
-    justify-content:center;
-    perspective:1400px;
-    z-index: 20;
-    width: 100%;
-    max-width: 1000px; /* 너무 퍼지지 않게 제한 */
+.staff-container {
+    display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;
+    z-index: 20; width: 100%; max-width: 1200px;
+    padding: 0 10px;
 }
 
 .staff-img {
-    width: calc(45% - 10px); /* 2열 배치 기본 */
-    max-width: 400px;
-    min-width: 280px; /* 모바일에서도 너무 작아지지 않게 */
-    height: auto;
+    /* 브라우저 크기에 맞춰 이미지 크기 자동 조절 */
+    width: calc(33.33% - 20px); 
+    max-width: 250px;
+    min-width: 140px; 
+    height: auto; 
     border: 2px solid #22d3ee;
-    background: rgba(0,0,0,.6);
-    box-shadow: 0 0 30px rgba(34,211,238,.4);
-    opacity: 0;
-    transform: rotateX(55deg) translateY(80px);
-    transition: 1.2s cubic-bezier(.2,1,.3,1);
+    filter: grayscale(1) brightness(0.5);
+    opacity: 0; transform: translateY(30px);
+    transition: 1s cubic-bezier(.2,1,.3,1);
 }
 
 @media (max-width: 640px) {
-    .staff-img {
-        width: 80%; /* 모바일에서는 거의 꽉 차게 */
-    }
+    .staff-img { width: calc(50% - 15px); } /* 모바일에선 2열 */
 }
 
-.staff-img.reveal{
-    opacity:1;
-    transform:none;
+.staff-img.reveal {
+    opacity: 1; transform: none; filter: grayscale(0) brightness(1);
+    box-shadow: 0 0 20px rgba(34,211,238,0.4);
 }
 
-.staff-img:hover{
-    box-shadow:0 0 60px rgba(34,211,238,.9);
-    transform:scale(1.05);
+.pulse { animation: pulse 1.5s infinite; }
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
 }
 
-/* ===============================
-    BLINK CURSOR
-================================ */
-.cursor::after{
-    content:'▮';
-    animation:blink 1s steps(1) infinite;
-}
-
-@keyframes blink{
-    50%{opacity:0}
+.success-theme {
+    background: radial-gradient(circle at center, #0e7490 0%, #000 100%) !important;
+    transition: all 2s ease;
 }
 </style>
 </head>
 
 <body>
-<div class="cyber-bg"></div>
-<div class="screen-glitch-overlay"></div>
+<canvas id="laser-guide"></canvas>
+<div id="bg-layer" class="fixed inset-0 z-0 bg-black transition-all duration-1000"></div>
+<div id="glitch-overlay" class="fixed inset-0 z-10 pointer-events-none"></div>
 <div class="hacker-lines"></div>
 
-<div class="skull-overlay">
-    <img src="images/logo/skull.webp" class="skull-scare">
-    <img src="images/logo/skull.webp" class="skull-scare-2" style="left: 20%; top: 30%;">
+<div id="sys-msg" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 text-red-500 font-bold text-[10px] md:text-sm hidden">
+    [!] SYSTEM OVERRIDE: TARGET_IP_LOCATED
 </div>
 
-<div class="noise"></div>
-<div class="vignette"></div>
-
-<div class="relative z-10 min-h-screen flex flex-col items-center justify-center py-20 px-4">
-    <div class="scan"></div>
-
-    <div class="mb-8 border border-cyan-500 px-6 md:px-10 py-4 backdrop-blur bg-cyan-950/40 text-center">
-        <h1 class="text-2xl md:text-4xl font-black tracking-widest glitch">
-            TDLiD SECURE TERMINAL
+<div class="relative z-20 min-h-screen flex flex-col items-center justify-start py-10 px-4">
+    <div id="main-frame" class="mb-6 border border-cyan-500 px-6 py-3 backdrop-blur bg-cyan-950/40 text-center">
+        <h1 id="title" class="text-xl md:text-3xl font-black tracking-tighter md:tracking-widest transition-all">
+            SCANNING FOR INTRUDERS...
         </h1>
     </div>
 
-    <div id="terminal" class="text-lg md:text-xl mb-10 cursor min-h-[32px] text-center"></div>
+    <div id="terminal" class="text-sm md:text-lg mb-8 h-6 text-center text-cyan-400 font-bold"></div>
 
-    <div class="staff-container">
-        <img class="staff-img" src="images/easter_egg/staff1.webp">
+    <div class="staff-container" id="staff-box">
+        <img class="staff-img" src="images/easter_egg/staff1.webp" alt="RAY">
+        <img class="staff-img" src="images/easter_egg/staff2.webp" alt="EZA">
+        <img class="staff-img" src="images/easter_egg/staff3.webp" alt="REZY">
+        <img class="staff-img" src="images/easter_egg/staff4.webp" alt="ETNO">
+        <img class="staff-img" src="images/easter_egg/staff5.webp" alt="STAFF5">
+        <img class="staff-img" src="images/easter_egg/staff6.webp" alt="STAFF6">
     </div>
 
-    <div class="fixed bottom-4 left-4 text-[10px] opacity-40 hidden sm:block">
-        CORE_TEMP: 31.8C<br>
-        BMS_STATE: OVERRIDE<br>
-        SIGNAL: CLEAN<br>
-        <span class="text-red-500 font-bold animate-pulse">> WARNING: UNAUTHORIZED ACCESS DETECTED</span>
-    </div>
+    <button id="final-btn" class="mt-12 mb-10 px-10 py-4 bg-red-600 text-white font-black opacity-0 transition-all duration-1000 hover:scale-110">
+        ABORT SYSTEM
+    </button>
+</div>
 
-    <div class="fixed bottom-4 right-4 text-[10px] opacity-40 text-right hidden sm:block">
-        ENCRYPTION v4.0.2<br>
-        ACCESS LEVEL █████<br>
-        IP_ORIGIN: TRACED
-    </div>
+<div id="alex-popup" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 opacity-0 pointer-events-none transition-opacity duration-500">
+    <img src="images/easter_egg/alex.png" class="max-w-[90%] max-h-[80%] border-2 border-white">
 </div>
 
 <script>
-const terminal = document.getElementById("terminal");
-const imgs = document.querySelectorAll(".staff-img");
+/* JS 로직은 동일하게 유지하되, 버튼 스크롤 이동 추가 */
+const canvas = document.getElementById('laser-guide');
+const ctx = canvas.getContext('2d');
+let mouse = { x: 0, y: 0 };
 
-const lines = [
-    "> BOOTING SECURE NODE...",
-    "> LINKING ENCRYPTED CHANNEL...",
-    "> RUNNING BIOMETRIC SCAN...",
-    "> [!] INTRUSION DETECTED...",
-    "> BYPASSING SECURITY...",
-    "> IDENTITIES CONFIRMED:",
-    "RAY // AUTH OK",
-    "EZA // AUTH OK",
-    "REZY // AUTH OK",
-    "ETNO // AUTH OK",
-    "> ACCESS GRANTED"
+window.onmousemove = (e) => { mouse.x = e.clientX; mouse.y = e.clientY; };
+
+function drawLaser() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = 'rgba(34, 211, 238, 0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(mouse.x, 0); ctx.lineTo(mouse.x, canvas.height);
+    ctx.moveTo(0, mouse.y); ctx.lineTo(canvas.width, mouse.y);
+    ctx.stroke();
+    requestAnimationFrame(drawLaser);
+}
+drawLaser();
+
+const terminal = document.getElementById("terminal");
+const title = document.getElementById("title");
+const glitch = document.getElementById("glitch-overlay");
+const sysMsg = document.getElementById("sys-msg");
+
+const script = [
+    { txt: "> TRACING CONNECTION...", time: 800 },
+    { txt: "> SECURITY BYPASSED...", time: 800 },
+    { txt: "> [!] DANGER: DATA LEAK", time: 500, alert: true },
+    { txt: "> INTRUDER IDENTIFIED: YOU", time: 1500, heavyGlitch: true },
+    { txt: "> INITIATING SELF-DESTRUCT...", time: 1000 },
+    { txt: "WAIT... WHAT IS THIS?", time: 1200, stopGlitch: true }
 ];
 
-let i = 0;
-
-function typeLine(text){
-    terminal.innerHTML = "";
-    let c = 0;
-    const t = setInterval(()=>{
-        terminal.innerHTML += text[c++];
-        if(c >= text.length){
-            clearInterval(t);
-        }
-    },30);
+let step = 0;
+function runScenario() {
+    if (step < script.length) {
+        const item = script[step];
+        terminal.innerText = item.txt;
+        if (item.alert) { sysMsg.classList.remove('hidden'); title.style.color = 'red'; }
+        if (item.heavyGlitch) glitch.classList.add('glitch-heavy');
+        if (item.stopGlitch) { glitch.classList.remove('glitch-heavy'); title.style.color = '#22d3ee'; }
+        step++;
+        setTimeout(runScenario, item.time);
+    } else {
+        triggerHappyEnding();
+    }
 }
 
-const seq = setInterval(()=>{
-    typeLine(lines[i]);
-    if(i === 5){
-        imgs.forEach((img,idx)=>{
-            setTimeout(()=>img.classList.add("reveal"), idx*500);
+function triggerHappyEnding() {
+    title.innerText = "HAPPY ENCOUNTER!";
+    terminal.innerText = "WELCOME TO THE TDLiD FAMILY!";
+    document.getElementById('bg-layer').classList.add('success-theme');
+    
+    const imgs = document.querySelectorAll(".staff-img");
+    imgs.forEach((img, idx) => {
+        setTimeout(() => { img.classList.add("reveal", "pulse"); }, idx * 300);
+    });
+
+    const btn = document.getElementById('final-btn');
+    btn.innerText = "RETURN TO HOME";
+    btn.style.opacity = "1";
+    btn.classList.remove('bg-red-600');
+    btn.classList.add('bg-cyan-500');
+    btn.onclick = () => location.href = 'index_m.html';
+
+    // 이미지가 다 뜨고 나면 버튼이 있는 곳으로 부드럽게 스크롤
+    setTimeout(() => {
+        btn.scrollIntoView({ behavior: 'smooth' });
+    }, imgs.length * 300);
+
+    // staff6 클릭 이벤트
+    const staff6 = document.querySelector('img[alt="STAFF6"]');
+    const alexPopup = document.getElementById('alex-popup');
+    if (staff6) {
+        staff6.style.cursor = 'pointer';
+        staff6.addEventListener('click', () => {
+            alexPopup.classList.remove('opacity-0', 'pointer-events-none');
+            alexPopup.classList.add('opacity-100');
+            setTimeout(() => {
+                alexPopup.classList.replace('opacity-100', 'opacity-0');
+                alexPopup.classList.add('pointer-events-none');
+            }, 3000);
         });
     }
-    i++;
-    if(i >= lines.length){
-        clearInterval(seq);
-        setTimeout(()=>history.back(), 5000); // 이미지 볼 수 있게 시간을 좀 더 늘림
-    }
-},900);
+}
+
+setTimeout(runScenario, 1000);
 </script>
 </body>
 </html>
