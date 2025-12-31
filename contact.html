@@ -120,8 +120,7 @@
             Talk to us about your goals
         </h2>
         <p class="text-neutral-400 text-lg mb-10">
-Complete the form below and discover how we can help you.
-        </p>
+Complete the form below and discover how we can help <span id="triggerOur" class="stealth-link">you</span>.        </p>
 
         <form id="quoteForm" class="grid gap-6">
             <div class="grid grid-cols-2 gap-6">
@@ -251,14 +250,15 @@ Complete the form below and discover how we can help you.
     }
 
 
-    function initEeggTrigger() {
-        const trigger = document.getElementById('triggerOur');
-        if (trigger) {
-            trigger.onclick = () => {
-                window.location.href = 'e-egg.html';
-            };
-        }
+function initEeggTrigger() {
+    // 위 HTML에서 설정한 id인 'triggerOur'를 찾습니다.
+    const trigger = document.getElementById('triggerOur');
+    if (trigger) {
+        trigger.onclick = () => {
+            window.location.href = 'e-egg.html';
+        };
     }
+}
 
     function initMenuToggle() {
         const menuBtn = document.getElementById("menuToggleBtn");
