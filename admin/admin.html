@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TDLiD Admin - Control Center</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
@@ -17,188 +19,221 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
     <style>
-        body { background-color: #020617; font-family: 'Pretendard', sans-serif; color: #e5e7eb; }
-        .tab-item { transition: all 0.3s ease; position: relative; }
-        .tab-item.active { color: #22d3ee; }
-        .tab-item.active::after {
-            content: ''; position: absolute; bottom: -25px; left: 0; width: 100%; height: 2px;
-            background: #22d3ee; box-shadow: 0 0 10px #22d3ee;
-        }
-        .nav-card { transition: all 0.3s ease; border: 1px solid rgba(34, 211, 238, 0.1); }
-        .nav-card:hover { transform: translateY(-5px); border-color: rgba(34, 211, 238, 0.5); background: rgba(34, 211, 238, 0.05); }
+        body { background-color: #020617; color: #e5e7eb; font-family: 'Pretendard', sans-serif; }
+        .sidebar-item { transition: all 0.2s; border-radius: 12px; }
+        .sidebar-item:hover, .sidebar-item.active { background: rgba(34, 211, 238, 0.1); color: #22d3ee; }
+        .stat-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(34, 211, 238, 0.1); border-radius: 24px; }
         
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        /* Dashboard Summary Widget Style */
+        .dash-widget { background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.5)); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; transition: transform 0.3s ease; }
+        .dash-widget:hover { transform: translateY(-3px); border-color: rgba(34, 211, 238, 0.3); }
+
+        /* Custom Switch */
+        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #1e293b; transition: .4s; border-radius: 22px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #22d3ee; }
-        input:checked + .slider:before { transform: translateX(20px); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
         #authOverlay { position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .flatpickr-input { cursor: pointer; }
-
-        .ql-toolbar.ql-snow { background: #111; border-color: #333 !important; border-top-left-radius: 12px; border-top-right-radius: 12px; }
-        .ql-container.ql-snow { background: #000; border-color: #333 !important; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; min-height: 250px; }
-        .ql-editor { color: #e5e7eb; font-size: 14px; }
+        
+        .ql-toolbar.ql-snow { background: #0f172a; border: 1px solid rgba(255,255,255,0.05) !important; border-radius: 12px 12px 0 0; }
+        .ql-container.ql-snow { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05) !important; border-radius: 0 0 12px 12px; min-height: 250px; }
+        .ql-editor { color: #e5e7eb; }
         .ql-snow .ql-stroke { stroke: #94a3b8 !important; }
         .ql-snow .ql-fill { fill: #94a3b8 !important; }
         .ql-snow .ql-picker { color: #94a3b8 !important; }
 
-        /* 슬롯 버튼 스타일 */
-        .slot-btn { transition: all 0.2s; border: 1px solid #333; }
-        .slot-btn.active { background: #22d3ee; color: #000; border-color: #22d3ee; font-weight: bold; box-shadow: 0 0 10px rgba(34, 211, 238, 0.3); }
+        .slot-btn { transition: all 0.2s; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); color: #64748b; }
+        .slot-btn.active { background: #22d3ee; color: #020617; font-weight: 700; box-shadow: 0 0 15px rgba(34, 211, 238, 0.4); }
     </style>
 </head>
-<body class="p-8">
+<body class="min-h-screen flex">
+
     <div id="authOverlay">
-        <p class="text-cyan-400 font-bold tracking-widest animate-pulse">CHECKING AUTHORITY...</p>
+        <p class="text-cyan-400 font-bold tracking-widest animate-pulse">AUTHORIZING...</p>
     </div>
 
-    <div class="max-w-6xl mx-auto">
-        <header class="mb-12 border-b border-cyan-900/50 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-                <h1 class="text-4xl font-bold text-cyan-400 tracking-tighter italic">ADMIN SYSTEM</h1>
-                <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">TDL Energy Indonesia Management</p>
-            </div>
-            <div class="flex flex-col items-end gap-4">
-                <button onclick="logout()" class="text-[10px] text-neutral-500 hover:text-red-400 transition uppercase tracking-widest">Logout Account</button>
-                <nav class="flex gap-8 text-sm font-bold uppercase tracking-wider text-neutral-500">
-                    <a href="admin.html" class="tab-item active hover:text-white transition">Dashboard</a>
-                    <a href="visitor.html" class="tab-item hover:text-white transition">Visitor</a>
-                    <a href="inquiry.html" class="tab-item hover:text-white transition">Inquiry</a>
-                    <a href="post.html" class="tab-item hover:text-white transition">Posts</a>
-                    <a href="memo.html" class="tab-item hover:text-white transition">Memo</a>
-                    <a href="security.html" class="tab-item hover:text-white transition">Security</a>
-                </nav>
+    <aside class="w-64 border-r border-white/5 flex flex-col p-6 hidden md:flex">
+        <div class="mb-10 px-2">
+            <h1 class="text-2xl font-black text-white italic tracking-tighter">TDLiD <span class="text-cyan-500">ADMIN</span></h1>
+            <p class="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-1">Control Center</p>
+        </div>
+        
+        <nav class="space-y-1 flex-1">
+            <a href="admin.html" class="sidebar-item active flex items-center gap-3 px-4 py-3 text-sm font-semibold">
+                <span>🏠</span> Dashboard
+            </a>
+            <a href="visitor.html" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-semibold text-neutral-400">
+                <span>📊</span> Visitor Analysis
+            </a>
+            <a href="inquiry.html" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-semibold text-neutral-400">
+                <span>📩</span> Inquiries
+            </a>
+            <a href="post.html" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-semibold text-neutral-400">
+                <span>✍️</span> Content Manager
+            </a>
+            <a href="memo.html" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-semibold text-neutral-400">
+                <span>📝</span> Internal Memo
+            </a>
+            <a href="security.html" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-semibold text-neutral-400">
+                <span>🛡️</span> Security Log
+            </a>
+        </nav>
+
+<div class="pt-2">
+    <a href="../index.html" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-cyan-400 hover:bg-cyan-400/10 rounded-xl transition">
+        <span>🌐</span> Go to Website
+    </a>
+</div>
+
+        <div class="pt-6 border-t border-white/5">
+            <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-400/10 rounded-xl transition">
+                <span>🚪</span> Logout
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#020617]">
+        <header class="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#020617]/80 backdrop-blur-md sticky top-0 z-10">
+            <h2 class="text-lg font-bold">System Configuration</h2>
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="text-xs text-neutral-500 hover:text-cyan-400 transition font-medium">Exit to Website →</a>
+                <div class="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-xs font-bold text-cyan-500">A</div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <a href="visitor.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
-                <div class="text-4xl mb-4">📊</div>
-                <h3 class="text-xl font-bold text-white mb-2">Visitor Analysis</h3>
-                <p class="text-neutral-500 text-xs">Traffic & User Logs</p>
-            </a>
-            <a href="inquiry.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
-                <div class="text-4xl mb-4">📩</div>
-                <h3 class="text-xl font-bold text-amber-400 mb-2">Inquiries</h3>
-                <p class="text-neutral-500 text-xs">Customer Requests</p>
-            </a>
-            <a href="post.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
-                <div class="text-4xl mb-4">✍️</div>
-                <h3 class="text-xl font-bold text-cyan-400 mb-2">Manage Posts</h3>
-                <p class="text-neutral-500 text-xs">Notice & News Editor</p>
-            </a>
-            <a href="memo.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center">
-                <div class="text-4xl mb-4">📝</div>
-                <h3 class="text-xl font-bold text-emerald-400 mb-2">Memo</h3>
-                <p class="text-neutral-500 text-xs">Internal Admin Notes</p>
-            </a>
-            <a href="security.html" class="nav-card bg-neutral-900/50 p-8 rounded-2xl block text-center lg:hidden">
-                <div class="text-4xl mb-4">🛡️</div>
-                <h3 class="text-xl font-bold text-red-400 mb-2">Security</h3>
-                <p class="text-neutral-500 text-xs">Access Control</p>
-            </a>
+        <div class="p-8 space-y-8">
+            
+         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-blue-500/5 transition-colors" onclick="location.href='visitor.html'">
+        <div class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-2xl">📊</div>
+        <div>
+            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Total Visitors</p>
+            <h4 id="stat-visitors" class="text-xl font-black text-white">...</h4>
         </div>
+    </div>
 
-        <div class="space-y-8">
-            <div class="bg-neutral-900/80 p-8 rounded-3xl border border-white/5 shadow-2xl">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="text-2xl">🔍</span>
-                    <h3 class="text-xl font-bold text-white">Search Engine Optimization (SEO)</h3>
+    <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-emerald-500/5 transition-colors" onclick="location.href='inquiry.html'">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl">📩</div>
+        <div>
+            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Inquiries</p>
+            <h4 id="stat-inquiries" class="text-xl font-black text-white">...</h4>
+        </div>
+    </div>
+
+    <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-amber-500/5 transition-colors" onclick="location.href='post.html'">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-2xl">✍️</div>
+        <div>
+            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Posts / Notices</p>
+            <h4 id="stat-posts" class="text-xl font-black text-white">...</h4>
+        </div>
+    </div>
+
+    <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-purple-500/5 transition-colors" onclick="location.href='memo.html'">
+        <div class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl">📝</div>
+        <div>
+            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Internal Memos</p>
+            <h4 id="stat-memos" class="text-xl font-black text-white">...</h4>
+        </div>
+    </div>
+</section>
+
+
+
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2 h-2 bg-cyan-500 rounded-full"></span> Search Engine Optimization
+                    </h3>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-6">
+                <div class="stat-card p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 space-y-4">
                         <div>
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-2">Site Description</label>
-                            <textarea id="seoDesc" class="w-full bg-black border border-neutral-800 rounded-xl p-4 text-sm text-neutral-300 focus:border-cyan-500 outline-none transition h-24" placeholder="Enter site description..."></textarea>
+                            <label class="text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Site Description</label>
+                            <textarea id="seoDesc" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition h-24" placeholder="Enter site description..."></textarea>
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-2">Keywords</label>
-                            <input type="text" id="seoKeywords" class="w-full bg-black border border-neutral-800 rounded-xl p-4 text-sm text-neutral-300 focus:border-cyan-500 outline-none transition" placeholder="energy, indonesia, tdl...">
+                            <label class="text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Keywords</label>
+                            <input type="text" id="seoKeywords" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition" placeholder="energy, indonesia, tdl...">
                         </div>
-                        <button onclick="saveSEO()" class="w-full py-4 bg-cyan-600/20 hover:bg-cyan-600 text-cyan-400 hover:text-white font-bold rounded-xl transition uppercase tracking-widest text-xs">Update Meta Data</button>
+                        <button onclick="saveSEO()" class="w-full py-3.5 bg-cyan-500 text-black font-bold rounded-2xl hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20 text-sm">
+                            Save Meta Settings
+                        </button>
                     </div>
-                    <div class="p-5 bg-black/40 rounded-2xl border border-white/5 space-y-4 text-[11px]">
-                        <p class="font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2"><span class="text-base">💡</span> SEO Management Guide</p>
-                        <p class="text-neutral-400 leading-relaxed"><strong class="text-neutral-300">Description:</strong> Google search results preview. Keep it under 160 chars.</p>
-                        <p class="text-neutral-400 leading-relaxed"><strong class="text-neutral-300">Keywords:</strong> Core business terms separated by commas.</p>
-                        <p class="text-neutral-500 italic">* Changes may take weeks to appear in search results.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-neutral-900/80 p-8 rounded-3xl border border-white/5 shadow-2xl">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 border-b border-white/5 pb-6">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">📢</span>
-                        <h3 class="text-xl font-bold text-white">Notice & Popups Management</h3>
-                    </div>
-                    <div class="flex gap-2 bg-black/60 p-1.5 rounded-2xl border border-white/10">
-                        <button onclick="switchPopup(0)" class="slot-btn active px-4 py-2 rounded-xl text-[10px] uppercase font-bold">Slot 1</button>
-                        <button onclick="switchPopup(1)" class="slot-btn px-4 py-2 rounded-xl text-[10px] uppercase font-bold">Slot 2</button>
-                        <button onclick="switchPopup(2)" class="slot-btn px-4 py-2 rounded-xl text-[10px] uppercase font-bold">Slot 3</button>
-                        <button onclick="switchPopup(3)" class="slot-btn px-4 py-2 rounded-xl text-[10px] uppercase font-bold">Slot 4</button>
-                        <button onclick="switchPopup(4)" class="slot-btn px-4 py-2 rounded-xl text-[10px] uppercase font-bold">Slot 5</button>
+                    <div class="bg-cyan-500/5 rounded-2xl p-6 border border-cyan-500/10 flex flex-col justify-center">
+                        <p class="text-cyan-500 text-xs font-bold mb-2">💡 SEO Guide</p>
+                        <p class="text-neutral-400 text-xs leading-relaxed">
+                            Description은 160자 이내를 권장하며, 키워드는 쉼표(,)로 구분하십시오.
+                        </p>
                     </div>
                 </div>
+            </section>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="space-y-6">
-                        <div class="flex justify-between items-center p-5 bg-black/40 rounded-2xl border border-white/5">
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2 h-2 bg-amber-500 rounded-full"></span> Notice & Popups
+                    </h3>
+                    <div class="flex gap-1.5 bg-black/40 p-1 rounded-xl border border-white/5">
+                        <button onclick="switchPopup(0)" class="slot-btn active px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 1</button>
+                        <button onclick="switchPopup(1)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 2</button>
+                        <button onclick="switchPopup(2)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 3</button>
+                        <button onclick="switchPopup(3)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 4</button>
+                        <button onclick="switchPopup(4)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 5</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-4 space-y-4">
+                        <div class="stat-card p-5 flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-bold text-white">Main Page Popup</p>
-                                <p class="text-[10px] text-neutral-500">Show floating modal</p>
+                                <p class="text-sm font-bold">Main Popup</p>
+                                <p class="text-[10px] text-neutral-500 uppercase">Modal Activation</p>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="popupActive">
                                 <span class="slider"></span>
                             </label>
                         </div>
-                        <div class="flex justify-between items-center p-5 bg-black/40 rounded-2xl border border-white/5">
+                        <div class="stat-card p-5 flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-bold text-amber-500">Emergency Banner</p>
-                                <p class="text-[10px] text-neutral-500">Header red banner</p>
+                                <p class="text-[10px] text-neutral-500 uppercase">Top Bar Visibility</p>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="bannerActive">
                                 <span class="slider"></span>
                             </label>
                         </div>
-                        <div class="p-5 bg-black/40 rounded-2xl border border-white/5 space-y-4">
-                            <p class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Active Period</p>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-[9px] text-neutral-500 uppercase block mb-1">Start</label>
-                                    <input type="text" id="startDate" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg p-2.5 text-xs text-white outline-none">
-                                </div>
-                                <div>
-                                    <label class="text-[9px] text-neutral-500 uppercase block mb-1">End</label>
-                                    <input type="text" id="endDate" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg p-2.5 text-xs text-white outline-none">
-                                </div>
+                        <div class="stat-card p-6 space-y-4">
+                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Active Schedule</p>
+                            <div class="space-y-3">
+                                <input type="text" id="startDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="Start Date">
+                                <input type="text" id="endDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="End Date">
                             </div>
                         </div>
                     </div>
 
-                    <div class="lg:col-span-2">
-                        <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-2">Content Editor (Slot <span id="slotDisplay">1</span>)</label>
-                        <div id="editor-container" class="mb-4"></div>
-                        <button onclick="saveNotice()" class="w-full py-4 bg-white/5 hover:bg-cyan-600 text-white font-bold rounded-2xl transition uppercase tracking-widest text-xs border border-white/10">Save Settings to Current Slot</button>
+                    <div class="lg:col-span-8">
+                        <div class="stat-card p-6 h-full flex flex-col">
+                            <div class="flex items-center justify-between mb-4 px-1">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase">Visual Content Editor (Slot <span id="slotDisplay" class="text-cyan-500">1</span>)</label>
+                            </div>
+                            <div id="editor-container" class="flex-1 min-h-[300px]"></div>
+                            <button onclick="saveNotice()" class="mt-4 w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-bold transition uppercase tracking-widest text-xs">
+                                Update Current Slot Data
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
-
-<div class="mt-24 pt-12 border-t border-white/5 text-center flex justify-center items-center gap-4 pb-12">
-            <span class="w-8 h-[1px] bg-neutral-800"></span>
-            <a href="../index.html" class="text-neutral-600 hover:text-cyan-400 text-sm transition font-medium tracking-wide">
-                ← Exit to Public Website
-            </a>
-            <span class="w-8 h-[1px] bg-neutral-800"></span>
-        </div>
-    </div>
+    </main>
 
     <script>
+        // Firebase Configuration (동일)
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -214,7 +249,7 @@
         const auth = firebase.auth();
         let quill;
         let currentSlot = 0;
-        let popupDataList = [{}, {}, {}, {}, {}]; // 로컬 데이터 저장소
+        let popupDataList = [{}, {}, {}, {}, {}];
 
         document.addEventListener('DOMContentLoaded', function() {
             quill = new Quill('#editor-container', {
@@ -231,27 +266,45 @@
             if (user) {
                 document.getElementById('authOverlay').style.display = 'none';
                 loadSettings();
+                loadDashboardStats(); // 대시보드 통계 호출
             } else { window.location.href = "login.html"; }
         });
 
+        // 추가된 함수: Firebase 실시간 데이터 카운팅
+        async function loadDashboardStats() {
+            // 1. 방문자 수 (visitorLogs)
+            database.ref('visitorLogs').on('value', snap => {
+                document.getElementById('stat-visitors').innerText = snap.numChildren().toLocaleString();
+            });
+
+            // 2. 문의 내역 (messages)
+            database.ref('messages').on('value', snap => {
+                document.getElementById('stat-inquiries').innerText = snap.numChildren().toLocaleString();
+            });
+
+            // 3. 콘텐츠/공지사항 (notices)
+            database.ref('notices').on('value', snap => {
+                document.getElementById('stat-posts').innerText = snap.numChildren().toLocaleString();
+            });
+
+            // 4. 내부 메모 (adminMemos)
+            database.ref('adminMemos').on('value', snap => {
+                document.getElementById('stat-memos').innerText = snap.numChildren().toLocaleString();
+            });
+        }
+
+        // --- 기존 함수들 (loadSettings, saveNotice 등) 동일하게 유지 ---
         async function loadSettings() {
             try {
-                // SEO 로드
                 const seoSnap = await database.ref('siteSettings/seo').once('value');
                 if(seoSnap.exists()) {
                     document.getElementById('seoDesc').value = seoSnap.val().description || '';
                     document.getElementById('seoKeywords').value = seoSnap.val().keywords || '';
                 }
-
-                // 팝업 리스트 로드
                 const popSnap = await database.ref('siteSettings/popups').once('value');
                 if(popSnap.exists()) {
                     const data = popSnap.val();
                     for(let i=0; i<5; i++) { if(data[i]) popupDataList[i] = data[i]; }
-                } else {
-                    // 데이터가 없는 경우를 위한 초기화
-                    const oldNotice = await database.ref('siteSettings/notice').once('value');
-                    if(oldNotice.exists()) popupDataList[0] = oldNotice.val();
                 }
                 displayCurrentPopup();
             } catch (e) { console.error("Load Error:", e); }
@@ -287,9 +340,7 @@
                 endDate: document.getElementById('endDate').value,
                 updatedAt: Date.now()
             };
-
             popupDataList[currentSlot] = data;
-
             try {
                 await database.ref('siteSettings/popups').set(popupDataList);
                 alert(`Slot ${currentSlot + 1} updated successfully.`);
