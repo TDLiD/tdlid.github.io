@@ -256,9 +256,18 @@ async function loadLayout() {
             console.warn("admin-auth.html을 찾을 수 없지만 계속 진행합니다.");
         }
 
-        // [3] 푸터 & BGM 로드
-        const footerRes = await fetch('components/footer.html');
-        if(footerRes.ok) document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+// 4. 푸터 로드 및 스크립트 강제 실행
+const footerRes = await fetch('components/footer.html');
+const footerPlaceholder = document.getElementById('footer-placeholder');
+footerPlaceholder.innerHTML = await footerRes.text();
+
+// 추가: 푸터 내의 스크립트 추출 및 실행
+const footerScripts = footerPlaceholder.querySelectorAll("script");
+footerScripts.forEach(oldScript => {
+    const newScript = document.createElement("script");
+    newScript.text = oldScript.text;
+    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+});
 
         const bgmRes = await fetch('components/bgm.html');
         if(bgmRes.ok) {
