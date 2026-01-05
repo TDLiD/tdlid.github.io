@@ -132,53 +132,66 @@ async function verifyAdminPassword() {
 }
 
     /* [추가] 실시간 공지/팝업/SEO 감지 함수 */
-    function initLiveSettings() {
-        // 1. SEO 설정 감지
-        database.ref('siteSettings/seo').on('value', (snapshot) => {
-            const data = snapshot.val();
-if (data) {
-        const now = new Date().toISOString().split('T')[0]; // 현재 날짜 (YYYY-MM-DD)
-        
-        // 날짜 범위 체크 함수
-        const isExpired = (data.startDate && now < data.startDate) || (data.endDate && now > data.endDate);
-
-        // 팝업 표시 (날짜가 기한 내에 있을 때만)
-        const popup = document.getElementById('mainPopup');
-        if (data.popupActive && !isExpired) {
-            popup.style.display = 'flex';
-            document.getElementById('popupText').innerText = data.text;
-        } else {
-            popup.style.display = 'none';
+/* [수정된] 실시간 공지/팝업/SEO 감지 함수 */
+function initLiveSettings() {
+    // 1. SEO 설정 감지
+    database.ref('siteSettings/seo').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            // SEO 메타 태그 업데이트 로직 (필요 시 유지)
+            if (data.description) document.getElementById('metaDescription')?.setAttribute('content', data.description);
+            if (data.keywords) document.getElementById('metaKeywords')?.setAttribute('content', data.keywords);
         }
-        
-        // 배너 표시 로직도 위와 동일하게 isExpired를 활용하여 적용...
-    }
-        });
+    });
 
-        // 2. 공지/팝업 설정 감지
-        database.ref('siteSettings/notice').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                // 상단 긴급 배너 제어
-                const banner = document.getElementById('emergencyBanner');
-                if (data.bannerActive) {
-                    banner.style.display = 'block';
-                    document.getElementById('bannerText').innerText = data.text;
-                } else {
-                    banner.style.display = 'none';
-                }
+    // 2. 공지/팝업 설정 감지
+    database.ref('siteSettings/notice').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            const now = new Date().toISOString().split('T')[0]; // 현재 날짜 (YYYY-MM-DD)
+            
+            // 날짜 범위 체크 (시작일/종료일 기준)
+            const isExpired = (data.startDate && now < data.startDate) || (data.endDate && now > data.endDate);
 
-                // 중앙 팝업 제어
-                const popup = document.getElementById('mainPopup');
-                if (data.popupActive) {
-                    popup.style.display = 'flex';
-                    document.getElementById('popupText').innerText = data.text;
-                } else {
-                    popup.style.display = 'none';
-                }
+            // --- 상단 긴급 배너 제어 ---
+            const banner = document.getElementById('emergencyBanner');
+            const bannerText = document.getElementById('bannerText');
+            if (data.bannerActive && !isExpired) {
+                banner.style.display = 'block';
+                // 텍스트 및 HTML 서식 적용
+                bannerText.innerHTML = data.content || data.text || '';
+            } else {
+                banner.style.display = 'none';
             }
-        });
-    }
+
+            // --- 중앙 팝업 제어 ---
+            const popup = document.getElementById('mainPopup');
+            const popupContent = document.getElementById('popupText'); // 실제 내용이 들어가는 영역
+
+            if (data.popupActive && !isExpired) {
+                popup.style.display = 'flex';
+                
+                // [중요] innerText 대신 innerHTML 사용 (이미지/서식 렌더링)
+                // 관리자에서 저장한 content(HTML)가 있으면 그것을 사용, 없으면 text(일반문자열) 사용
+                popupContent.innerHTML = data.content || data.text || '';
+
+                // [추가] 팝업 내 이미지 크기 최적화 (반응형 대응)
+                const images = popupContent.getElementsByTagName('img');
+                for (let img of images) {
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    img.style.borderRadius = '8px';
+                    img.style.margin = '10px auto';
+                    img.style.display = 'block';
+                }
+            } else {
+                popup.style.display = 'none';
+            }
+        }
+    });
+}
+
+
     </script>
 
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
@@ -245,15 +258,18 @@ if (data) {
 
     #adminAuthModal { background: rgba(0,0,0,0.8); }
 
-    .popup-box { 
-        background: #0a0a0a; 
-        border: 1px solid #22d3ee; 
-        padding: 40px; 
-        border-radius: 24px; 
-        max-width: 420px; 
-        width: 90%; 
-        text-align: center; 
-    }
+.popup-box { 
+    background: #0a0a0a; 
+    border: 1px solid #22d3ee; 
+    padding: 30px; /* 패딩 약간 축소 */
+    border-radius: 24px; 
+    max-width: 550px; /* 기존 420px에서 550px로 확장 */
+    width: 90%; 
+    text-align: center; 
+    max-height: 80vh; /* 화면 높이의 80%까지만 허용 */
+    overflow-y: auto; /* 내용이 길면 스크롤 생성 */
+}
+
 
     #imageModal { 
         position: fixed; 

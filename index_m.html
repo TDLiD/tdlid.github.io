@@ -29,53 +29,75 @@
         const database = firebase.database();
 
         // [추가] 실시간 공지/팝업/SEO 감지 함수
-        function initLiveSettings() {
-            // 1. SEO 설정 실시간 감지
-            database.ref('siteSettings/seo').on('value', (snapshot) => {
-                const data = snapshot.val();
-if (data) {
-        const now = new Date().toISOString().split('T')[0]; // 현재 날짜 (YYYY-MM-DD)
-        
-        // 날짜 범위 체크 함수
-        const isExpired = (data.startDate && now < data.startDate) || (data.endDate && now > data.endDate);
+// [수정 및 추가] 실시간 공지/팝업/SEO 감지 함수
+function initLiveSettings() {
+    // 1. SEO 설정 실시간 감지 (기존 유지)
+    database.ref('siteSettings/seo').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            const now = new Date().toISOString().split('T')[0];
+            const isExpired = (data.startDate && now < data.startDate) || (data.endDate && now > data.endDate);
+            
+            const popup = document.getElementById('mainPopup');
+            const popupText = document.getElementById('popupText');
 
-        // 팝업 표시 (날짜가 기한 내에 있을 때만)
-        const popup = document.getElementById('mainPopup');
-        if (data.popupActive && !isExpired) {
-            popup.style.display = 'flex';
-            document.getElementById('popupText').innerText = data.text;
-        } else {
-            popup.style.display = 'none';
-        }
-        
-        // 배너 표시 로직도 위와 동일하게 isExpired를 활용하여 적용...
-    }
-            });
-
-            // 2. 공지/팝업 설정 실시간 감지
-            database.ref('siteSettings/notice').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    // 상단 배너
-                    const banner = document.getElementById('emergencyBanner');
-                    if (data.bannerActive) {
-                        banner.style.display = 'block';
-                        document.getElementById('bannerText').innerText = data.text;
-                    } else {
-                        banner.style.display = 'none';
-                    }
-
-                    // 중앙 팝업
-                    const popup = document.getElementById('mainPopup');
-                    if (data.popupActive) {
-                        popup.style.display = 'flex';
-                        document.getElementById('popupText').innerText = data.text;
-                    } else {
-                        popup.style.display = 'none';
-                    }
+            if (data.popupActive && !isExpired) {
+                popup.style.display = 'flex';
+                // [변경] innerText -> innerHTML (이미지 및 태그 허용)
+                // [변경] data.text -> data.content (에디터 본문 데이터 우선 호출)
+                popupText.innerHTML = data.content || data.text || '';
+                
+                // [추가] 팝업 내 이미지 반응형 처리
+                const imgs = popupText.getElementsByTagName('img');
+                for(let img of imgs) {
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    img.style.borderRadius = '8px';
+                    img.style.display = 'block';
+                    img.style.margin = '10px auto';
                 }
-            });
+            } else {
+                popup.style.display = 'none';
+            }
         }
+    });
+
+    // 2. 공지/팝업 설정 실시간 감지 (기존 수정)
+    database.ref('siteSettings/notice').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            // 상단 배너 제어
+            const banner = document.getElementById('emergencyBanner');
+            const bannerText = document.getElementById('bannerText');
+            if (data.bannerActive) {
+                banner.style.display = 'block';
+                // [변경] HTML 서식 허용
+                bannerText.innerHTML = data.content || data.text || '';
+            } else {
+                banner.style.display = 'none';
+            }
+
+            // 중앙 팝업 제어 (위의 SEO 로직과 겹칠 경우 notice 설정을 우선하거나 통합 관리하세요)
+            const popup = document.getElementById('mainPopup');
+            const popupText = document.getElementById('popupText');
+            if (data.popupActive) {
+                popup.style.display = 'flex';
+                popupText.innerHTML = data.content || data.text || '';
+                
+                // 이미지 반응형 처리
+                const imgs = popupText.getElementsByTagName('img');
+                for(let img of imgs) {
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    img.style.display = 'block';
+                    img.style.margin = '10px auto';
+                }
+            } else {
+                popup.style.display = 'none';
+            }
+        }
+    });
+}
 
         // 2. 관리자 인증 로직
         function openAdminAuth() {
@@ -203,15 +225,30 @@ async function verifyAdminPassword() {
         background: rgba(0, 0, 0, 0.8);
     }
 
-    .popup-box {
-        background: #0a0a0a;
-        border: 1px solid #22d3ee;
-        padding: 30px 20px;
-        border-radius: 20px;
-        width: 100%;
-        max-width: 320px;
-        text-align: center;
-    }
+/* [수정] 팝업 박스 모바일 대응 스크롤 추가 */
+.popup-box {
+    background: #0a0a0a;
+    border: 1px solid #22d3ee;
+    padding: 25px 20px;
+    border-radius: 20px;
+    width: 90%;          /* 모바일에서 좌우 여백 확보 */
+    max-width: 340px;
+    text-align: center;
+    max-height: 80vh;    /* 화면 높이의 80%를 넘지 않게 설정 */
+    overflow-y: auto;    /* 내용이 길어지면 내부에서 스크롤 */
+    box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
+}
+
+/* 팝업 내 텍스트 정렬 및 간격 */
+#popupText {
+    text-align: left;    /* 긴 본문은 왼쪽 정렬이 가독성이 좋습니다 */
+    font-size: 14px;
+    color: #d1d5db;
+}
+
+/* 스크롤바 디자인 (선택사항) */
+.popup-box::-webkit-scrollbar { width: 4px; }
+.popup-box::-webkit-scrollbar-thumb { background: #22d3ee; border-radius: 10px; }
 
     /* 기존 스타일 */
     #header-placeholder {
