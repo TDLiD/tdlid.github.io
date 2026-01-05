@@ -29,46 +29,42 @@
         const database = firebase.database();
 
 // [수정] Firebase 데이터 구조 변경(배열형)에 따른 모바일용 실시간 설정 감지 함수
+// [수정된 버전] 팝업 변수명 일치 및 데이터 검증 강화
 function initLiveSettings() {
-    // 1. SEO 설정 실시간 감지 (기존 유지)
     database.ref('siteSettings/seo').on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            // 필요 시 title이나 meta tag 변경 로직을 여기에 추가할 수 있습니다.
+            if(data.description) document.getElementById('metaDescription').content = data.description;
+            if(data.keywords) document.getElementById('metaKeywords').content = data.keywords;
         }
     });
 
-    // 2. 팝업 및 공지 설정 실시간 감지 (siteSettings/popups 배열 구조)
     database.ref('siteSettings/popups').on('value', (snapshot) => {
         const popups = snapshot.val();
-        
         const banner = document.getElementById('emergencyBanner');
         const bannerText = document.getElementById('bannerText');
         const popup = document.getElementById('mainPopup');
         const popupText = document.getElementById('popupText');
 
-        // 상태 초기화 (표시할 데이터가 없을 경우를 대비)
         let isAnyPopupVisible = false;
         let isAnyBannerVisible = false;
 
         if (popups && Array.isArray(popups)) {
-            const now = new Date().toISOString().split('T')[0]; // 오늘 날짜 (YYYY-MM-DD)
+            const now = new Date().toISOString().split('T')[0];
 
             popups.forEach(item => {
                 if (!item) return;
 
-                // 공통 조건: 활성화 상태여야 함 + 기간이 유효해야 함
+                // 공통 기간 유효성 체크
                 const isDateValid = (!item.startDate || now >= item.startDate) && 
                                     (!item.endDate || now <= item.endDate);
                 
-                if (item.isActive && isDateValid) {
-                    
-                    // A. 중앙 팝업 처리 (가장 먼저 발견된 활성 팝업 하나만 표시)
-                    if (item.type === 'popup' && !isAnyPopupVisible) {
+                if (isDateValid) {
+                    // 1. 중앙 팝업 체크 (item.isActive -> item.popupActive 로 변경)
+                    if (item.popupActive && !isAnyPopupVisible) {
                         popup.style.display = 'flex';
                         popupText.innerHTML = item.content || item.text || '';
                         
-                        // [추가] 팝업 내 이미지 반응형 처리
                         const imgs = popupText.getElementsByTagName('img');
                         for(let img of imgs) {
                             img.style.maxWidth = '100%';
@@ -80,8 +76,8 @@ function initLiveSettings() {
                         isAnyPopupVisible = true;
                     }
 
-                    // B. 하단/상단 공지 배너 처리
-                    if (item.type === 'notice' && !isAnyBannerVisible) {
+                    // 2. 하단 배너 체크 (item.type === 'notice' -> item.bannerActive 로 변경)
+                    if (item.bannerActive && !isAnyBannerVisible) {
                         banner.style.display = 'block';
                         bannerText.innerHTML = item.content || item.text || '';
                         isAnyBannerVisible = true;
@@ -90,13 +86,8 @@ function initLiveSettings() {
             });
         }
 
-        // 활성화된 팝업이나 배너가 없으면 숨김 처리
-        if (!isAnyPopupVisible) {
-            popup.style.display = 'none';
-        }
-        if (!isAnyBannerVisible) {
-            banner.style.display = 'none';
-        }
+        if (!isAnyPopupVisible) popup.style.display = 'none';
+        if (!isAnyBannerVisible) banner.style.display = 'none';
     });
 }
 
