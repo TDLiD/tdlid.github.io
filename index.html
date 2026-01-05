@@ -133,64 +133,66 @@ async function verifyAdminPassword() {
 
     /* [추가] 실시간 공지/팝업/SEO 감지 함수 */
 /* [수정된] 실시간 공지/팝업/SEO 감지 함수 */
+/* [수정된] 실시간 공지/팝업/SEO 감지 함수 */
 function initLiveSettings() {
-    // 1. SEO 설정 감지
+    // 1. SEO 설정 감지 (기존 유지)
     database.ref('siteSettings/seo').on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            // SEO 메타 태그 업데이트 로직 (필요 시 유지)
             if (data.description) document.getElementById('metaDescription')?.setAttribute('content', data.description);
             if (data.keywords) document.getElementById('metaKeywords')?.setAttribute('content', data.keywords);
         }
     });
 
-    // 2. 공지/팝업 설정 감지
-    database.ref('siteSettings/notice').on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
+    // 2. 팝업 설정 감지 (배열 구조 대응 수정)
+    database.ref('siteSettings/popups').on('value', (snapshot) => {
+        const popups = snapshot.val();
+        if (Array.isArray(popups)) {
             const now = new Date().toISOString().split('T')[0]; // 현재 날짜 (YYYY-MM-DD)
-            
-            // 날짜 범위 체크 (시작일/종료일 기준)
-            const isExpired = (data.startDate && now < data.startDate) || (data.endDate && now > data.endDate);
 
-            // --- 상단 긴급 배너 제어 ---
-            const banner = document.getElementById('emergencyBanner');
-            const bannerText = document.getElementById('bannerText');
-            if (data.bannerActive && !isExpired) {
-                banner.style.display = 'block';
-                // 텍스트 및 HTML 서식 적용
-                bannerText.innerHTML = data.content || data.text || '';
-            } else {
-                banner.style.display = 'none';
-            }
+            // 팝업 리스트 중 활성화 상태이고 날짜가 유효한 첫 번째 항목을 찾음
+            const activePopup = popups.find(p => {
+                const isExpired = (p.startDate && now < p.startDate) || (p.endDate && now > p.endDate);
+                return p.popupActive && !isExpired;
+            });
 
-            // --- 중앙 팝업 제어 ---
             const popup = document.getElementById('mainPopup');
-            const popupContent = document.getElementById('popupText'); // 실제 내용이 들어가는 영역
+            const popupContent = document.getElementById('popupText');
 
-            if (data.popupActive && !isExpired) {
+            if (activePopup) {
                 popup.style.display = 'flex';
-                
-                // [중요] innerText 대신 innerHTML 사용 (이미지/서식 렌더링)
-                // 관리자에서 저장한 content(HTML)가 있으면 그것을 사용, 없으면 text(일반문자열) 사용
-                popupContent.innerHTML = data.content || data.text || '';
+                popupContent.innerHTML = activePopup.content || activePopup.text || '';
 
-                // [추가] 팝업 내 이미지 크기 최적화 (반응형 대응)
+                // 이미지 최적화
                 const images = popupContent.getElementsByTagName('img');
                 for (let img of images) {
                     img.style.maxWidth = '100%';
                     img.style.height = 'auto';
-                    img.style.borderRadius = '8px';
-                    img.style.margin = '10px auto';
                     img.style.display = 'block';
+                    img.style.margin = '10px auto';
+                    img.style.borderRadius = '8px';
                 }
             } else {
                 popup.style.display = 'none';
             }
+
+            // --- 상단 긴급 배너 제어 (첫 번째 활성 배너 기준) ---
+            const activeBanner = popups.find(p => {
+                const isExpired = (p.startDate && now < p.startDate) || (p.endDate && now > p.endDate);
+                return p.bannerActive && !isExpired;
+            });
+
+            const banner = document.getElementById('emergencyBanner');
+            const bannerText = document.getElementById('bannerText');
+            if (banner && activeBanner) {
+                banner.style.display = 'block';
+                bannerText.innerHTML = activeBanner.content || activeBanner.text || '';
+            } else if (banner) {
+                banner.style.display = 'none';
+            }
         }
     });
 }
-
 
     </script>
 

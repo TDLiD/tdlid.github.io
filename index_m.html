@@ -28,73 +28,74 @@
         }
         const database = firebase.database();
 
-        // [추가] 실시간 공지/팝업/SEO 감지 함수
-// [수정 및 추가] 실시간 공지/팝업/SEO 감지 함수
+// [수정] Firebase 데이터 구조 변경(배열형)에 따른 모바일용 실시간 설정 감지 함수
 function initLiveSettings() {
     // 1. SEO 설정 실시간 감지 (기존 유지)
     database.ref('siteSettings/seo').on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            const now = new Date().toISOString().split('T')[0];
-            const isExpired = (data.startDate && now < data.startDate) || (data.endDate && now > data.endDate);
-            
-            const popup = document.getElementById('mainPopup');
-            const popupText = document.getElementById('popupText');
-
-            if (data.popupActive && !isExpired) {
-                popup.style.display = 'flex';
-                // [변경] innerText -> innerHTML (이미지 및 태그 허용)
-                // [변경] data.text -> data.content (에디터 본문 데이터 우선 호출)
-                popupText.innerHTML = data.content || data.text || '';
-                
-                // [추가] 팝업 내 이미지 반응형 처리
-                const imgs = popupText.getElementsByTagName('img');
-                for(let img of imgs) {
-                    img.style.maxWidth = '100%';
-                    img.style.height = 'auto';
-                    img.style.borderRadius = '8px';
-                    img.style.display = 'block';
-                    img.style.margin = '10px auto';
-                }
-            } else {
-                popup.style.display = 'none';
-            }
+            // 필요 시 title이나 meta tag 변경 로직을 여기에 추가할 수 있습니다.
         }
     });
 
-    // 2. 공지/팝업 설정 실시간 감지 (기존 수정)
-    database.ref('siteSettings/notice').on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            // 상단 배너 제어
-            const banner = document.getElementById('emergencyBanner');
-            const bannerText = document.getElementById('bannerText');
-            if (data.bannerActive) {
-                banner.style.display = 'block';
-                // [변경] HTML 서식 허용
-                bannerText.innerHTML = data.content || data.text || '';
-            } else {
-                banner.style.display = 'none';
-            }
+    // 2. 팝업 및 공지 설정 실시간 감지 (siteSettings/popups 배열 구조)
+    database.ref('siteSettings/popups').on('value', (snapshot) => {
+        const popups = snapshot.val();
+        
+        const banner = document.getElementById('emergencyBanner');
+        const bannerText = document.getElementById('bannerText');
+        const popup = document.getElementById('mainPopup');
+        const popupText = document.getElementById('popupText');
 
-            // 중앙 팝업 제어 (위의 SEO 로직과 겹칠 경우 notice 설정을 우선하거나 통합 관리하세요)
-            const popup = document.getElementById('mainPopup');
-            const popupText = document.getElementById('popupText');
-            if (data.popupActive) {
-                popup.style.display = 'flex';
-                popupText.innerHTML = data.content || data.text || '';
+        // 상태 초기화 (표시할 데이터가 없을 경우를 대비)
+        let isAnyPopupVisible = false;
+        let isAnyBannerVisible = false;
+
+        if (popups && Array.isArray(popups)) {
+            const now = new Date().toISOString().split('T')[0]; // 오늘 날짜 (YYYY-MM-DD)
+
+            popups.forEach(item => {
+                if (!item) return;
+
+                // 공통 조건: 활성화 상태여야 함 + 기간이 유효해야 함
+                const isDateValid = (!item.startDate || now >= item.startDate) && 
+                                    (!item.endDate || now <= item.endDate);
                 
-                // 이미지 반응형 처리
-                const imgs = popupText.getElementsByTagName('img');
-                for(let img of imgs) {
-                    img.style.maxWidth = '100%';
-                    img.style.height = 'auto';
-                    img.style.display = 'block';
-                    img.style.margin = '10px auto';
+                if (item.isActive && isDateValid) {
+                    
+                    // A. 중앙 팝업 처리 (가장 먼저 발견된 활성 팝업 하나만 표시)
+                    if (item.type === 'popup' && !isAnyPopupVisible) {
+                        popup.style.display = 'flex';
+                        popupText.innerHTML = item.content || item.text || '';
+                        
+                        // [추가] 팝업 내 이미지 반응형 처리
+                        const imgs = popupText.getElementsByTagName('img');
+                        for(let img of imgs) {
+                            img.style.maxWidth = '100%';
+                            img.style.height = 'auto';
+                            img.style.borderRadius = '8px';
+                            img.style.display = 'block';
+                            img.style.margin = '10px auto';
+                        }
+                        isAnyPopupVisible = true;
+                    }
+
+                    // B. 하단/상단 공지 배너 처리
+                    if (item.type === 'notice' && !isAnyBannerVisible) {
+                        banner.style.display = 'block';
+                        bannerText.innerHTML = item.content || item.text || '';
+                        isAnyBannerVisible = true;
+                    }
                 }
-            } else {
-                popup.style.display = 'none';
-            }
+            });
+        }
+
+        // 활성화된 팝업이나 배너가 없으면 숨김 처리
+        if (!isAnyPopupVisible) {
+            popup.style.display = 'none';
+        }
+        if (!isAnyBannerVisible) {
+            banner.style.display = 'none';
         }
     });
 }
