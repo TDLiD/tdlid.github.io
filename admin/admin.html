@@ -23,12 +23,9 @@
         .sidebar-item { transition: all 0.2s; border-radius: 12px; }
         .sidebar-item:hover, .sidebar-item.active { background: rgba(34, 211, 238, 0.1); color: #22d3ee; }
         .stat-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(34, 211, 238, 0.1); border-radius: 24px; }
-        
-        /* Dashboard Summary Widget Style */
         .dash-widget { background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.5)); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; transition: transform 0.3s ease; }
         .dash-widget:hover { transform: translateY(-3px); border-color: rgba(34, 211, 238, 0.3); }
 
-        /* Custom Switch */
         .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #1e293b; transition: .4s; border-radius: 22px; }
@@ -50,7 +47,6 @@
     </style>
 </head>
 
-
 <body class="min-h-screen bg-[#020617]">
 
     <div id="authOverlay">
@@ -61,7 +57,6 @@
 
     <main class="w-full">
         <div class="max-w-[1600px] mx-auto p-8 space-y-8">
-            
             <div class="mb-2">
                 <h2 class="text-xl font-bold text-white flex items-center gap-2">
                     <span class="w-1 h-5 bg-cyan-500 rounded-full"></span>
@@ -70,44 +65,35 @@
             </div>
             
             <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-blue-500/5 transition-colors" onclick="location.href='visitor.html'">
+                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='visitor.html'">
                     <div class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-2xl">📊</div>
                     <div>
                         <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Total Visitors</p>
                         <h4 id="stat-visitors" class="text-xl font-black text-white">...</h4>
                     </div>
                 </div>
-
-                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-emerald-500/5 transition-colors" onclick="location.href='inquiry.html'">
+                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='inquiry.html'">
                     <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl">📩</div>
                     <div>
                         <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Inquiries</p>
                         <h4 id="stat-inquiries" class="text-xl font-black text-white">...</h4>
                     </div>
                 </div>
-
-                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-amber-500/5 transition-colors" onclick="location.href='post.html'">
+                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='post.html'">
                     <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-2xl">✍️</div>
                     <div>
-                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Posts / Notices</p>
+                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Posts</p>
                         <h4 id="stat-posts" class="text-xl font-black text-white">...</h4>
                     </div>
                 </div>
-
-                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-purple-500/5 transition-colors" onclick="location.href='memo.html'">
+                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='memo.html'">
                     <div class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl">📝</div>
                     <div>
-                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Internal Memos</p>
+                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Memos</p>
                         <h4 id="stat-memos" class="text-xl font-black text-white">...</h4>
                     </div>
                 </div>
             </section>
-            
-            </div>
-    </main>
-</body>
-
-
 
             <section>
                 <div class="flex items-center justify-between mb-4">
@@ -119,22 +105,17 @@
                     <div class="lg:col-span-2 space-y-4">
                         <div>
                             <label class="text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Site Description</label>
-                            <textarea id="seoDesc" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition h-24" placeholder="Enter site description..."></textarea>
+                            <textarea id="seoDesc" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition h-24"></textarea>
                         </div>
                         <div>
                             <label class="text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Keywords</label>
-                            <input type="text" id="seoKeywords" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition" placeholder="energy, indonesia, tdl...">
+                            <input type="text" id="seoKeywords" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition">
                         </div>
-                        <button onclick="saveSEO()" class="w-full py-3.5 bg-cyan-500 text-black font-bold rounded-2xl hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20 text-sm">
-                            Save Meta Settings
-                        </button>
+                        <button onclick="saveSEO()" class="w-full py-3.5 bg-cyan-500 text-black font-bold rounded-2xl hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20 text-sm">Save Meta Settings</button>
                     </div>
                     <div class="bg-cyan-500/5 rounded-2xl p-6 border border-cyan-500/10 flex flex-col justify-center">
                         <p class="text-cyan-500 text-xs font-bold mb-2">💡 SEO Guide</p>
-                        <p class="text-neutral-400 text-xs leading-relaxed">
- A brief summary of your website content. For optimal search engine visibility, we recommend keeping this under 160 characters.                        <p class="text-neutral-400 text-xs leading-relaxed">
- Enter primary terms that define your website. Please separate multiple keywords using a comma ( , ). (e.g., Solar Energy, Indonesia, TDL)                        </p>
-                        </p>
+                        <p class="text-neutral-400 text-xs leading-relaxed">KEEP UNDER 160 CHARACTERS. SEPARATE KEYWORDS WITH COMMAS.</p>
                     </div>
                 </div>
             </section>
@@ -156,43 +137,25 @@
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <div class="lg:col-span-4 space-y-4">
                         <div class="stat-card p-5 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-bold">Main Popup</p>
-                                <p class="text-[10px] text-neutral-500 uppercase">Modal Activation</p>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" id="popupActive">
-                                <span class="slider"></span>
-                            </label>
+                            <div><p class="text-sm font-bold">Main Popup</p></div>
+                            <label class="switch"><input type="checkbox" id="popupActive"><span class="slider"></span></label>
                         </div>
                         <div class="stat-card p-5 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-bold text-amber-500">Emergency Banner</p>
-                                <p class="text-[10px] text-neutral-500 uppercase">Top Bar Visibility</p>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" id="bannerActive">
-                                <span class="slider"></span>
-                            </label>
+                            <div><p class="text-sm font-bold text-amber-500">Emergency Banner</p></div>
+                            <label class="switch"><input type="checkbox" id="bannerActive"><span class="slider"></span></label>
                         </div>
                         <div class="stat-card p-6 space-y-4">
                             <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Active Schedule</p>
-                            <div class="space-y-3">
-                                <input type="text" id="startDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="Start Date">
-                                <input type="text" id="endDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="End Date">
-                            </div>
+                            <input type="text" id="startDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="Start Date">
+                            <input type="text" id="endDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="End Date">
                         </div>
                     </div>
 
                     <div class="lg:col-span-8">
                         <div class="stat-card p-6 h-full flex flex-col">
-                            <div class="flex items-center justify-between mb-4 px-1">
-                                <label class="text-[10px] font-bold text-neutral-500 uppercase">Visual Content Editor (Slot <span id="slotDisplay" class="text-cyan-500">1</span>)</label>
-                            </div>
+                            <label class="text-[10px] font-bold text-neutral-500 uppercase mb-4">Editor (Slot <span id="slotDisplay" class="text-cyan-500">1</span>)</label>
                             <div id="editor-container" class="flex-1 min-h-[300px]"></div>
-                            <button onclick="saveNotice()" class="mt-4 w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-bold transition uppercase tracking-widest text-xs">
-                                Update Current Slot Data
-                            </button>
+                            <button onclick="saveNotice()" class="mt-4 w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-bold transition text-xs">UPDATE SLOT DATA</button>
                         </div>
                     </div>
                 </div>
@@ -200,157 +163,142 @@
         </div>
     </main>
 
-    <script>
-        // Firebase Configuration (동일)
-        const firebaseConfig = {
-            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
-            authDomain: "tdlid-107669.firebaseapp.com",
-            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
-            projectId: "tdlid-107669",
-            storageBucket: "tdlid-107669.firebasestorage.app",
-            messagingSenderId: "604782345004",
-            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
-        };
+<script>
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+        authDomain: "tdlid-107669.firebaseapp.com",
+        databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+        projectId: "tdlid-107669",
+        storageBucket: "tdlid-107669.firebasestorage.app",
+        messagingSenderId: "604782345004",
+        appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+    };
 
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const auth = firebase.auth();
-        let quill;
-        let currentSlot = 0;
-        let popupDataList = [{}, {}, {}, {}, {}];
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const auth = firebase.auth();
+    let quill;
+    let currentSlot = 0;
+    let popupDataList = [{}, {}, {}, {}, {}];
 
-// 1. 사이드바 로드 함수
-async function includeSidebar() {
-    try {
-        const response = await fetch('sidebar.html');
-        const html = await response.text();
-        document.getElementById('sidebar-target').innerHTML = html;
-
-        // 현재 페이지 활성화 표시
-        const currentPage = window.location.pathname.split("/").pop() || 'admin.html';
-        const navItems = document.querySelectorAll('.sidebar-item');
-        
-        navItems.forEach(item => {
-            if (item.getAttribute('data-nav') === currentPage) {
-                item.classList.add('active');
-                item.classList.remove('text-neutral-400');
-            }
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', function() {
+        quill = new Quill('#editor-container', {
+            theme: 'snow',
+            modules: { toolbar: [[{ 'header': [1, 2, false] }], ['bold', 'italic', 'underline'], ['image', 'code-block'], [{ 'color': [] }], ['clean']] }
         });
-    } catch (error) {
-        console.error('Sidebar load failed:', error);
-    }
-}
-
-// 2. 페이지 초기화
-document.addEventListener('DOMContentLoaded', function() {
-    quill = new Quill('#editor-container', {
-        theme: 'snow',
-        modules: { toolbar: [[{ 'header': [1, 2, false] }], ['bold', 'italic', 'underline'], ['image', 'code-block'], [{ 'color': [] }], ['clean']] }
-    });
-
-    const dateConfig = { dateFormat: "Y-m-d", locale: "default", disableMobile: "true" };
-    flatpickr("#startDate", dateConfig);
-    flatpickr("#endDate", dateConfig);
-
-    // 사이드바 호출 추가
-    includeSidebar(); 
-});
-
-// 3. 인증 상태 감시 및 데이터 로드
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        document.getElementById('authOverlay').style.display = 'none';
-        loadSettings();
-        loadDashboardStats(); // 대시보드 실시간 통계 시작
-    } else { 
-        window.location.href = "login.html"; 
-    }
-});
-
-// 4. 대시보드 통계 실시간 업데이트 (on 사용)
-function loadDashboardStats() {
-    database.ref('visitorLogs').on('value', snap => {
-        document.getElementById('stat-visitors').innerText = snap.numChildren().toLocaleString();
-    });
-    database.ref('messages').on('value', snap => {
-        document.getElementById('stat-inquiries').innerText = snap.numChildren().toLocaleString();
-    });
-    database.ref('notices').on('value', snap => {
-        document.getElementById('stat-posts').innerText = snap.numChildren().toLocaleString();
-    });
-    database.ref('adminMemos').on('value', snap => {
-        document.getElementById('stat-memos').innerText = snap.numChildren().toLocaleString();
-    });
-}
-
-        // --- 기존 함수들 (loadSettings, saveNotice 등) 동일하게 유지 ---
-        async function loadSettings() {
-            try {
-                const seoSnap = await database.ref('siteSettings/seo').once('value');
-                if(seoSnap.exists()) {
-                    document.getElementById('seoDesc').value = seoSnap.val().description || '';
-                    document.getElementById('seoKeywords').value = seoSnap.val().keywords || '';
-                }
-                const popSnap = await database.ref('siteSettings/popups').once('value');
-                if(popSnap.exists()) {
-                    const data = popSnap.val();
-                    for(let i=0; i<5; i++) { if(data[i]) popupDataList[i] = data[i]; }
-                }
-                displayCurrentPopup();
-            } catch (e) { console.error("Load Error:", e); }
-        }
-
-        function switchPopup(index) {
-            currentSlot = index;
-            document.querySelectorAll('.slot-btn').forEach((btn, i) => {
-                btn.classList.toggle('active', i === index);
+        const dateConfig = { dateFormat: "Y-m-d", locale: "default", disableMobile: "true" };
+        flatpickr("#startDate", dateConfig);
+        flatpickr("#endDate", dateConfig);
+        
+        // Sidebar load
+        fetch('sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-target').innerHTML = html;
+            const currentPage = window.location.pathname.split("/").pop() || 'admin.html';
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                if (item.getAttribute('data-nav') === currentPage) item.classList.add('active');
             });
-            document.getElementById('slotDisplay').innerText = index + 1;
-            displayCurrentPopup();
-        }
+        });
+    });
 
-        function displayCurrentPopup() {
-            const data = popupDataList[currentSlot];
-            document.getElementById('popupActive').checked = data.popupActive || false;
-            document.getElementById('bannerActive').checked = data.bannerActive || false;
-            quill.root.innerHTML = data.content || data.text || '';
-            if(data.startDate) document.getElementById('startDate')._flatpickr.setDate(data.startDate);
-            else document.getElementById('startDate').value = '';
-            if(data.endDate) document.getElementById('endDate')._flatpickr.setDate(data.endDate);
-            else document.getElementById('endDate').value = '';
+    // Auth Watcher
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            document.getElementById('authOverlay').style.display = 'none';
+            loadSettings();
+            loadDashboardStats();
+        } else {
+            window.location.href = "login.html";
         }
+    });
 
-        async function saveNotice() {
-            const data = {
-                popupActive: document.getElementById('popupActive').checked,
-                bannerActive: document.getElementById('bannerActive').checked,
-                content: quill.root.innerHTML,
-                text: quill.getText(),
-                startDate: document.getElementById('startDate').value,
-                endDate: document.getElementById('endDate').value,
-                updatedAt: Date.now()
-            };
-            popupDataList[currentSlot] = data;
-            try {
-                await database.ref('siteSettings/popups').set(popupDataList);
-                alert(`Slot ${currentSlot + 1} updated successfully.`);
-            } catch (e) { alert(e.message); }
-        }
+    function loadDashboardStats() {
+        const refs = { 'visitorLogs': 'stat-visitors', 'messages': 'stat-inquiries', 'notices': 'stat-posts', 'adminMemos': 'stat-memos' };
+        Object.keys(refs).forEach(path => {
+            database.ref(path).on('value', snap => {
+                const el = document.getElementById(refs[path]);
+                if (el) el.innerText = snap.numChildren().toLocaleString();
+            }, err => console.log(`${path} access pending...`));
+        });
+    }
 
-        async function saveSEO() {
-            const description = document.getElementById('seoDesc').value;
-            const keywords = document.getElementById('seoKeywords').value;
-            try {
-                await database.ref('siteSettings/seo').set({ description, keywords });
-                alert("SEO updated.");
-            } catch (e) { alert(e.message); }
-        }
-
-        function logout() {
-            if(confirm("Do you want to logout?")) {
-                auth.signOut().then(() => { window.location.href = "login.html"; });
+async function loadSettings() {
+    try {
+        // 1. SEO 설정 (허용된 경로)
+        database.ref('siteSettings/seo').once('value').then(snap => {
+            if(snap.exists()) {
+                if(document.getElementById('seoDesc')) document.getElementById('seoDesc').value = snap.val().description || '';
+                if(document.getElementById('seoKeywords')) document.getElementById('seoKeywords').value = snap.val().keywords || '';
             }
+        }).catch(e => console.log("SEO load skipped or denied"));
+
+        // 2. 팝업 설정 (허용된 경로)
+        database.ref('siteSettings/popups').once('value').then(snap => {
+            if(snap.exists()) {
+                const data = snap.val();
+                for(let i=0; i<5; i++) { if(data[i]) popupDataList[i] = data[i]; }
+            }
+            displayCurrentPopup();
+        }).catch(e => console.log("Popups load skipped or denied"));
+
+        // [절대 금지] database.ref('adminConfig/password') 관련 코드는 이 세상 어디에도 없어야 합니다.
+        
+    } catch (e) { 
+        console.error("Settings Load Error:", e); 
+    }
+}
+
+
+    function switchPopup(index) {
+        currentSlot = index;
+        document.querySelectorAll('.slot-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
+        document.getElementById('slotDisplay').innerText = index + 1;
+        displayCurrentPopup();
+    }
+
+    function displayCurrentPopup() {
+        const data = popupDataList[currentSlot] || {};
+        document.getElementById('popupActive').checked = data.popupActive || false;
+        document.getElementById('bannerActive').checked = data.bannerActive || false;
+        quill.root.innerHTML = data.content || '';
+        if(data.startDate) document.getElementById('startDate')._flatpickr.setDate(data.startDate);
+        else document.getElementById('startDate').value = '';
+        if(data.endDate) document.getElementById('endDate')._flatpickr.setDate(data.endDate);
+        else document.getElementById('endDate').value = '';
+    }
+
+    async function saveNotice() {
+        const data = {
+            popupActive: document.getElementById('popupActive').checked,
+            bannerActive: document.getElementById('bannerActive').checked,
+            content: quill.root.innerHTML,
+            text: quill.getText(),
+            startDate: document.getElementById('startDate').value,
+            endDate: document.getElementById('endDate').value,
+            updatedAt: Date.now()
+        };
+        popupDataList[currentSlot] = data;
+        try {
+            await database.ref('siteSettings/popups').set(popupDataList);
+            alert("저장되었습니다.");
+        } catch (e) { alert("저장 실패: " + e.message); }
+    }
+
+    async function saveSEO() {
+        const description = document.getElementById('seoDesc').value;
+        const keywords = document.getElementById('seoKeywords').value;
+        try {
+            await database.ref('siteSettings/seo').set({ description, keywords });
+            alert("SEO 저장 완료");
+        } catch (e) { alert("저장 실패: " + e.message); }
+    }
+
+    function logout() {
+        if(confirm("로그아웃 하시겠습니까?")) {
+            auth.signOut().then(() => { window.location.href = "login.html"; });
         }
-    </script>
+    }
+</script>
 </body>
 </html>

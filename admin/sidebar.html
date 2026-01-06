@@ -1,19 +1,17 @@
 <header id="admin-topbar" class="w-full border-b border-white/5 bg-[#020617]/90 backdrop-blur-xl sticky top-0 z-[999]">
     <div class="max-w-[1600px] mx-auto flex items-center justify-between px-6 h-16">
         <div class="flex items-center gap-8">
-
-<div class="flex items-center gap-3">
-    <img src="../images/logo/admin-logo.gif" alt="Logo" class="w-[52px] h-[52px] object-contain">
-    
-    <div class="flex flex-col leading-none">
-        <h1 class="text-xl font-black text-white italic tracking-tighter">
-            TDLiD <span class="text-cyan-500">ADMIN</span>
-        </h1>
-        <p class="text-[8px] text-neutral-500 font-bold uppercase tracking-[0.2em] mt-0.5">
-            Control Center
-        </p>
-    </div>
-</div>
+            <div class="flex items-center gap-3">
+                <img src="../images/logo/admin-logo.gif" alt="Logo" class="w-[52px] h-[52px] object-contain">
+                <div class="flex flex-col leading-none">
+                    <h1 class="text-xl font-black text-white italic tracking-tighter">
+                        TDLiD <span class="text-cyan-500">ADMIN</span>
+                    </h1>
+                    <p class="text-[8px] text-neutral-500 font-bold uppercase tracking-[0.2em] mt-0.5">
+                        Control Center
+                    </p>
+                </div>
+            </div>
 
             <nav class="hidden md:flex items-center gap-1">
                 <a href="admin.html" data-nav="admin.html" class="sidebar-item flex items-center gap-2 px-4 py-2 text-xs font-bold text-neutral-400 hover:text-white transition-all rounded-lg">
@@ -59,17 +57,32 @@
 </header>
 
 <style>
-    /* 활성화된 탭 스타일 */
-    .sidebar-item.active {
-        background: rgba(34, 211, 238, 0.1);
-        color: #22d3ee !important;
-    }
-    
-    /* 모바일 스크롤바 숨기기 */
+    .sidebar-item.active { background: rgba(34, 211, 238, 0.1); color: #22d3ee !important; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-    /* 기존 메인 콘텐츠 여백 조정 대응 */
-    /* 사이드바가 사라졌으므로, 각 페이지의 body 클래스에서 'flex'를 제거하거나 
-       콘텐츠 영역의 마진을 조정해야 합니다. */
 </style>
+
+<script>
+    // 로그아웃 함수
+    function logout() {
+        if(confirm("로그아웃 하시겠습니까?")) {
+            firebase.auth().signOut().then(() => { 
+                window.location.href = "login.html"; 
+            });
+        }
+    }
+
+    // [중요] 에러의 원인이 되는 코드가 다른 곳에 있을 수 있으므로 
+    // 페이지 로드 시 해당 경로를 참조하는 리스너가 있다면 강제로 해제하거나 무시하도록 설정
+    (function() {
+        try {
+            // 현재 활성 메뉴 표시
+            const currentPage = window.location.pathname.split("/").pop() || 'admin.html';
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                if (item.getAttribute('href') === currentPage) {
+                    item.classList.add('active');
+                }
+            });
+        } catch(e) {}
+    })();
+</script>
