@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TDLiD Admin - Content Manager</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
@@ -15,100 +17,97 @@
     <style>
         body { background-color: #020617; color: #e5e7eb; font-family: 'Pretendard', sans-serif; }
         
-        .tab-item { transition: all 0.3s ease; position: relative; }
-        .tab-item.active { color: #22d3ee; }
-        .tab-item.active::after {
-            content: ''; position: absolute; bottom: -25px; left: 0; width: 100%; height: 2px;
-            background: #22d3ee; box-shadow: 0 0 10px #22d3ee;
-        }
+        /* 사이드바 관련 공통 스타일 */
+        .sidebar-item { transition: all 0.2s; border-radius: 12px; }
+        .sidebar-item:hover, .sidebar-item.active { background: rgba(34, 211, 238, 0.1); color: #22d3ee; }
 
-        .ql-toolbar { background: #1e293b !important; border-radius: 8px 8px 0 0; border: 1px solid #334155 !important; }
-        .ql-container { background: #0f172a !important; color: white; min-height: 300px; border: 1px solid #334155 !important; border-radius: 0 0 8px 8px; }
-        .ql-editor.ql-blank::before { color: #64748b !important; }
-        input, select { background: #0f172a !important; border: 1px solid #1e293b !important; color: white !important; outline: none; }
-        input:focus { border-color: #0891b2 !important; }
+        /* Quill Editor 커스텀 */
+        .ql-toolbar { background: #1e293b !important; border: 1px solid #334155 !important; border-radius: 16px 16px 0 0; padding: 12px !important; }
+        .ql-container { background: #0f172a !important; color: white; min-height: 400px; border: 1px solid #334155 !important; border-radius: 0 0 16px 16px; font-family: 'Pretendard', sans-serif; }
+        .ql-editor { font-size: 15px; line-height: 1.8; }
+        .ql-editor.ql-blank::before { color: #64748b !important; font-style: normal; }
+        
+        input, select { background: #0f172a !important; border: 1px solid #334155 !important; color: white !important; outline: none; transition: all 0.2s; }
+        input:focus, select:focus { border-color: #22d3ee !important; box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.1); }
 
-        /* [추가] 로딩 오버레이 스타일 */
         #authOverlay { position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
     </style>
 </head>
-<body class="p-8">
+<body class="min-h-screen bg-[#020617] text-sm">
+
     <div id="authOverlay">
-        <p class="text-cyan-400 font-bold tracking-widest animate-pulse">CHECKING AUTHORITY...</p>
+        <p class="text-cyan-400 font-bold tracking-widest animate-pulse">AUTHORIZING...</p>
     </div>
 
-    <div class="max-w-6xl mx-auto">
-        <header class="mb-12 border-b border-cyan-900/50 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-                <h1 class="text-4xl font-bold text-cyan-400 tracking-tighter italic">ADMIN SYSTEM</h1>
-                <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">TDL Energy Indonesia Management</p>
+    <div id="sidebar-target"></div>
+
+    <main class="w-full">
+        <div class="max-w-[1000px] mx-auto p-8 space-y-12">
+            <div class="flex items-center gap-2">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span class="w-1 h-5 bg-cyan-500 rounded-full"></span>
+                    Content Management
+                </h2>
             </div>
 
-            <div class="flex flex-col items-end gap-4">
-                <button onclick="logout()" class="text-[10px] text-neutral-500 hover:text-red-400 transition uppercase tracking-widest">Logout Account</button>
-                <nav class="flex gap-8 text-sm font-bold uppercase tracking-wider text-neutral-500">
-                    <a href="admin.html" class="tab-item hover:text-white transition">Dashboard</a>
-                    <a href="visitor.html" class="tab-item hover:text-white transition">Visitor</a>
-                    <a href="inquiry.html" class="tab-item hover:text-white transition">Inquiry</a>
-                    <a href="post.html" class="tab-item active hover:text-white transition">Posts</a>
-                    <a href="memo.html" class="tab-item hover:text-white transition">Memo</a>
-
-                    <a href="security.html" class="tab-item hover:text-white transition">Security</a>
-                </nav>
+            <div class="bg-neutral-900/40 p-8 rounded-[32px] border border-white/5 shadow-2xl">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="w-2 h-2 bg-cyan-500 rounded-full"></span>
+                    <h3 class="text-sm font-black uppercase tracking-widest text-cyan-500">Create / Edit Post</h3>
+                </div>
+                
+                <input type="hidden" id="editKey">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <select id="postCategory" class="p-4 rounded-2xl text-cyan-400 font-bold appearance-none cursor-pointer">
+                        <option value="notice">ANNOUNCEMENT</option>
+                        <option value="news">LATEST NEWS</option>
+                    </select>
+                    <input type="text" id="noticeTitle" placeholder="Enter post title..." class="md:col-span-3 p-4 rounded-2xl font-bold placeholder:text-neutral-700">
+                </div>
+                
+                <div id="editor-container" class="mb-6"></div>
+                
+                <div class="flex gap-3">
+                    <button onclick="uploadNotice()" id="submitBtn" class="flex-grow py-5 bg-cyan-600 hover:bg-cyan-500 text-white font-black rounded-2xl uppercase transition shadow-xl shadow-cyan-900/20 flex items-center justify-center gap-2">
+                        <span>Register Post</span>
+                    </button>
+                    <button onclick="resetForm()" id="cancelBtn" class="hidden px-8 py-5 bg-neutral-800 text-neutral-400 font-bold rounded-2xl hover:bg-neutral-700 transition uppercase text-xs">
+                        Cancel
+                    </button>
+                </div>
             </div>
-        </header>
 
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-cyan-400">Content Management</h2>
-            <button onclick="location.href='admin.html'" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-4 py-1.5 rounded-lg transition">Dashboard</button>
-        </div>
-        
-        <div class="bg-neutral-900/50 p-6 rounded-2xl border border-white/5 mb-8 shadow-xl">
-            <input type="hidden" id="editKey">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                <select id="postCategory" class="p-3 rounded-lg text-cyan-400 font-bold">
-                    <option value="notice">ANNOUNCEMENT</option>
-                    <option value="news">LATEST NEWS</option>
-                </select>
-                <input type="text" id="noticeTitle" placeholder="Enter post title..." class="md:col-span-3 p-3 rounded-lg">
-            </div>
-            
-            <div id="editor-container" class="mb-4 text-left"></div>
-            
-            <div class="flex gap-3">
-                <button onclick="uploadNotice()" id="submitBtn" class="flex-grow py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-black rounded-xl uppercase transition shadow-lg shadow-cyan-900/20">
-                    Register Post
-                </button>
-                <button onclick="resetForm()" id="cancelBtn" class="hidden px-6 py-4 bg-neutral-800 text-neutral-400 font-bold rounded-xl hover:bg-neutral-700 transition">
-                    Cancel
-                </button>
-            </div>
-        </div>
-
-        <div class="bg-neutral-900/80 rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="bg-white/5 text-[10px] uppercase tracking-widest text-neutral-500">
-                        <tr>
-                            <th class="p-5">Category</th>
-                            <th class="p-5">Title</th>
-                            <th class="p-5">Date</th>
-                            <th class="p-5 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="noticeTableBody" class="divide-y divide-neutral-800 text-sm">
+            <div class="bg-neutral-900/40 rounded-[32px] border border-white/5 overflow-hidden shadow-2xl">
+                <div class="p-6 border-b border-white/5 bg-white/[0.02]">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-neutral-500">Published Contents</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-black/20 text-[10px] uppercase tracking-widest text-neutral-600 font-black">
+                            <tr>
+                                <th class="p-5">Category</th>
+                                <th class="p-5">Subject Title</th>
+                                <th class="p-5">Date</th>
+                                <th class="p-5 text-center">Manage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="noticeTableBody" class="divide-y divide-white/5 text-sm italic font-medium">
+                            <tr><td colspan="4" class="p-20 text-center text-neutral-600 animate-pulse">Syncing with server...</td></tr>
                         </tbody>
-                </table>
+                    </table>
+                </div>
             </div>
+            
+            <footer class="py-8 text-center border-t border-white/5">
+                <p class="text-[10px] text-neutral-600 uppercase tracking-[0.3em]">TDL Energy Indonesia &copy; Admin Console</p>
+            </footer>
         </div>
-
-        <div class="text-center">
-            <button onclick="location.href='admin.html'" class="text-xs text-neutral-600 hover:text-neutral-400 transition">Return to Dashboard</button>
-            <div class="mt-4">
-                <a href="../index.html" class="text-neutral-600 hover:text-cyan-400 text-xs transition">← Exit to Public Website</a>
-            </div>
-        </div>
-    </div>
+    </main>
 
     <script>
         const firebaseConfig = {
@@ -123,30 +122,39 @@
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const auth = firebase.auth(); // [추가] Auth 초기화
+        const auth = firebase.auth();
 
-        // [추가] 관리자 인증 체크 로직
+        async function includeSidebar() {
+            try {
+                const response = await fetch('sidebar.html');
+                const html = await response.text();
+                document.getElementById('sidebar-target').innerHTML = html;
+
+                const currentPage = 'post.html';
+                const navItems = document.querySelectorAll('.sidebar-item');
+                navItems.forEach(item => {
+                    if (item.getAttribute('data-nav') === currentPage) {
+                        item.classList.add('active');
+                        item.classList.remove('text-neutral-400');
+                    }
+                });
+            } catch (error) { console.error('Sidebar error:', error); }
+        }
+
+        document.addEventListener('DOMContentLoaded', includeSidebar);
+
         auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById('authOverlay').style.display = 'none';
-                loadPosts(); // 인증 완료 후 게시글 로드
+                loadPosts();
             } else {
                 window.location.href = "login.html";
             }
         });
 
-        // [추가] 로그아웃 함수
-        function logout() {
-            if(confirm("Do you want to logout?")) {
-                auth.signOut().then(() => {
-                    window.location.href = "login.html";
-                });
-            }
-        }
-
         const quill = new Quill('#editor-container', {
             theme: 'snow',
-            placeholder: 'Write your content here...',
+            placeholder: 'Share the latest update with your audience...',
             modules: {
                 toolbar: [
                     [{ 'header': [1, 2, 3, false] }],
@@ -159,45 +167,44 @@
         });
 
         function loadPosts() {
-            const tableBody = document.getElementById('noticeTableBody');
-            tableBody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-neutral-500">Loading contents...</td></tr>';
-
             database.ref('notices').on('value', (snapshot) => {
+                const tableBody = document.getElementById('noticeTableBody');
+                if(!tableBody) return;
+                
                 const noticeData = snapshot.val();
                 let allPosts = [];
                 if (noticeData) {
                     Object.keys(noticeData).forEach(key => {
                         const item = noticeData[key];
-                        if (item && item.category) {
-                            allPosts.push({ key: key, ...item });
-                        }
+                        if (item && item.category) allPosts.push({ key: key, ...item });
                     });
                 }
                 allPosts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                renderTable(allPosts);
-            });
-        }
+                
+                tableBody.innerHTML = '';
+                if (allPosts.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="4" class="p-20 text-center text-neutral-600 italic">No published content found.</td></tr>';
+                    return;
+                }
 
-        function renderTable(data) {
-            const tableBody = document.getElementById('noticeTableBody');
-            tableBody.innerHTML = '';
-            if (data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-neutral-500">No posts found.</td></tr>';
-                return;
-            }
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = "hover:bg-white/5 transition border-b border-white/5";
-                row.innerHTML = `
-                    <td class="p-5"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${item.category === 'notice' ? 'bg-amber-900/30 text-amber-500' : 'bg-blue-900/30 text-blue-500'}">${item.category}</span></td>
-                    <td class="p-5 font-bold text-neutral-200">${item.title || 'Untitled'}</td>
-                    <td class="p-5 text-neutral-500 font-mono text-[10px]">${item.date || '-'}</td>
-                    <td class="p-5 text-center text-xs">
-                        <button onclick="editPost('${item.key}')" class="text-cyan-500 hover:text-cyan-300 mr-3 font-bold uppercase">Edit</button>
-                        <button onclick="deletePost('${item.key}')" class="text-red-500 hover:text-red-300 font-bold uppercase">Delete</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
+                allPosts.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-white/[0.03] transition border-b border-white/5";
+                    row.innerHTML = `
+                        <td class="p-5">
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${item.category === 'notice' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'bg-cyan-500/10 text-cyan-500 border border-cyan-500/20'}">
+                                ${item.category}
+                            </span>
+                        </td>
+                        <td class="p-5 font-bold text-white tracking-tight">${item.title || 'Untitled'}</td>
+                        <td class="p-5 text-neutral-500 font-mono text-[10px] uppercase">${item.date || '-'}</td>
+                        <td class="p-5 text-center text-[10px]">
+                            <button onclick="editPost('${item.key}')" class="text-cyan-500 hover:text-white transition font-black uppercase mr-4">Edit</button>
+                            <button onclick="deletePost('${item.key}')" class="text-neutral-700 hover:text-red-500 transition font-black uppercase">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
             });
         }
 
@@ -208,7 +215,7 @@
             const editKey = document.getElementById('editKey').value;
 
             if (!title || quill.getText().trim().length === 0) { 
-                alert("Please enter both title and content."); 
+                alert("Title and content are required."); 
                 return; 
             }
 
@@ -223,16 +230,13 @@
             try {
                 if (editKey) {
                     await database.ref(`notices/${editKey}`).update(postData);
-                    alert("Updated!");
                 } else {
                     const newKey = `${category}_${Date.now()}`;
                     await database.ref(`notices/${newKey}`).set(postData);
-                    alert("Registered!");
                 }
                 resetForm();
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
+                alert("Action completed successfully.");
+            } catch (error) { alert("Error: " + error.message); }
         }
 
         async function editPost(key) {
@@ -243,13 +247,13 @@
             document.getElementById('postCategory').value = data.category;
             document.getElementById('noticeTitle').value = data.title;
             quill.root.innerHTML = data.content;
-            document.getElementById('submitBtn').innerText = "Update Post";
+            document.getElementById('submitBtn').innerHTML = "<span>Update Changes</span>";
             document.getElementById('cancelBtn').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function deletePost(key) {
-            if (confirm("Delete this post?")) {
+            if (confirm("Permanently delete this post?")) {
                 await database.ref(`notices/${key}`).remove();
             }
         }
@@ -258,7 +262,7 @@
             document.getElementById('editKey').value = '';
             document.getElementById('noticeTitle').value = '';
             quill.root.innerHTML = '';
-            document.getElementById('submitBtn').innerText = "Register Post";
+            document.getElementById('submitBtn').innerHTML = "<span>Register Post</span>";
             document.getElementById('cancelBtn').classList.add('hidden');
         }
     </script>

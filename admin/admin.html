@@ -49,96 +49,63 @@
         .slot-btn.active { background: #22d3ee; color: #020617; font-weight: 700; box-shadow: 0 0 15px rgba(34, 211, 238, 0.4); }
     </style>
 </head>
-<body class="min-h-screen flex">
+
+
+<body class="min-h-screen bg-[#020617]">
 
     <div id="authOverlay">
         <p class="text-cyan-400 font-bold tracking-widest animate-pulse">AUTHORIZING...</p>
     </div>
 
-    <aside class="w-64 border-r border-white/5 flex flex-col p-6 hidden md:flex">
-        <div class="mb-10 px-2">
-            <h1 class="text-2xl font-black text-white italic tracking-tighter">TDLiD <span class="text-cyan-500">ADMIN</span></h1>
-            <p class="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-1">Control Center</p>
-        </div>
-        
-        <nav class="space-y-1 flex-1">
-            <a href="admin.html" class="sidebar-item active flex items-center gap-3 px-4 py-3 text-sm font-semibold">
-                <span>🏠</span> Dashboard
-            </a>
-            <a href="visitor.html" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-semibold text-neutral-400">
-                <span>📊</span> Visitor Analysis
-            </a>
-            <a href="inquiry.html" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-semibold text-neutral-400">
-                <span>📩</span> Inquiries
-            </a>
-            <a href="post.html" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-semibold text-neutral-400">
-                <span>✍️</span> Content Manager
-            </a>
-            <a href="memo.html" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-semibold text-neutral-400">
-                <span>📝</span> Internal Memo
-            </a>
-            <a href="security.html" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-semibold text-neutral-400">
-                <span>🛡️</span> Security Log
-            </a>
-        </nav>
+    <div id="sidebar-target"></div>
 
-<div class="pt-2">
-    <a href="../index.html" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-cyan-400 hover:bg-cyan-400/10 rounded-xl transition">
-        <span>🌐</span> Go to Website
-    </a>
-</div>
-
-        <div class="pt-6 border-t border-white/5">
-            <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-400/10 rounded-xl transition">
-                <span>🚪</span> Logout
-            </button>
-        </div>
-    </aside>
-
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#020617]">
-        <header class="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#020617]/80 backdrop-blur-md sticky top-0 z-10">
-            <h2 class="text-lg font-bold">System Configuration</h2>
-            <div class="flex items-center gap-4">
-                <a href="../index.html" class="text-xs text-neutral-500 hover:text-cyan-400 transition font-medium">Exit to Website →</a>
-                <div class="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-xs font-bold text-cyan-500">A</div>
-            </div>
-        </header>
-
-        <div class="p-8 space-y-8">
+    <main class="w-full">
+        <div class="max-w-[1600px] mx-auto p-8 space-y-8">
             
-         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-blue-500/5 transition-colors" onclick="location.href='visitor.html'">
-        <div class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-2xl">📊</div>
-        <div>
-            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Total Visitors</p>
-            <h4 id="stat-visitors" class="text-xl font-black text-white">...</h4>
-        </div>
-    </div>
+            <div class="mb-2">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span class="w-1 h-5 bg-cyan-500 rounded-full"></span>
+                    System Configuration
+                </h2>
+            </div>
+            
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-blue-500/5 transition-colors" onclick="location.href='visitor.html'">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-2xl">📊</div>
+                    <div>
+                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Total Visitors</p>
+                        <h4 id="stat-visitors" class="text-xl font-black text-white">...</h4>
+                    </div>
+                </div>
 
-    <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-emerald-500/5 transition-colors" onclick="location.href='inquiry.html'">
-        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl">📩</div>
-        <div>
-            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Inquiries</p>
-            <h4 id="stat-inquiries" class="text-xl font-black text-white">...</h4>
-        </div>
-    </div>
+                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-emerald-500/5 transition-colors" onclick="location.href='inquiry.html'">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl">📩</div>
+                    <div>
+                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Inquiries</p>
+                        <h4 id="stat-inquiries" class="text-xl font-black text-white">...</h4>
+                    </div>
+                </div>
 
-    <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-amber-500/5 transition-colors" onclick="location.href='post.html'">
-        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-2xl">✍️</div>
-        <div>
-            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Posts / Notices</p>
-            <h4 id="stat-posts" class="text-xl font-black text-white">...</h4>
-        </div>
-    </div>
+                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-amber-500/5 transition-colors" onclick="location.href='post.html'">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-2xl">✍️</div>
+                    <div>
+                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Posts / Notices</p>
+                        <h4 id="stat-posts" class="text-xl font-black text-white">...</h4>
+                    </div>
+                </div>
 
-    <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-purple-500/5 transition-colors" onclick="location.href='memo.html'">
-        <div class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl">📝</div>
-        <div>
-            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Internal Memos</p>
-            <h4 id="stat-memos" class="text-xl font-black text-white">...</h4>
-        </div>
-    </div>
-</section>
+                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer hover:bg-purple-500/5 transition-colors" onclick="location.href='memo.html'">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl">📝</div>
+                    <div>
+                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Internal Memos</p>
+                        <h4 id="stat-memos" class="text-xl font-black text-white">...</h4>
+                    </div>
+                </div>
+            </section>
+            
+            </div>
+    </main>
+</body>
 
 
 
@@ -165,7 +132,8 @@
                     <div class="bg-cyan-500/5 rounded-2xl p-6 border border-cyan-500/10 flex flex-col justify-center">
                         <p class="text-cyan-500 text-xs font-bold mb-2">💡 SEO Guide</p>
                         <p class="text-neutral-400 text-xs leading-relaxed">
-                            Description은 160자 이내를 권장하며, 키워드는 쉼표(,)로 구분하십시오.
+ A brief summary of your website content. For optimal search engine visibility, we recommend keeping this under 160 characters.                        <p class="text-neutral-400 text-xs leading-relaxed">
+ Enter primary terms that define your website. Please separate multiple keywords using a comma ( , ). (e.g., Solar Energy, Indonesia, TDL)                        </p>
                         </p>
                     </div>
                 </div>
@@ -251,47 +219,69 @@
         let currentSlot = 0;
         let popupDataList = [{}, {}, {}, {}, {}];
 
-        document.addEventListener('DOMContentLoaded', function() {
-            quill = new Quill('#editor-container', {
-                theme: 'snow',
-                modules: { toolbar: [[{ 'header': [1, 2, false] }], ['bold', 'italic', 'underline'], ['image', 'code-block'], [{ 'color': [] }], ['clean']] }
-            });
+// 1. 사이드바 로드 함수
+async function includeSidebar() {
+    try {
+        const response = await fetch('sidebar.html');
+        const html = await response.text();
+        document.getElementById('sidebar-target').innerHTML = html;
 
-            const dateConfig = { dateFormat: "Y-m-d", locale: "default", disableMobile: "true" };
-            flatpickr("#startDate", dateConfig);
-            flatpickr("#endDate", dateConfig);
+        // 현재 페이지 활성화 표시
+        const currentPage = window.location.pathname.split("/").pop() || 'admin.html';
+        const navItems = document.querySelectorAll('.sidebar-item');
+        
+        navItems.forEach(item => {
+            if (item.getAttribute('data-nav') === currentPage) {
+                item.classList.add('active');
+                item.classList.remove('text-neutral-400');
+            }
         });
+    } catch (error) {
+        console.error('Sidebar load failed:', error);
+    }
+}
 
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                document.getElementById('authOverlay').style.display = 'none';
-                loadSettings();
-                loadDashboardStats(); // 대시보드 통계 호출
-            } else { window.location.href = "login.html"; }
-        });
+// 2. 페이지 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    quill = new Quill('#editor-container', {
+        theme: 'snow',
+        modules: { toolbar: [[{ 'header': [1, 2, false] }], ['bold', 'italic', 'underline'], ['image', 'code-block'], [{ 'color': [] }], ['clean']] }
+    });
 
-        // 추가된 함수: Firebase 실시간 데이터 카운팅
-        async function loadDashboardStats() {
-            // 1. 방문자 수 (visitorLogs)
-            database.ref('visitorLogs').on('value', snap => {
-                document.getElementById('stat-visitors').innerText = snap.numChildren().toLocaleString();
-            });
+    const dateConfig = { dateFormat: "Y-m-d", locale: "default", disableMobile: "true" };
+    flatpickr("#startDate", dateConfig);
+    flatpickr("#endDate", dateConfig);
 
-            // 2. 문의 내역 (messages)
-            database.ref('messages').on('value', snap => {
-                document.getElementById('stat-inquiries').innerText = snap.numChildren().toLocaleString();
-            });
+    // 사이드바 호출 추가
+    includeSidebar(); 
+});
 
-            // 3. 콘텐츠/공지사항 (notices)
-            database.ref('notices').on('value', snap => {
-                document.getElementById('stat-posts').innerText = snap.numChildren().toLocaleString();
-            });
+// 3. 인증 상태 감시 및 데이터 로드
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        document.getElementById('authOverlay').style.display = 'none';
+        loadSettings();
+        loadDashboardStats(); // 대시보드 실시간 통계 시작
+    } else { 
+        window.location.href = "login.html"; 
+    }
+});
 
-            // 4. 내부 메모 (adminMemos)
-            database.ref('adminMemos').on('value', snap => {
-                document.getElementById('stat-memos').innerText = snap.numChildren().toLocaleString();
-            });
-        }
+// 4. 대시보드 통계 실시간 업데이트 (on 사용)
+function loadDashboardStats() {
+    database.ref('visitorLogs').on('value', snap => {
+        document.getElementById('stat-visitors').innerText = snap.numChildren().toLocaleString();
+    });
+    database.ref('messages').on('value', snap => {
+        document.getElementById('stat-inquiries').innerText = snap.numChildren().toLocaleString();
+    });
+    database.ref('notices').on('value', snap => {
+        document.getElementById('stat-posts').innerText = snap.numChildren().toLocaleString();
+    });
+    database.ref('adminMemos').on('value', snap => {
+        document.getElementById('stat-memos').innerText = snap.numChildren().toLocaleString();
+    });
+}
 
         // --- 기존 함수들 (loadSettings, saveNotice 등) 동일하게 유지 ---
         async function loadSettings() {

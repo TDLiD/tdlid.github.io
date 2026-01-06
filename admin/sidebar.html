@@ -1,0 +1,66 @@
+<header id="admin-topbar" class="w-full border-b border-white/5 bg-[#020617]/90 backdrop-blur-xl sticky top-0 z-[999]">
+    <div class="max-w-[1600px] mx-auto flex items-center justify-between px-6 h-16">
+        <div class="flex items-center gap-8">
+            <div class="flex flex-col leading-none">
+                <h1 class="text-xl font-black text-white italic tracking-tighter">TDLiD <span class="text-cyan-500">ADMIN</span></h1>
+                <p class="text-[8px] text-neutral-500 font-bold uppercase tracking-[0.2em] mt-0.5">Control Center</p>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-1">
+                <a href="admin.html" data-nav="admin.html" class="sidebar-item flex items-center gap-2 px-4 py-2 text-xs font-bold text-neutral-400 hover:text-white transition-all rounded-lg">
+                    <span>🏠</span> Dashboard
+                </a>
+                <a href="visitor.html" data-nav="visitor.html" class="sidebar-item flex items-center gap-2 px-4 py-2 text-xs font-bold text-neutral-400 hover:text-white transition-all rounded-lg">
+                    <span>📊</span> Analysis
+                </a>
+                <a href="inquiry.html" data-nav="inquiry.html" class="sidebar-item flex items-center gap-2 px-4 py-2 text-xs font-bold text-neutral-400 hover:text-white transition-all rounded-lg">
+                    <span>📩</span> Inquiries
+                </a>
+                <a href="post.html" data-nav="post.html" class="sidebar-item flex items-center gap-2 px-4 py-2 text-xs font-bold text-neutral-400 hover:text-white transition-all rounded-lg">
+                    <span>✍️</span> Posts
+                </a>
+                <a href="memo.html" data-nav="memo.html" class="sidebar-item flex items-center gap-2 px-4 py-2 text-xs font-bold text-neutral-400 hover:text-white transition-all rounded-lg">
+                    <span>📝</span> Memo
+                </a>
+                <a href="security.html" data-nav="security.html" class="sidebar-item flex items-center gap-2 px-4 py-2 text-xs font-bold text-neutral-400 hover:text-white transition-all rounded-lg">
+                    <span>🛡️</span> Security
+                </a>
+            </nav>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <a href="../index.html" class="hidden sm:flex items-center gap-2 px-3 py-1.5 text-[10px] font-black text-cyan-500 border border-cyan-500/20 hover:bg-cyan-500/10 rounded-full transition uppercase tracking-widest">
+                <span>🌐</span> Website
+            </a>
+            <div class="h-4 w-[1px] bg-white/10 mx-2 hidden sm:block"></div>
+            <button onclick="logout()" class="flex items-center gap-2 px-3 py-1.5 text-[10px] font-black text-red-500 hover:bg-red-500/10 rounded-full transition uppercase tracking-widest">
+                <span>🚪</span> Logout
+            </button>
+        </div>
+    </div>
+
+    <nav class="md:hidden flex items-center gap-1 overflow-x-auto px-4 pb-3 no-scrollbar">
+        <a href="admin.html" data-nav="admin.html" class="sidebar-item whitespace-nowrap px-4 py-2 text-[11px] font-bold text-neutral-400">Dashboard</a>
+        <a href="visitor.html" data-nav="visitor.html" class="sidebar-item whitespace-nowrap px-4 py-2 text-[11px] font-bold text-neutral-400">Analysis</a>
+        <a href="inquiry.html" data-nav="inquiry.html" class="sidebar-item whitespace-nowrap px-4 py-2 text-[11px] font-bold text-neutral-400">Inquiries</a>
+        <a href="post.html" data-nav="post.html" class="sidebar-item whitespace-nowrap px-4 py-2 text-[11px] font-bold text-neutral-400">Posts</a>
+        <a href="memo.html" data-nav="memo.html" class="sidebar-item whitespace-nowrap px-4 py-2 text-[11px] font-bold text-neutral-400">Memo</a>
+        <a href="security.html" data-nav="security.html" class="sidebar-item whitespace-nowrap px-4 py-2 text-[11px] font-bold text-neutral-400">Security</a>
+    </nav>
+</header>
+
+<style>
+    /* 활성화된 탭 스타일 */
+    .sidebar-item.active {
+        background: rgba(34, 211, 238, 0.1);
+        color: #22d3ee !important;
+    }
+    
+    /* 모바일 스크롤바 숨기기 */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* 기존 메인 콘텐츠 여백 조정 대응 */
+    /* 사이드바가 사라졌으므로, 각 페이지의 body 클래스에서 'flex'를 제거하거나 
+       콘텐츠 영역의 마진을 조정해야 합니다. */
+</style>

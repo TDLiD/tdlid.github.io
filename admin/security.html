@@ -2,103 +2,125 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TDLiD Admin - Security & Audit Logs</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
         body { background-color: #020617; color: #e5e7eb; font-family: 'Pretendard', sans-serif; }
-        .tab-item { transition: all 0.3s ease; position: relative; }
-        .tab-item.active { color: #22d3ee; }
-        .tab-item.active::after {
-            content: ''; position: absolute; bottom: -25px; left: 0; width: 100%; height: 2px;
-            background: #22d3ee; box-shadow: 0 0 10px #22d3ee;
+        
+        /* 사이드바 공통 스타일 */
+        .sidebar-item { transition: all 0.2s; border-radius: 12px; }
+        .sidebar-item:hover, .sidebar-item.active { background: rgba(34, 211, 238, 0.1); color: #22d3ee; }
+
+        /* 보안 전용 입력창 */
+        .pw-input { 
+            background: #0f172a !important; 
+            border: 1px solid #334155 !important; 
+            color: #f87171 !important; 
+            outline: none; 
+            transition: all 0.2s; 
         }
-        .log-container::-webkit-scrollbar { width: 4px; }
+        .pw-input:focus { border-color: #ef4444 !important; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1); }
+
+        /* 커스텀 스크롤바 */
+        .log-container::-webkit-scrollbar { width: 6px; }
+        .log-container::-webkit-scrollbar-track { background: transparent; }
         .log-container::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
 
-        /* [추가] 로딩 오버레이 스타일 */
         #authOverlay { position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
-<body class="p-8">
+<body class="min-h-screen bg-[#020617] text-sm">
+
     <div id="authOverlay">
-        <p class="text-cyan-400 font-bold tracking-widest animate-pulse">CHECKING AUTHORITY...</p>
+        <p class="text-cyan-400 font-bold tracking-widest animate-pulse">ESTABLISHING SECURE CONNECTION...</p>
     </div>
 
-    <div class="max-w-6xl mx-auto">
-        <header class="mb-12 border-b border-cyan-900/50 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-                <h1 class="text-4xl font-bold text-cyan-400 tracking-tighter italic">ADMIN SYSTEM</h1>
-                <p class="text-neutral-500 text-sm mt-1 uppercase tracking-widest">TDL Energy Indonesia Management</p>
+    <div id="sidebar-target"></div>
+
+    <main class="w-full">
+        <div class="max-w-[1100px] mx-auto p-8 space-y-12">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                    <span class="w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+                    Security & Audit Logs
+                </h2>
+                <div class="flex items-center gap-4">
+                    <div class="bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
+                        <span class="text-[9px] font-black text-red-500 uppercase tracking-widest">System Shield Active</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="flex flex-col items-end gap-4">
-                <button onclick="logout()" class="text-[10px] text-neutral-500 hover:text-red-400 transition uppercase tracking-widest">Logout Account</button>
-                <nav class="flex gap-8 text-sm font-bold uppercase tracking-wider text-neutral-500">
-                    <a href="admin.html" class="tab-item hover:text-white transition">Dashboard</a>
-                    <a href="visitor.html" class="tab-item hover:text-white transition">Visitor</a>
-                    <a href="inquiry.html" class="tab-item hover:text-white transition">Inquiry</a>
-                    <a href="post.html" class="tab-item hover:text-white transition">Posts</a>
-                    <a href="memo.html" class="tab-item hover:text-white transition">Memo</a>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-4">
+                    <div class="bg-neutral-900/40 p-8 rounded-[32px] border border-red-900/20 shadow-2xl sticky top-8">
+                        <div class="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center text-2xl mb-6">🛡️</div>
+                        <h3 class="text-xl font-bold text-white mb-2 tracking-tight">Access Key</h3>
+                        <p class="text-neutral-500 text-[11px] mb-8 uppercase tracking-widest font-medium">Master Admin Password</p>
 
-                    <a href="security.html" class="tab-item active hover:text-white transition">Security</a>
-                </nav>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-            <div class="lg:col-span-1 flex flex-col items-center">
-                <div class="w-full bg-neutral-900/50 p-8 rounded-3xl border border-red-900/30 shadow-2xl">
-                    <div class="text-red-500 text-4xl mb-4">🛡️</div>
-                    <h2 class="text-2xl font-bold text-white mb-2">Password</h2>
-                    <p class="text-neutral-500 text-xs mb-8 uppercase tracking-tight">Access Key Management</p>
-
-                    <div class="space-y-4 text-left">
-                        <div>
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest ml-1">Current / New Admin Password</label>
-                            <input type="text" id="adminNewPassword" class="w-full bg-black border border-neutral-800 p-4 rounded-xl mt-2 outline-none focus:border-red-500 transition font-mono text-red-400" placeholder="Loading...">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-1">Configuration Key</label>
+                                <input type="text" id="adminNewPassword" class="pw-input w-full rounded-2xl p-5 mt-2 font-mono text-lg tracking-widest" placeholder="Loading...">
+                            </div>
+                            <button onclick="updatePw()" class="w-full py-5 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white font-black rounded-2xl transition uppercase tracking-widest text-[11px] border border-red-600/20 shadow-lg shadow-red-950/20">
+                                Apply Security Update
+                            </button>
+                            <div class="p-4 bg-black/40 rounded-2xl border border-white/5">
+                                <p class="text-[9px] text-neutral-500 text-center leading-relaxed italic">Changing the master key will be recorded in the permanent audit log with your current IP address.</p>
+                            </div>
                         </div>
-                        <button onclick="updatePw()" class="w-full py-4 bg-red-600/10 hover:bg-red-600 border border-red-600/50 text-red-500 hover:text-white font-black rounded-xl transition uppercase tracking-widest text-xs">
-                            Confirm Change
-                        </button>
                     </div>
                 </div>
-            </div>
 
-            <div class="lg:col-span-2 space-y-8">
-                <div class="bg-neutral-900/30 border border-white/5 rounded-3xl p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-bold text-cyan-400 uppercase tracking-widest text-sm italic">Audit & Login Logs</h3>
-                        <span class="text-[10px] text-neutral-500 uppercase font-mono tracking-tighter">Auto-Session: 30m Active</span>
-                    </div>
-                    
-                    <div class="log-container overflow-y-auto max-h-[400px] pr-2">
-                        <table class="w-full text-left">
-                            <thead class="text-[10px] text-neutral-600 uppercase border-b border-white/5">
-                                <tr>
-                                    <th class="pb-3 pl-2">Event</th>
-                                    <th class="pb-3">Details / IP</th>
-                                    <th class="pb-3 text-right pr-2">Time</th>
-                                </tr>
-                            </thead>
-                            <tbody id="auditLogList" class="text-xs">
+                <div class="lg:col-span-8">
+                    <div class="bg-neutral-900/20 border border-white/5 rounded-[32px] p-8 overflow-hidden">
+                        <div class="flex justify-between items-center mb-8">
+                            <div>
+                                <h3 class="font-black text-cyan-400 uppercase tracking-widest text-xs italic">Activity Stream</h3>
+                                <p class="text-[10px] text-neutral-600 mt-1 uppercase font-mono tracking-tighter">Real-time system monitoring</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse"></span>
+                                <span class="text-[9px] font-black text-neutral-500 uppercase tracking-widest">Live Audit</span>
+                            </div>
+                        </div>
+                        
+                        <div class="log-container overflow-y-auto max-h-[600px] pr-4">
+                            <table class="w-full text-left">
+                                <thead class="text-[10px] text-neutral-600 uppercase border-b border-white/5">
+                                    <tr>
+                                        <th class="pb-4 font-black">Event</th>
+                                        <th class="pb-4 font-black">Details & Intelligence</th>
+                                        <th class="pb-4 text-right font-black">Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditLogList" class="divide-y divide-white/[0.03]">
+                                    <tr>
+                                        <td colspan="3" class="py-20 text-center text-neutral-700 italic">Syncing security database...</td>
+                                    </tr>
                                 </tbody>
-                        </table>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="text-center">
-            <button onclick="location.href='admin.html'" class="text-xs text-neutral-600 hover:text-neutral-400 transition">Return to Dashboard</button>
-            <div class="mt-4">
-                <a href="../index.html" class="text-neutral-600 hover:text-cyan-400 text-xs transition">← Exit to Public Website</a>
-            </div>
+            <footer class="pt-12 pb-8 text-center border-t border-white/5">
+                <div class="flex flex-col items-center gap-4">
+
+                    <p class="text-[9px] text-neutral-700 uppercase tracking-widest">TDL Energy Indonesia &copy; SECURE ADMINISTRATION PORTAL</p>
+                </div>
+            </footer>
         </div>
-    </div>
+    </main>
 
     <script>
         const firebaseConfig = {
@@ -113,9 +135,26 @@
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const auth = firebase.auth(); // [추가] Auth 초기화
+        const auth = firebase.auth();
 
-        // [추가] 관리자 인증 체크 로직
+        async function includeSidebar() {
+            try {
+                const response = await fetch('sidebar.html');
+                const html = await response.text();
+                document.getElementById('sidebar-target').innerHTML = html;
+
+                const currentPage = 'security.html';
+                document.querySelectorAll('.sidebar-item').forEach(item => {
+                    if (item.getAttribute('data-nav') === currentPage) {
+                        item.classList.add('active');
+                        item.classList.remove('text-neutral-400');
+                    }
+                });
+            } catch (error) { console.error('Sidebar error:', error); }
+        }
+
+        document.addEventListener('DOMContentLoaded', includeSidebar);
+
         auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById('authOverlay').style.display = 'none';
@@ -127,31 +166,17 @@
             }
         });
 
-        // [추가] 로그아웃 함수
-        function logout() {
-            if(confirm("Do you want to logout?")) {
-                auth.signOut().then(() => {
-                    window.location.href = "login.html";
-                });
-            }
-        }
-
-        // --- 보안 기능 1: 세션 만료 로직 (30분 무활동 시 로그아웃) ---
+        // 세션 자동 종료 (30분)
         const SESSION_TIMEOUT = 30 * 60 * 1000;
         let lastActivity = Date.now();
-
-        function checkSession() {
-            if (Date.now() - lastActivity > SESSION_TIMEOUT) {
-                alert("Session expired due to inactivity.");
-                auth.signOut().then(() => { window.location.href = "login.html"; });
-            }
-        }
-
         document.onmousemove = () => lastActivity = Date.now();
         document.onkeypress = () => lastActivity = Date.now();
-        setInterval(checkSession, 10000);
+        setInterval(() => {
+            if (Date.now() - lastActivity > SESSION_TIMEOUT) {
+                auth.signOut().then(() => { window.location.href = "login.html"; });
+            }
+        }, 10000);
 
-        // --- 보안 기능 2: 로그 기록 함수 ---
         async function recordAdminAction(type, detail) {
             try {
                 let ip = "0.0.0.0";
@@ -197,18 +222,26 @@
             const logTbody = document.getElementById('auditLogList');
             database.ref('adminLogs').limitToLast(50).on('value', (snapshot) => {
                 logTbody.innerHTML = '';
+                if (!snapshot.exists()) {
+                    logTbody.innerHTML = '<tr><td colspan="3" class="py-12 text-center text-neutral-600 uppercase tracking-widest text-[10px]">No logs available</td></tr>';
+                    return;
+                }
+
                 const logs = [];
                 snapshot.forEach(child => { logs.push(child.val()); });
                 logs.reverse().forEach(log => {
-                    const typeColor = log.type === 'PASSWORD_CHANGE' ? 'text-red-500' : 'text-cyan-500';
+                    const typeColor = log.type === 'PASSWORD_CHANGE' ? 'text-red-500' : 
+                                    (log.type === 'ACCESS' ? 'text-cyan-500' : 'text-emerald-500');
                     const row = `
-                        <tr class="border-b border-white/5 hover:bg-white/[0.02] transition">
-                            <td class="py-4 pl-2 font-black ${typeColor}">${log.type}</td>
-                            <td class="py-4 text-neutral-400">
-                                <div>${log.detail}</div>
-                                <div class="text-[9px] font-mono text-neutral-600 mt-1">${log.ip}</div>
+                        <tr class="hover:bg-white/[0.02] transition">
+                            <td class="py-5 font-black ${typeColor} tracking-tighter">${log.type}</td>
+                            <td class="py-5">
+                                <div class="text-neutral-200 font-medium">${log.detail}</div>
+                                <div class="text-[9px] font-mono text-neutral-600 mt-1 uppercase tracking-tighter italic">Remote IP: ${log.ip}</div>
                             </td>
-                            <td class="py-4 text-right text-neutral-500 font-mono text-[10px] pr-2">${log.timeStr}</td>
+                            <td class="py-5 text-right text-neutral-500 font-mono text-[10px] tabular-nums whitespace-nowrap pl-4">
+                                ${log.timeStr}
+                            </td>
                         </tr>
                     `;
                     logTbody.innerHTML += row;
