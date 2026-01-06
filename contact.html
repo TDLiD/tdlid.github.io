@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+ < !DOCTYPE html >
+ < html lang = "en" >
+     < head >
+     < meta charset = "UTF-8" >
 
-<script>
-    (function() {
+     < script >
+    (function () {
         // 1. iPad를 제외하고 iPhone, Android 폰만 감지
         const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-        
+
         const urlParams = new URLSearchParams(window.location.search);
         const isPCMode = urlParams.get('view_mode') === 'pc';
 
@@ -15,258 +15,260 @@
         if (isMobileOnly && !isPCMode) {
             let path = window.location.pathname;
             let page = path.split("/").pop();
-            
+
             // 메인 페이지(index) 처리
             if (page === "" || page === "contact.html") {
                 window.location.href = "contact_m.html";
-            } 
+            }
             // 그 외 페이지들 (예: products.html -> products_m.html)
             else if (page.endsWith(".html") && !page.includes("_m.html")) {
                 window.location.href = page.replace(".html", "_m.html");
             }
         }
     })();
-</script>
+ <  / script >
 
-    <title>Request Quote | TDL Energy Indonesia</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+ < title > Request Quote | TDL Energy Indonesia <  / title >
+ < meta name = "viewport" content = "width=device-width, initial-scale=1.0" >
+     < script src = "https://cdn.tailwindcss.com" >  <  / script >
+     < link rel = "stylesheet" href = "css/main.css" >
+     < link rel = "preconnect" href = "https://fonts.googleapis.com" >
+     < link rel = "preconnect" href = "https://fonts.gstatic.com" crossorigin >
+     < link href = "https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel = "stylesheet" >
 
-<style>
+     < style >
     body {
-        -webkit-user-select: auto;
-        user-select: auto;
-    }
-
-    input, textarea, select {
-        user-select: auto !important;
-        -webkit-user-select: auto !important;
-    }
-
-    .contact-form-container {
-        min-height: calc(100vh - 120px);
-        display: flex;
-        align-items: center; 
-        justify-content: center;
-        padding-top: 8rem;
-    }
-    .form-card {
-        max-width: 800px;
-        width: 100%;
-        margin-bottom: 5rem;
-    }
-
-    /* Our 텍스트 스타일: 커서가 변하지 않도록 cursor: text 부여 */
-    .stealth-link {
-        cursor: text !important;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    #musicToggleBtn { 
-        position: fixed; 
-        bottom: 25px; 
-        right: 25px; 
-        z-index: 10005; 
-        width: 44px; 
-        height: 44px; 
-        background: rgba(23, 23, 23, 0.8); 
-        border: 1px solid rgba(34, 211, 238, 0.4); 
-        border-radius: 50%; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        cursor: pointer; 
-        color: #22d3ee; 
-        backdrop-filter: blur(4px); 
-        transition: all 0.3s; 
-    }
-    #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
-
-/* [수정] 모든 페이지 공통 헤드라인 스타일 적용 */
-.hero-slogan-gradient {
-    display: inline-block !important;
-    font-weight: 900 !important; /* font-black */
-    line-height: 1.2 !important;
-    padding-bottom: 0.1em;
-    
-    /* 타 페이지와 동일한 청록-화이트 그라데이션 */
-    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    background-clip: text !important;
-    
-    color: transparent !important; 
+    -webkit - user - select: auto;
+    user - select: auto;
 }
 
+input, textarea, select {
+    user - select: auto!important;
+    -webkit - user - select: auto!important;
+}
 
+.contact - form - container {
+    min - height: calc(100vh - 120px);
+    display: flex;
+    align - items: center;
+    justify - content: center;
+    padding - top: 8rem;
+}
+.form - card {
+    max - width: 800px;
+    width: 100 % ;
+    margin - bottom: 5rem;
+}
 
-</style>
-</head>
+/* Our 텍스트 스타일: 커서가 변하지 않도록 cursor: text 부여 */
+.stealth - link {
+    cursor: text!important;
+    user - select: none;
+    -webkit - tap - highlight - color: transparent;
+}
 
-<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] overflow-x-hidden">
+#musicToggleBtn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z - index: 10005;
+    width: 44px;
+    height: 44px;
+    background: rgba(23, 23, 23, 0.8);
+    border: 1px solid rgba(34, 211, 238, 0.4);
+    border - radius: 50 % ;
+    display: flex;
+    align - items: center;
+    justify - content: center;
+    cursor: pointer;
+    color: #22d3ee;
+    backdrop - filter: blur(4px);
+    transition: all 0.3s;
+}
+#musicToggleBtn: hover {
+    transform: scale(1.1);
+    border - color: #22d3ee;
+}
 
-<div id="bgm-placeholder"></div>
+/* [수정] 모든 페이지 공통 헤드라인 스타일 적용 */
+.hero - slogan - gradient {
+    display: inline - block!important;
+    font - weight: 900!important; /* font-black */
+    line - height: 1.2!important;
+    padding - bottom: 0.1em;
 
-<div id="header-placeholder"></div>
+    /* 타 페이지와 동일한 청록-화이트 그라데이션 */
+    background: linear - gradient(to right, #0891b2 0 % , #22d3ee 50 % , #ffffff 100 % )!important;
+    -webkit - background - clip: text!important;
+    -webkit - text - fill - color: transparent!important;
+    background - clip: text!important;
 
-<main class="px-6 contact-form-container">
-    <div class="form-card bg-neutral-900 border border-neutral-800 p-12 rounded-3xl shadow-2xl relative">
-        <h2 class="text-5xl font-black tracking-tight hero-slogan-gradient mb-4">
-            Talk to us about your goals
-        </h2>
-        <p class="text-neutral-400 text-lg mb-10">
-Complete the form below and discover how we can help <span id="triggerOur" class="stealth-link">you</span>.        </p>
+    color: transparent!important;
+}
 
-        <form id="quoteForm" class="grid gap-6">
-            <div class="grid grid-cols-2 gap-6">
-                <input name="company" placeholder="Company / Name" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required>
-                <input name="email" type="email" placeholder="Email Address" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-6">
-                <input name="phone" placeholder="Phone / WhatsApp (Optional)" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition">
-                <select name="product" id="quoteProductSelect" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition text-neutral-400">
-                    <option value="" class="text-neutral-400">-- Select Product / Service (Optional) --</option>
-                    <option value="72V 20Ah Battery Pack">72V 20Ah Battery Pack</option>
-                    <option value="EV Conversion Kit">EV Conversion Kit</option>
-                    <option value="Solar Home Charging Solution">Solar Home Charging Solution</option>
-                    <option value="Battery Recycling Program">Battery Recycling Program</option>
-                    <option value="Other / General Inquiry">Other / General Inquiry</option>
-                </select>
-            </div>
+ <  / style >
+ <  / head >
 
-            <textarea name="details" rows="8" placeholder="Project details, required quantity, use-case, delivery location, etc." class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition"></textarea>
-            
-            <button type="submit" class="w-full mt-6 py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black text-xl font-bold transition shadow-lg shadow-cyan-500/20">
-                Submit Request
-            </button>
-        </form>
+ < body class = "bg-neutral-950 text-neutral-100 font-[Pretendard] overflow-x-hidden" >
 
-        <p id="formStatus" class="mt-6 text-center text-lg font-medium"></p>
-    </div>
-</main>
+     < div id = "bgm-placeholder" >  <  / div >
 
-<div id="footer-placeholder"></div>
+     < div id = "header-placeholder" >  <  / div >
 
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <!-- ⭐ 추가 -->
+     < main class = "px-6 contact-form-container" >
+     < div class = "form-card bg-neutral-900 border border-neutral-800 p-12 rounded-3xl shadow-2xl relative" >
+     < h2 class = "text-5xl font-black tracking-tight hero-slogan-gradient mb-4" >
+    Talk to us about your goals
+     <  / h2 >
+     < p class = "text-neutral-400 text-lg mb-10" >
+    Complete the form below and discover how we can help < span id = "triggerOur" class = "stealth-link" > you <  / span > . <  / p >
 
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+     < form id = "quoteForm" class = "grid gap-6" >
+     < div class = "grid grid-cols-2 gap-6" >
+     < input name = "company" placeholder = "Company / Name" class = "p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required >
+     < input name = "email" type = "email" placeholder = "Email Address" class = "p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required >
+     <  / div >
 
-<script>
+     < div class = "grid grid-cols-2 gap-6" >
+     < input name = "phone" placeholder = "Phone / WhatsApp (Optional)" class = "p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" >
+     < select name = "product" id = "quoteProductSelect" class = "p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition text-neutral-400" >
+     < option value = "" class = "text-neutral-400" > --Select Product / Service(Optional)-- <  / option >
+     < option value = "72V 20Ah Battery Pack" > 72V 20Ah Battery Pack <  / option >
+     < option value = "EV Conversion Kit" > EV Conversion Kit <  / option >
+     < option value = "Solar Home Charging Solution" > Solar Home Charging Solution <  / option >
+     < option value = "Battery Recycling Program" > Battery Recycling Program <  / option >
+     < option value = "Other / General Inquiry" > Other / General Inquiry <  / option >
+     <  / select >
+     <  / div >
+
+     < textarea name = "details" rows = "8" placeholder = "Project details, required quantity, use-case, delivery location, etc." class = "p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" >  <  / textarea >
+
+     < button type = "submit" class = "w-full mt-6 py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black text-xl font-bold transition shadow-lg shadow-cyan-500/20" >
+    Submit Request
+     <  / button >
+     <  / form >
+
+     < p id = "formStatus" class = "mt-6 text-center text-lg font-medium" >  <  / p >
+     <  / div >
+     <  / main >
+
+     < div id = "footer-placeholder" >  <  / div >
+
+     < script src = "https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js" >  <  / script >
+     < script src = "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js" >  <  / script >  < !--⭐ 추가-- >
+
+     < script src = "https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js" >  <  / script >
+
+     < script >
     const firebaseConfig = {
-        apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
-        authDomain: "tdlid-107669.firebaseapp.com",
-        databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
-        projectId: "tdlid-107669",
-        storageBucket: "tdlid-107669.firebasestorage.app",
-        messagingSenderId: "604782345004",
-        appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
-    };
+    apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+    authDomain: "tdlid-107669.firebaseapp.com",
+    databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+    projectId: "tdlid-107669",
+    storageBucket: "tdlid-107669.firebasestorage.app",
+    messagingSenderId: "604782345004",
+    appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+};
 
-    // Firebase 중복 초기화 방지 및 안전한 데이터베이스 참조
-    let database;
-    if (typeof firebase !== 'undefined') {
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-const auth = firebase.auth();   // ⭐ 추가
-database = firebase.database();
+// Firebase 중복 초기화 방지 및 안전한 데이터베이스 참조
+let database;
+if (typeof firebase !== 'undefined') {
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
     }
+    const auth = firebase.auth(); // ⭐ 추가
+    database = firebase.database();
+}
 
 /**
-     * 1. 레이아웃 로드 및 공통 컴포넌트 초기화
-     * 헤더, 푸터, BGM과 함께 공통 관리자 인증 모달(admin-auth.html)을 로드합니다.
-     */
-    async function loadLayout() {
-        try {
-            // [1] 헤더 로드 및 삽입
-            const headerRes = await fetch('components/header.html');
-            const headerHTML = await headerRes.text();
-            const headerPlaceholder = document.getElementById('header-placeholder');
-            headerPlaceholder.innerHTML = headerHTML;
+ * 1. 레이아웃 로드 및 공통 컴포넌트 초기화
+ * 헤더, 푸터, BGM과 함께 공통 관리자 인증 모달(admin-auth.html)을 로드합니다.
+ */
+async function loadLayout() {
+    try {
+        // [1] 헤더 로드 및 삽입
+        const headerRes = await fetch('components/header.html');
+        const headerHTML = await headerRes.text();
+        const headerPlaceholder = document.getElementById('header-placeholder');
+        headerPlaceholder.innerHTML = headerHTML;
 
-            // [2] 헤더 내 스크립트 실행 및 경로 최적화 (Admin 링크 대응)
-            const headerScripts = headerPlaceholder.querySelectorAll("script");
-            headerScripts.forEach(oldScript => {
-                if (oldScript.src) return; // 외부 스크립트 중복 로드 방지
+        // [2] 헤더 내 스크립트 실행 및 경로 최적화 (Admin 링크 대응)
+        const headerScripts = headerPlaceholder.querySelectorAll("script");
+        headerScripts.forEach(oldScript => {
+            if (oldScript.src)
+                return; // 외부 스크립트 중복 로드 방지
+            const newScript = document.createElement("script");
+            let scriptText = oldScript.text;
+            // admin.html 경로를 루트 폴더 구조에 맞춰 admin/admin.html로 치환
+            if (scriptText.includes("admin.html")) {
+                scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
+            }
+            newScript.text = scriptText;
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        });
+
+        // [3] 공통 관리자 인증 모달 로드 및 삽입
+        const authRes = await fetch('components/admin-auth.html');
+        const authHTML = await authRes.text();
+
+        let authDiv = document.getElementById('admin-auth-placeholder');
+        if (!authDiv) {
+            authDiv = document.createElement('div');
+            authDiv.id = 'admin-auth-placeholder';
+            document.body.appendChild(authDiv);
+        }
+        authDiv.innerHTML = authHTML;
+
+        // ⭐ auth 상태 확인 후에만 admin-auth 실행
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user)
+                return;
+
+            const authScripts = authDiv.querySelectorAll("script");
+            authScripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
-                let scriptText = oldScript.text;
-                // admin.html 경로를 루트 폴더 구조에 맞춰 admin/admin.html로 치환
-                if (scriptText.includes("admin.html")) {
-                    scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
-                }
-                newScript.text = scriptText;
+                newScript.text = oldScript.text;
                 document.body.appendChild(newScript).parentNode.removeChild(newScript);
             });
+        });
 
-            // [3] 공통 관리자 인증 모달 로드 및 삽입
-            const authRes = await fetch('components/admin-auth.html');
-            const authHTML = await authRes.text();
-            
-            let authDiv = document.getElementById('admin-auth-placeholder');
-            if (!authDiv) {
-                authDiv = document.createElement('div');
-                authDiv.id = 'admin-auth-placeholder';
-                document.body.appendChild(authDiv);
-            }
-authDiv.innerHTML = authHTML;
+        // 4. 푸터 로드 및 스크립트 강제 실행
+        const footerRes = await fetch('components/footer.html');
+        const footerPlaceholder = document.getElementById('footer-placeholder');
+        footerPlaceholder.innerHTML = await footerRes.text();
 
-// ⭐ auth 상태 확인 후에만 admin-auth 실행
-firebase.auth().onAuthStateChanged(user => {
-    if (!user) return;
+        // 추가: 푸터 내의 스크립트 추출 및 실행
+        const footerScripts = footerPlaceholder.querySelectorAll("script");
+        footerScripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            newScript.text = oldScript.text;
+            document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        });
 
-    const authScripts = authDiv.querySelectorAll("script");
-    authScripts.forEach(oldScript => {
-        const newScript = document.createElement("script");
-        newScript.text = oldScript.text;
-        document.body.appendChild(newScript).parentNode.removeChild(newScript);
-    });
-});
-
-
-// 4. 푸터 로드 및 스크립트 강제 실행
-const footerRes = await fetch('components/footer.html');
-const footerPlaceholder = document.getElementById('footer-placeholder');
-footerPlaceholder.innerHTML = await footerRes.text();
-
-// 추가: 푸터 내의 스크립트 추출 및 실행
-const footerScripts = footerPlaceholder.querySelectorAll("script");
-footerScripts.forEach(oldScript => {
-    const newScript = document.createElement("script");
-    newScript.text = oldScript.text;
-    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-});
-
-            // [5] BGM 로드 및 스크립트 실행
-            const bgmRes = await fetch('components/bgm.html');
-            const bgmPlaceholder = document.getElementById('bgm-placeholder');
-            if (bgmPlaceholder) {
-                bgmPlaceholder.innerHTML = await bgmRes.text();
-                const bgmScripts = bgmPlaceholder.querySelectorAll("script");
-                bgmScripts.forEach(oldScript => {
-                    if (oldScript.src) return;
-                    const newScript = document.createElement("script");
-                    newScript.text = oldScript.text;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-            }
-
-            // [6] 페이지 전용 기능 초기화
-            initMenuToggle();   // 상단 메뉴
-            initFormHandler();  // 문의 폼 처리
-            initEeggTrigger();  // 이스터에그 기능
-
-        } catch (err) {
-            console.error("Layout load failed:", err);
+        // [5] BGM 로드 및 스크립트 실행
+        const bgmRes = await fetch('components/bgm.html');
+        const bgmPlaceholder = document.getElementById('bgm-placeholder');
+        if (bgmPlaceholder) {
+            bgmPlaceholder.innerHTML = await bgmRes.text();
+            const bgmScripts = bgmPlaceholder.querySelectorAll("script");
+            bgmScripts.forEach(oldScript => {
+                if (oldScript.src)
+                    return;
+                const newScript = document.createElement("script");
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
         }
-    }
 
+        // [6] 페이지 전용 기능 초기화
+        initMenuToggle(); // 상단 메뉴
+        initFormHandler(); // 문의 폼 처리
+        initEeggTrigger(); // 이스터에그 기능
+
+    } catch (err) {
+        console.error("Layout load failed:", err);
+    }
+}
 
 function initEeggTrigger() {
     // 위 HTML에서 설정한 id인 'triggerOur'를 찾습니다.
@@ -278,68 +280,71 @@ function initEeggTrigger() {
     }
 }
 
-    function initMenuToggle() {
-        const menuBtn = document.getElementById("menuToggleBtn");
-        const dropdown = document.getElementById("dropdownMenu");
-        const menuIcon = document.getElementById("menuIcon");
-        if (menuBtn && dropdown) {
-            menuBtn.onclick = (e) => {
-                e.stopPropagation();
-                const isOpen = dropdown.classList.contains("opacity-100");
-                if (!isOpen) {
-                    dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
-                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                    if(menuIcon) menuIcon.innerText = "✕";
-                } else {
-                    closeMenu();
-                }
-            };
-            function closeMenu() {
-                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
-                if(menuIcon) menuIcon.innerText = "☰";
+function initMenuToggle() {
+    const menuBtn = document.getElementById("menuToggleBtn");
+    const dropdown = document.getElementById("dropdownMenu");
+    const menuIcon = document.getElementById("menuIcon");
+    if (menuBtn && dropdown) {
+        menuBtn.onclick = (e) => {
+            e.stopPropagation();
+            const isOpen = dropdown.classList.contains("opacity-100");
+            if (!isOpen) {
+                dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
+                dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                if (menuIcon)
+                    menuIcon.innerText = "✕";
+            } else {
+                closeMenu();
             }
-            document.addEventListener("click", (e) => {
-                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
-            });
+        };
+        function closeMenu() {
+            dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+            dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
+            if (menuIcon)
+                menuIcon.innerText = "☰";
         }
+        document.addEventListener("click", (e) => {
+            if (!dropdown.contains(e.target) && !menuBtn.contains(e.target))
+                closeMenu();
+        });
     }
+}
 
-    function initFormHandler() {
-        const form = document.getElementById('quoteForm');
-        const formStatus = document.getElementById('formStatus');
-        if(form) {
-            form.onsubmit = async (e) => {
-                e.preventDefault();
-                formStatus.textContent = 'Storing Request...';
-                formStatus.className = 'mt-6 text-center text-lg text-cyan-400';
-                try {
-                    const formData = new FormData(form);
-                    const msgData = {
-                        timestamp: Date.now(),
-                        date: new Date().toLocaleString(),
-                        company: formData.get('company'),
-                        email: formData.get('email'),
-                        phone: formData.get('phone') || 'N/A',
-                        product: formData.get('product') || 'None Selected',
-                        details: formData.get('details') || '',
-                        read: false,
-                        status: 'new'
-                    };
-                    await database.ref('messages').push(msgData);
-                    formStatus.textContent = '✅ Submitted successfully!';
-                    formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
-                    form.reset();
-                } catch (error) {
-                    formStatus.textContent = '❌ Error saving data.';
-                    formStatus.className = 'mt-6 text-center text-lg text-red-500';
-                }
-            };
-        }
+function initFormHandler() {
+    const form = document.getElementById('quoteForm');
+    const formStatus = document.getElementById('formStatus');
+    if (form) {
+        form.onsubmit = async(e) => {
+            e.preventDefault();
+            formStatus.textContent = 'Storing Request...';
+            formStatus.className = 'mt-6 text-center text-lg text-cyan-400';
+            try {
+                const formData = new FormData(form);
+                const msgData = {
+                    timestamp: Date.now(),
+                    date: new Date().toLocaleString(),
+                    company: formData.get('company'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone') || 'N/A',
+                    product: formData.get('product') || 'None Selected',
+                    details: formData.get('details') || '',
+                    read: false,
+                    status: 'new'
+                };
+                await database.ref('messages').push(msgData);
+                formStatus.textContent = '✅ Submitted successfully!';
+                formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
+                form.reset();
+            } catch (error) {
+                formStatus.textContent = '❌ Error saving data.';
+                formStatus.className = 'mt-6 text-center text-lg text-red-500';
+            }
+        };
     }
+}
 
-    document.addEventListener("DOMContentLoaded", loadLayout);
-</script>
+document.addEventListener("DOMContentLoaded", loadLayout);
+ <  / script >
 
-</body>
-</html>
+ <  / body >
+<  / html >
