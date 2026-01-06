@@ -1,15 +1,15 @@
- < !DOCTYPE html >
- < html lang = "en" >
-     < head >
-     < meta charset = "UTF-8" >
-     < meta name = "description" id = "metaDescription" content = "" >
-     < meta name = "keywords" id = "metaKeywords" content = "" >
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" id="metaDescription" content="">
+    <meta name="keywords" id="metaKeywords" content="">
 
-     < script >
-    (function () {
+    <script>
+    (function() {
         // 1. 기기 감지 수정 (iPad를 명시적으로 제외)
         const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-
+        
         const urlParams = new URLSearchParams(window.location.search);
         const isPCMode = urlParams.get('view_mode') === 'pc';
 
@@ -17,7 +17,7 @@
         if (isMobileOnly && !isPCMode) {
             let path = window.location.pathname;
             let page = path.split("/").pop();
-
+            
             if (page === "" || page === "index.html") {
                 window.location.href = "index_m.html";
 
@@ -26,116 +26,96 @@
             }
         }
     })();
- <  / script >
+    </script>
 
- < script src = "https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js" >  <  / script >
-     < script src = "https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js" >  <  / script >
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-     < script >
-    // 2. Firebase 설정
-    const firebaseConfig = {
-    apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
-    authDomain: "tdlid-107669.firebaseapp.com",
-    databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
-    projectId: "tdlid-107669",
-    storageBucket: "tdlid-107669.firebasestorage.app",
-    messagingSenderId: "604782345004",
-    appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
-};
+    <script>
+      // 2. Firebase 설정
+      const firebaseConfig = {
+        apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+        authDomain: "tdlid-107669.firebaseapp.com",
+        databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+        projectId: "tdlid-107669",
+        storageBucket: "tdlid-107669.firebasestorage.app",
+        messagingSenderId: "604782345004",
+        appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+      };
 
-if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const database = firebase.database();
+    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+      const database = firebase.database();
 
-// 3. 접속 기록 함수
-async function recordVisit() {
-    try {
-        let geoData = {
-            ip: "0.0.0.0",
-            country: "Unknown",
-            city: "Unknown"
-        };
+      // 3. 접속 기록 함수
+      async function recordVisit() {
         try {
-            const response = await fetch('https://ipapi.co/json/');
-            const data = await response.json();
-            geoData = {
-                ip: data.ip,
-                country: data.country_name,
-                city: data.city
+            let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                geoData = { ip: data.ip, country: data.country_name, city: data.city };
+            } catch (e) { console.error("Geo API Error:", e); }
+
+            const ua = navigator.userAgent;
+            const now = new Date();
+            const visitData = {
+              timestamp: now.getTime(),
+              timeStr: now.toLocaleString(),
+              page: window.location.pathname.split('/').pop() || 'index.html',
+              ip: geoData.ip,
+              country: geoData.country,
+              city: geoData.city,
+              device: /iPhone|iPad|iPod|Android/i.test(ua) ? "Mobile" : "PC",
+              os: getOS(ua),
+              browser: getBrowser(ua),
+              sid: getSessionId(),
+              referrer: document.referrer || "Direct"
             };
-        } catch (e) {
-            console.error("Geo API Error:", e);
+            database.ref('visits').push(visitData);
+        } catch(e) { console.error("History error:", e); }
+      }
+
+      function getOS(ua) {
+        if (ua.indexOf("Windows") !== -1) return "Windows";
+        if (ua.indexOf("Mac") !== -1) return "macOS";
+        if (ua.indexOf("Android") !== -1) return "Android";
+        if (ua.indexOf("iPhone") !== -1 || ua.indexOf("iPad") !== -1) return "iOS";
+        return "Unknown";
+      }
+
+      function getBrowser(ua) {
+        if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) return "Edge";
+        if (ua.indexOf("Chrome") !== -1) return "Chrome";
+        if (ua.indexOf("Safari") !== -1) return "Safari";
+        if (ua.indexOf("Firefox") !== -1) return "Firefox";
+        return "Others";
+      }
+
+      function getSessionId() {
+        if (!sessionStorage.getItem('session_id')) {
+            sessionStorage.setItem('session_id', 's_' + Math.random().toString(36).substr(2, 9));
         }
+        return sessionStorage.getItem('session_id');
+      }
 
-        const ua = navigator.userAgent;
-        const now = new Date();
-        const visitData = {
-            timestamp: now.getTime(),
-            timeStr: now.toLocaleString(),
-            page: window.location.pathname.split('/').pop() || 'index.html',
-            ip: geoData.ip,
-            country: geoData.country,
-            city: geoData.city,
-            device: /iPhone|iPad|iPod|Android/i.test(ua) ? "Mobile" : "PC",
-            os: getOS(ua),
-            browser: getBrowser(ua),
-            sid: getSessionId(),
-            referrer: document.referrer || "Direct"
-        };
-        database.ref('visits').push(visitData);
-    } catch (e) {
-        console.error("History error:", e);
+      recordVisit();
+
+      /* [추가] 관리자 인증 로직 */
+    function openAdminAuth() {
+        const modal = document.getElementById('adminAuthModal');
+        modal.classList.remove('hidden');
+        document.getElementById('adminPasswordInput').focus();
+        document.body.style.overflow = 'hidden';
     }
-}
 
-function getOS(ua) {
-    if (ua.indexOf("Windows") !== -1)
-        return "Windows";
-    if (ua.indexOf("Mac") !== -1)
-        return "macOS";
-    if (ua.indexOf("Android") !== -1)
-        return "Android";
-    if (ua.indexOf("iPhone") !== -1 || ua.indexOf("iPad") !== -1)
-        return "iOS";
-    return "Unknown";
-}
-
-function getBrowser(ua) {
-    if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1)
-        return "Edge";
-    if (ua.indexOf("Chrome") !== -1)
-        return "Chrome";
-    if (ua.indexOf("Safari") !== -1)
-        return "Safari";
-    if (ua.indexOf("Firefox") !== -1)
-        return "Firefox";
-    return "Others";
-}
-
-function getSessionId() {
-    if (!sessionStorage.getItem('session_id')) {
-        sessionStorage.setItem('session_id', 's_' + Math.random().toString(36).substr(2, 9));
+    function closeAdminAuth() {
+        const modal = document.getElementById('adminAuthModal');
+        modal.classList.add('hidden');
+        document.getElementById('adminPasswordInput').value = '';
+        document.body.style.overflow = '';
     }
-    return sessionStorage.getItem('session_id');
-}
-
-recordVisit();
-
-/* [추가] 관리자 인증 로직 */
-function openAdminAuth() {
-    const modal = document.getElementById('adminAuthModal');
-    modal.classList.remove('hidden');
-    document.getElementById('adminPasswordInput').focus();
-    document.body.style.overflow = 'hidden';
-}
-
-function closeAdminAuth() {
-    const modal = document.getElementById('adminAuthModal');
-    modal.classList.add('hidden');
-    document.getElementById('adminPasswordInput').value = '';
-    document.body.style.overflow = '';
-}
 
 async function verifyAdminPassword() {
     const inputPw = document.getElementById('adminPasswordInput').value;
@@ -151,399 +131,363 @@ async function verifyAdminPassword() {
     }
 }
 
-/* [추가] 실시간 공지/팝업/SEO 감지 함수 */
-/* [수정된] 실시간 공지/팝업/SEO 감지 함수 */
-/* [수정된] 실시간 공지/팝업/SEO 감지 함수 */
-function initLiveSettings() {
-    // 1. SEO 설정 감지 (기존 유지)
-    database.ref('siteSettings/seo').on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            if (data.description)
-                document.getElementById('metaDescription')?.setAttribute('content', data.description);
-            if (data.keywords)
-                document.getElementById('metaKeywords')?.setAttribute('content', data.keywords);
+    /* [추가] 실시간 공지/팝업/SEO 감지 함수 */
+    function initLiveSettings() {
+        // 1. SEO 설정 감지
+        database.ref('siteSettings/seo').on('value', (snapshot) => {
+            const data = snapshot.val();
+if (data) {
+        const now = new Date().toISOString().split('T')[0]; // 현재 날짜 (YYYY-MM-DD)
+        
+        // 날짜 범위 체크 함수
+        const isExpired = (data.startDate && now < data.startDate) || (data.endDate && now > data.endDate);
+
+        // 팝업 표시 (날짜가 기한 내에 있을 때만)
+        const popup = document.getElementById('mainPopup');
+        if (data.popupActive && !isExpired) {
+            popup.style.display = 'flex';
+            document.getElementById('popupText').innerText = data.text;
+        } else {
+            popup.style.display = 'none';
         }
-    });
+        
+        // 배너 표시 로직도 위와 동일하게 isExpired를 활용하여 적용...
+    }
+        });
 
-    // 2. 팝업 설정 감지 (배열 구조 대응 수정)
-    database.ref('siteSettings/popups').on('value', (snapshot) => {
-        const popups = snapshot.val();
-        if (Array.isArray(popups)) {
-            const now = new Date().toISOString().split('T')[0]; // 현재 날짜 (YYYY-MM-DD)
-
-            // 팝업 리스트 중 활성화 상태이고 날짜가 유효한 첫 번째 항목을 찾음
-            const activePopup = popups.find(p => {
-                const isExpired = (p.startDate && now < p.startDate) || (p.endDate && now > p.endDate);
-                return p.popupActive && !isExpired;
-            });
-
-            const popup = document.getElementById('mainPopup');
-            const popupContent = document.getElementById('popupText');
-
-            if (activePopup) {
-                popup.style.display = 'flex';
-                popupContent.innerHTML = activePopup.content || activePopup.text || '';
-
-                // 이미지 최적화
-                const images = popupContent.getElementsByTagName('img');
-                for (let img of images) {
-                    img.style.maxWidth = '100%';
-                    img.style.height = 'auto';
-                    img.style.display = 'block';
-                    img.style.margin = '10px auto';
-                    img.style.borderRadius = '8px';
+        // 2. 공지/팝업 설정 감지
+        database.ref('siteSettings/notice').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // 상단 긴급 배너 제어
+                const banner = document.getElementById('emergencyBanner');
+                if (data.bannerActive) {
+                    banner.style.display = 'block';
+                    document.getElementById('bannerText').innerText = data.text;
+                } else {
+                    banner.style.display = 'none';
                 }
-            } else {
-                popup.style.display = 'none';
+
+                // 중앙 팝업 제어
+                const popup = document.getElementById('mainPopup');
+                if (data.popupActive) {
+                    popup.style.display = 'flex';
+                    document.getElementById('popupText').innerText = data.text;
+                } else {
+                    popup.style.display = 'none';
+                }
             }
+        });
+    }
+    </script>
 
-            // --- 상단 긴급 배너 제어 (첫 번째 활성 배너 기준) ---
-            const activeBanner = popups.find(p => {
-                const isExpired = (p.startDate && now < p.startDate) || (p.endDate && now > p.endDate);
-                return p.bannerActive && !isExpired;
-            });
+    <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/main.css">
 
-            const banner = document.getElementById('emergencyBanner');
-            const bannerText = document.getElementById('bannerText');
-            if (banner && activeBanner) {
-                banner.style.display = 'block';
-                bannerText.innerHTML = activeBanner.content || activeBanner.text || '';
-            } else if (banner) {
-                banner.style.display = 'none';
-            }
-        }
-    });
-}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
- <  / script >
-
- < title > TDL Energy Indonesia — NextGen Motorcycle Battery Packs <  / title >
- < meta name = "viewport" content = "width=device-width, initial-scale=1.0" >
-     < script src = "https://cdn.tailwindcss.com" >  <  / script >
-     < link rel = "stylesheet" href = "css/main.css" >
-
-     < link rel = "preconnect" href = "https://fonts.googleapis.com" >
-     < link rel = "preconnect" href = "https://fonts.gstatic.com" crossorigin >
-     < link href = "https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel = "stylesheet" >
-
-     < style >
+<style>
     /* [수정] BGM 토글 버튼 - 최상단 우선순위 부여 */
-    #musicToggleBtn {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    z - index: 999999!important;
-    width: 44px;
-    height: 44px;
-    background: rgba(23, 23, 23, 0.8);
-    border: 1px solid rgba(34, 211, 238, 0.4);
-    border - radius: 50 % ;
-    display: flex;
-    align - items: center;
-    justify - content: center;
-    cursor: pointer;
-    color: #22d3ee;
-    backdrop - filter: blur(4px);
-    transition: all 0.3s;
-    pointer - events: auto!important;
-}
+    #musicToggleBtn { 
+        position: fixed; 
+        bottom: 25px; 
+        right: 25px; 
+        z-index: 999999 !important;
+        width: 44px; 
+        height: 44px; 
+        background: rgba(23, 23, 23, 0.8); 
+        border: 1px solid rgba(34, 211, 238, 0.4); 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        cursor: pointer; 
+        color: #22d3ee; 
+        backdrop-filter: blur(4px); 
+        transition: all 0.3s; 
+        pointer-events: auto !important;
+    }
 
-#musicToggleBtn: hover {
-    transform: scale(1.1);
-    border - color: #22d3ee;
-}
+    #musicToggleBtn:hover { 
+        transform: scale(1.1); 
+        border-color: #22d3ee; 
+    }
 
-/* 실시간 제어 UI & 모달 스타일 */
-#emergencyBanner {
-    display: none;
-    background: #ef4444;
-    color: white;
-    text - align: center;
-    padding: 12px;
-    font - weight: bold;
-    position: fixed;
-    bottom: 0;
-    width: 100 % ;
-    z - index: 99999;
-    font - size: 14px;
-    box - shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
+    /* 실시간 제어 UI & 모달 스타일 */
+    #emergencyBanner { 
+        display: none; 
+        background: #ef4444; 
+        color: white; 
+        text-align: center; 
+        padding: 12px; 
+        font-weight: bold; 
+        position: fixed; 
+        bottom: 0; 
+        width: 100%; 
+        z-index: 99999; 
+        font-size: 14px; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+    }
 
-#mainPopup {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    z - index: 100000;
-    align - items: center;
-    justify - content: center;
-}
+    #mainPopup { 
+        display: none; 
+        position: fixed; 
+        inset: 0; 
+        background: rgba(0,0,0,0.7); 
+        z-index: 100000; 
+        align-items: center; 
+        justify-content: center; 
+    }
 
-#adminAuthModal {
-    background: rgba(0, 0, 0, 0.8);
-}
+    #adminAuthModal { background: rgba(0,0,0,0.8); }
 
-.popup - box {
-    background: #0a0a0a;
-    border: 1px solid #22d3ee;
-    padding: 30px; /* 패딩 약간 축소 */
-    border - radius: 24px;
-    max - width: 550px; /* 기존 420px에서 550px로 확장 */
-    width: 90 % ;
-    text - align: center;
-    max - height: 80vh; /* 화면 높이의 80%까지만 허용 */
-    overflow - y: auto; /* 내용이 길면 스크롤 생성 */
-}
+    .popup-box { 
+        background: #0a0a0a; 
+        border: 1px solid #22d3ee; 
+        padding: 40px; 
+        border-radius: 24px; 
+        max-width: 420px; 
+        width: 90%; 
+        text-align: center; 
+    }
 
-#imageModal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, .9);
-    z - index: 10000;
-}
+    #imageModal { 
+        position: fixed; 
+        inset: 0; 
+        background: rgba(0,0,0,.9); 
+        z-index: 10000; 
+    }
 
-#modalDetailImage {
-    max - width: 90 % ;
-    max - height: 90 % ;
-    object - fit: contain;
-}
+    #modalDetailImage { 
+        max-width: 90%; 
+        max-height: 90%; 
+        object-fit: contain; 
+    }
 
-/* 드롭다운 및 유틸리티 */
-.dropdown - link {
-    padding: 12px 20px;
-    display: block;
-    color: #ccc;
-    border - bottom: 1px solid #262626;
-    transition: all 0.2s;
-    text - align: left;
-}
+    /* 드롭다운 및 유틸리티 */
+    .dropdown-link { 
+        padding: 12px 20px; 
+        display: block; 
+        color: #ccc; 
+        border-bottom: 1px solid #262626; 
+        transition: all 0.2s; 
+        text-align: left; 
+    }
 
-.dropdown - link: hover {
-    background - color: #1a1a1a;
-    color: #22d3ee;
-}
+    .dropdown-link:hover { 
+        background-color: #1a1a1a; 
+        color: #22d3ee; 
+    }
 
-.dropdown - quote - btn {
-    padding: 12px 20px;
-    display: block;
-    background: #22d3ee;
-    color: #000;
-    font - weight: 600;
-    text - align: center;
-    border - radius: 0 0 11px 11px;
-    transition: background 0.2s;
-}
+    .dropdown-quote-btn { 
+        padding: 12px 20px; 
+        display: block; 
+        background: #22d3ee; 
+        color: #000; 
+        font-weight: 600; 
+        text-align: center; 
+        border-radius: 0 0 11px 11px; 
+        transition: background 0.2s; 
+    }
 
-.dropdown - quote - btn: hover {
-    background: #67e8f9;
-}
+    .dropdown-quote-btn:hover { background: #67e8f9; }
 
-.whitespace - nowrap {
-    white - space: nowrap!important;
-}
+    .whitespace-nowrap { white-space: nowrap !important; }
 
-#triggerWord {
-    color: inherit!important;
-    font - weight: inherit!important;
-    text - decoration: none!important;
-    cursor: text!important;
-    display: inline;
-    position: relative;
-    z - index: 9998;
-    pointer - events: auto!important;
-}
+    #triggerWord { 
+        color: inherit !important; 
+        font-weight: inherit !important; 
+        text-decoration: none !important; 
+        cursor: text !important; 
+        display: inline; 
+        position: relative; 
+        z-index: 9998; 
+        pointer-events: auto !important; 
+    }
 
-/* 레이아웃 구조 */
-body, .hero - section, .video - bg - container {
-    background - color: #000000!important;
-}
+    /* 레이아웃 구조 */
+    body, .hero-section, .video-bg-container {
+        background-color: #000000 !important;
+    }
 
-.hero - section {
-    position: relative;
-    width: 100 % ;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    align - items: center;
-    justify - content: center;
-}
+    .hero-section { 
+        position: relative; 
+        width: 100%; 
+        height: 100vh; 
+        overflow: hidden; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+    }
 
-.video - bg - container {
-    position: absolute;
-    inset: 0;
-    z - index: 0;
-}
+    .video-bg-container { 
+        position: absolute; 
+        inset: 0; 
+        z-index: 0; 
+    }
 
-.video - bg {
-    width: 100 % ;
-    height: 100 % ;
-    object - fit: cover;
-    filter: brightness(0.4)contrast(1.1);
-}
+    .video-bg { 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+        filter: brightness(0.4) contrast(1.1); 
+    }
 
-.video - overlay {
-    position: absolute;
-    inset: 0;
-    background: radial - gradient(circle, rgba(0, 0, 0, 0)0 % , rgba(0, 0, 0, 0.4)100 % );
-    z - index: 5;
-}
+    .video-overlay { 
+        position: absolute; 
+        inset: 0; 
+        background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%); 
+        z-index: 5; 
+    }
 
-.hero - content {
-    position: relative;
-    z - index: 10;
-}
+    .hero-content { 
+        position: relative; 
+        z-index: 10; 
+    }
 
-/* --------------------------------------------------
-배경 이미지 설정 (bg-3.gif)
+ /* --------------------------------------------------
+    배경 이미지 설정 (bg-3.gif)
 -------------------------------------------------- */
-.bg - slide {
+.bg-slide {
     position: absolute;
     inset: 0;
-    z - index: 1;
-    background - color: #000000;
-    background - image: url('images/bg/bg-3.gif'); /* 이미지 경로 */
-    background - size: 60 % ;
-    background - repeat: no - repeat;
-    background - position: center;
+    z-index: 1;
+    background-color: #000000;
+    background-image: url('images/bg/bg-3.gif'); /* 이미지 경로 */
+    background-size: 60%;
+    background-repeat: no-repeat;
+    background-position: center;
     opacity: 1;
-
+    
     /* 외곽 경계선 제거를 위한 마스크 */
-    mask - image: radial - gradient(circle, black 70 % , transparent 100 % );
-    -webkit - mask - image: radial - gradient(circle, black 70 % , transparent 100 % );
-
+    mask-image: radial-gradient(circle, black 70%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle, black 70%, transparent 100%);
+    
     /* 줌 애니메이션 */
-    animation: smoothZoom 15s ease - in - out infinite alternate;
+    animation: smoothZoom 15s ease-in-out infinite alternate;
 }
 
- @ keyframes smoothZoom {
-    from {
-        transform: scale(1);
-    }
-    to {
-        transform: scale(1.05);
-    }
+@keyframes smoothZoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
 }
 
 /* 펄스 효과가 필요할 때만 추가로 사용하는 클래스 (선택 사항) */
-.single - bg - effect {
+.single-bg-effect {
     filter: brightness(0.6);
-    animation: pulseFade 8s ease - in - out infinite;
+    animation: pulseFade 8s ease-in-out infinite;
 }
 
- @ keyframes pulseFade {
-    0 % {
-        opacity: 0;
-        transform: scale(1.0);
-    }
-    50 % {
-        opacity: 1;
-        transform: scale(1.05);
-    }
-    100 % {
-        opacity: 0;
-        transform: scale(1.1);
-    }
+@keyframes pulseFade {
+    0% { opacity: 0; transform: scale(1.0); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0; transform: scale(1.1); }
 }
 
- <  / style >
 
- <  / head >
+</style>
 
- < body class = "bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden" >
 
-     < div id = "mainPopup" >
-     < div class = "popup-box shadow-[0_0_50px_rgba(34,211,238,0.15)]" >
-     < h3 class = "text-cyan-400 font-black text-2xl mb-4 italic" > NOTICE <  / h3 >
-     < p id = "popupText" class = "text-neutral-300 mb-8 leading-relaxed whitespace-pre-wrap" >  <  / p >
-     < button onclick = "document.getElementById('mainPopup').style.display='none'"
-    class = "w-full py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition-all active:scale-95" >
-    Close
-     <  / button >
-     <  / div >
-     <  / div >
+</head>
 
-     < div id = "bgm-placeholder" >  <  / div >
-     < div id = "header-placeholder" >  <  / div >
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
 
-     < main class = "flex-grow" >
+<div id="mainPopup">
+    <div class="popup-box shadow-[0_0_50px_rgba(34,211,238,0.15)]">
+        <h3 class="text-cyan-400 font-black text-2xl mb-4 italic">NOTICE</h3>
+        <p id="popupText" class="text-neutral-300 mb-8 leading-relaxed whitespace-pre-wrap"></p>
+        <button onclick="document.getElementById('mainPopup').style.display='none'" 
+                class="w-full py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition-all active:scale-95">
+            Close
+        </button>
+    </div>
+</div>
 
-     < section class = "hero-section flex flex-col items-center justify-center min-h-screen" >
-     < div id = "image-bg-container" class = "video-bg-container" >
-     < div class = "video-overlay" style = "z-index: 2;" >  <  / div >
-     <  / div >
+<div id="bgm-placeholder"></div>
+<div id="header-placeholder"></div>
 
-     < div class = "hero-content max-w-6xl w-full px-12 text-center flex flex-col items-center justify-center h-full" >
+<main class="flex-grow">
 
-     < div class = "flex flex-col items-center justify-center" >
-     < h1 class = "hero-logo-gradient" style = "font-size: 2.5rem; line-height: 1.2;" > NO MORE CARBON <  / h1 >
-     < p class = "hero-slogan-gradient" style = "font-size: 1.8rem; letter-spacing: 0.5em; margin-top: 1.5rem;" > NO MORE FOSSIL FUEL <  / p >
-     <  / div >
+<section class="hero-section flex flex-col items-center justify-center min-h-screen">
+    <div id="image-bg-container" class="video-bg-container">
+        <div class="video-overlay" style="z-index: 2;"></div> 
+    </div>
 
-     < p class = "hero-description text-xl md:text-2xl mt-80 mb-12 max-w-4xl mx-auto leading-relaxed" >
-     < span > TDLiD <  / span > is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy - related businesses in Indonesia.
- <  / p >
- <  / div >
- <  / section >
+    <div class="hero-content max-w-6xl w-full px-12 text-center flex flex-col items-center justify-center h-full">
+        
+        <div class="flex flex-col items-center justify-center">
+            <h1 class="hero-logo-gradient" style="font-size: 2.5rem; line-height: 1.2;">NO MORE CARBON</h1>
+            <p class="hero-slogan-gradient" style="font-size: 1.8rem; letter-spacing: 0.5em; margin-top: 1.5rem;">NO MORE FOSSIL FUEL</p>
+        </div>
 
- < section id = "trust-certs-showcase" class = "py-24 bg-neutral-900 border-t border-b border-neutral-800 relative z-10" >
-     < div class = "max-w-7xl mx-auto" >
-     < div class = "text-center mb-20" >
-     < h2 class = "text-2xl font-extralight mb-12 text-cyan-400" > A Pillar of Trust in the E - Scooter Ecosystem <  / h2 >
-     < div class = "flex items-center justify-center gap-24 opacity-75 grayscale hover:grayscale-0 transition-all duration-700" >
-     < img src = "images/home/DAVIGO.webp" alt = "DAVIGO" class = "h-16" >
-     < img src = "images/home/GESITS.webp" alt = "GESITS" class = "h-16" >
-     < img src = "images/home/ALESSA.webp" alt = "ALESSA" class = "h-16" >
-     <  / div >
-     <  / div >
+        <p class="hero-description text-xl md:text-2xl mt-80 mb-12 max-w-4xl mx-auto leading-relaxed">
+            <span>TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
+        </p>
+    </div>
+</section>
 
-     < div class = "mt-20" >
-     < h2 class = "text-2xl font-extralight text-center mb-16 text-cyan-400" > Global Compliance and Safety Standards <  / h2 >
-     < div id = "certifications-inside-hero" class = "flex flex-wrap gap-10 items-center justify-center interactive-certs" >
-     < a href = "#" class = "cert-link cert-zoom-wrapper" data - original - src = "images/certification/CE-EMC-TEST.webp" >
-     < img src = "images/certification/CE-EMC-TEST.webp" class = "h-24 transition-transform duration-300 shadow-2xl hover:scale-110" >
-     <  / a >
-     < a href = "#" class = "cert-link cert-zoom-wrapper" data - original - src = "images/certification/CB-TEST.webp" >  < img src = "images/certification/CB-TEST.webp" class = "h-24 transition-transform duration-300 shadow-2xl hover:scale-110" >  <  / a >
-     < a href = "#" class = "cert-link cert-zoom-wrapper" data - original - src = "images/certification/EMC-COMPLIANCE.webp" >  < img src = "images/certification/EMC-COMPLIANCE.webp" class = "h-24 transition-transform duration-300 shadow-2xl hover:scale-110" >  <  / a >
-     < a href = "#" class = "cert-link cert-zoom-wrapper" data - original - src = "images/certification/IEC-62619.webp" >  < img src = "images/certification/IEC-62619.webp" class = "h-24 transition-transform duration-300 shadow-2xl hover:scale-110" >  <  / a >
-     < a href = "#" class = "cert-link cert-zoom-wrapper" data - original - src = "images/certification/Material-Safety.webp" >  < img src = "images/certification/Material-Safety.webp" class = "h-24 transition-transform duration-300 shadow-2xl hover:scale-110" >  <  / a >
-     < a href = "#" class = "cert-link cert-zoom-wrapper" data - original - src = "images/certification/UN38.3.webp" >  < img src = "images/certification/UN38.3.webp" class = "h-24 transition-transform duration-300 shadow-2xl hover:scale-110" >  <  / a >
-     < a href = "#" class = "cert-link cert-zoom-wrapper" data - original - src = "images/certification/Dangerous-Goods.webp" >  < img src = "images/certification/Dangerous-Goods.webp" class = "h-24 transition-transform duration-300 shadow-2xl hover:scale-110" >  <  / a >
-     <  / div >
-     <  / div >
-     <  / div >
-     <  / section >
-     <  / main >
+    <section id="trust-certs-showcase" class="py-24 bg-neutral-900 border-t border-b border-neutral-800 relative z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-20">
+                <h2 class="text-2xl font-extralight mb-12 text-cyan-400">A Pillar of Trust in the E-Scooter Ecosystem</h2>
+                <div class="flex items-center justify-center gap-24 opacity-75 grayscale hover:grayscale-0 transition-all duration-700">
+                    <img src="images/home/DAVIGO.webp" alt="DAVIGO" class="h-16">
+                    <img src="images/home/GESITS.webp" alt="GESITS" class="h-16">
+                    <img src="images/home/ALESSA.webp" alt="ALESSA" class="h-16">
+                </div>
+            </div>
+            
+            <div class="mt-20">
+                <h2 class="text-2xl font-extralight text-center mb-16 text-cyan-400">Global Compliance and Safety Standards</h2>
+                <div id="certifications-inside-hero" class="flex flex-wrap gap-10 items-center justify-center interactive-certs">
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CE-EMC-TEST.webp">
+                        <img src="images/certification/CE-EMC-TEST.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
+                    </a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/CB-TEST.webp"><img src="images/certification/CB-TEST.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/EMC-COMPLIANCE.webp"><img src="images/certification/EMC-COMPLIANCE.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/IEC-62619.webp"><img src="images/certification/IEC-62619.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Material-Safety.webp"><img src="images/certification/Material-Safety.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/UN38.3.webp"><img src="images/certification/UN38.3.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                    <a href="#" class="cert-link cert-zoom-wrapper" data-original-src="images/certification/Dangerous-Goods.webp"><img src="images/certification/Dangerous-Goods.webp" class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
 
-     < div id = "adminAuthModal" class = "hidden fixed inset-0 bg-black/95 z-[30000] flex items-center justify-center p-4 backdrop-blur-sm" >
-     < div class = "bg-neutral-900 border border-cyan-500/30 p-8 rounded-2xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(0,0,0,1)]" >
-     < h3 class = "text-cyan-400 font-bold text-xl mb-1 uppercase tracking-tighter" > Admin Access <  / h3 >
-     < p class = "text-neutral-500 text-xs mb-6" > Database Authentication Required <  / p >
-     < input type = "password" id = "adminPasswordInput"
-    class = "w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white mb-6 focus:border-cyan-500 outline-none transition-all text-center tracking-widest"
-    placeholder = "••••••••" >
-     < div class = "flex gap-3" >
-     < button onclick = "closeAdminAuth()" class = "flex-1 py-3 bg-neutral-800 text-neutral-400 rounded-xl font-semibold text-sm" > Cancel <  / button >
-     < button onclick = "verifyAdminPassword()" class = "flex-1 py-3 bg-cyan-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-900/20 hover:bg-cyan-500 transition-colors" > Verify <  / button >
-     <  / div >
-     <  / div >
-     <  / div >
+<div id="adminAuthModal" class="hidden fixed inset-0 bg-black/95 z-[30000] flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-neutral-900 border border-cyan-500/30 p-8 rounded-2xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(0,0,0,1)]">
+        <h3 class="text-cyan-400 font-bold text-xl mb-1 uppercase tracking-tighter">Admin Access</h3>
+        <p class="text-neutral-500 text-xs mb-6">Database Authentication Required</p>
+        <input type="password" id="adminPasswordInput" 
+               class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white mb-6 focus:border-cyan-500 outline-none transition-all text-center tracking-widest"
+               placeholder="••••••••">
+        <div class="flex gap-3">
+            <button onclick="closeAdminAuth()" class="flex-1 py-3 bg-neutral-800 text-neutral-400 rounded-xl font-semibold text-sm">Cancel</button>
+            <button onclick="verifyAdminPassword()" class="flex-1 py-3 bg-cyan-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-900/20 hover:bg-cyan-500 transition-colors">Verify</button>
+        </div>
+    </div>
+</div>
 
-     < div id = "imageModal" class = "hidden" >
-     < div class = "flex items-center justify-center w-full h-full" >
-     < img id = "modalDetailImage" src = "" class = "max-w-[90%] max-h-[90%] object-contain" >
-     <  / div >
-     <  / div >
+<div id="imageModal" class="hidden">
+    <div class="flex items-center justify-center w-full h-full">
+        <img id="modalDetailImage" src="" class="max-w-[90%] max-h-[90%] object-contain">
+    </div>
+</div>
 
-     < div id = "footer-placeholder" >  <  / div >
+<div id="footer-placeholder"></div>
 
-     < div id = "emergencyBanner" >
-    📢 < span id = "bannerText" > Notice <  / span >
-     <  / div >
+<div id="emergencyBanner">
+    📢 <span id="bannerText">Notice</span>
+</div>
 
-     < script >
-    /** 1. 레이아웃 로드 **/
-    async function loadLayout() {
+<script>
+/** 1. 레이아웃 로드 **/
+async function loadLayout() {
     try {
         // 1. 헤더 로드
         const headerRes = await fetch('components/header.html');
@@ -554,7 +498,7 @@ body, .hero - section, .video - bg - container {
         }
 
         // 2. admin-auth.html 로드 부분 수정 (에러 방지)
-        // 외부 파일을 못 가져올 경우를 대비해, 이미 HTML에 작성된
+        // 외부 파일을 못 가져올 경우를 대비해, 이미 HTML에 작성된 
         // <div id="adminAuthModal">를 사용하도록 하고 fetch는 건너뜁니다.
         console.log("Admin Auth Modal is already embedded in index.html");
 
@@ -564,7 +508,7 @@ body, .hero - section, .video - bg - container {
             document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
         }
 
-        // 4. BGM 로드
+// 4. BGM 로드
         const bgmRes = await fetch('components/bgm.html');
         if (bgmRes.ok) {
             const bgmPlaceholder = document.getElementById('bgm-placeholder');
@@ -583,52 +527,54 @@ body, .hero - section, .video - bg - container {
         }
 
         // 초기화 실행
-        if (typeof initNavigation === "function")
-            initNavigation();
-
-    } catch (err) {
-        console.error("Layout Load Error:", err);
+        if (typeof initNavigation === "function") initNavigation();
+        
+    } catch (err) { 
+        console.error("Layout Load Error:", err); 
     }
 }
 
-/** 2. 내비게이션 **/
-function initNavigation() {
-    const menuBtn = document.getElementById("menuToggleBtn");
-    const dropdown = document.getElementById("dropdownMenu");
-    const menuIcon = document.getElementById("menuIcon");
-    if (menuBtn && dropdown) {
-        menuBtn.onclick = (e) => {
-            e.stopPropagation();
-            const isOpen = dropdown.classList.contains("visible");
-            if (isOpen) {
-                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                dropdown.classList.add("opacity-0", "invisible");
-                menuIcon.innerText = "☰";
-            } else {
-                dropdown.classList.remove("opacity-0", "invisible");
-                dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                menuIcon.innerText = "✕";
-            }
-        };
+
+    /** 2. 내비게이션 **/
+    function initNavigation() {
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const dropdown = document.getElementById("dropdownMenu");
+        const menuIcon = document.getElementById("menuIcon");
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isOpen = dropdown.classList.contains("visible");
+                if (isOpen) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                    dropdown.classList.add("opacity-0", "invisible");
+                    menuIcon.innerText = "☰";
+                } else {
+                    dropdown.classList.remove("opacity-0", "invisible");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                    menuIcon.innerText = "✕";
+                }
+            };
+        }
     }
-}
 
-/** 3. 관리자 페이지 트리거 **/
-function initAdminTriggers() {}
+    /** 3. 관리자 페이지 트리거 **/
+    function initAdminTriggers() {
 
-/** 4. 초기화 및 공통 기능 **/
+    }
+
+    /** 4. 초기화 및 공통 기능 **/
 /** 4. 초기화 및 공통 기능 **/
 document.addEventListener("DOMContentLoaded", () => {
 
-    // [수정] 다중 슬라이드 제거 후 단일 배경 설정
-    const bgContainer = document.getElementById('image-bg-container');
-    if (bgContainer) {
-        // 내부를 비우고 오버레이(z-index:5)와 배경슬라이드(z-index:1)를 생성
-        bgContainer.innerHTML = `
+// [수정] 다중 슬라이드 제거 후 단일 배경 설정
+const bgContainer = document.getElementById('image-bg-container');
+if (bgContainer) {
+    // 내부를 비우고 오버레이(z-index:5)와 배경슬라이드(z-index:1)를 생성
+    bgContainer.innerHTML = `
         <div class="video-overlay" style="z-index: 5;"></div>
         <div class="bg-slide"></div>
     `;
-    }
+}
 
     // 2. 인증 및 기타 함수 호출 (중괄호 누락 주의)
     loadLayout();
@@ -636,8 +582,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 3. 인증창 엔터키 이벤트 (함수 내부로 이동)
     document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter')
-            verifyAdminPassword();
+        if (e.key === 'Enter') verifyAdminPassword();
     });
 
     // 4. 인증서 클릭 모달 이벤트
@@ -665,23 +610,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 }); // <--- DOMContentLoaded 마침
 
-document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter')
-        verifyAdminPassword();
-});
+    document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') verifyAdminPassword();
+    });
+
 
 /* ==========================================
-TDLiD -> BIG HEART ANIMATION SCRIPT (수정본)
-========================================== */
+    TDLiD -> BIG HEART ANIMATION SCRIPT (수정본)
+   ========================================== */
 var isHeartRunning = false;
-var inputBuffer = "";
+var inputBuffer = ""; 
 const secretWord = "awesome";
 
 // [오류 해결] e.key 존재 여부를 먼저 체크하여 toLowerCase 오류 방지
 document.addEventListener('keydown', (e) => {
-    if (isHeartRunning || !e.key)
-        return;
-
+    if (isHeartRunning || !e.key) return; 
+    
     inputBuffer += e.key.toLowerCase();
     if (inputBuffer.length > secretWord.length) {
         inputBuffer = inputBuffer.substring(inputBuffer.length - secretWord.length);
@@ -693,130 +637,16 @@ document.addEventListener('keydown', (e) => {
 });
 
 // 전역에서 접근 가능하도록 window 객체에 할당 (푸터 클릭용)
-window.activateTdlidHeart = function () {
-    if (isHeartRunning)
-        return;
+window.activateTdlidHeart = function() {
+    if (isHeartRunning) return;
     isHeartRunning = true;
 
-    const points = [{
-            x: 0,
-            y: 0
-        }, {
-            x: 1,
-            y: 0
-        }, {
-            x: 2,
-            y: 0
-        }, {
-            x: 1,
-            y: 1
-        }, {
-            x: 1,
-            y: 2
-        }, {
-            x: 1,
-            y: 3
-        }, {
-            x: 1,
-            y: 4
-        }, // T
-        {
-            x: 3.5,
-            y: 0
-        }, {
-            x: 3.5,
-            y: 1
-        }, {
-            x: 3.5,
-            y: 2
-        }, {
-            x: 3.5,
-            y: 3
-        }, {
-            x: 3.5,
-            y: 4
-        }, {
-            x: 4.5,
-            y: 0
-        }, {
-            x: 5.5,
-            y: 1
-        }, {
-            x: 5.5,
-            y: 2
-        }, {
-            x: 5.5,
-            y: 3
-        }, {
-            x: 4.5,
-            y: 4
-        }, // D
-        {
-            x: 7,
-            y: 0
-        }, {
-            x: 7,
-            y: 1
-        }, {
-            x: 7,
-            y: 2
-        }, {
-            x: 7,
-            y: 3
-        }, {
-            x: 7,
-            y: 4
-        }, {
-            x: 8,
-            y: 4
-        }, {
-            x: 9,
-            y: 4
-        }, // L
-        {
-            x: 10.5,
-            y: 0.5
-        }, {
-            x: 10.5,
-            y: 2
-        }, {
-            x: 10.5,
-            y: 3
-        }, {
-            x: 10.5,
-            y: 4
-        }, // i
-        {
-            x: 12,
-            y: 0
-        }, {
-            x: 12,
-            y: 1
-        }, {
-            x: 12,
-            y: 2
-        }, {
-            x: 12,
-            y: 3
-        }, {
-            x: 12,
-            y: 4
-        }, {
-            x: 13,
-            y: 0
-        }, {
-            x: 14,
-            y: 1
-        }, {
-            x: 14,
-            y: 2
-        }, {
-            x: 14,
-            y: 3
-        }, {
-            x: 13,
-            y: 4
-        } // D
+    const points = [
+        {x:0, y:0}, {x:1, y:0}, {x:2, y:0}, {x:1, y:1}, {x:1, y:2}, {x:1, y:3}, {x:1, y:4}, // T
+        {x:3.5, y:0}, {x:3.5, y:1}, {x:3.5, y:2}, {x:3.5, y:3}, {x:3.5, y:4}, {x:4.5, y:0}, {x:5.5, y:1}, {x:5.5, y:2}, {x:5.5, y:3}, {x:4.5, y:4}, // D
+        {x:7, y:0}, {x:7, y:1}, {x:7, y:2}, {x:7, y:3}, {x:7, y:4}, {x:8, y:4}, {x:9, y:4}, // L
+        {x:10.5, y:0.5}, {x:10.5, y:2}, {x:10.5, y:3}, {x:10.5, y:4}, // i
+        {x:12, y:0}, {x:12, y:1}, {x:12, y:2}, {x:12, y:3}, {x:12, y:4}, {x:13, y:0}, {x:14, y:1}, {x:14, y:2}, {x:14, y:3}, {x:13, y:4} // D
     ];
 
     const hearts = [];
@@ -832,13 +662,8 @@ window.activateTdlidHeart = function () {
             transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
         `;
         document.body.appendChild(heart);
-        hearts.push({
-            el: heart,
-            target: p
-        });
-        setTimeout(() => {
-            heart.style.opacity = '1';
-        }, i * 10);
+        hearts.push({ el: heart, target: p });
+        setTimeout(() => { heart.style.opacity = '1'; }, i * 10);
     });
 
     // TDLiD 형성
@@ -862,7 +687,7 @@ window.activateTdlidHeart = function () {
         hearts.forEach((obj, i) => {
             const t = (i / hearts.length) * 2 * Math.PI;
             const hx = 16 * Math.pow(Math.sin(t), 3);
-            const hy =  - (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+            const hy = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
             obj.el.style.transition = "all 2s cubic-bezier(0.25, 1, 0.5, 1)";
             obj.el.style.left = (centerX + hx * heartScale) + 'px';
             obj.el.style.top = (centerY + hy * heartScale) + 'px';
@@ -876,7 +701,7 @@ window.activateTdlidHeart = function () {
         hearts.forEach(obj => {
             obj.el.style.transition = "all 1.5s ease-in";
             obj.el.style.opacity = '0';
-            obj.el.style.transform = `translate(${(Math.random() - 0.5) * 500}px, ${(Math.random() - 0.5) * 500}px) scale(0)`;
+            obj.el.style.transform = `translate(${(Math.random()-0.5)*500}px, ${(Math.random()-0.5)*500}px) scale(0)`;
             setTimeout(() => obj.el.remove(), 1500);
         });
         isHeartRunning = false;
@@ -898,6 +723,7 @@ function bindHeartTrigger() {
 }
 bindHeartTrigger();
 
+
 // 모바일용 트리거
 const mobileTrigger = document.getElementById('mobileHeartTrigger');
 if (mobileTrigger) {
@@ -907,6 +733,7 @@ if (mobileTrigger) {
     };
 }
 
- <  / script >
- <  / body >
-<  / html >
+
+</script>
+</body>
+</html>
