@@ -140,54 +140,58 @@ async function verifyAdminPassword() {
     }
 }
 
-    /* [추가] 실시간 공지/팝업/SEO 감지 함수 */
-    function initLiveSettings() {
-        // 1. SEO 설정 감지
-        database.ref('siteSettings/seo').on('value', (snapshot) => {
-            const data = snapshot.val();
-if (data) {
-        const now = new Date().toISOString().split('T')[0]; // 현재 날짜 (YYYY-MM-DD)
-        
-        // 날짜 범위 체크 함수
-        const isExpired = (data.startDate && now < data.startDate) || (data.endDate && now > data.endDate);
+/* [최종 수정] HTML 태그(컬러 등)가 적용된 팝업 감지 함수 */
+function initLiveSettings() {
+    // 1. SEO 설정 감지 (기존 유지)
+    database.ref('siteSettings/seo').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data && data.description) document.getElementById('metaDescription').content = data.description;
+        if (data && data.keywords) document.getElementById('metaKeywords').content = data.keywords;
+    });
 
-        // 팝업 표시 (날짜가 기한 내에 있을 때만)
+    // 2. 팝업/배너 설정 감지 (content 필드 사용)
+    database.ref('siteSettings/popups').on('value', (snapshot) => {
+        const popups = snapshot.val(); 
+        if (!popups) return;
+
+        const now = new Date().toISOString().split('T')[0]; 
+        const banner = document.getElementById('emergencyBanner');
         const popup = document.getElementById('mainPopup');
-        if (data.popupActive && !isExpired) {
-            popup.style.display = 'flex';
-            document.getElementById('popupText').innerText = data.text;
-        } else {
-            popup.style.display = 'none';
-        }
-        
-        // 배너 표시 로직도 위와 동일하게 isExpired를 활용하여 적용...
-    }
-        });
+        const bannerText = document.getElementById('bannerText');
+        const popupText = document.getElementById('popupText');
 
-        // 2. 공지/팝업 설정 감지
-        database.ref('siteSettings/notice').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                // 상단 긴급 배너 제어
-                const banner = document.getElementById('emergencyBanner');
-                if (data.bannerActive) {
-                    banner.style.display = 'block';
-                    document.getElementById('bannerText').innerText = data.text;
-                } else {
-                    banner.style.display = 'none';
-                }
+        let isPopupFound = false;
+        let isBannerFound = false;
 
-                // 중앙 팝업 제어
-                const popup = document.getElementById('mainPopup');
-                if (data.popupActive) {
+        popups.forEach(data => {
+            if (!data) return;
+
+            const isWithinDate = (!data.startDate || now >= data.startDate) && 
+                                 (!data.endDate || now <= data.endDate);
+
+            if (isWithinDate) {
+                // 팝업 처리 (HTML 컬러 적용을 위해 innerHTML 사용)
+                if (data.popupActive && !isPopupFound) {
                     popup.style.display = 'flex';
-                    document.getElementById('popupText').innerText = data.text;
-                } else {
-                    popup.style.display = 'none';
+                    // ⭐ 중요: text 대신 content를 사용하고, innerHTML로 삽입합니다.
+                    popupText.innerHTML = data.content; 
+                    isPopupFound = true;
+                }
+                // 배너 처리
+                if (data.bannerActive && !isBannerFound) {
+                    banner.style.display = 'block';
+                    // 배너는 보통 한 줄 텍스트이므로 텍스트만 표시하거나 content를 넣을 수 있습니다.
+                    bannerText.innerHTML = data.text; 
+                    isBannerFound = true;
                 }
             }
         });
-    }
+
+        if (!isPopupFound) popup.style.display = 'none';
+        if (!isBannerFound) banner.style.display = 'none';
+    });
+}
+
     </script>
 
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
@@ -259,8 +263,8 @@ if (data) {
         border: 1px solid #22d3ee; 
         padding: 40px; 
         border-radius: 24px; 
-        max-width: 420px; 
-        width: 90%; 
+        max-width: 600px; 
+        width: 95%; 
         text-align: center; 
     }
 
