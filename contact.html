@@ -154,6 +154,8 @@ Complete the form below and discover how we can help <span id="triggerOur" class
 <div id="footer-placeholder"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <!-- ⭐ 추가 -->
+
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
 <script>
@@ -173,7 +175,8 @@ Complete the form below and discover how we can help <span id="triggerOur" class
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-        database = firebase.database();
+const auth = firebase.auth();   // ⭐ 추가
+database = firebase.database();
     }
 
 /**
@@ -212,14 +215,20 @@ Complete the form below and discover how we can help <span id="triggerOur" class
                 authDiv.id = 'admin-auth-placeholder';
                 document.body.appendChild(authDiv);
             }
-            authDiv.innerHTML = authHTML;
+authDiv.innerHTML = authHTML;
 
-            const authScripts = authDiv.querySelectorAll("script");
-            authScripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                newScript.text = oldScript.text;
-                document.body.appendChild(newScript).parentNode.removeChild(newScript);
-            });
+// ⭐ auth 상태 확인 후에만 admin-auth 실행
+firebase.auth().onAuthStateChanged(user => {
+    if (!user) return;
+
+    const authScripts = authDiv.querySelectorAll("script");
+    authScripts.forEach(oldScript => {
+        const newScript = document.createElement("script");
+        newScript.text = oldScript.text;
+        document.body.appendChild(newScript).parentNode.removeChild(newScript);
+    });
+});
+
 
 // 4. 푸터 로드 및 스크립트 강제 실행
 const footerRes = await fetch('components/footer.html');
