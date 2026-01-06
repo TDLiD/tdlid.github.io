@@ -29,6 +29,7 @@
     </script>
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
@@ -46,6 +47,7 @@
     if (typeof firebase !== 'undefined' && !firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
+const auth = firebase.auth();      // ⭐ 추가
       const database = firebase.database();
 
       // 3. 접속 기록 함수
@@ -119,13 +121,20 @@
 
 async function verifyAdminPassword() {
     const inputPw = document.getElementById('adminPasswordInput').value;
-    const errorMsg = document.getElementById('adminErrorMsg');
-
+    
     if (inputPw.length > 0) {
-        // DB 조회를 하지 않고, 일단 로그인 페이지로 보냅니다.
-        // 실제 보안은 login.html과 그 이후 admin 페이지의 Auth 체크에서 담당합니다.
+        // 세션 스토리지에 임시 저장 (기존 로직 유지)
         sessionStorage.setItem('admin_pre_auth', 'true');
-        window.location.href = "admin/login.html"; // 경로가 다를 경우 "login.html"로 수정
+        
+        // 인증 상태 확인 후 스크립트 동작 권한 부여 (news.html 방식 적용)
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                console.log("Admin Authenticated");
+                // 필요한 경우 여기서 관리자 전용 스크립트를 추가 실행할 수 있습니다.
+            }
+        });
+        
+        window.location.href = "admin/login.html";
     } else {
         alert("Please enter password.");
     }
@@ -502,11 +511,20 @@ async function loadLayout() {
         // <div id="adminAuthModal">를 사용하도록 하고 fetch는 건너뜁니다.
         console.log("Admin Auth Modal is already embedded in index.html");
 
-        // 3. 푸터 로드
-        const footerRes = await fetch('components/footer.html');
-        if (footerRes.ok) {
-            document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
-        }
+// 3. 푸터 로드 및 스크립트 강제 실행
+const footerRes = await fetch('components/footer.html');
+if (footerRes.ok) {
+    const footerPlaceholder = document.getElementById('footer-placeholder');
+    footerPlaceholder.innerHTML = await footerRes.text();
+
+    // ⭐ 추가: 푸터 내의 스크립트(pcHeartTrigger 등) 추출 및 실행
+    const footerScripts = footerPlaceholder.querySelectorAll("script");
+    footerScripts.forEach(oldScript => {
+        const newScript = document.createElement("script");
+        newScript.text = oldScript.text;
+        document.body.appendChild(newScript).parentNode.removeChild(newScript);
+    });
+}
 
 // 4. BGM 로드
         const bgmRes = await fetch('components/bgm.html');
