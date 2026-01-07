@@ -41,57 +41,65 @@
                 }
             });
 
-            database.ref('siteSettings/popups').on('value', (snapshot) => {
-                const popups = snapshot.val();
-                const banner = document.getElementById('emergencyBanner');
-                const bannerText = document.getElementById('bannerText');
-                const popup = document.getElementById('mainPopup');
-                const popupText = document.getElementById('popupText');
+database.ref('siteSettings/popups').on('value', (snapshot) => {
+        const popups = snapshot.val();
+        const popup = document.getElementById('mainPopup');
+        const popupBox = popup.querySelector('.popup-box'); // 실제 박스 요소
+        const popupText = document.getElementById('popupText');
 
-                let isAnyPopupVisible = false;
-                let isAnyBannerVisible = false;
+        let isAnyPopupVisible = false;
 
-                if (popups && Array.isArray(popups)) {
-                    const now = new Date().toISOString().split('T')[0];
+        if (popups && Array.isArray(popups)) {
+            const now = new Date().toISOString().split('T')[0];
 
-                    popups.forEach(item => {
-                        if (!item) return;
+            popups.forEach(item => {
+                if (item && item.popupActive && !isAnyPopupVisible) {
+                    const isDateValid = (!item.startDate || now >= item.startDate) &&
+                                        (!item.endDate || now <= item.endDate);
 
-                        // 공통 기간 유효성 체크
-                        const isDateValid = (!item.startDate || now >= item.startDate) &&
-                            (!item.endDate || now <= item.endDate);
+                    if (isDateValid) {
+                        // 1. 기존 효과 클래스 초기화
+                        popupBox.className = "popup-box"; 
+                        
+                        // 2. 효과 적용 (item.effect 값에 따라)
+                        const effectClass = `effect-${item.effect || 'classic'}`;
+                        popupBox.classList.add(effectClass);
 
-                        if (isDateValid) {
-                            // 1. 중앙 팝업 체크 (item.isActive -> item.popupActive 로 변경)
-                            if (item.popupActive && !isAnyPopupVisible) {
-                                popup.style.display = 'flex';
-                                popupText.innerHTML = item.content || item.text || '';
+                        // 3. 내용 삽입 및 표시
+                        popup.style.display = 'flex';
+                        popupText.innerHTML = item.content || item.text || '';
+                        isAnyPopupVisible = true;
 
-                                const imgs = popupText.getElementsByTagName('img');
-                                for (let img of imgs) {
-                                    img.style.maxWidth = '100%';
-                                    img.style.height = 'auto';
-                                    img.style.borderRadius = '8px';
-                                    img.style.display = 'block';
-                                    img.style.margin = '10px auto';
-                                }
-                                isAnyPopupVisible = true;
-                            }
-
-                            // 2. 하단 배너 체크 (item.type === 'notice' -> item.bannerActive 로 변경)
-                            if (item.bannerActive && !isAnyBannerVisible) {
-                                banner.style.display = 'block';
-                                bannerText.innerHTML = item.content || item.text || '';
-                                isAnyBannerVisible = true;
-                            }
+                        // 4. 자동 종료 처리 (Classic 제외 모든 효과는 3초 후 사라짐)
+                        if (item.effect && item.effect !== 'classic') {
+                            setTimeout(() => {
+                                popupBox.classList.add('popup-exit-active');
+                                setTimeout(() => {
+                                    closeMainPopup();
+                                    popupBox.classList.remove('popup-exit-active');
+                                }, 500); // 사라지는 애니메이션 시간
+                            }, 3000); // 3초 대기
                         }
-                    });
+                        
+                        // 하트 효과가 있는 경우 실행
+                        if (item.effect === 'heart' && typeof activateHeartEasterEgg === 'function') {
+                            activateHeartEasterEgg();
+                        }
+                    }
                 }
-
-                if (!isAnyPopupVisible) popup.style.display = 'none';
-                if (!isAnyBannerVisible) banner.style.display = 'none';
             });
         }
+        if (!isAnyPopupVisible) closeMainPopup();
+    });
+}
+
+// 닫기 함수 보강
+function closeMainPopup() {
+    const popup = document.getElementById('mainPopup');
+    popup.style.display = 'none';
+    document.body.classList.remove('overflow-hidden');
+}
+
 
         // 2. 관리자 인증 로직
         function openAdminAuth() {
@@ -440,6 +448,49 @@
             opacity: 0;
             z-index: 0;
         }
+
+/* --- 팝업 효과 (Dissolve Effects) --- */
+
+/* 1. Cleavage (상하 쪼개짐) */
+@keyframes cleavageIn {
+    0% { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0, 0 100%, 100% 100%, 100% 100%, 0 100%); opacity: 0; }
+    100% { clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%, 0 50%, 100% 50%, 100% 100%, 0 100%); opacity: 1; }
+}
+.effect-cleavage { animation: cleavageIn 0.8s ease-out forwards; }
+
+/* 2. Wave (파도 출렁임) */
+@keyframes waveIn {
+    0% { transform: scale(0.8) translateY(20px); opacity: 0; filter: blur(10px); }
+    50% { transform: scale(1.05) translateY(-5px); filter: blur(2px); }
+    100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0); }
+}
+.effect-wave { animation: waveIn 1s ease-in-out infinite alternate; } /* 출렁이는 느낌을 위해 infinite 사용 가능 */
+
+/* 3. Rotation (360도 회전) */
+@keyframes rotateIn {
+    0% { transform: rotate(-360deg) scale(0); opacity: 0; }
+    100% { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+.effect-rotation { animation: rotateIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* 4. Slide (하단에서 중앙으로) */
+@keyframes slideInCenter {
+    0% { transform: translateY(100vh); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+.effect-slide { animation: slideInCenter 0.6s ease-out forwards; }
+
+/* 5. Classic (기본 나타남) */
+.effect-classic { animation: fadeIn 0.4s ease-in forwards; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* 사라지는 애니메이션용 클래스 (JS에서 추가) */
+.popup-exit-active {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 0.5s ease-in;
+}
+
     </style>
 
 
