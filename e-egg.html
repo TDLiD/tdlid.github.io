@@ -1,225 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>TDLiD // Secure Node</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.tailwindcss.com"></script>
 
-<style>
-/* ===============================
+<head>
+    <meta charset="UTF-8">
+    <title>TDLiD // Secure Node</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* ===============================
     GLOBAL & RESPONSIVE FIX
 ================================ */
-body {
-    background: #000;
-    color: #22d3ee;
-    font-family: 'Courier New', monospace;
-    /* 스크롤 허용 및 가로 오버플로우 방지 */
-    overflow-x: hidden; 
-    overflow-y: auto; 
-    cursor: crosshair;
-    min-height: 100vh;
-}
+        body {
+            background: #000;
+            color: #22d3ee;
+            font-family: 'Courier New', monospace;
+            /* 스크롤 허용 및 가로 오버플로우 방지 */
+            overflow-x: hidden;
+            overflow-y: auto;
+            cursor: crosshair;
+            min-height: 100vh;
+        }
 
-/* 마우스 추적 레이저 레이어 */
-#laser-guide {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 50;
-}
+        /* 마우스 추적 레이저 레이어 */
+        #laser-guide {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
 
-.hacker-lines {
-    position: fixed; inset: 0;
-    background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(34, 211, 238, 0.05) 2px, transparent 3px);
-    pointer-events: none; z-index: 10;
-}
+        .hacker-lines {
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(34, 211, 238, 0.05) 2px, transparent 3px);
+            pointer-events: none;
+            z-index: 10;
+        }
 
-/* 스크린 글리치 */
-.glitch-heavy {
-    animation: shake 0.1s infinite !important;
-    background: rgba(255, 0, 0, 0.05) !important;
-}
+        /* 스크린 글리치 */
+        .glitch-heavy {
+            animation: shake 0.1s infinite !important;
+            background: rgba(255, 0, 0, 0.05) !important;
+        }
 
-@keyframes shake {
-    0% { transform: translate(0,0); }
-    10% { transform: translate(-2px, -2px); }
-    20% { transform: translate(2px, 2px); }
-    100% { transform: translate(0,0); }
-}
+        @keyframes shake {
+            0% {
+                transform: translate(0, 0);
+            }
 
-/* ===============================
+            10% {
+                transform: translate(-2px, -2px);
+            }
+
+            20% {
+                transform: translate(2px, 2px);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        /* ===============================
     STAFF IMAGES (Responsive Size)
 ================================ */
-.staff-container {
-    display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;
-    z-index: 20; width: 100%; max-width: 1200px;
-    padding: 0 10px;
-}
+        .staff-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 20;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 10px;
+        }
 
-.staff-img {
-    /* 브라우저 크기에 맞춰 이미지 크기 자동 조절 */
-    width: calc(33.33% - 20px); 
-    max-width: 250px;
-    min-width: 140px; 
-    height: auto; 
-    border: 2px solid #22d3ee;
-    filter: grayscale(1) brightness(0.5);
-    opacity: 0; transform: translateY(30px);
-    transition: 1s cubic-bezier(.2,1,.3,1);
-}
+        .staff-img {
+            /* 브라우저 크기에 맞춰 이미지 크기 자동 조절 */
+            width: calc(33.33% - 20px);
+            max-width: 250px;
+            min-width: 140px;
+            height: auto;
+            border: 2px solid #22d3ee;
+            filter: grayscale(1) brightness(0.5);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: 1s cubic-bezier(.2, 1, .3, 1);
+        }
 
-@media (max-width: 640px) {
-    .staff-img { width: calc(50% - 15px); } /* 모바일에선 2열 */
-}
+        @media (max-width: 640px) {
+            .staff-img {
+                width: calc(50% - 15px);
+            }
 
-.staff-img.reveal {
-    opacity: 1; transform: none; filter: grayscale(0) brightness(1);
-    box-shadow: 0 0 20px rgba(34,211,238,0.4);
-}
+            /* 모바일에선 2열 */
+        }
 
-.pulse { animation: pulse 1.5s infinite; }
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-    100% { transform: scale(1); }
-}
+        .staff-img.reveal {
+            opacity: 1;
+            transform: none;
+            filter: grayscale(0) brightness(1);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+        }
 
-.success-theme {
-    background: radial-gradient(circle at center, #0e7490 0%, #000 100%) !important;
-    transition: all 2s ease;
-}
-</style>
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.03);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .success-theme {
+            background: radial-gradient(circle at center, #0e7490 0%, #000 100%) !important;
+            transition: all 2s ease;
+        }
+    </style>
 </head>
 
 <body>
-<canvas id="laser-guide"></canvas>
-<div id="bg-layer" class="fixed inset-0 z-0 bg-black transition-all duration-1000"></div>
-<div id="glitch-overlay" class="fixed inset-0 z-10 pointer-events-none"></div>
-<div class="hacker-lines"></div>
+    <canvas id="laser-guide"></canvas>
+    <div id="bg-layer" class="fixed inset-0 z-0 bg-black transition-all duration-1000"></div>
+    <div id="glitch-overlay" class="fixed inset-0 z-10 pointer-events-none"></div>
+    <div class="hacker-lines"></div>
 
-<div id="sys-msg" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 text-red-500 font-bold text-[10px] md:text-sm hidden">
-    [!] SYSTEM OVERRIDE: TARGET_IP_LOCATED
-</div>
-
-<div class="relative z-20 min-h-screen flex flex-col items-center justify-start py-10 px-4">
-    <div id="main-frame" class="mb-6 border border-cyan-500 px-6 py-3 backdrop-blur bg-cyan-950/40 text-center">
-        <h1 id="title" class="text-xl md:text-3xl font-black tracking-tighter md:tracking-widest transition-all">
-            SCANNING FOR INTRUDERS...
-        </h1>
+    <div id="sys-msg"
+        class="fixed top-5 left-1/2 -translate-x-1/2 z-50 text-red-500 font-bold text-[10px] md:text-sm hidden">
+        [!] SYSTEM OVERRIDE: TARGET_IP_LOCATED
     </div>
 
-    <div id="terminal" class="text-sm md:text-lg mb-8 h-6 text-center text-cyan-400 font-bold"></div>
+    <div class="relative z-20 min-h-screen flex flex-col items-center justify-start py-10 px-4">
+        <div id="main-frame" class="mb-6 border border-cyan-500 px-6 py-3 backdrop-blur bg-cyan-950/40 text-center">
+            <h1 id="title" class="text-xl md:text-3xl font-black tracking-tighter md:tracking-widest transition-all">
+                SCANNING FOR INTRUDERS...
+            </h1>
+        </div>
 
-    <div class="staff-container" id="staff-box">
-        <img class="staff-img" src="images/easter_egg/staff1.webp" alt="RAY">
-        <img class="staff-img" src="images/easter_egg/staff2.webp" alt="EZA">
-        <img class="staff-img" src="images/easter_egg/staff3.webp" alt="REZY">
-        <img class="staff-img" src="images/easter_egg/staff4.webp" alt="ETNO">
-        <img class="staff-img" src="images/easter_egg/staff5.webp" alt="STAFF5">
-        <img class="staff-img" src="images/easter_egg/staff6.webp" alt="STAFF6">
+        <div id="terminal" class="text-sm md:text-lg mb-8 h-6 text-center text-cyan-400 font-bold"></div>
+
+        <div class="staff-container" id="staff-box">
+            <img class="staff-img" src="images/easter_egg/staff1.webp" alt="RAY">
+            <img class="staff-img" src="images/easter_egg/staff2.webp" alt="EZA">
+            <img class="staff-img" src="images/easter_egg/staff3.webp" alt="REZY">
+            <img class="staff-img" src="images/easter_egg/staff4.webp" alt="ETNO">
+            <img class="staff-img" src="images/easter_egg/staff5.webp" alt="STAFF5">
+            <img class="staff-img" src="images/easter_egg/staff6.webp" alt="STAFF6">
+        </div>
+
+        <button id="final-btn"
+            class="mt-12 mb-10 px-10 py-4 bg-red-600 text-white font-black opacity-0 transition-all duration-1000 hover:scale-110">
+            ABORT SYSTEM
+        </button>
     </div>
 
-    <button id="final-btn" class="mt-12 mb-10 px-10 py-4 bg-red-600 text-white font-black opacity-0 transition-all duration-1000 hover:scale-110">
-        ABORT SYSTEM
-    </button>
-</div>
+    <div id="alex-popup"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 opacity-0 pointer-events-none transition-opacity duration-500">
+        <img src="images/easter_egg/alex.png" class="max-w-[90%] max-h-[80%] border-2 border-white">
+    </div>
 
-<div id="alex-popup" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 opacity-0 pointer-events-none transition-opacity duration-500">
-    <img src="images/easter_egg/alex.png" class="max-w-[90%] max-h-[80%] border-2 border-white">
-</div>
+    <script>
+        /* JS 로직은 동일하게 유지하되, 버튼 스크롤 이동 추가 */
+        const canvas = document.getElementById('laser-guide');
+        const ctx = canvas.getContext('2d');
+        let mouse = { x: 0, y: 0 };
 
-<script>
-/* JS 로직은 동일하게 유지하되, 버튼 스크롤 이동 추가 */
-const canvas = document.getElementById('laser-guide');
-const ctx = canvas.getContext('2d');
-let mouse = { x: 0, y: 0 };
+        window.onmousemove = (e) => { mouse.x = e.clientX; mouse.y = e.clientY; };
 
-window.onmousemove = (e) => { mouse.x = e.clientX; mouse.y = e.clientY; };
+        function drawLaser() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(34, 211, 238, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(mouse.x, 0); ctx.lineTo(mouse.x, canvas.height);
+            ctx.moveTo(0, mouse.y); ctx.lineTo(canvas.width, mouse.y);
+            ctx.stroke();
+            requestAnimationFrame(drawLaser);
+        }
+        drawLaser();
 
-function drawLaser() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = 'rgba(34, 211, 238, 0.2)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(mouse.x, 0); ctx.lineTo(mouse.x, canvas.height);
-    ctx.moveTo(0, mouse.y); ctx.lineTo(canvas.width, mouse.y);
-    ctx.stroke();
-    requestAnimationFrame(drawLaser);
-}
-drawLaser();
+        const terminal = document.getElementById("terminal");
+        const title = document.getElementById("title");
+        const glitch = document.getElementById("glitch-overlay");
+        const sysMsg = document.getElementById("sys-msg");
 
-const terminal = document.getElementById("terminal");
-const title = document.getElementById("title");
-const glitch = document.getElementById("glitch-overlay");
-const sysMsg = document.getElementById("sys-msg");
+        const script = [
+            { txt: "> TRACING CONNECTION...", time: 800 },
+            { txt: "> SECURITY BYPASSED...", time: 800 },
+            { txt: "> [!] DANGER: DATA LEAK", time: 500, alert: true },
+            { txt: "> INTRUDER IDENTIFIED: YOU", time: 1500, heavyGlitch: true },
+            { txt: "> INITIATING SELF-DESTRUCT...", time: 1000 },
+            { txt: "WAIT... WHAT IS THIS?", time: 1200, stopGlitch: true }
+        ];
 
-const script = [
-    { txt: "> TRACING CONNECTION...", time: 800 },
-    { txt: "> SECURITY BYPASSED...", time: 800 },
-    { txt: "> [!] DANGER: DATA LEAK", time: 500, alert: true },
-    { txt: "> INTRUDER IDENTIFIED: YOU", time: 1500, heavyGlitch: true },
-    { txt: "> INITIATING SELF-DESTRUCT...", time: 1000 },
-    { txt: "WAIT... WHAT IS THIS?", time: 1200, stopGlitch: true }
-];
+        let step = 0;
+        function runScenario() {
+            if (step < script.length) {
+                const item = script[step];
+                terminal.innerText = item.txt;
+                if (item.alert) { sysMsg.classList.remove('hidden'); title.style.color = 'red'; }
+                if (item.heavyGlitch) glitch.classList.add('glitch-heavy');
+                if (item.stopGlitch) { glitch.classList.remove('glitch-heavy'); title.style.color = '#22d3ee'; }
+                step++;
+                setTimeout(runScenario, item.time);
+            } else {
+                triggerHappyEnding();
+            }
+        }
 
-let step = 0;
-function runScenario() {
-    if (step < script.length) {
-        const item = script[step];
-        terminal.innerText = item.txt;
-        if (item.alert) { sysMsg.classList.remove('hidden'); title.style.color = 'red'; }
-        if (item.heavyGlitch) glitch.classList.add('glitch-heavy');
-        if (item.stopGlitch) { glitch.classList.remove('glitch-heavy'); title.style.color = '#22d3ee'; }
-        step++;
-        setTimeout(runScenario, item.time);
-    } else {
-        triggerHappyEnding();
-    }
-}
+        function triggerHappyEnding() {
+            title.innerText = "HAPPY ENCOUNTER!";
+            terminal.innerText = "WELCOME TO THE TDLiD FAMILY!";
+            document.getElementById('bg-layer').classList.add('success-theme');
 
-function triggerHappyEnding() {
-    title.innerText = "HAPPY ENCOUNTER!";
-    terminal.innerText = "WELCOME TO THE TDLiD FAMILY!";
-    document.getElementById('bg-layer').classList.add('success-theme');
-    
-    const imgs = document.querySelectorAll(".staff-img");
-    imgs.forEach((img, idx) => {
-        setTimeout(() => { img.classList.add("reveal", "pulse"); }, idx * 300);
-    });
+            const imgs = document.querySelectorAll(".staff-img");
+            imgs.forEach((img, idx) => {
+                setTimeout(() => { img.classList.add("reveal", "pulse"); }, idx * 300);
+            });
 
-    const btn = document.getElementById('final-btn');
-    btn.innerText = "RETURN TO HOME";
-    btn.style.opacity = "1";
-    btn.classList.remove('bg-red-600');
-    btn.classList.add('bg-cyan-500');
-    btn.onclick = () => location.href = 'index_m.html';
+            const btn = document.getElementById('final-btn');
+            btn.innerText = "RETURN TO HOME";
+            btn.style.opacity = "1";
+            btn.classList.remove('bg-red-600');
+            btn.classList.add('bg-cyan-500');
+            btn.onclick = () => location.href = 'index_m.html';
 
-    // 이미지가 다 뜨고 나면 버튼이 있는 곳으로 부드럽게 스크롤
-    setTimeout(() => {
-        btn.scrollIntoView({ behavior: 'smooth' });
-    }, imgs.length * 300);
-
-    // staff6 클릭 이벤트
-    const staff6 = document.querySelector('img[alt="STAFF6"]');
-    const alexPopup = document.getElementById('alex-popup');
-    if (staff6) {
-        staff6.style.cursor = 'pointer';
-        staff6.addEventListener('click', () => {
-            alexPopup.classList.remove('opacity-0', 'pointer-events-none');
-            alexPopup.classList.add('opacity-100');
+            // 이미지가 다 뜨고 나면 버튼이 있는 곳으로 부드럽게 스크롤
             setTimeout(() => {
-                alexPopup.classList.replace('opacity-100', 'opacity-0');
-                alexPopup.classList.add('pointer-events-none');
-            }, 3000);
-        });
-    }
-}
+                btn.scrollIntoView({ behavior: 'smooth' });
+            }, imgs.length * 300);
 
-setTimeout(runScenario, 1000);
-</script>
+            // staff6 클릭 이벤트
+            const staff6 = document.querySelector('img[alt="STAFF6"]');
+            const alexPopup = document.getElementById('alex-popup');
+            if (staff6) {
+                staff6.style.cursor = 'pointer';
+                staff6.addEventListener('click', () => {
+                    alexPopup.classList.remove('opacity-0', 'pointer-events-none');
+                    alexPopup.classList.add('opacity-100');
+                    setTimeout(() => {
+                        alexPopup.classList.replace('opacity-100', 'opacity-0');
+                        alexPopup.classList.add('pointer-events-none');
+                    }, 3000);
+                });
+            }
+        }
+
+        setTimeout(runScenario, 1000);
+    </script>
 </body>
+
 </html>

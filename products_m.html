@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Products | TDL Energy Indonesia</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="TDLiD - High-density lithium battery packs for electric motorcycles.">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
-        body { -webkit-user-select: none; user-select: none; overflow-x: hidden; }
+        body {
+            -webkit-user-select: none;
+            user-select: none;
+            overflow-x: hidden;
+        }
 
         #productContentWrapper {
             transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.8s ease-out;
@@ -21,202 +26,277 @@
         }
 
         #galleryImageContainer {
-            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
             position: relative;
         }
-        
+
         #galleryImageContainer img {
-            max-width: 100%; height: auto; object-fit: contain;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
         }
 
         /* [추가] 모바일 전용 팝업 모달 스타일 */
         .modal-backdrop {
-            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.95);
-            display: flex; justify-content: center; align-items: center; z-index: 10002;
-            padding: 20px; backdrop-filter: blur(5px);
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10002;
+            padding: 20px;
+            backdrop-filter: blur(5px);
         }
-        .modal-content {
-            background: #111; color: #ddd; padding: 24px; border-radius: 24px;
-            max-width: 100%; width: 100%; max-height: 85vh; text-align: center; 
-            border: 1px solid #333; position: relative; overflow-y: auto;
-        }
-        .modal-image { max-width: 100%; max-height: 50vh; object-fit: contain; border-radius: 12px; margin: 0 auto; }
-        .modal-close-btn { 
-            margin-top: 24px; width: 100%; padding: 14px; background: #06b6d4; color: black; 
-            font-weight: 700; border-radius: 12px; transition: all 0.2s;
-        }
-        .modal-close-x { position: absolute; top: 15px; right: 20px; color: #fff; font-size: 24px; opacity: 0.5; }
 
-        #productGallery { touch-action: pan-y; }
+        .modal-content {
+            background: #111;
+            color: #ddd;
+            padding: 24px;
+            border-radius: 24px;
+            max-width: 100%;
+            width: 100%;
+            max-height: 85vh;
+            text-align: center;
+            border: 1px solid #333;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .modal-image {
+            max-width: 100%;
+            max-height: 50vh;
+            object-fit: contain;
+            border-radius: 12px;
+            margin: 0 auto;
+        }
+
+        .modal-close-btn {
+            margin-top: 24px;
+            width: 100%;
+            padding: 14px;
+            background: #06b6d4;
+            color: black;
+            font-weight: 700;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .modal-close-x {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #fff;
+            font-size: 24px;
+            opacity: 0.5;
+        }
+
+        #productGallery {
+            touch-action: pan-y;
+        }
 
         .gallery-nav-btn {
-            width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;
-            background: rgba(23, 23, 23, 0.8); border: 1px solid rgba(34, 211, 238, 0.3);
-            border-radius: 50%; color: #22d3ee; backdrop-filter: blur(8px);
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(23, 23, 23, 0.8);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            border-radius: 50%;
+            color: #22d3ee;
+            backdrop-filter: blur(8px);
             transition: all 0.2s ease;
         }
-        .gallery-nav-btn:active { transform: scale(0.9); background: #22d3ee; color: #000; }
 
-        .dropdown-link { padding: 16px 20px; display: block; color: #ccc; border-bottom: 1px solid #262626; }
-        .dropdown-quote-btn { padding: 16px 20px; display: block; background: #22d3ee; color: #000; font-weight: 700; text-align: center; border-radius: 0 0 11px 11px; }
+        .gallery-nav-btn:active {
+            transform: scale(0.9);
+            background: #22d3ee;
+            color: #000;
+        }
 
-.hero-slogan-gradient {
-    display: inline-block !important;
-    font-weight: 900 !important;
-    line-height: 1.2 !important;
-    padding-bottom: 0.1em;
-    
-    /* contact.html과 동일한 반전 그라데이션 설정 */
-    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    background-clip: text !important;
-    
-    /* 안전장치 */
-    color: transparent !important; 
-}
+        .dropdown-link {
+            padding: 16px 20px;
+            display: block;
+            color: #ccc;
+            border-bottom: 1px solid #262626;
+        }
 
+        .dropdown-quote-btn {
+            padding: 16px 20px;
+            display: block;
+            background: #22d3ee;
+            color: #000;
+            font-weight: 700;
+            text-align: center;
+            border-radius: 0 0 11px 11px;
+        }
 
+        .hero-slogan-gradient {
+            display: inline-block !important;
+            font-weight: 900 !important;
+            line-height: 1.2 !important;
+            padding-bottom: 0.1em;
+
+            /* contact.html과 동일한 반전 그라데이션 설정 */
+            background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+
+            /* 안전장치 */
+            color: transparent !important;
+        }
     </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
-<div id="header-placeholder"></div>
+    <div id="header-placeholder"></div>
 
-<main class="flex-grow pt-24 pb-12 px-5 flex flex-col justify-center">
-    <div class="max-w-full mx-auto w-full">
-        <div class="flex flex-col items-center mb-8">
-            <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient">
-                TDLiD Products</h3>
-            
-            <div class="grid grid-cols-2 gap-3 w-full max-w-sm">
-                <a href="data/catalog/comparison.pdf" target="_blank" class="flex items-center justify-center py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs font-semibold active:bg-neutral-800 transition shadow-lg">
-                    Compare Models
-                </a>
-                <a href="data/catalog/tei-catalog-2025.pdf" target="_blank" class="flex items-center justify-center py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs font-semibold active:bg-neutral-800 transition shadow-lg">
-                    View Catalog
-                </a>
-            </div>
-        </div>
-        
-        <div id="productGallery" class="relative w-full max-w-md mx-auto aspect-[4/5] bg-neutral-900/50 rounded-3xl border border-neutral-800/50 shadow-2xl flex flex-col overflow-hidden">
-            <div class="flex-grow flex items-center justify-center p-8 overflow-hidden">
-                <div id="productContentWrapper" class="w-full h-full flex items-center justify-center">
-                    <div id="galleryImageContainer" class="w-full h-full">
-                    </div>
+    <main class="flex-grow pt-24 pb-12 px-5 flex flex-col justify-center">
+        <div class="max-w-full mx-auto w-full">
+            <div class="flex flex-col items-center mb-8">
+                <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient">
+                    TDLiD Products</h3>
+
+                <div class="grid grid-cols-2 gap-3 w-full max-w-sm">
+                    <a href="data/catalog/comparison.pdf" target="_blank"
+                        class="flex items-center justify-center py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs font-semibold active:bg-neutral-800 transition shadow-lg">
+                        Compare Models
+                    </a>
+                    <a href="data/catalog/tei-catalog-2025.pdf" target="_blank"
+                        class="flex items-center justify-center py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs font-semibold active:bg-neutral-800 transition shadow-lg">
+                        View Catalog
+                    </a>
                 </div>
             </div>
 
-            <div class="absolute top-6 left-1/2 -translate-x-1/2">
-                <span id="galleryStatus" class="px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/5 text-cyan-400 font-mono text-[10px] tracking-[0.2em] uppercase"></span>
-            </div>
-            
-            <div class="flex justify-between items-center px-6 pb-8">
-                <button id="galleryPrevBtn" class="gallery-nav-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-                
-                <div class="text-neutral-500 text-[10px] uppercase tracking-widest font-bold">Battery Pack Archive</div>
+            <div id="productGallery"
+                class="relative w-full max-w-md mx-auto aspect-[4/5] bg-neutral-900/50 rounded-3xl border border-neutral-800/50 shadow-2xl flex flex-col overflow-hidden">
+                <div class="flex-grow flex items-center justify-center p-8 overflow-hidden">
+                    <div id="productContentWrapper" class="w-full h-full flex items-center justify-center">
+                        <div id="galleryImageContainer" class="w-full h-full">
+                        </div>
+                    </div>
+                </div>
 
-                <button id="galleryNextBtn" class="gallery-nav-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
+                <div class="absolute top-6 left-1/2 -translate-x-1/2">
+                    <span id="galleryStatus"
+                        class="px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/5 text-cyan-400 font-mono text-[10px] tracking-[0.2em] uppercase"></span>
+                </div>
+
+                <div class="flex justify-between items-center px-6 pb-8">
+                    <button id="galleryPrevBtn" class="gallery-nav-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    <div class="text-neutral-500 text-[10px] uppercase tracking-widest font-bold">Battery Pack Archive
+                    </div>
+
+                    <button id="galleryNextBtn" class="gallery-nav-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
             </div>
+
+            <p class="text-center text-neutral-600 text-[11px] mt-8 tracking-tighter">
+                Swipe or tap image to enlarge 32 battery models.
+            </p>
         </div>
-        
-        <p class="text-center text-neutral-600 text-[11px] mt-8 tracking-tighter">
-            Swipe or tap image to enlarge 32 battery models.
-        </p>
-    </div>
-</main>
+    </main>
 
-<div id="footer-placeholder"></div>
+    <div id="footer-placeholder"></div>
 
-<script>
-    async function loadLayout() {
-        try {
-            // 1. 헤더와 푸터를 동시에 불러오기
-            const [headerRes, footerRes] = await Promise.all([
-                fetch('components/header_m.html'),
-                fetch('components/footer_m.html')
-            ]);
+    <script>
+        async function loadLayout() {
+            try {
+                // 1. 헤더와 푸터를 동시에 불러오기
+                const [headerRes, footerRes] = await Promise.all([
+                    fetch('components/header_m.html'),
+                    fetch('components/footer_m.html')
+                ]);
 
-            // 2. 헤더 처리: 관리자 링크(admin.html) 제거
-            const headerText = await headerRes.text();
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = headerText;
-            
-            const adminLink = tempDiv.querySelector('a[href="admin.html"]');
-            if(adminLink) adminLink.remove();
-            
-            document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
+                // 2. 헤더 처리: 관리자 링크(admin.html) 제거
+                const headerText = await headerRes.text();
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = headerText;
 
-            // 3. 푸터 처리
-            const footerPlaceholder = document.getElementById('footer-placeholder');
-            footerPlaceholder.innerHTML = await footerRes.text();
+                const adminLink = tempDiv.querySelector('a[href="admin.html"]');
+                if (adminLink) adminLink.remove();
 
-            // 4. [핵심] 푸터 내 BGM 스크립트 추출 및 수동 실행
-            const scripts = footerPlaceholder.querySelectorAll("script");
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                if (oldScript.src) {
-                    newScript.src = oldScript.src;
-                } else {
-                    newScript.text = oldScript.text;
-                }
-                document.body.appendChild(newScript).parentNode.removeChild(newScript);
-            });
+                document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
 
-            // 5. 메뉴 토글 기능 초기화
-            if (typeof initMenuToggle === 'function') initMenuToggle();
-            
-        } catch (err) {
-            console.error("Layout load failed:", err);
+                // 3. 푸터 처리
+                const footerPlaceholder = document.getElementById('footer-placeholder');
+                footerPlaceholder.innerHTML = await footerRes.text();
+
+                // 4. [핵심] 푸터 내 BGM 스크립트 추출 및 수동 실행
+                const scripts = footerPlaceholder.querySelectorAll("script");
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    if (oldScript.src) {
+                        newScript.src = oldScript.src;
+                    } else {
+                        newScript.text = oldScript.text;
+                    }
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
+
+                // 5. 메뉴 토글 기능 초기화
+                if (typeof initMenuToggle === 'function') initMenuToggle();
+
+            } catch (err) {
+                console.error("Layout load failed:", err);
+            }
         }
-    }
 
-    const productsData = [];
-    for(let i=1; i<=32; i++) {
-        productsData.push({ image: `images/products/image-${i}.webp` });
-    }
+        const productsData = [];
+        for (let i = 1; i <= 32; i++) {
+            productsData.push({ image: `images/products/image-${i}.webp` });
+        }
 
-    const productContentWrapper = document.getElementById('productContentWrapper');
-    const galleryImageContainer = document.getElementById('galleryImageContainer');
-    const galleryStatus = document.getElementById('galleryStatus');
-    const galleryPrevBtn = document.getElementById('galleryPrevBtn');
-    const galleryNextBtn = document.getElementById('galleryNextBtn');
-    const productGallery = document.getElementById('productGallery');
+        const productContentWrapper = document.getElementById('productContentWrapper');
+        const galleryImageContainer = document.getElementById('galleryImageContainer');
+        const galleryStatus = document.getElementById('galleryStatus');
+        const galleryPrevBtn = document.getElementById('galleryPrevBtn');
+        const galleryNextBtn = document.getElementById('galleryNextBtn');
+        const productGallery = document.getElementById('productGallery');
 
-    let currentProductIndex = 0;
-    let isAnimating = false;
-    let autoChangeInterval;
-    const AUTO_CHANGE_TIME = 3500;
-    const transitionDuration = 600;
-    const slideDistance = 50;
+        let currentProductIndex = 0;
+        let isAnimating = false;
+        let autoChangeInterval;
+        const AUTO_CHANGE_TIME = 3500;
+        const transitionDuration = 600;
+        const slideDistance = 50;
 
-    // [수정] 렌더링 시 클릭 이벤트(모달) 추가
-    function renderProduct(product, index) {
-        galleryImageContainer.innerHTML = `
+        // [수정] 렌더링 시 클릭 이벤트(모달) 추가
+        function renderProduct(product, index) {
+            galleryImageContainer.innerHTML = `
             <img src="${product.image}" 
                  alt="Battery Pack ${index + 1}" 
                  class="max-h-full cursor-pointer"
                  onclick="openImagePopup('${product.image}', ${index + 1})">`;
-        galleryStatus.textContent = `${(index + 1).toString().padStart(2, '0')} / ${productsData.length}`;
-    }
+            galleryStatus.textContent = `${(index + 1).toString().padStart(2, '0')} / ${productsData.length}`;
+        }
 
-    // [추가] 모바일 팝업 열기 함수
-    function openImagePopup(src, num) {
-        stopAutoChange(); // 팝업 시 자동 슬라이드 정지
-        
-        const modal = document.createElement('div');
-        modal.className = 'modal-backdrop';
-        modal.innerHTML = `
+        // [추가] 모바일 팝업 열기 함수
+        function openImagePopup(src, num) {
+            stopAutoChange(); // 팝업 시 자동 슬라이드 정지
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.innerHTML = `
             <div class="modal-content">
                 <span class="modal-close-x">✕</span>
                 <img src="${src}" class="modal-image">
@@ -224,115 +304,116 @@
                 <p class="text-neutral-500 mt-1 text-[10px] uppercase tracking-widest">Next-Gen Energy Solution</p>
                 <button class="modal-close-btn">닫기 (Close)</button>
             </div>`;
-        
-        const close = () => { 
-            if(document.body.contains(modal)) document.body.removeChild(modal); 
-            startAutoChange(); 
-        };
 
-        modal.querySelector('.modal-close-btn').onclick = close;
-        modal.querySelector('.modal-close-x').onclick = close;
-        modal.onclick = (e) => { if(e.target === modal) close(); };
-        
-        document.body.appendChild(modal);
-    }
-
-    function stopAutoChange() { if (autoChangeInterval) clearInterval(autoChangeInterval); }
-    function startAutoChange() {
-        stopAutoChange();
-        autoChangeInterval = setInterval(() => changeProduct((currentProductIndex + 1) % productsData.length, true), AUTO_CHANGE_TIME);
-    }
-
-    function changeProduct(newIndex, isAutomatic = false) {
-        if (isAnimating) return;
-        isAnimating = true;
-        if (!isAutomatic) stopAutoChange();
-
-        productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.23, 1, 0.32, 1), opacity ${transitionDuration}ms ease-out`;
-        productContentWrapper.style.transform = `translateX(-${slideDistance}px)`;
-        productContentWrapper.style.opacity = '0';
-        
-        setTimeout(() => {
-            currentProductIndex = newIndex;
-            const newProduct = productsData[currentProductIndex];
-            productContentWrapper.style.transition = 'none';
-            productContentWrapper.style.transform = `translateX(${slideDistance}px)`;
-            renderProduct(newProduct, currentProductIndex); 
-            void productContentWrapper.offsetWidth; 
-            productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.23, 1, 0.32, 1), opacity ${transitionDuration}ms ease-out`;
-            productContentWrapper.style.transform = 'translateX(0)';
-            productContentWrapper.style.opacity = '1';
-            isAnimating = false;
-            if (!isAutomatic) startAutoChange();
-        }, transitionDuration); 
-    }
-
-    function initSwipeEvents() {
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        productGallery.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-            stopAutoChange();
-        }, { passive: true });
-
-        productGallery.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            const swipeThreshold = 50;
-
-            if (touchEndX < touchStartX - swipeThreshold) {
-                changeProduct((currentProductIndex + 1) % productsData.length);
-            } else if (touchEndX > touchStartX + swipeThreshold) {
-                changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
-            } else {
+            const close = () => {
+                if (document.body.contains(modal)) document.body.removeChild(modal);
                 startAutoChange();
-            }
-        }, { passive: true });
-    }
-
-    galleryNextBtn.onclick = () => changeProduct((currentProductIndex + 1) % productsData.length);
-    galleryPrevBtn.onclick = () => changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
-
-    function initMenuToggle() {
-        const menuBtn = document.getElementById("menuToggleBtn");
-        const dropdown = document.getElementById("dropdownMenu");
-        const menuIcon = document.getElementById("menuIcon");
-
-        if (menuBtn && dropdown) {
-            menuBtn.onclick = (e) => {
-                e.stopPropagation();
-                const isOpen = dropdown.classList.contains("opacity-100");
-                if (isOpen) {
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                    dropdown.classList.add("opacity-0", "invisible");
-                    if(menuIcon) menuIcon.innerText = "☰";
-                } else {
-                    dropdown.classList.remove("opacity-0", "invisible");
-                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                    if(menuIcon) menuIcon.innerText = "✕";
-                }
             };
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                    dropdown.classList.add("opacity-0", "invisible");
-                    if(menuIcon) menuIcon.innerText = "☰";
+
+            modal.querySelector('.modal-close-btn').onclick = close;
+            modal.querySelector('.modal-close-x').onclick = close;
+            modal.onclick = (e) => { if (e.target === modal) close(); };
+
+            document.body.appendChild(modal);
+        }
+
+        function stopAutoChange() { if (autoChangeInterval) clearInterval(autoChangeInterval); }
+        function startAutoChange() {
+            stopAutoChange();
+            autoChangeInterval = setInterval(() => changeProduct((currentProductIndex + 1) % productsData.length, true), AUTO_CHANGE_TIME);
+        }
+
+        function changeProduct(newIndex, isAutomatic = false) {
+            if (isAnimating) return;
+            isAnimating = true;
+            if (!isAutomatic) stopAutoChange();
+
+            productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.23, 1, 0.32, 1), opacity ${transitionDuration}ms ease-out`;
+            productContentWrapper.style.transform = `translateX(-${slideDistance}px)`;
+            productContentWrapper.style.opacity = '0';
+
+            setTimeout(() => {
+                currentProductIndex = newIndex;
+                const newProduct = productsData[currentProductIndex];
+                productContentWrapper.style.transition = 'none';
+                productContentWrapper.style.transform = `translateX(${slideDistance}px)`;
+                renderProduct(newProduct, currentProductIndex);
+                void productContentWrapper.offsetWidth;
+                productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.23, 1, 0.32, 1), opacity ${transitionDuration}ms ease-out`;
+                productContentWrapper.style.transform = 'translateX(0)';
+                productContentWrapper.style.opacity = '1';
+                isAnimating = false;
+                if (!isAutomatic) startAutoChange();
+            }, transitionDuration);
+        }
+
+        function initSwipeEvents() {
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            productGallery.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                stopAutoChange();
+            }, { passive: true });
+
+            productGallery.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                const swipeThreshold = 50;
+
+                if (touchEndX < touchStartX - swipeThreshold) {
+                    changeProduct((currentProductIndex + 1) % productsData.length);
+                } else if (touchEndX > touchStartX + swipeThreshold) {
+                    changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
+                } else {
+                    startAutoChange();
                 }
-            });
+            }, { passive: true });
         }
-    }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadLayout();
-        if (productsData.length > 0) {
-            renderProduct(productsData[0], 0);
-            startAutoChange();
-            initSwipeEvents();
+        galleryNextBtn.onclick = () => changeProduct((currentProductIndex + 1) % productsData.length);
+        galleryPrevBtn.onclick = () => changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
+
+        function initMenuToggle() {
+            const menuBtn = document.getElementById("menuToggleBtn");
+            const dropdown = document.getElementById("dropdownMenu");
+            const menuIcon = document.getElementById("menuIcon");
+
+            if (menuBtn && dropdown) {
+                menuBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const isOpen = dropdown.classList.contains("opacity-100");
+                    if (isOpen) {
+                        dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                        dropdown.classList.add("opacity-0", "invisible");
+                        if (menuIcon) menuIcon.innerText = "☰";
+                    } else {
+                        dropdown.classList.remove("opacity-0", "invisible");
+                        dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                        if (menuIcon) menuIcon.innerText = "✕";
+                    }
+                };
+                document.addEventListener('click', (e) => {
+                    if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                        dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                        dropdown.classList.add("opacity-0", "invisible");
+                        if (menuIcon) menuIcon.innerText = "☰";
+                    }
+                });
+            }
         }
-    });
 
-    document.addEventListener('contextmenu', e => e.preventDefault());
-</script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadLayout();
+            if (productsData.length > 0) {
+                renderProduct(productsData[0], 0);
+                startAutoChange();
+                initSwipeEvents();
+            }
+        });
+
+        document.addEventListener('contextmenu', e => e.preventDefault());
+    </script>
 
 </body>
+
 </html>

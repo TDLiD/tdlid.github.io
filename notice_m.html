@@ -38,7 +38,8 @@
             background-color: rgba(23, 23, 23, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 1rem;
-            margin-bottom: 0.5rem; /* 데스크톱 피드백 반영 축소 */
+            margin-bottom: 0.5rem;
+            /* 데스크톱 피드백 반영 축소 */
             overflow: hidden;
             transition: all 0.3s ease;
         }
@@ -84,23 +85,22 @@
             display: block;
         }
 
-/* Core Technology와 동일한 스타일 유지 */
-.hero-slogan-gradient {
-    display: inline-block !important;
-    font-weight: 900 !important; /* font-black 효과 */
-    line-height: 1.2 !important;
-    padding-bottom: 0.1em;
-    
-    /* 타 페이지와 동일한 청록-화이트 그라데이션 */
-    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    background-clip: text !important;
-    
-    color: transparent !important; 
-}
+        /* Core Technology와 동일한 스타일 유지 */
+        .hero-slogan-gradient {
+            display: inline-block !important;
+            font-weight: 900 !important;
+            /* font-black 효과 */
+            line-height: 1.2 !important;
+            padding-bottom: 0.1em;
 
+            /* 타 페이지와 동일한 청록-화이트 그라데이션 */
+            background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
 
+            color: transparent !important;
+        }
     </style>
 </head>
 
@@ -109,7 +109,7 @@
 
     <main class="pt-24 pb-12 px-5 flex-grow">
         <div class="max-w-full mx-auto pt-4">
-    <h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
+            <h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
                 Notice
             </h2>
 
@@ -121,7 +121,8 @@
             </div>
 
             <div class="mt-12 text-center pb-10">
-                <a href="index.html" class="inline-block px-8 py-3 rounded-xl border border-neutral-800 bg-neutral-900/50 text-neutral-400 text-sm font-medium active:scale-95 transition-all">
+                <a href="index.html"
+                    class="inline-block px-8 py-3 rounded-xl border border-neutral-800 bg-neutral-900/50 text-neutral-400 text-sm font-medium active:scale-95 transition-all">
                     &larr; Back to Home
                 </a>
             </div>
@@ -132,34 +133,34 @@
 
     <script>
         // 레이아웃 로드
- async function loadLayout() {
-    try {
-        const [h, f] = await Promise.all([
-            fetch('components/header_m.html'),
-            fetch('components/footer_m.html')
-        ]);
-        
-        // 헤더 삽입
-        document.getElementById('header-placeholder').innerHTML = await h.text();
-        
-        // 푸터 삽입
-        const footerHTML = await f.text();
-        const footerPlaceholder = document.getElementById('footer-placeholder');
-        footerPlaceholder.innerHTML = footerHTML;
+        async function loadLayout() {
+            try {
+                const [h, f] = await Promise.all([
+                    fetch('components/header_m.html'),
+                    fetch('components/footer_m.html')
+                ]);
 
-        // [중요] 푸터 내부에 포함된 <script> 태그를 강제로 실행시킴
-        const scripts = footerPlaceholder.querySelectorAll("script");
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement("script");
-            newScript.text = oldScript.text; // 소스 코드 복사
-            document.body.appendChild(newScript).parentNode.removeChild(newScript);
-        });
-        
-        if (typeof initMenuToggle === 'function') initMenuToggle();
-    } catch (e) {
-        console.error("Layout load failed:", e);
-    }
-}
+                // 헤더 삽입
+                document.getElementById('header-placeholder').innerHTML = await h.text();
+
+                // 푸터 삽입
+                const footerHTML = await f.text();
+                const footerPlaceholder = document.getElementById('footer-placeholder');
+                footerPlaceholder.innerHTML = footerHTML;
+
+                // [중요] 푸터 내부에 포함된 <script> 태그를 강제로 실행시킴
+                const scripts = footerPlaceholder.querySelectorAll("script");
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text; // 소스 코드 복사
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
+
+                if (typeof initMenuToggle === 'function') initMenuToggle();
+            } catch (e) {
+                console.error("Layout load failed:", e);
+            }
+        }
 
         // Firebase 설정
         const firebaseConfig = {
@@ -179,7 +180,7 @@
             const item = element.closest('.notice-item');
             const isActive = item.classList.contains('active');
             document.querySelectorAll('.notice-item').forEach(el => el.classList.remove('active'));
-            
+
             if (!isActive) {
                 item.classList.add('active');
                 setTimeout(() => {
@@ -264,7 +265,7 @@
                     if (!isOpen) {
                         dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
                         dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                        if(menuIcon) menuIcon.innerText = "✕";
+                        if (menuIcon) menuIcon.innerText = "✕";
                     } else {
                         closeMenu();
                     }
@@ -272,7 +273,7 @@
                 function closeMenu() {
                     dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
                     dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
-                    if(menuIcon) menuIcon.innerText = "☰";
+                    if (menuIcon) menuIcon.innerText = "☰";
                 }
                 document.addEventListener("click", () => closeMenu());
             }
@@ -282,4 +283,5 @@
         document.addEventListener("DOMContentLoaded", loadLayout);
     </script>
 </body>
+
 </html>

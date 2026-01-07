@@ -1,48 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <!-- ⭐ 추가 -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <!-- ⭐ 추가 -->
 
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-<script>
-    (function() {
-        // 1. iPad를 제외하고 iPhone, Android 폰만 감지
-        const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const isPCMode = urlParams.get('view_mode') === 'pc';
+    <script>
+        (function () {
+            // 1. iPad를 제외하고 iPhone, Android 폰만 감지
+            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
 
-        // 2. 리다이렉트 실행
-        if (isMobileOnly && !isPCMode) {
-            let path = window.location.pathname;
-            let page = path.split("/").pop();
-            
-            // 메인 페이지(index) 처리
-            if (page === "" || page === "products.html") {
-                window.location.href = "products_m.html";
-            } 
-            // 그 외 페이지들 (예: products.html -> products_m.html)
-            else if (page.endsWith(".html") && !page.includes("_m.html")) {
-                window.location.href = page.replace(".html", "_m.html");
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPCMode = urlParams.get('view_mode') === 'pc';
+
+            // 2. 리다이렉트 실행
+            if (isMobileOnly && !isPCMode) {
+                let path = window.location.pathname;
+                let page = path.split("/").pop();
+
+                // 메인 페이지(index) 처리
+                if (page === "" || page === "products.html") {
+                    window.location.href = "products_m.html";
+                }
+                // 그 외 페이지들 (예: products.html -> products_m.html)
+                else if (page.endsWith(".html") && !page.includes("_m.html")) {
+                    window.location.href = page.replace(".html", "_m.html");
+                }
             }
-        }
-    })();
-</script>
+        })();
+    </script>
 
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="TDLiD - High-density lithium battery packs for electric motorcycles.">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         #productContentWrapper {
             transition: transform 0.8s ease-out, opacity 0.8s ease-out;
@@ -50,12 +51,16 @@
         }
 
         #galleryImageContainer {
-            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
             width: 100%;
         }
+
         #galleryImageContainer img {
-            max-width: 100%; 
-            max-height: 100%; 
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
             height: auto;
             transition: transform 0.3s ease;
@@ -63,263 +68,339 @@
 
         /* [추가] 팝업 모달 스타일 */
         .modal-backdrop {
-            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.9);
-            display: flex; justify-content: center; align-items: center; z-index: 10002;
-            padding: 40px; backdrop-filter: blur(8px);
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10002;
+            padding: 40px;
+            backdrop-filter: blur(8px);
         }
+
         .modal-content {
-            background: #0a0a0a; color: #ddd; padding: 20px; border-radius: 24px;
-            max-width: 900px; width: 100%; max-height: 90vh; text-align: center; 
-            border: 1px solid #333; position: relative; overflow-y: auto;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
-        }
-        .modal-image { max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 12px; margin: 0 auto; }
-        .modal-close-btn { 
-            margin-top: 24px; padding: 12px 40px; background: #06b6d4; color: black; 
-            font-weight: 700; border-radius: 50px; transition: all 0.2s;
-        }
-        .modal-close-btn:hover { background: #22d3ee; transform: scale(1.05); }
-        .modal-close-x { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 28px; cursor: pointer; opacity: 0.5; }
-        .modal-close-x:hover { opacity: 1; }
-
-        .dropdown-link { 
-            padding: 12px 20px; display: block; color: #ccc; 
-            border-bottom: 1px solid #262626; transition: all 0.2s;
-        }
-        .dropdown-link:hover { background-color: #1a1a1a; color: #22d3ee; }
-        .dropdown-quote-btn { 
-            padding: 12px 20px; display: block; background: #22d3ee; 
-            color: #000; font-weight: 600; text-align: center; border-radius: 0 0 11px 11px; 
+            background: #0a0a0a;
+            color: #ddd;
+            padding: 20px;
+            border-radius: 24px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            text-align: center;
+            border: 1px solid #333;
+            position: relative;
+            overflow-y: auto;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
         }
 
-        body { overflow-x: hidden; -webkit-user-select: none; user-select: none; }
-        .gallery-card { width: 100%; max-width: 1024px; }
+        .modal-image {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 12px;
+            margin: 0 auto;
+        }
 
-/* header.html <style> 구간에 추가 */
-#main-nav li {
-    position: relative;
-    z-index: 10005; /* 충분히 높은 우선순위 */
-}
+        .modal-close-btn {
+            margin-top: 24px;
+            padding: 12px 40px;
+            background: #06b6d4;
+            color: black;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: all 0.2s;
+        }
 
-.nav-link {
-    pointer-events: auto !important; /* 클릭 차단 해제 */
-}
+        .modal-close-btn:hover {
+            background: #22d3ee;
+            transform: scale(1.05);
+        }
 
-.hero-slogan-gradient {
-    display: inline-block !important;
-    font-weight: 900 !important;
-    line-height: 1.2 !important;
-    padding-bottom: 0.1em;
-    
-    /* contact.html과 동일한 반전 그라데이션 설정 */
-    background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    background-clip: text !important;
-    
-    /* 안전장치 */
-    color: transparent !important; 
-}
+        .modal-close-x {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.5;
+        }
 
+        .modal-close-x:hover {
+            opacity: 1;
+        }
+
+        .dropdown-link {
+            padding: 12px 20px;
+            display: block;
+            color: #ccc;
+            border-bottom: 1px solid #262626;
+            transition: all 0.2s;
+        }
+
+        .dropdown-link:hover {
+            background-color: #1a1a1a;
+            color: #22d3ee;
+        }
+
+        .dropdown-quote-btn {
+            padding: 12px 20px;
+            display: block;
+            background: #22d3ee;
+            color: #000;
+            font-weight: 600;
+            text-align: center;
+            border-radius: 0 0 11px 11px;
+        }
+
+        body {
+            overflow-x: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .gallery-card {
+            width: 100%;
+            max-width: 1024px;
+        }
+
+        /* header.html <style> 구간에 추가 */
+        #main-nav li {
+            position: relative;
+            z-index: 10005;
+            /* 충분히 높은 우선순위 */
+        }
+
+        .nav-link {
+            pointer-events: auto !important;
+            /* 클릭 차단 해제 */
+        }
+
+        .hero-slogan-gradient {
+            display: inline-block !important;
+            font-weight: 900 !important;
+            line-height: 1.2 !important;
+            padding-bottom: 0.1em;
+
+            /* contact.html과 동일한 반전 그라데이션 설정 */
+            background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+
+            /* 안전장치 */
+            color: transparent !important;
+        }
     </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
-<div id="bgm-placeholder"></div>
+    <div id="bgm-placeholder"></div>
 
-<script>
-    document.addEventListener('contextmenu', e => e.preventDefault());
-</script>
+    <script>
+        document.addEventListener('contextmenu', e => e.preventDefault());
+    </script>
 
-<div id="header-placeholder"></div>
+    <div id="header-placeholder"></div>
 
-<main class="flex-grow pt-32 lg:pt-40 pb-24 px-6">
-    <div class="max-w-7xl mx-auto">
-        <div class="relative flex flex-col items-center justify-center mb-16">
-            <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient">
-                TDLiD Products
-            </h3>
-            
-            <div class="flex gap-4 mt-6 md:mt-0 md:absolute md:right-0">
-                <a href="data/catalog/comparison.pdf" target="_blank" class="whitespace-nowrap px-5 py-3 rounded-xl bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform font-bold text-sm">Compare Models</a>
-                <a href="data/catalog/tei-catalog-2025.pdf" target="_blank" class="whitespace-nowrap px-5 py-3 rounded-xl bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform font-bold text-sm">View Catalog</a>
-            </div>
-        </div>
-        
-        <div id="productGallery" class="gallery-card mx-auto p-4 md:p-8 bg-neutral-900 rounded-[2rem] md:rounded-[2.5rem] border border-neutral-800 shadow-[0_30px_100px_rgba(0,0,0,0.6)]">
-            <div id="productContentWrapper" class="overflow-hidden">
-                <div id="galleryImageContainer" class="aspect-[16/10] bg-neutral-800/30 rounded-2xl md:rounded-3xl p-4 md:p-10">
+    <main class="flex-grow pt-32 lg:pt-40 pb-24 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="relative flex flex-col items-center justify-center mb-16">
+                <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient">
+                    TDLiD Products
+                </h3>
+
+                <div class="flex gap-4 mt-6 md:mt-0 md:absolute md:right-0">
+                    <a href="data/catalog/comparison.pdf" target="_blank"
+                        class="whitespace-nowrap px-5 py-3 rounded-xl bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform font-bold text-sm">Compare
+                        Models</a>
+                    <a href="data/catalog/tei-catalog-2025.pdf" target="_blank"
+                        class="whitespace-nowrap px-5 py-3 rounded-xl bg-neutral-800 text-neutral-100 border-b-4 border-neutral-700 hover:bg-neutral-700 active:border-b-0 active:translate-y-0.5 transition transform font-bold text-sm">View
+                        Catalog</a>
                 </div>
             </div>
-            
-            <div class="flex justify-between items-center mt-6 md:mt-10 px-2 md:px-4">
-                <button id="galleryPrevBtn" class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-neutral-800 rounded-full border border-neutral-700 text-cyan-400 hover:bg-cyan-500 hover:text-black hover:scale-110 transition-all duration-300">
-                    <span class="text-xl md:text-2xl">←</span>
-                </button>
-                
-                <div class="flex flex-col items-center">
-                    <span id="galleryStatus" class="text-neutral-500 font-mono tracking-[0.2em] md:tracking-[0.3em] text-sm md:text-lg uppercase font-bold"></span>
-                    <div class="h-1 w-16 md:w-20 bg-cyan-500/20 mt-2 rounded-full overflow-hidden">
-                        <div id="progressBar" class="h-full bg-cyan-500 transition-all duration-300" style="width: 0%"></div>
+
+            <div id="productGallery"
+                class="gallery-card mx-auto p-4 md:p-8 bg-neutral-900 rounded-[2rem] md:rounded-[2.5rem] border border-neutral-800 shadow-[0_30px_100px_rgba(0,0,0,0.6)]">
+                <div id="productContentWrapper" class="overflow-hidden">
+                    <div id="galleryImageContainer"
+                        class="aspect-[16/10] bg-neutral-800/30 rounded-2xl md:rounded-3xl p-4 md:p-10">
                     </div>
                 </div>
 
-                <button id="galleryNextBtn" class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-neutral-800 rounded-full border border-neutral-700 text-cyan-400 hover:bg-cyan-500 hover:text-black hover:scale-110 transition-all duration-300">
-                    <span class="text-xl md:text-2xl">→</span>
-                </button>
+                <div class="flex justify-between items-center mt-6 md:mt-10 px-2 md:px-4">
+                    <button id="galleryPrevBtn"
+                        class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-neutral-800 rounded-full border border-neutral-700 text-cyan-400 hover:bg-cyan-500 hover:text-black hover:scale-110 transition-all duration-300">
+                        <span class="text-xl md:text-2xl">←</span>
+                    </button>
+
+                    <div class="flex flex-col items-center">
+                        <span id="galleryStatus"
+                            class="text-neutral-500 font-mono tracking-[0.2em] md:tracking-[0.3em] text-sm md:text-lg uppercase font-bold"></span>
+                        <div class="h-1 w-16 md:w-20 bg-cyan-500/20 mt-2 rounded-full overflow-hidden">
+                            <div id="progressBar" class="h-full bg-cyan-500 transition-all duration-300"
+                                style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <button id="galleryNextBtn"
+                        class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-neutral-800 rounded-full border border-neutral-700 text-cyan-400 hover:bg-cyan-500 hover:text-black hover:scale-110 transition-all duration-300">
+                        <span class="text-xl md:text-2xl">→</span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
-<div id="footer-placeholder"></div>
+    <div id="footer-placeholder"></div>
 
-<script>
+    <script>
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
-    authDomain: "tdlid-107669.firebaseapp.com",
-    databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
-    projectId: "tdlid-107669",
-    storageBucket: "tdlid-107669.firebasestorage.app",
-    messagingSenderId: "604782345004",
-    appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+            authDomain: "tdlid-107669.firebaseapp.com",
+            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+            projectId: "tdlid-107669",
+            storageBucket: "tdlid-107669.firebasestorage.app",
+            messagingSenderId: "604782345004",
+            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+        };
 
-// 수정 후 (안전함)
-if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const auth = firebase.auth();      // ⭐ 추가
-const database = firebase.database();
+        // 수정 후 (안전함)
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();      // ⭐ 추가
+        const database = firebase.database();
 
-async function loadLayout() {
-    try {
-        // 1. 헤더 로드 및 삽입
-        const headerRes = await fetch('components/header.html');
-        const headerHTML = await headerRes.text();
-        const headerPlaceholder = document.getElementById('header-placeholder');
-        headerPlaceholder.innerHTML = headerHTML;
+        async function loadLayout() {
+            try {
+                // 1. 헤더 로드 및 삽입
+                const headerRes = await fetch('components/header.html');
+                const headerHTML = await headerRes.text();
+                const headerPlaceholder = document.getElementById('header-placeholder');
+                headerPlaceholder.innerHTML = headerHTML;
 
-        // 2. 헤더 내 스크립트 실행 (Admin 이동 경로 수정 포함)
-        const headerScripts = headerPlaceholder.querySelectorAll("script");
-        headerScripts.forEach(oldScript => {
-            const newScript = document.createElement("script");
-            let scriptText = oldScript.text;
-            if (scriptText.includes("admin.html")) {
-                scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
+                // 2. 헤더 내 스크립트 실행 (Admin 이동 경로 수정 포함)
+                const headerScripts = headerPlaceholder.querySelectorAll("script");
+                headerScripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    let scriptText = oldScript.text;
+                    if (scriptText.includes("admin.html")) {
+                        scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
+                    }
+                    newScript.text = scriptText;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
+
+                // 3. [추가] 관리자 전용 모달 로드 및 삽입
+                const authRes = await fetch('components/admin-auth.html');
+                const authHTML = await authRes.text();
+
+                // 모달을 담을 공간이 없으면 생성, 있으면 삽입
+                let authPlaceholder = document.getElementById('admin-auth-placeholder');
+                if (!authPlaceholder) {
+                    authPlaceholder = document.createElement('div');
+                    authPlaceholder.id = 'admin-auth-placeholder';
+                    document.body.appendChild(authPlaceholder);
+                }
+                authPlaceholder.innerHTML = authHTML;
+
+                // 모달 내의 스크립트(verifyAdminPassword 등) 실행 및 등록
+                const authScripts = authPlaceholder.querySelectorAll("script");
+                // ⭐ admin-auth 스크립트는 auth 준비 후 실행
+                firebase.auth().onAuthStateChanged(user => {
+                    if (!user) return; // 로그인 안 돼 있으면 실행 금지
+
+                    authScripts.forEach(oldScript => {
+                        const newScript = document.createElement("script");
+                        newScript.text = oldScript.text;
+                        document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                    });
+                });
+
+                // 4. 푸터 로드 및 스크립트 강제 실행
+                const footerRes = await fetch('components/footer.html');
+                const footerPlaceholder = document.getElementById('footer-placeholder');
+                footerPlaceholder.innerHTML = await footerRes.text();
+
+                // 추가: 푸터 내의 스크립트 추출 및 실행
+                const footerScripts = footerPlaceholder.querySelectorAll("script");
+                footerScripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
+
+                // 5. BGM 로드 및 스크립트 실행
+                const bgmRes = await fetch('components/bgm.html');
+                const bgmPlaceholder = document.getElementById('bgm-placeholder');
+                if (bgmPlaceholder) {
+                    bgmPlaceholder.innerHTML = await bgmRes.text();
+                    const bgmScripts = bgmPlaceholder.querySelectorAll("script");
+                    bgmScripts.forEach(oldScript => {
+                        const newScript = document.createElement("script");
+                        newScript.text = oldScript.text;
+                        document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                    });
+                }
+
+                // 6. 메뉴 및 공통 기능 초기화
+                if (typeof initMenuToggle === "function") initMenuToggle();
+
+                // Admin 트리거 버튼(TDLiD 로고 등)이 있다면 다시 바인딩
+                if (typeof initAdminTriggers === "function") initAdminTriggers();
+
+            } catch (err) {
+                console.error("Layout load failed:", err);
             }
-            newScript.text = scriptText;
-            document.body.appendChild(newScript).parentNode.removeChild(newScript);
-        });
-
-        // 3. [추가] 관리자 전용 모달 로드 및 삽입
-        const authRes = await fetch('components/admin-auth.html');
-        const authHTML = await authRes.text();
-        
-        // 모달을 담을 공간이 없으면 생성, 있으면 삽입
-        let authPlaceholder = document.getElementById('admin-auth-placeholder');
-        if (!authPlaceholder) {
-            authPlaceholder = document.createElement('div');
-            authPlaceholder.id = 'admin-auth-placeholder';
-            document.body.appendChild(authPlaceholder);
-        }
-        authPlaceholder.innerHTML = authHTML;
-
-        // 모달 내의 스크립트(verifyAdminPassword 등) 실행 및 등록
-        const authScripts = authPlaceholder.querySelectorAll("script");
-// ⭐ admin-auth 스크립트는 auth 준비 후 실행
-firebase.auth().onAuthStateChanged(user => {
-    if (!user) return; // 로그인 안 돼 있으면 실행 금지
-
-    authScripts.forEach(oldScript => {
-        const newScript = document.createElement("script");
-        newScript.text = oldScript.text;
-        document.body.appendChild(newScript).parentNode.removeChild(newScript);
-    });
-});
-
-// 4. 푸터 로드 및 스크립트 강제 실행
-const footerRes = await fetch('components/footer.html');
-const footerPlaceholder = document.getElementById('footer-placeholder');
-footerPlaceholder.innerHTML = await footerRes.text();
-
-// 추가: 푸터 내의 스크립트 추출 및 실행
-const footerScripts = footerPlaceholder.querySelectorAll("script");
-footerScripts.forEach(oldScript => {
-    const newScript = document.createElement("script");
-    newScript.text = oldScript.text;
-    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-});
-
-        // 5. BGM 로드 및 스크립트 실행
-        const bgmRes = await fetch('components/bgm.html');
-        const bgmPlaceholder = document.getElementById('bgm-placeholder');
-        if (bgmPlaceholder) {
-            bgmPlaceholder.innerHTML = await bgmRes.text();
-            const bgmScripts = bgmPlaceholder.querySelectorAll("script");
-            bgmScripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                newScript.text = oldScript.text;
-                document.body.appendChild(newScript).parentNode.removeChild(newScript);
-            });
         }
 
-        // 6. 메뉴 및 공통 기능 초기화
-        if (typeof initMenuToggle === "function") initMenuToggle();
-        
-        // Admin 트리거 버튼(TDLiD 로고 등)이 있다면 다시 바인딩
-        if (typeof initAdminTriggers === "function") initAdminTriggers();
+        const productsData = [];
+        for (let i = 1; i <= 32; i++) {
+            productsData.push({ image: `images/products/image-${i}.webp` });
+        }
 
-    } catch (err) {
-        console.error("Layout load failed:", err);
-    }
-}
+        const productContentWrapper = document.getElementById('productContentWrapper');
+        const galleryImageContainer = document.getElementById('galleryImageContainer');
+        const galleryStatus = document.getElementById('galleryStatus');
+        const progressBar = document.getElementById('progressBar');
+        const galleryPrevBtn = document.getElementById('galleryPrevBtn');
+        const galleryNextBtn = document.getElementById('galleryNextBtn');
 
-    const productsData = [];
-    for(let i=1; i<=32; i++) {
-        productsData.push({ image: `images/products/image-${i}.webp` });
-    }
+        let currentProductIndex = 0;
+        let isAnimating = false;
+        let autoChangeInterval;
+        const AUTO_CHANGE_TIME = 3000;
+        const transitionDuration = 800;
 
-    const productContentWrapper = document.getElementById('productContentWrapper');
-    const galleryImageContainer = document.getElementById('galleryImageContainer');
-    const galleryStatus = document.getElementById('galleryStatus');
-    const progressBar = document.getElementById('progressBar');
-    const galleryPrevBtn = document.getElementById('galleryPrevBtn');
-    const galleryNextBtn = document.getElementById('galleryNextBtn');
+        function getSlideDistance() {
+            return window.innerWidth < 768 ? 100 : 150;
+        }
 
-    let currentProductIndex = 0;
-    let isAnimating = false;
-    let autoChangeInterval;
-    const AUTO_CHANGE_TIME = 3000;
-    const transitionDuration = 800;
-
-    function getSlideDistance() {
-        return window.innerWidth < 768 ? 100 : 150;
-    }
-
-    // [수정] 이미지 렌더링 시 클릭 이벤트 추가
-    function renderProduct(product, index) {
-        galleryImageContainer.innerHTML = `
+        // [수정] 이미지 렌더링 시 클릭 이벤트 추가
+        function renderProduct(product, index) {
+            galleryImageContainer.innerHTML = `
             <img src="${product.image}" 
                  alt="Battery Pack ${index + 1}" 
                  class="max-h-full drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] cursor-pointer hover:scale-105 transition-transform"
                  onclick="openImagePopup('${product.image}', ${index + 1})">`;
-        
-        galleryStatus.textContent = `${(index + 1).toString().padStart(2, '0')} / ${productsData.length}`;
-        if(progressBar) {
-            progressBar.style.width = `${((index + 1) / productsData.length) * 100}%`;
-        }
-    }
 
-    // [추가] 팝업 열기 로직
-    function openImagePopup(src, num) {
-        stopAutoChange(); // 팝업 시 자동 슬라이드 정지
-        
-        const modal = document.createElement('div');
-        modal.className = 'modal-backdrop';
-        modal.innerHTML = `
+            galleryStatus.textContent = `${(index + 1).toString().padStart(2, '0')} / ${productsData.length}`;
+            if (progressBar) {
+                progressBar.style.width = `${((index + 1) / productsData.length) * 100}%`;
+            }
+        }
+
+        // [추가] 팝업 열기 로직
+        function openImagePopup(src, num) {
+            stopAutoChange(); // 팝업 시 자동 슬라이드 정지
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.innerHTML = `
             <div class="modal-content">
                 <span class="modal-close-x">✕</span>
                 <img src="${src}" class="modal-image">
@@ -327,93 +408,94 @@ footerScripts.forEach(oldScript => {
                 <p class="text-neutral-500 mt-2 text-sm uppercase tracking-widest">High-Density Energy Solution</p>
                 <button class="modal-close-btn">Close</button>
             </div>`;
-        
-        const close = () => { 
-            if(document.body.contains(modal)) document.body.removeChild(modal); 
-            startAutoChange(); // 닫을 때 다시 자동 슬라이드 시작
-        };
 
-        modal.querySelector('.modal-close-btn').onclick = close;
-        modal.querySelector('.modal-close-x').onclick = close;
-        modal.onclick = (e) => { if(e.target === modal) close(); };
-        
-        document.body.appendChild(modal);
-    }
-
-    function stopAutoChange() { if (autoChangeInterval) clearInterval(autoChangeInterval); }
-    function startAutoChange() {
-        stopAutoChange();
-        autoChangeInterval = setInterval(() => changeProduct((currentProductIndex + 1) % productsData.length, true), AUTO_CHANGE_TIME);
-    }
-
-    function changeProduct(newIndex, isAutomatic = false) {
-        if (isAnimating) return;
-        isAnimating = true;
-        if (!isAutomatic) stopAutoChange();
-
-        const dist = getSlideDistance();
-        productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${transitionDuration}ms ease-out`;
-        productContentWrapper.style.transform = `translateX(-${dist}px)`;
-        productContentWrapper.style.opacity = '0';
-        
-        setTimeout(() => {
-            currentProductIndex = newIndex;
-            const newProduct = productsData[currentProductIndex];
-            productContentWrapper.style.transition = 'none';
-            productContentWrapper.style.transform = `translateX(${dist}px)`;
-            renderProduct(newProduct, currentProductIndex); 
-            void productContentWrapper.offsetWidth; 
-            productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${transitionDuration}ms ease-out`;
-            productContentWrapper.style.transform = 'translateX(0)';
-            productContentWrapper.style.opacity = '1';
-            isAnimating = false;
-            if (!isAutomatic) startAutoChange();
-        }, transitionDuration); 
-    }
-
-    galleryNextBtn.onclick = () => changeProduct((currentProductIndex + 1) % productsData.length);
-    galleryPrevBtn.onclick = () => changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
-
-    function initMenuToggle() {
-        const menuBtn = document.getElementById("menuToggleBtn");
-        const dropdown = document.getElementById("dropdownMenu");
-        const menuIcon = document.getElementById("menuIcon");
-
-        if (menuBtn && dropdown) {
-            menuBtn.onclick = (e) => {
-                e.stopPropagation();
-                const isOpen = dropdown.classList.contains("visible");
-                if (isOpen) {
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                    dropdown.classList.add("opacity-0", "invisible");
-                    if(menuIcon) menuIcon.innerText = "☰";
-                } else {
-                    dropdown.classList.remove("opacity-0", "invisible");
-                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                    if(menuIcon) menuIcon.innerText = "✕";
-                }
+            const close = () => {
+                if (document.body.contains(modal)) document.body.removeChild(modal);
+                startAutoChange(); // 닫을 때 다시 자동 슬라이드 시작
             };
 
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                    dropdown.classList.add("opacity-0", "invisible");
-                    if(menuIcon) menuIcon.innerText = "☰";
-                }
-            });
+            modal.querySelector('.modal-close-btn').onclick = close;
+            modal.querySelector('.modal-close-x').onclick = close;
+            modal.onclick = (e) => { if (e.target === modal) close(); };
+
+            document.body.appendChild(modal);
         }
-    }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadLayout();
-        if (productsData.length > 0) {
-            renderProduct(productsData[0], 0);
-            startAutoChange();
+        function stopAutoChange() { if (autoChangeInterval) clearInterval(autoChangeInterval); }
+        function startAutoChange() {
+            stopAutoChange();
+            autoChangeInterval = setInterval(() => changeProduct((currentProductIndex + 1) % productsData.length, true), AUTO_CHANGE_TIME);
         }
-    });
+
+        function changeProduct(newIndex, isAutomatic = false) {
+            if (isAnimating) return;
+            isAnimating = true;
+            if (!isAutomatic) stopAutoChange();
+
+            const dist = getSlideDistance();
+            productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${transitionDuration}ms ease-out`;
+            productContentWrapper.style.transform = `translateX(-${dist}px)`;
+            productContentWrapper.style.opacity = '0';
+
+            setTimeout(() => {
+                currentProductIndex = newIndex;
+                const newProduct = productsData[currentProductIndex];
+                productContentWrapper.style.transition = 'none';
+                productContentWrapper.style.transform = `translateX(${dist}px)`;
+                renderProduct(newProduct, currentProductIndex);
+                void productContentWrapper.offsetWidth;
+                productContentWrapper.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${transitionDuration}ms ease-out`;
+                productContentWrapper.style.transform = 'translateX(0)';
+                productContentWrapper.style.opacity = '1';
+                isAnimating = false;
+                if (!isAutomatic) startAutoChange();
+            }, transitionDuration);
+        }
+
+        galleryNextBtn.onclick = () => changeProduct((currentProductIndex + 1) % productsData.length);
+        galleryPrevBtn.onclick = () => changeProduct((currentProductIndex - 1 + productsData.length) % productsData.length);
+
+        function initMenuToggle() {
+            const menuBtn = document.getElementById("menuToggleBtn");
+            const dropdown = document.getElementById("dropdownMenu");
+            const menuIcon = document.getElementById("menuIcon");
+
+            if (menuBtn && dropdown) {
+                menuBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const isOpen = dropdown.classList.contains("visible");
+                    if (isOpen) {
+                        dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                        dropdown.classList.add("opacity-0", "invisible");
+                        if (menuIcon) menuIcon.innerText = "☰";
+                    } else {
+                        dropdown.classList.remove("opacity-0", "invisible");
+                        dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                        if (menuIcon) menuIcon.innerText = "✕";
+                    }
+                };
+
+                document.addEventListener('click', (e) => {
+                    if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                        dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                        dropdown.classList.add("opacity-0", "invisible");
+                        if (menuIcon) menuIcon.innerText = "☰";
+                    }
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadLayout();
+            if (productsData.length > 0) {
+                renderProduct(productsData[0], 0);
+                startAutoChange();
+            }
+        });
 
 
-</script>
+    </script>
 
 </body>
+
 </html>
