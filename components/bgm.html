@@ -1,13 +1,27 @@
 <style>
-    #musicToggleBtn { 
-        position: fixed; bottom: 25px; right: 25px; z-index: 10005; 
-        width: 44px; height: 44px; background: rgba(23, 23, 23, 0.8); 
-        border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 50%; 
-        display: flex; align-items: center; justify-content: center; 
-        cursor: pointer; color: #22d3ee; backdrop-filter: blur(4px); 
-        transition: all 0.3s; 
+    #musicToggleBtn {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        z-index: 10005;
+        width: 44px;
+        height: 44px;
+        background: rgba(23, 23, 23, 0.8);
+        border: 1px solid rgba(34, 211, 238, 0.4);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #22d3ee;
+        backdrop-filter: blur(4px);
+        transition: all 0.3s;
     }
-    #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
+
+    #musicToggleBtn:hover {
+        transform: scale(1.1);
+        border-color: #22d3ee;
+    }
 </style>
 
 <audio id="bgm" src="mp3/tdlid.mp3" loop muted preload="auto" playsinline></audio>
@@ -17,7 +31,7 @@
 </button>
 
 <script>
-    (function() {
+    (function () {
         const bgm = document.getElementById('bgm');
         const musicBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIconUI');
@@ -43,7 +57,7 @@
                     // [B] 자동 재생이 막힌 경우 (모바일 등) 사용자의 첫 클릭 시 재생되도록 대기
                     console.log("Autoplay blocked. Waiting for user interaction.");
                     musicIcon.innerText = "🔇";
-                    
+
                     const playOnGesture = () => {
                         bgm.muted = false;
                         bgm.play().then(() => {

@@ -1,42 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TDLiD Admin - Internal Memo</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
-        body { background-color: #020617; color: #e5e7eb; font-family: 'Pretendard', sans-serif; }
-        
+        body {
+            background-color: #020617;
+            color: #e5e7eb;
+            font-family: 'Pretendard', sans-serif;
+        }
+
         /* 사이드바 공통 스타일 */
-        .sidebar-item { transition: all 0.2s; border-radius: 12px; }
-        .sidebar-item:hover, .sidebar-item.active { background: rgba(34, 211, 238, 0.1); color: #22d3ee; }
+        .sidebar-item {
+            transition: all 0.2s;
+            border-radius: 12px;
+        }
+
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: rgba(34, 211, 238, 0.1);
+            color: #22d3ee;
+        }
 
         /* 입력 필드 커스텀 */
-        input, textarea { background: #0f172a !important; border: 1px solid #334155 !important; color: white !important; outline: none; transition: all 0.2s; }
-        input:focus, textarea:focus { border-color: #22d3ee !important; box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.1); }
+        input,
+        textarea {
+            background: #0f172a !important;
+            border: 1px solid #334155 !important;
+            color: white !important;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #22d3ee !important;
+            box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.1);
+        }
 
         /* 모달 및 오버레이 */
-        #authOverlay, #memoModal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        #authOverlay { background: #020617; }
-        #memoModal { background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); display: none; }
-        
+        #authOverlay,
+        #memoModal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #authOverlay {
+            background: #020617;
+        }
+
+        #memoModal {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            display: none;
+        }
+
         /* 메모 아이템 효과 */
-        .memo-list-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-left: 0px solid #22d3ee; }
-        .memo-list-item:hover { background: rgba(34, 211, 238, 0.08); border-left-width: 4px; padding-left: 1.5rem; transform: translateX(4px); }
+        .memo-list-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 0px solid #22d3ee;
+        }
+
+        .memo-list-item:hover {
+            background: rgba(34, 211, 238, 0.08);
+            border-left-width: 4px;
+            padding-left: 1.5rem;
+            transform: translateX(4px);
+        }
 
         /* 스크롤바 */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 10px;
+        }
     </style>
 </head>
+
 <body class="min-h-screen bg-[#020617] text-sm">
 
     <div id="authOverlay">
@@ -44,29 +104,40 @@
     </div>
 
     <div id="memoModal" onclick="closeModal(event)">
-        <div class="bg-[#0f172a] w-full max-w-2xl p-8 rounded-[32px] border border-white/10 shadow-2xl m-4 overflow-hidden" onclick="event.stopPropagation()">
+        <div class="bg-[#0f172a] w-full max-w-2xl p-8 rounded-[32px] border border-white/10 shadow-2xl m-4 overflow-hidden"
+            onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-8">
                 <div>
                     <h2 id="modalTitleDisplay" class="text-2xl font-bold text-white mb-2 tracking-tight">제목</h2>
-                    <p id="modalDateDisplay" class="text-[10px] text-neutral-500 font-mono uppercase tracking-widest">날짜 표시</p>
+                    <p id="modalDateDisplay" class="text-[10px] text-neutral-500 font-mono uppercase tracking-widest">날짜
+                        표시</p>
                 </div>
-                <button onclick="closeModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-neutral-400 hover:text-white transition">✕</button>
+                <button onclick="closeModal()"
+                    class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-neutral-400 hover:text-white transition">✕</button>
             </div>
-            
+
             <div id="viewMode">
-                <div id="modalContentDisplay" class="bg-black/20 p-8 rounded-2xl text-neutral-300 text-sm leading-relaxed whitespace-pre-wrap min-h-[250px] mb-8 border border-white/5 italic">내용</div>
+                <div id="modalContentDisplay"
+                    class="bg-black/20 p-8 rounded-2xl text-neutral-300 text-sm leading-relaxed whitespace-pre-wrap min-h-[250px] mb-8 border border-white/5 italic">
+                    내용</div>
                 <div class="flex gap-3 justify-end">
-                    <button onclick="switchEditMode()" class="px-6 py-2.5 bg-cyan-500/10 text-cyan-500 text-[11px] font-black rounded-full hover:bg-cyan-500 hover:text-white transition uppercase tracking-widest">Edit</button>
-                    <button onclick="handleDelete()" class="px-6 py-2.5 bg-red-500/10 text-red-500 text-[11px] font-black rounded-full hover:bg-red-500 hover:text-white transition uppercase tracking-widest">Delete</button>
+                    <button onclick="switchEditMode()"
+                        class="px-6 py-2.5 bg-cyan-500/10 text-cyan-500 text-[11px] font-black rounded-full hover:bg-cyan-500 hover:text-white transition uppercase tracking-widest">Edit</button>
+                    <button onclick="handleDelete()"
+                        class="px-6 py-2.5 bg-red-500/10 text-red-500 text-[11px] font-black rounded-full hover:bg-red-500 hover:text-white transition uppercase tracking-widest">Delete</button>
                 </div>
             </div>
 
             <div id="editMode" class="hidden space-y-4">
                 <input type="text" id="editTitle" class="w-full rounded-2xl p-5 font-bold" placeholder="Title">
-                <textarea id="editContent" class="w-full rounded-2xl p-5 h-64 resize-none" placeholder="Content"></textarea>
+                <textarea id="editContent" class="w-full rounded-2xl p-5 h-64 resize-none"
+                    placeholder="Content"></textarea>
                 <div class="flex gap-3 justify-end">
-                    <button onclick="switchViewMode()" class="px-6 py-2.5 text-neutral-500 text-[11px] font-bold uppercase">Cancel</button>
-                    <button onclick="updateMemo()" class="px-8 py-2.5 bg-cyan-600 text-white text-[11px] font-black rounded-full shadow-lg shadow-cyan-900/40 uppercase tracking-widest">Save Changes</button>
+                    <button onclick="switchViewMode()"
+                        class="px-6 py-2.5 text-neutral-500 text-[11px] font-bold uppercase">Cancel</button>
+                    <button onclick="updateMemo()"
+                        class="px-8 py-2.5 bg-cyan-600 text-white text-[11px] font-black rounded-full shadow-lg shadow-cyan-900/40 uppercase tracking-widest">Save
+                        Changes</button>
                 </div>
             </div>
         </div>
@@ -91,9 +162,14 @@
                             <h3 class="text-xs font-black uppercase tracking-widest text-emerald-500">Quick Memo</h3>
                         </div>
                         <div class="space-y-4">
-                            <input type="text" id="newTitle" class="w-full rounded-2xl p-5 font-bold placeholder:text-neutral-700" placeholder="Memo Title">
-                            <textarea id="newContent" class="w-full rounded-2xl p-5 h-48 resize-none placeholder:text-neutral-700" placeholder="Write internal notes..."></textarea>
-                            <button onclick="saveNewMemo()" class="w-full py-5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-500 hover:text-white font-black rounded-2xl transition uppercase tracking-[0.2em] text-[11px] shadow-lg shadow-emerald-950/20">
+                            <input type="text" id="newTitle"
+                                class="w-full rounded-2xl p-5 font-bold placeholder:text-neutral-700"
+                                placeholder="Memo Title">
+                            <textarea id="newContent"
+                                class="w-full rounded-2xl p-5 h-48 resize-none placeholder:text-neutral-700"
+                                placeholder="Write internal notes..."></textarea>
+                            <button onclick="saveNewMemo()"
+                                class="w-full py-5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-500 hover:text-white font-black rounded-2xl transition uppercase tracking-[0.2em] text-[11px] shadow-lg shadow-emerald-950/20">
                                 Create Entry
                             </button>
                         </div>
@@ -103,9 +179,11 @@
                 <div class="lg:col-span-7">
                     <div class="flex items-center justify-between mb-8">
                         <h3 class="text-xs font-black uppercase tracking-[0.3em] text-neutral-500">Archive List</h3>
-                        <span id="memoCount" class="text-[10px] font-mono text-cyan-500 bg-cyan-500/10 px-2 py-0.5 rounded">0 ITEMS</span>
+                        <span id="memoCount"
+                            class="text-[10px] font-mono text-cyan-500 bg-cyan-500/10 px-2 py-0.5 rounded">0
+                            ITEMS</span>
                     </div>
-                    
+
                     <div class="space-y-3" id="memoList">
                         <p class="text-neutral-600 animate-pulse italic py-12 text-center">Synchronizing archives...</p>
                     </div>
@@ -113,7 +191,8 @@
             </div>
 
             <footer class="py-12 text-center border-t border-white/5">
-                <p class="text-[10px] text-neutral-600 uppercase tracking-[0.4em]">TDL Energy Indonesia &copy; Internal Secure Pad</p>
+                <p class="text-[10px] text-neutral-600 uppercase tracking-[0.4em]">TDL Energy Indonesia &copy; Internal
+                    Secure Pad</p>
             </footer>
         </div>
     </main>
@@ -166,7 +245,7 @@
         async function saveNewMemo() {
             const title = document.getElementById('newTitle').value;
             const content = document.getElementById('newContent').value;
-            if(!title.trim()) { alert("Please enter a title."); return; }
+            if (!title.trim()) { alert("Please enter a title."); return; }
 
             try {
                 await database.ref('adminMemos').push({
@@ -183,8 +262,8 @@
         function loadMemos() {
             database.ref('adminMemos').on('value', (snapshot) => {
                 const memoList = document.getElementById('memoList');
-                if(!memoList) return;
-                
+                if (!memoList) return;
+
                 memoList.innerHTML = '';
                 if (!snapshot.exists()) {
                     memoList.innerHTML = '<div class="py-20 text-center text-neutral-600 italic border border-dashed border-white/5 rounded-3xl">No internal memos found.</div>';
@@ -216,11 +295,11 @@
         function openModal(key) {
             currentMemoKey = key;
             const memo = memosData[key];
-            
+
             document.getElementById('modalTitleDisplay').innerText = memo.title;
             document.getElementById('modalContentDisplay').innerText = memo.content || '(No content)';
             document.getElementById('modalDateDisplay').innerText = memo.dateText + (memo.lastModified ? ' (Last Edited)' : '');
-            
+
             document.getElementById('editTitle').value = memo.title;
             document.getElementById('editContent').value = memo.content;
 
@@ -229,7 +308,7 @@
         }
 
         function closeModal(e) {
-            if(!e || e.target.id === 'memoModal' || e.type === 'click') {
+            if (!e || e.target.id === 'memoModal' || e.type === 'click') {
                 document.getElementById('memoModal').style.display = 'none';
             }
         }
@@ -247,7 +326,7 @@
         async function updateMemo() {
             const title = document.getElementById('editTitle').value;
             const content = document.getElementById('editContent').value;
-            if(!title.trim()) return;
+            if (!title.trim()) return;
 
             try {
                 await database.ref(`adminMemos/${currentMemoKey}`).update({
@@ -261,11 +340,12 @@
         }
 
         async function handleDelete() {
-            if(confirm("Permanently delete this memo?")) {
+            if (confirm("Permanently delete this memo?")) {
                 await database.ref(`adminMemos/${currentMemoKey}`).remove();
                 closeModal();
             }
         }
     </script>
 </body>
+
 </html>

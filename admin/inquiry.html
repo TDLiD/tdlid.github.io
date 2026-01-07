@@ -1,33 +1,72 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TDLiD Admin - Customer Inquiries</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
-        body { background-color: #020617; color: #e5e7eb; font-family: 'Pretendard', sans-serif; }
-        .unread-row { background-color: rgba(251, 191, 36, 0.03); }
-        #detailModal { transition: opacity 0.3s ease, visibility 0.3s ease; }
-        #authOverlay { position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        
+        body {
+            background-color: #020617;
+            color: #e5e7eb;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .unread-row {
+            background-color: rgba(251, 191, 36, 0.03);
+        }
+
+        #detailModal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #authOverlay {
+            position: fixed;
+            inset: 0;
+            background: #020617;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         /* 사이드바 관련 공통 스타일 */
-        .sidebar-item { transition: all 0.2s; border-radius: 12px; }
-        .sidebar-item:hover, .sidebar-item.active { background: rgba(34, 211, 238, 0.1); color: #22d3ee; }
-        
+        .sidebar-item {
+            transition: all 0.2s;
+            border-radius: 12px;
+        }
+
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: rgba(34, 211, 238, 0.1);
+            color: #22d3ee;
+        }
+
         /* 스크롤바 커스텀 */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 10px;
+        }
     </style>
 </head>
-<body class="min-h-screen bg-[#020617]"> <div id="authOverlay">
+
+<body class="min-h-screen bg-[#020617]">
+    <div id="authOverlay">
         <p class="text-cyan-400 font-bold tracking-widest animate-pulse">AUTHORIZING...</p>
     </div>
 
@@ -40,13 +79,16 @@
                     <span class="w-1 h-5 bg-cyan-500 rounded-full"></span>
                     Customer Inquiries
                 </h2>
-                <span id="unreadCount" class="bg-amber-500/10 text-amber-500 text-[10px] px-3 py-1 rounded-full border border-amber-500/20 font-black tracking-widest">0 NEW</span>
+                <span id="unreadCount"
+                    class="bg-amber-500/10 text-amber-500 text-[10px] px-3 py-1 rounded-full border border-amber-500/20 font-black tracking-widest">0
+                    NEW</span>
             </div>
 
             <div class="bg-neutral-900/40 rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
-                        <thead class="bg-black/20 text-neutral-500 text-[10px] uppercase tracking-widest border-b border-white/5">
+                        <thead
+                            class="bg-black/20 text-neutral-500 text-[10px] uppercase tracking-widest border-b border-white/5">
                             <tr>
                                 <th class="p-5 font-bold">Current Status</th>
                                 <th class="p-5 font-bold">Submission Info</th>
@@ -55,7 +97,10 @@
                             </tr>
                         </thead>
                         <tbody id="inquiryTableBody" class="divide-y divide-white/5 text-sm">
-                            <tr><td colspan="4" class="p-20 text-center text-neutral-600 animate-pulse italic">Connecting to secure database...</td></tr>
+                            <tr>
+                                <td colspan="4" class="p-20 text-center text-neutral-600 animate-pulse italic">
+                                    Connecting to secure database...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -63,16 +108,19 @@
         </div>
     </main>
 
-    <div id="detailModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center invisible opacity-0 p-4">
-        <div class="bg-slate-900 border border-white/10 w-full max-w-2xl rounded-[32px] overflow-hidden shadow-2xl transition-all scale-95 duration-300">
+    <div id="detailModal"
+        class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center invisible opacity-0 p-4">
+        <div
+            class="bg-slate-900 border border-white/10 w-full max-w-2xl rounded-[32px] overflow-hidden shadow-2xl transition-all scale-95 duration-300">
             <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
                 <h3 class="text-xl font-bold text-cyan-400 flex items-center gap-2">
                     <span class="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></span>
                     Inquiry Details
                 </h3>
-                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-neutral-400 hover:text-white transition">✕</button>
+                <button onclick="closeModal()"
+                    class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-neutral-400 hover:text-white transition">✕</button>
             </div>
-            
+
             <div class="p-8 space-y-6 max-h-[65vh] overflow-y-auto">
                 <div class="grid grid-cols-2 gap-6">
                     <div class="space-y-1">
@@ -80,8 +128,10 @@
                         <p id="modalName" class="text-lg text-white font-bold">-</p>
                     </div>
                     <div class="space-y-1 text-right">
-                        <p class="text-[10px] text-neutral-500 uppercase font-black tracking-widest">Processing Status</p>
-                        <select id="modalStatus" class="bg-black border border-white/10 text-amber-400 rounded-lg px-3 py-1.5 text-xs outline-none focus:border-cyan-500 transition">
+                        <p class="text-[10px] text-neutral-500 uppercase font-black tracking-widest">Processing Status
+                        </p>
+                        <select id="modalStatus"
+                            class="bg-black border border-white/10 text-amber-400 rounded-lg px-3 py-1.5 text-xs outline-none focus:border-cyan-500 transition">
                             <option value="false">NEW ARRIVAL</option>
                             <option value="processing">IN PROGRESS</option>
                             <option value="true">COMPLETED</option>
@@ -92,25 +142,33 @@
                         <p id="modalEmail" class="text-cyan-400 font-medium">-</p>
                     </div>
                     <div class="space-y-1 text-right">
-                        <p class="text-[10px] text-neutral-500 uppercase font-black tracking-widest">Interested Product</p>
+                        <p class="text-[10px] text-neutral-500 uppercase font-black tracking-widest">Interested Product
+                        </p>
                         <p id="modalCompany" class="text-white font-bold">-</p>
                     </div>
                 </div>
 
                 <div class="bg-black/40 p-6 rounded-2xl border border-white/5">
-                    <p class="text-[10px] text-neutral-600 uppercase font-black tracking-widest mb-3">Customer Message</p>
-                    <div id="modalMessage" class="text-neutral-300 leading-relaxed whitespace-pre-wrap italic text-sm"></div>
+                    <p class="text-[10px] text-neutral-600 uppercase font-black tracking-widest mb-3">Customer Message
+                    </p>
+                    <div id="modalMessage" class="text-neutral-300 leading-relaxed whitespace-pre-wrap italic text-sm">
+                    </div>
                 </div>
 
                 <div class="space-y-2">
                     <p class="text-[10px] text-neutral-500 uppercase font-black tracking-widest">Internal Admin Memo</p>
-                    <textarea id="modalMemo" class="w-full bg-black/60 border border-white/10 rounded-2xl p-4 text-sm text-neutral-300 outline-none h-28 focus:border-cyan-500/50 transition" placeholder="Write internal notes here..."></textarea>
+                    <textarea id="modalMemo"
+                        class="w-full bg-black/60 border border-white/10 rounded-2xl p-4 text-sm text-neutral-300 outline-none h-28 focus:border-cyan-500/50 transition"
+                        placeholder="Write internal notes here..."></textarea>
                 </div>
             </div>
 
             <div class="p-6 bg-white/[0.02] border-t border-white/5 flex gap-3">
-                <button onclick="updateInquiry()" class="flex-grow bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-2xl transition uppercase tracking-widest text-xs shadow-lg shadow-cyan-900/20">Save Operational Changes</button>
-                <button onclick="closeModal()" class="px-8 bg-neutral-800 text-neutral-400 font-bold py-4 rounded-2xl hover:bg-neutral-700 transition uppercase tracking-widest text-xs">Cancel</button>
+                <button onclick="updateInquiry()"
+                    class="flex-grow bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-2xl transition uppercase tracking-widest text-xs shadow-lg shadow-cyan-900/20">Save
+                    Operational Changes</button>
+                <button onclick="closeModal()"
+                    class="px-8 bg-neutral-800 text-neutral-400 font-bold py-4 rounded-2xl hover:bg-neutral-700 transition uppercase tracking-widest text-xs">Cancel</button>
             </div>
         </div>
     </div>
@@ -164,8 +222,8 @@
         function startInquiryLoad() {
             database.ref('messages').on('value', (snapshot) => {
                 const tbody = document.getElementById('inquiryTableBody');
-                if(!tbody) return;
-                
+                if (!tbody) return;
+
                 tbody.innerHTML = '';
                 let unread = 0;
                 let items = [];
@@ -177,8 +235,8 @@
 
                 snapshot.forEach(c => {
                     const d = c.val();
-                    if(d.read === false || d.read === undefined) unread++;
-                    items.push({key: c.key, ...d});
+                    if (d.read === false || d.read === undefined) unread++;
+                    items.push({ key: c.key, ...d });
                 });
 
                 document.getElementById('unreadCount').innerText = unread + " NEW";
@@ -186,10 +244,10 @@
                 items.reverse().forEach(item => {
                     const isRead = item.read === true || item.read === "true";
                     const isProcessing = item.read === "processing";
-                    
+
                     let statusHtml = `<div class="flex items-center gap-2 text-amber-500 font-black text-[10px]"><span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-ping"></span>NEW</div>`;
-                    if(isProcessing) statusHtml = `<div class="text-cyan-400 font-black italic text-[10px]">● PROCESSING</div>`;
-                    else if(isRead) statusHtml = `<div class="text-neutral-600 font-bold text-[10px]">COMPLETED</div>`;
+                    if (isProcessing) statusHtml = `<div class="text-cyan-400 font-black italic text-[10px]">● PROCESSING</div>`;
+                    else if (isRead) statusHtml = `<div class="text-neutral-600 font-bold text-[10px]">COMPLETED</div>`;
 
                     const row = document.createElement('tr');
                     row.className = `hover:bg-white/[0.03] transition border-b border-white/5 cursor-pointer ${(!isRead && !isProcessing) ? 'unread-row' : ''}`;
@@ -213,7 +271,7 @@
         }
 
         async function updateInquiry() {
-            if(!currentInquiryKey) return;
+            if (!currentInquiryKey) return;
             const status = document.getElementById('modalStatus').value;
             const memo = document.getElementById('modalMemo').value;
             let valToSave = status === "true" ? true : (status === "false" ? false : status);
@@ -227,8 +285,8 @@
             } catch (e) { alert("Error: " + e.message); }
         }
 
-        function deleteMsg(key) { 
-            if(confirm("Permanently delete this inquiry?")) {
+        function deleteMsg(key) {
+            if (confirm("Permanently delete this inquiry?")) {
                 database.ref('messages/' + key).remove();
             }
         }
@@ -241,7 +299,7 @@
             document.getElementById('modalMessage').innerText = item.details || '';
             document.getElementById('modalStatus').value = (item.read === true || item.read === "true") ? "true" : (item.read === "processing" ? "processing" : "false");
             document.getElementById('modalMemo').value = item.adminMemo || '';
-            
+
             const modal = document.getElementById('detailModal');
             modal.classList.remove('invisible', 'opacity-0');
             modal.querySelector('div').classList.remove('scale-95');
@@ -256,4 +314,5 @@
         }
     </script>
 </body>
+
 </html>
