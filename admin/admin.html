@@ -152,7 +152,34 @@
             font-weight: 700;
             box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
         }
+
+/* 효과 선택 버튼 스타일 추가 */
+    .effect-btn {
+        transition: all 0.2s;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.02);
+        color: #94a3b8;
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+    }
+    .effect-btn:hover {
+        border-color: rgba(34, 211, 238, 0.3);
+        color: #e5e7eb;
+    }
+    .effect-btn.selected {
+        background: rgba(34, 211, 238, 0.1);
+        border-color: #22d3ee;
+        color: #22d3ee;
+    }
+
+
     </style>
+
+
 </head>
 
 <body class="min-h-screen bg-[#020617]">
@@ -240,69 +267,66 @@
                 </div>
             </section>
 
-            <section>
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-2">
-                        <span class="w-2 h-2 bg-amber-500 rounded-full"></span> Notice & Popups
-                    </h3>
-                    <div class="flex gap-1.5 bg-black/40 p-1 rounded-xl border border-white/5">
-                        <button onclick="switchPopup(0)"
-                            class="slot-btn active px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 1</button>
-                        <button onclick="switchPopup(1)"
-                            class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 2</button>
-                        <button onclick="switchPopup(2)"
-                            class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 3</button>
-                        <button onclick="switchPopup(3)"
-                            class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 4</button>
-                        <button onclick="switchPopup(4)"
-                            class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 5</button>
-                    </div>
-                </div>
+   
+<section>
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-2">
+            <span class="w-2 h-2 bg-amber-500 rounded-full"></span> Notice & Popups
+        </h3>
+        <div class="flex gap-1.5 bg-black/40 p-1 rounded-xl border border-white/5">
+            <button onclick="switchPopup(0)" class="slot-btn active px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 1</button>
+            <button onclick="switchPopup(1)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 2</button>
+            <button onclick="switchPopup(2)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 3</button>
+            <button onclick="switchPopup(3)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 4</button>
+            <button onclick="switchPopup(4)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 5</button>
+        </div>
+    </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div class="lg:col-span-4 space-y-4">
-                        <div class="stat-card p-5 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-bold">Main Popup</p>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="popupActive"><span
-                                    class="slider"></span></label>
-                        </div>
-                        <div class="stat-card p-5 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-bold text-amber-500">Emergency Banner</p>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="bannerActive"><span
-                                    class="slider"></span></label>
-                        </div>
-                        <div class="stat-card p-6 space-y-4">
-                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Active Schedule
-                            </p>
-                            <input type="text" id="startDate"
-                                class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none"
-                                placeholder="Start Date">
-                            <input type="text" id="endDate"
-                                class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none"
-                                placeholder="End Date">
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-8">
-                        <div class="stat-card p-6 h-full flex flex-col">
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase mb-4">Editor (Slot <span
-                                    id="slotDisplay" class="text-cyan-500">1</span>)</label>
-                            <div id="editor-container" class="flex-1 min-h-[300px]"></div>
-                            <button onclick="saveNotice()"
-                                class="mt-4 w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-bold transition text-xs">UPDATE
-                                SLOT DATA</button>
-                        </div>
-                    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-4 space-y-4">
+            <div class="stat-card p-5 flex items-center justify-between">
+                <div><p class="text-sm font-bold">Main Popup</p></div>
+                <label class="switch"><input type="checkbox" id="popupActive"><span class="slider"></span></label>
+            </div>
+            <div class="stat-card p-5 flex items-center justify-between">
+                <div><p class="text-sm font-bold text-amber-500">Emergency Banner</p></div>
+                <label class="switch"><input type="checkbox" id="bannerActive"><span class="slider"></span></label>
+            </div>
+            
+            <div class="stat-card p-5 space-y-3">
+                <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Popup Dissolve Effect</p>
+                <div class="grid grid-cols-2 gap-2" id="effectContainer">
+                    <button onclick="selectEffect('cleavage')" data-effect="cleavage" class="effect-btn">🫧 Cleavage (3s)</button>
+                    <button onclick="selectEffect('wave')" data-effect="wave" class="effect-btn">💨 Wave (3s)</button>
+                    <button onclick="selectEffect('rotation')" data-effect="rotation" class="effect-btn">🤏 Rotation (3s)</button>
+                    <button onclick="selectEffect('slide')" data-effect="slide" class="effect-btn">👉 Slide (3s)</button>
+                    <button onclick="selectEffect('classic')" data-effect="classic" class="effect-btn col-span-2">🔒 Classic (Manual)</button>
                 </div>
-            </section>
+            </div>
+
+            <div class="stat-card p-6 space-y-4">
+                <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Active Schedule</p>
+                <input type="text" id="startDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="Start Date">
+                <input type="text" id="endDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="End Date">
+            </div>
+        </div>
+
+        <div class="lg:col-span-8">
+            <div class="stat-card p-6 h-full flex flex-col">
+                <label class="text-[10px] font-bold text-neutral-500 uppercase mb-4">Editor (Slot <span id="slotDisplay" class="text-cyan-500">1</span>)</label>
+                <div id="editor-container" class="flex-1 min-h-[300px]"></div>
+                <button onclick="saveNotice()" class="mt-4 w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-bold transition text-xs">UPDATE SLOT DATA</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
         </div>
     </main>
 
-    <script>
+<script>
         // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
@@ -317,8 +341,10 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
+        
         let quill;
         let currentSlot = 0;
+        let currentEffect = 'classic'; // [추가] 현재 선택된 효과 상태값
         let popupDataList = [{}, {}, {}, {}, {}];
 
         // Initialize Page
@@ -352,6 +378,18 @@
             }
         });
 
+        // [추가] 효과 선택 버튼 UI 업데이트 함수
+        function selectEffect(effectId) {
+            currentEffect = effectId;
+            document.querySelectorAll('.effect-btn').forEach(btn => {
+                if (btn.dataset.effect === effectId) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+
         function loadDashboardStats() {
             const refs = { 'visitorLogs': 'stat-visitors', 'messages': 'stat-inquiries', 'notices': 'stat-posts', 'adminMemos': 'stat-memos' };
             Object.keys(refs).forEach(path => {
@@ -364,7 +402,7 @@
 
         async function loadSettings() {
             try {
-                // 1. SEO 설정 (허용된 경로)
+                // 1. SEO 설정
                 database.ref('siteSettings/seo').once('value').then(snap => {
                     if (snap.exists()) {
                         if (document.getElementById('seoDesc')) document.getElementById('seoDesc').value = snap.val().description || '';
@@ -372,7 +410,7 @@
                     }
                 }).catch(e => console.log("SEO load skipped or denied"));
 
-                // 2. 팝업 설정 (허용된 경로)
+                // 2. 팝업 설정
                 database.ref('siteSettings/popups').once('value').then(snap => {
                     if (snap.exists()) {
                         const data = snap.val();
@@ -381,13 +419,10 @@
                     displayCurrentPopup();
                 }).catch(e => console.log("Popups load skipped or denied"));
 
-                // [절대 금지] database.ref('adminConfig/password') 관련 코드는 이 세상 어디에도 없어야 합니다.
-
             } catch (e) {
                 console.error("Settings Load Error:", e);
             }
         }
-
 
         function switchPopup(index) {
             currentSlot = index;
@@ -401,6 +436,11 @@
             document.getElementById('popupActive').checked = data.popupActive || false;
             document.getElementById('bannerActive').checked = data.bannerActive || false;
             quill.root.innerHTML = data.content || '';
+            
+            // [수정] 저장된 효과를 불러와 UI에 적용
+            const savedEffect = data.effect || 'classic';
+            selectEffect(savedEffect);
+
             if (data.startDate) document.getElementById('startDate')._flatpickr.setDate(data.startDate);
             else document.getElementById('startDate').value = '';
             if (data.endDate) document.getElementById('endDate')._flatpickr.setDate(data.endDate);
@@ -411,6 +451,7 @@
             const data = {
                 popupActive: document.getElementById('popupActive').checked,
                 bannerActive: document.getElementById('bannerActive').checked,
+                effect: currentEffect, // [추가] 선택된 효과 코드 저장
                 content: quill.root.innerHTML,
                 text: quill.getText(),
                 startDate: document.getElementById('startDate').value,
@@ -439,6 +480,7 @@
             }
         }
     </script>
+
 </body>
 
 </html>
