@@ -45,11 +45,11 @@
             appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
         };
 
-if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const auth = firebase.auth();
-const database = firebase.database();
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const database = firebase.database();
 
         // 3. 접속 기록 함수
         async function recordVisit() {
@@ -141,100 +141,100 @@ const database = firebase.database();
             }
         }
 
-/* [최종 수정] 효과별 로직 및 타이밍 처리 */
-function initLiveSettings() {
-    database.ref('siteSettings/popups').on('value', (snapshot) => {
-        const popupElement = document.getElementById('mainPopup');
-        const popupBox = popupElement.querySelector('.popup-box');
-        const popupText = document.getElementById('popupText');
+        /* [최종 수정] 효과별 로직 및 타이밍 처리 */
+        function initLiveSettings() {
+            database.ref('siteSettings/popups').on('value', (snapshot) => {
+                const popupElement = document.getElementById('mainPopup');
+                const popupBox = popupElement.querySelector('.popup-box');
+                const popupText = document.getElementById('popupText');
 
-        if (!snapshot.exists()) {
-            popupElement.style.display = 'none';
-            return;
+                if (!snapshot.exists()) {
+                    popupElement.style.display = 'none';
+                    return;
+                }
+
+                const now = new Date().toISOString().split('T')[0];
+                let isPopupFound = false;
+
+                snapshot.forEach((childSnapshot) => {
+                    if (isPopupFound) return;
+                    const data = childSnapshot.val();
+                    const isWithinDate = (!data.startDate || now >= data.startDate) &&
+                        (!data.endDate || now <= data.endDate);
+
+                    if (data.popupActive && isWithinDate) {
+                        isPopupFound = true;
+
+                        // 초기 설정 복구
+                        popupElement.style.display = 'flex';
+                        popupElement.style.opacity = '1';
+                        popupText.innerHTML = data.content;
+                        popupBox.className = 'popup-box shadow-[0_0_50px_rgba(34,211,238,0.15)]';
+                        popupElement.style.alignItems = 'center';
+                        popupElement.style.justifyContent = 'center';
+                        popupElement.style.background = 'rgba(0, 0, 0, 0.7)';
+                        popupElement.style.pointerEvents = 'auto';
+
+                        switch (data.effect) {
+                            case 'cleavage':
+                                popupBox.classList.add('effect-cleavage');
+                                setTimeout(() => {
+                                    popupBox.classList.add('exit');
+                                    setTimeout(closePopup, 800);
+                                }, 3000);
+                                break;
+
+                            case 'wave':
+                                popupBox.classList.add('effect-wave');
+                                setTimeout(() => {
+                                    closeWithFade(popupElement);
+                                }, 3000);
+                                break;
+
+                            case 'rotation':
+                                popupBox.classList.add('effect-rotation');
+                                setTimeout(() => {
+                                    popupBox.classList.add('exit');
+                                    setTimeout(closePopup, 800);
+                                }, 3000);
+                                break;
+
+                            case 'slide':
+                                // 하단 중앙 배치 수정
+                                popupElement.style.background = 'transparent';
+                                popupElement.style.alignItems = 'flex-end';
+                                popupElement.style.paddingBottom = '60px';
+                                popupElement.style.pointerEvents = 'none';
+                                popupBox.style.pointerEvents = 'auto';
+                                popupBox.classList.add('effect-slide-center');
+                                setTimeout(() => { closeWithFade(popupElement); }, 3000);
+                                break;
+
+                            case 'classic':
+                            default:
+                                // 수동 종료 (효과 없음/타이머 없음)
+                                break;
+                        }
+                    }
+                });
+                if (!isPopupFound) popupElement.style.display = 'none';
+            });
         }
 
-        const now = new Date().toISOString().split('T')[0];
-        let isPopupFound = false;
+        // 부드럽게 사라지는 공통 함수
+        function closeWithFade(el) {
+            el.style.transition = 'opacity 0.8s ease';
+            el.style.opacity = '0';
+            setTimeout(() => { closePopup(); }, 800);
+        }
 
-        snapshot.forEach((childSnapshot) => {
-            if (isPopupFound) return;
-            const data = childSnapshot.val();
-            const isWithinDate = (!data.startDate || now >= data.startDate) &&
-                                 (!data.endDate || now <= data.endDate);
-
-            if (data.popupActive && isWithinDate) {
-                isPopupFound = true;
-                
-                // 초기 설정 복구
-                popupElement.style.display = 'flex';
-                popupElement.style.opacity = '1';
-                popupText.innerHTML = data.content;
-                popupBox.className = 'popup-box shadow-[0_0_50px_rgba(34,211,238,0.15)]';
-                popupElement.style.alignItems = 'center';
-                popupElement.style.justifyContent = 'center';
-                popupElement.style.background = 'rgba(0, 0, 0, 0.7)';
-                popupElement.style.pointerEvents = 'auto';
-
-                switch(data.effect) {
-                    case 'cleavage':
-                        popupBox.classList.add('effect-cleavage');
-                        setTimeout(() => {
-                            popupBox.classList.add('exit');
-                            setTimeout(closePopup, 800);
-                        }, 3000);
-                        break;
-
-                    case 'wave':
-                        popupBox.classList.add('effect-wave');
-                        setTimeout(() => {
-                            closeWithFade(popupElement);
-                        }, 3000);
-                        break;
-
-                    case 'rotation':
-                        popupBox.classList.add('effect-rotation');
-                        setTimeout(() => {
-                            popupBox.classList.add('exit');
-                            setTimeout(closePopup, 800);
-                        }, 3000);
-                        break;
-
-                    case 'slide':
-                        // 하단 중앙 배치 수정
-                        popupElement.style.background = 'transparent';
-                        popupElement.style.alignItems = 'flex-end';
-                        popupElement.style.paddingBottom = '60px';
-                        popupElement.style.pointerEvents = 'none'; 
-                        popupBox.style.pointerEvents = 'auto';
-                        popupBox.classList.add('effect-slide-center');
-                        setTimeout(() => { closeWithFade(popupElement); }, 3000);
-                        break;
-
-                    case 'classic':
-                    default:
-                        // 수동 종료 (효과 없음/타이머 없음)
-                        break;
-                }
+        function closePopup() {
+            const popup = document.getElementById('mainPopup');
+            if (popup) {
+                popup.style.display = 'none';
+                popup.style.opacity = '1'; // 다음 팝업을 위해 복구
             }
-        });
-        if (!isPopupFound) popupElement.style.display = 'none';
-    });
-}
-
-// 부드럽게 사라지는 공통 함수
-function closeWithFade(el) {
-    el.style.transition = 'opacity 0.8s ease';
-    el.style.opacity = '0';
-    setTimeout(() => { closePopup(); }, 800);
-}
-
-function closePopup() {
-    const popup = document.getElementById('mainPopup');
-    if (popup) {
-        popup.style.display = 'none';
-        popup.style.opacity = '1'; // 다음 팝업을 위해 복구
-    }
-}
+        }
 
 
     </script>
@@ -472,53 +472,121 @@ function closePopup() {
         }
 
 
-/* 팝업 효과 애니메이션 정의 */
+        /* 팝업 효과 애니메이션 정의 */
 
-/* 1. Cleavage: 상하 분리 합체 효과 */
-@keyframes cleavage-in {
-    0% { opacity: 0; clip-path: inset(0 0 50% 0); transform: translateY(-20px); }
-    100% { opacity: 1; clip-path: inset(0 0 0 0); transform: translateY(0); }
-}
-@keyframes cleavage-out {
-    0% { opacity: 1; clip-path: inset(0 0 0 0); }
-    100% { opacity: 0; clip-path: inset(0 0 50% 0); transform: translateY(-20px); }
-}
+        /* 1. Cleavage: 상하 분리 합체 효과 */
+        @keyframes cleavage-in {
+            0% {
+                opacity: 0;
+                clip-path: inset(0 0 50% 0);
+                transform: translateY(-20px);
+            }
 
-/* 2. Wave: 출렁이는 효과 */
-@keyframes wave-effect {
-    0% { transform: scale(0.8) rotate(-5deg); opacity: 0; filter: blur(10px); }
-    20% { transform: scale(1.05) rotate(3deg); opacity: 1; filter: blur(0); }
-    40% { transform: scale(0.98) rotate(-2deg); }
-    60% { transform: scale(1) rotate(0); }
-}
+            100% {
+                opacity: 1;
+                clip-path: inset(0 0 0 0);
+                transform: translateY(0);
+            }
+        }
 
-/* 3. Rotation: 360도 회전 */
-@keyframes rotate-in {
-    0% { transform: rotate(-360deg) scale(0); opacity: 0; }
-    100% { transform: rotate(0deg) scale(1); opacity: 1; }
-}
-@keyframes rotate-out {
-    0% { transform: rotate(0deg) scale(1); opacity: 1; }
-    100% { transform: rotate(360deg) scale(0); opacity: 0; }
-}
+        @keyframes cleavage-out {
+            0% {
+                opacity: 1;
+                clip-path: inset(0 0 0 0);
+            }
 
-/* 4. Slide: 하단 중앙 슬라이드 */
-@keyframes slide-up {
-    0% { transform: translateY(100px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-}
+            100% {
+                opacity: 0;
+                clip-path: inset(0 0 50% 0);
+                transform: translateY(-20px);
+            }
+        }
 
-/* 효과 클래스 적용 */
-.effect-cleavage { animation: cleavage-in 0.8s ease-out forwards; }
-.effect-cleavage.exit { animation: cleavage-out 0.8s ease-in forwards; }
+        /* 2. Wave: 출렁이는 효과 */
+        @keyframes wave-effect {
+            0% {
+                transform: scale(0.8) rotate(-5deg);
+                opacity: 0;
+                filter: blur(10px);
+            }
 
-.effect-wave { animation: wave-effect 1.2s ease-in-out forwards; }
+            20% {
+                transform: scale(1.05) rotate(3deg);
+                opacity: 1;
+                filter: blur(0);
+            }
 
-.effect-rotation { animation: rotate-in 0.8s ease-out forwards; }
-.effect-rotation.exit { animation: rotate-out 0.8s ease-in forwards; }
+            40% {
+                transform: scale(0.98) rotate(-2deg);
+            }
 
-.effect-slide-center { animation: slide-up 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+            60% {
+                transform: scale(1) rotate(0);
+            }
+        }
 
+        /* 3. Rotation: 360도 회전 */
+        @keyframes rotate-in {
+            0% {
+                transform: rotate(-360deg) scale(0);
+                opacity: 0;
+            }
+
+            100% {
+                transform: rotate(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes rotate-out {
+            0% {
+                transform: rotate(0deg) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: rotate(360deg) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* 4. Slide: 하단 중앙 슬라이드 */
+        @keyframes slide-up {
+            0% {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 효과 클래스 적용 */
+        .effect-cleavage {
+            animation: cleavage-in 0.8s ease-out forwards;
+        }
+
+        .effect-cleavage.exit {
+            animation: cleavage-out 0.8s ease-in forwards;
+        }
+
+        .effect-wave {
+            animation: wave-effect 1.2s ease-in-out forwards;
+        }
+
+        .effect-rotation {
+            animation: rotate-in 0.8s ease-out forwards;
+        }
+
+        .effect-rotation.exit {
+            animation: rotate-out 0.8s ease-in forwards;
+        }
+
+        .effect-slide-center {
+            animation: slide-up 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
     </style>
 
 
