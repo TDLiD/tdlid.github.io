@@ -322,73 +322,69 @@ function initEeggTrigger() {
         }
     }
 
- function initFormHandler() {
-        const form = document.getElementById('quoteForm');
-        const formStatus = document.getElementById('formStatus');
-        
-        if(form) {
-            form.onsubmit = async (e) => {
-                e.preventDefault();
+function initFormHandler() {
+    const form = document.getElementById('quoteForm');
+    const formStatus = document.getElementById('formStatus');
+    
+    if(form) {
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            // 현재 언어 설정 가져오기 (기본값 'en')
+            const currentLang = localStorage.getItem('selectedLang') || 'en';
+            const t = translations[currentLang];
+
+            // 제출 버튼 비활성화
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // 상태 메시지: "Storing Request..." -> 다국어 적용
+            formStatus.textContent = t.status_storing;
+            formStatus.className = 'mt-6 text-center text-lg text-cyan-400 animate-pulse';
+
+            try {
+                const formData = new FormData(form);
+                const msgData = {
+                    timestamp: Date.now(),
+                    date: new Date().toLocaleString(),
+                    company: formData.get('company'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone') || 'N/A',
+                    product: formData.get('product') || 'None Selected',
+                    details: formData.get('details') || '',
+                    read: false,
+                    status: 'new'
+                };
+
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout')), 10000)
+                );
                 
-                // 제출 버튼 비활성화 (중복 제출 방지)
-                const submitBtn = form.querySelector('button[type="submit"]');
-                submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                await Promise.race([
+                    database.ref('messages').push(msgData),
+                    timeoutPromise
+                ]);
 
-                formStatus.textContent = 'Storing Request...';
-                formStatus.className = 'mt-6 text-center text-lg text-cyan-400 animate-pulse';
+                // ✅ 성공 메시지 다국어 적용
+                // IDN일 경우: ✅ Berhasil dikirim!
+                formStatus.innerHTML = `${t.status_success}<br><span class="text-sm font-normal">${currentLang === 'id' ? 'Kami akan segera menghubungi Anda.' : 'We will get back to you shortly.'}</span>`;
+                formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
+                form.reset();
 
-                try {
-                    const formData = new FormData(form);
-                    const msgData = {
-                        timestamp: Date.now(),
-                        date: new Date().toLocaleString(),
-                        company: formData.get('company'),
-                        email: formData.get('email'),
-                        phone: formData.get('phone') || 'N/A',
-                        product: formData.get('product') || 'None Selected',
-                        details: formData.get('details') || '',
-                        read: false,
-                        status: 'new'
-                    };
-
-                    // Firebase 타임아웃 설정 (네트워크 불안정 대비)
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Timeout')), 10000)
-                    );
-                    
-                    await Promise.race([
-                        database.ref('messages').push(msgData),
-                        timeoutPromise
-                    ]);
-
-                    formStatus.innerHTML = '✅ Submitted successfully!<br><span class="text-sm font-normal">We will get back to you shortly.</span>';
-                    formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
-                    form.reset();
-
-                } catch (error) {
-                    console.error("Submission Error:", error);
-                    
-                    // 상세 에러 메시지 분기
-                    let errorMsg = '❌ Error saving data.';
-                    if (!window.navigator.onLine) {
-                        errorMsg = '❌ Network Disconnected.<br><span class="text-sm font-normal text-neutral-400">Please check your internet connection and try again.</span>';
-                    } else if (error.message === 'Timeout') {
-                        errorMsg = '❌ Connection Timeout.<br><span class="text-sm font-normal text-neutral-400">The server is responding slowly. Please try again in a moment.</span>';
-                    } else {
-                        errorMsg = '❌ Submission Failed.<br><span class="text-sm font-normal text-neutral-400">Please try again, or contact us directly at <a href="mailto:info@tdlid.com" class="underline">info@tdlid.com</a></span>';
-                    }
-
-                    formStatus.innerHTML = errorMsg;
-                    formStatus.className = 'mt-6 text-center text-lg text-red-500 leading-relaxed';
-                } finally {
-                    // 버튼 복구
-                    submitBtn.disabled = false;
-                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
-            };
-        }
+            } catch (error) {
+                console.error("Submission Error:", error);
+                
+                // ❌ 에러 메시지 다국어 적용
+                formStatus.innerHTML = t.status_error;
+                formStatus.className = 'mt-6 text-center text-lg text-red-500 leading-relaxed';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        };
     }
+}
 
 
 const translations = {
@@ -407,7 +403,7 @@ const translations = {
     },
     id: {
         contact_title: "Bicarakan tujuan Anda",
-        contact_subtitle: "Isi formulir di bawah ini dan temukan bagaimana kami dapat membantu Anda.",
+        contact_subtitle: "Isi formulir di bawah ini dan temukan bagaimana kami dapat membantu Anda",
         company_placeholder: "Perusahaan / Nama",
         email_placeholder: "Alamat Email",
         phone_placeholder: "Telepon / WhatsApp (Opsional)",
