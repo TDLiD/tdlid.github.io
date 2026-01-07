@@ -241,60 +241,76 @@
         }
     }
 
-    function initFormHandler() {
-        const form = document.getElementById('quoteForm');
-        const formStatus = document.getElementById('formStatus');
-        
-        if(form) {
-            form.onsubmit = async (e) => {
-                e.preventDefault();
-                const currentLang = localStorage.getItem('selectedLang') || 'en';
-                const t = translations[currentLang];
+function initFormHandler() {
+    const form = document.getElementById('quoteForm');
+    const formStatus = document.getElementById('formStatus');
+    
+    if(form) {
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            // 현재 설정된 언어 가져오기
+            const currentLang = localStorage.getItem('selectedLang') || 'en';
+            const t = translations[currentLang];
 
-                const submitBtn = document.getElementById('submitBtn');
+            // 제출 버튼 비활성화 (모바일은 id가 'submitBtn'으로 설정된 경우 대응)
+            const submitBtn = document.getElementById('submitBtn') || form.querySelector('button[type="submit"]');
+            if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
 
-                formStatus.innerHTML = t.status_storing;
-                formStatus.className = 'mt-6 text-center text-lg text-cyan-400 animate-pulse';
+            // 로딩 메시지 다국어 적용
+            formStatus.innerHTML = t.status_storing;
+            formStatus.className = 'mt-6 text-center text-lg text-cyan-400 animate-pulse';
 
-                try {
-                    const formData = new FormData(form);
-                    const msgData = {
-                        timestamp: Date.now(),
-                        date: new Date().toLocaleString(),
-                        company: formData.get('company'),
-                        email: formData.get('email'),
-                        phone: formData.get('phone') || 'N/A',
-                        product: formData.get('product') || 'None Selected',
-                        details: formData.get('details') || '',
-                        read: false,
-                        status: 'new'
-                    };
+            try {
+                const formData = new FormData(form);
+                const msgData = {
+                    timestamp: Date.now(),
+                    date: new Date().toLocaleString(),
+                    company: formData.get('company'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone') || 'N/A',
+                    product: formData.get('product') || 'None Selected',
+                    details: formData.get('details') || '',
+                    read: false,
+                    status: 'new'
+                };
 
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Timeout')), 10000)
-                    );
-                    
-                    await Promise.race([
-                        database.ref('messages').push(msgData),
-                        timeoutPromise
-                    ]);
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout')), 10000)
+                );
+                
+                await Promise.race([
+                    database.ref('messages').push(msgData),
+                    timeoutPromise
+                ]);
 
-                    formStatus.innerHTML = t.status_success;
-                    formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
-                    form.reset();
+                // ✅ 성공 메시지 + 하단 안내 문구 다국어 적용
+                const subText = currentLang === 'id' 
+                    ? 'Kami akan segera menghubungi Anda.' 
+                    : 'We will get back to you shortly.';
+                
+                formStatus.innerHTML = `${t.status_success}<br><span class="text-sm font-normal">${subText}</span>`;
+                formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
+                form.reset();
 
-                } catch (error) {
-                    formStatus.innerHTML = t.status_error;
-                    formStatus.className = 'mt-6 text-center text-lg text-red-500';
-                } finally {
+            } catch (error) {
+                console.error("Submission Error:", error);
+                // ❌ 에러 메시지 다국어 적용
+                formStatus.innerHTML = t.status_error;
+                formStatus.className = 'mt-6 text-center text-lg text-red-500 font-medium';
+            } finally {
+                // 버튼 복구
+                if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
-            };
-        }
+            }
+        };
     }
+}
 
     document.addEventListener("DOMContentLoaded", loadLayout);
 </script>
