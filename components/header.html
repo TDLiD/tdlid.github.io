@@ -117,101 +117,168 @@
     z-index: 10001;
 }
 
+/* ... 기존 스타일 유지 ... */
+    .glass-header {
+        background: rgba(2, 6, 23, 0.75) !important;
+        backdrop-filter: blur(15px) saturate(180%);
+        -webkit-backdrop-filter: blur(15px) saturate(180%);
+        border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-bottom: 1px solid rgba(34, 211, 238, 0.2) !important;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 10001;
+    }
 
+    /* 언어 스위처 스타일 추가 */
+    .lang-switcher-container {
+        display: none !important; /* 기본적으로 모든 페이지에서 숨김 */
+        align-items: center;
+        gap: 8px;
+        margin-left: 15px;
+        padding-left: 15px;
+        border-left: 1px solid rgba(255,255,255,0.1);
+    }
+    .lang-btn {
+        width: 28px;
+        height: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+        overflow: hidden;
+        filter: grayscale(100%);
+        opacity: 0.4;
+    }
+    .lang-btn.active {
+        filter: grayscale(0%);
+        opacity: 1;
+        box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+        outline: 1px solid #22d3ee;
+    }
+    .lang-btn:hover {
+        opacity: 1;
+        filter: grayscale(0%);
+    }
 
+    /* 하단 생략 (기존 스타일 코드와 동일) */
+    .header-frame-deco { position: absolute; bottom: -1px; left: 0; height: 2px; background: linear-gradient(90deg, transparent 0%, rgba(34, 211, 238, 0.8) 50%, transparent 100%); width: 100%; opacity: 0.7; pointer-events: none; }
+    .nav-link { position: relative; color: #94a3b8; transition: all 0.3s ease; padding: 4px 0; white-space: nowrap; display: inline-block; }
+    .nav-link:hover, .nav-link.active-tab { color: #22d3ee !important; transform: translateY(-2px); text-shadow: 0 0 10px rgba(34, 211, 238, 0.5); }
+    .btn-neon { display: inline-flex !important; align-items: center; justify-content: center; width: 140px !important; height: 40px !important; background: rgba(15, 23, 42, 0.6) !important; border: 1px solid rgba(34, 211, 238, 0.5); transition: all 0.3s ease; }
+    #dropdownMenu { background: rgba(15, 23, 42, 0.98) !important; border: 1px solid rgba(34, 211, 238, 0.3); }
 </style>
 
 <script>
-    // 관리자 인증 함수
-  // header.html의 <script> 부분 수정
-function openAdminAuth() {
-    // 1. 페이지 내에 모달이 있는지 확인 (index.html 케이스)
-    const modal = document.getElementById('adminAuthModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        document.getElementById('adminPasswordInput').focus();
-        return;
+    // [다국어 로직] 언어 설정 및 적용
+    function setLanguage(lang) {
+        localStorage.setItem('selectedLang', lang);
+        
+        // 버튼 활성화 표시
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.dataset.lang === lang) btn.classList.add('active');
+        });
+
+        // 현재 페이지가 contact.html인 경우 등 각 페이지의 applyLanguage 함수 호출
+        if (typeof applyLanguage === 'function') {
+            applyLanguage(lang);
+        }
+        
+        // 헤더 자체의 텍스트 변경이 필요한 경우 여기서 처리 (예: 메뉴명 등)
+        updateHeaderStaticText(lang);
     }
 
-    // 2. 모달이 없는 일반 페이지(products 등)에서는 prompt 사용
-    const pw = prompt("관리자 비밀번호를 입력하세요:");
-    if (!pw) return;
+    function updateHeaderStaticText(lang) {
+        const headerText = {
+            en: { contact: "Talk to Us", quote: "Request Quote" },
+            id: { contact: "Hubungi Kami", quote: "Minta Penawaran" }
+        };
+        const t = headerText[lang];
+        document.querySelectorAll('.btn-neon').forEach(el => el.innerText = t.contact);
+        const mobileQuote = document.querySelector('#mobile-nav-container .bg-cyan-400');
+        if(mobileQuote) mobileQuote.innerText = t.quote;
+    }
 
-    const db = (typeof database !== 'undefined') ? database : firebase.database();
-    
-    db.ref('adminConfig/password').once('value').then((snapshot) => {
-        if (pw === snapshot.val()) {
-            // 경로 주의: 현재 위치가 루트인지 하위인지에 따라 조절 필요
-            window.location.href = "admin.html"; 
-        } else {
-            alert("비밀번호가 틀렸습니다.");
+    function openAdminAuth() {
+        const modal = document.getElementById('adminAuthModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.getElementById('adminPasswordInput').focus();
+            return;
         }
-    }).catch(err => {
-        console.error("Auth Error:", err);
-        // DB 연결 실패 시 직접 이동 시도
-        window.location.href = "admin.html";
+        const pw = prompt("Password:");
+        if (!pw) return;
+        const db = (typeof database !== 'undefined') ? database : firebase.database();
+        db.ref('adminConfig/password').once('value').then((snapshot) => {
+            if (pw === snapshot.val()) { window.location.href = "admin.html"; }
+            else { alert("Wrong password."); }
+        });
+    }
+
+function initNavigation() {
+    const menuBtn = document.getElementById('menuToggleBtn');
+    const dropdown = document.getElementById('dropdownMenu');
+    const menuIcon = document.getElementById('menuIcon');
+
+    // --- 추가된 로직: Contact 페이지에서만 국기 표시 ---
+    const path = window.location.pathname.split("/").pop() || 'index.html';
+    const isContactPage = path === 'contact.html' || path === 'contact_m.html';
+    
+    // PC용 국기 컨테이너
+    const langSwitcher = document.querySelector('.lang-switcher-container');
+    if (langSwitcher && isContactPage) {
+        langSwitcher.style.setProperty('display', 'flex', 'important');
+    }
+
+    // 모바일용 국기 컨테이너 (드롭다운 메뉴 내부)
+    const mobileLangSwitcher = document.querySelector('#mobile-nav-container .border-t');
+    if (mobileLangSwitcher) {
+        if (isContactPage) {
+            mobileLangSwitcher.style.display = 'block';
+        } else {
+            mobileLangSwitcher.style.display = 'none';
+        }
+    }
+    // ----------------------------------------------
+
+    if (menuBtn && dropdown) {
+        menuBtn.onclick = (e) => {
+            e.stopPropagation();
+            const isVisible = !dropdown.classList.contains('invisible');
+            if (isVisible) {
+                dropdown.classList.add('opacity-0', 'invisible', '-translate-y-5');
+                if(menuIcon) menuIcon.innerText = "☰";
+            } else {
+                dropdown.classList.remove('opacity-0', 'invisible', '-translate-y-5');
+                dropdown.classList.add('opacity-100', 'visible', 'translate-y-0');
+                if(menuIcon) menuIcon.innerText = "✕";
+            }
+        };
+    }
+
+    // 초기 언어 설정 로드
+    const savedLang = localStorage.getItem('selectedLang') || 'en';
+    setLanguage(savedLang);
+
+    // 현재 활성 탭 표시
+    document.querySelectorAll('.nav-link, .nav-item-m').forEach(link => {
+        if (link.getAttribute('href') === path) {
+            link.classList.add('active-tab');
+        }
     });
 }
 
-
-    // [필수 추가] 메뉴 작동 로직: fetch 이후에도 작동하도록 함수화
-    function initNavigation() {
-        const menuBtn = document.getElementById('menuToggleBtn');
-        const dropdown = document.getElementById('dropdownMenu');
-        const menuIcon = document.getElementById('menuIcon');
-
-        if (menuBtn && dropdown) {
-            menuBtn.onclick = (e) => {
-                e.stopPropagation(); // 클릭 이벤트 전파 방지
-                const isVisible = !dropdown.classList.contains('invisible');
-                if (isVisible) {
-                    dropdown.classList.add('opacity-0', 'invisible', '-translate-y-5');
-                    dropdown.classList.remove('opacity-100', 'visible', 'translate-y-0');
-                    if(menuIcon) menuIcon.innerText = "☰";
-                } else {
-                    dropdown.classList.remove('opacity-0', 'invisible', '-translate-y-5');
-                    dropdown.classList.add('opacity-100', 'visible', 'translate-y-0');
-                    if(menuIcon) menuIcon.innerText = "✕";
-                }
-            };
-        }
-
-        // 바깥 클릭 시 메뉴 닫기
-        document.addEventListener('click', (e) => {
-            if (dropdown && !dropdown.contains(e.target) && !dropdown.classList.contains('invisible')) {
-                dropdown.classList.add('opacity-0', 'invisible', '-translate-y-5');
-                if(menuIcon) menuIcon.innerText = "☰";
-            }
-        });
-
-        // 현재 페이지 활성화 표시
-        const path = window.location.pathname.split("/").pop() || 'index.html';
-        const cleanPath = path.split('?')[0];
-        document.querySelectorAll('.nav-link, .nav-item-m').forEach(link => {
-            if (link.getAttribute('href') === cleanPath) {
-                link.classList.add('active-tab');
-                if(link.classList.contains('nav-item-m')) link.style.color = "#22d3ee";
-            }
-        });
-    }
-
-    // 일반 로드와 fetch 로드 양쪽 모두 대응
     if (document.readyState === 'complete') initNavigation();
     else document.addEventListener('DOMContentLoaded', initNavigation);
 </script>
 
-
 <header class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-[10001] glass-header rounded-2xl px-6 py-3 flex justify-between items-center">
     <a href="index.html" class="flex items-center gap-3 shrink-0">
-        <div class="relative">
-            <img src="images/logo/logo-1.png" class="h-10 w-auto" alt="Logo">
-        </div>
-        <div class="flex flex-col gap-1">
-        </div>
+        <img src="images/logo/logo-1.png" class="h-10 w-auto" alt="Logo">
     </a>
 
     <nav class="hidden lg:flex items-center justify-center flex-1 px-4">
-        <ul id="main-nav" class="flex items-center text-[11px] xl:text-[12px] font-semibold uppercase tracking-wider whitespace-nowrap gap-6 xl:gap-8">
+        <ul id="main-nav" class="flex items-center text-[11px] xl:text-[12px] font-semibold uppercase tracking-wider gap-6 xl:gap-8">
             <li><a href="index.html" class="nav-link">Home</a></li>
             <li><a href="products.html" class="nav-link">Products</a></li>
             <li><a href="technology.html" class="nav-link">Technology</a></li>
@@ -223,14 +290,21 @@ function openAdminAuth() {
         </ul>
     </nav>
 
-    <div class="hidden lg:flex shrink-0 nav-btn-container">
-        <a href="contact.html" class="btn-neon rounded-xl text-cyan-400 font-bold text-[11px] uppercase">
-            Talk to Us
-       </a>
+    <div class="hidden lg:flex items-center shrink-0 nav-btn-container">
+        <a href="contact.html" class="btn-neon rounded-xl text-cyan-400 font-bold text-[11px] uppercase">Talk to Us</a>
+        
+        <div class="lang-switcher-container">
+            <div onclick="setLanguage('en')" class="lang-btn" data-lang="en" title="English">
+                <img src="https://flagcdn.com/w40/gb.png" class="w-full h-full object-cover">
+            </div>
+            <div onclick="setLanguage('id')" class="lang-btn" data-lang="id" title="Indonesia">
+                <img src="https://flagcdn.com/w40/id.png" class="w-full h-full object-cover">
+            </div>
+        </div>
     </div>
 
     <div class="flex items-center gap-3 lg:hidden">
-        <button id="menuToggleBtn" class="w-10 h-10 border border-cyan-500/50 rounded-xl flex flex-col items-center justify-center gap-1.5 flex-shrink-0 transition-all active:scale-95">
+        <button id="menuToggleBtn" class="w-10 h-10 border border-cyan-500/50 rounded-xl flex items-center justify-center transition-all active:scale-95">
             <span id="menuIcon" class="text-cyan-400 text-xl font-bold">☰</span>
         </button>
     </div>
@@ -244,9 +318,13 @@ function openAdminAuth() {
             <a href="company.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">Company</a>
             <a href="news.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm">News</a>
             <a href="notice.html" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-200 font-bold text-sm text-cyan-400">Notice</a> 
-            <a href="javascript:void(0)" onclick="openAdminAuth()" class="nav-item-m flex items-center p-3 rounded-xl text-neutral-500 font-bold text-[10px] uppercase">Admin Access</a>
-            <div class="pt-2">
-                <a href="contact.html" class="flex items-center justify-center p-4 rounded-xl bg-cyan-400 text-black font-black uppercase text-xs tracking-tighter hover:bg-white transition-colors">Request Quote</a>
+            
+            <div class="pt-2 border-t border-neutral-800 mt-2">
+                <div class="flex justify-center gap-4 py-2">
+                    <img onclick="setLanguage('en')" src="https://flagcdn.com/w40/gb.png" class="w-8 h-5 rounded cursor-pointer border border-neutral-700">
+                    <img onclick="setLanguage('id')" src="https://flagcdn.com/w40/id.png" class="w-8 h-5 rounded cursor-pointer border border-neutral-700">
+                </div>
+                <a href="contact.html" class="flex items-center justify-center p-4 rounded-xl bg-cyan-400 text-black font-black uppercase text-xs tracking-tighter mt-2">Request Quote</a>
             </div>
         </div>
     </div>
