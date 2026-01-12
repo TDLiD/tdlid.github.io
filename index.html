@@ -1,165 +1,979 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>Login - Daily Report System</title>
-    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-database-compat.js"></script>
+    <meta name="description" id="metaDescription" content="">
+    <meta name="keywords" id="metaKeywords" content="">
+
+    <script>
+        (function () {
+            // 1. 기기 감지 수정 (iPad를 명시적으로 제외)
+            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPCMode = urlParams.get('view_mode') === 'pc';
+
+            // 2. 리다이렉트 실행 (아이폰, 안드로이드 폰만 해당)
+            if (isMobileOnly && !isPCMode) {
+                let path = window.location.pathname;
+                let page = path.split("/").pop();
+
+                if (page === "" || page === "index.html") {
+                    window.location.href = "index_m.html";
+
+                } else if (page.endsWith(".html") && !page.includes("_m.html")) {
+                    window.location.href = page.replace(".html", "_m.html");
+                }
+            }
+        })();
+    </script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
+    <script>
+        // 2. Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+            authDomain: "tdlid-107669.firebaseapp.com",
+            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+            projectId: "tdlid-107669",
+            storageBucket: "tdlid-107669.firebasestorage.app",
+            messagingSenderId: "604782345004",
+            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+        };
+
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // 3. 접속 기록 함수
+        async function recordVisit() {
+            try {
+                let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
+                try {
+                    const response = await fetch('https://ipapi.co/json/');
+                    const data = await response.json();
+                    geoData = { ip: data.ip, country: data.country_name, city: data.city };
+                } catch (e) { console.error("Geo API Error:", e); }
+
+                const ua = navigator.userAgent;
+                const now = new Date();
+                const visitData = {
+                    timestamp: now.getTime(),
+                    timeStr: now.toLocaleString(),
+                    page: window.location.pathname.split('/').pop() || 'index.html',
+                    ip: geoData.ip,
+                    country: geoData.country,
+                    city: geoData.city,
+                    device: /iPhone|iPad|iPod|Android/i.test(ua) ? "Mobile" : "PC",
+                    os: getOS(ua),
+                    browser: getBrowser(ua),
+                    sid: getSessionId(),
+                    referrer: document.referrer || "Direct"
+                };
+                database.ref('visits').push(visitData);
+            } catch (e) { console.error("History error:", e); }
+        }
+
+        function getOS(ua) {
+            if (ua.indexOf("Windows") !== -1) return "Windows";
+            if (ua.indexOf("Mac") !== -1) return "macOS";
+            if (ua.indexOf("Android") !== -1) return "Android";
+            if (ua.indexOf("iPhone") !== -1 || ua.indexOf("iPad") !== -1) return "iOS";
+            return "Unknown";
+        }
+
+        function getBrowser(ua) {
+            if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) return "Edge";
+            if (ua.indexOf("Chrome") !== -1) return "Chrome";
+            if (ua.indexOf("Safari") !== -1) return "Safari";
+            if (ua.indexOf("Firefox") !== -1) return "Firefox";
+            return "Others";
+        }
+
+        function getSessionId() {
+            if (!sessionStorage.getItem('session_id')) {
+                sessionStorage.setItem('session_id', 's_' + Math.random().toString(36).substr(2, 9));
+            }
+            return sessionStorage.getItem('session_id');
+        }
+
+        recordVisit();
+
+        /* [추가] 관리자 인증 로직 */
+        function openAdminAuth() {
+            const modal = document.getElementById('adminAuthModal');
+            modal.classList.remove('hidden');
+            document.getElementById('adminPasswordInput').focus();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAdminAuth() {
+            const modal = document.getElementById('adminAuthModal');
+            modal.classList.add('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+            document.body.style.overflow = '';
+        }
+
+        async function verifyAdminPassword() {
+            const inputPw = document.getElementById('adminPasswordInput').value;
+
+            if (inputPw.length > 0) {
+                // 세션 스토리지에 임시 저장 (기존 로직 유지)
+                sessionStorage.setItem('admin_pre_auth', 'true');
+
+                // 인증 상태 확인 후 스크립트 동작 권한 부여 (news.html 방식 적용)
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        console.log("Admin Authenticated");
+                        // 필요한 경우 여기서 관리자 전용 스크립트를 추가 실행할 수 있습니다.
+                    }
+                });
+
+                window.location.href = "admin/login.html";
+            } else {
+                alert("Please enter password.");
+            }
+        }
+
+        /* [최종 수정] 효과별 로직 및 타이밍 처리 */
+        function initLiveSettings() {
+            database.ref('siteSettings/popups').on('value', (snapshot) => {
+                const popupElement = document.getElementById('mainPopup');
+                const popupBox = popupElement.querySelector('.popup-box');
+                const popupText = document.getElementById('popupText');
+
+                if (!snapshot.exists()) {
+                    popupElement.style.display = 'none';
+                    return;
+                }
+
+                const now = new Date().toISOString().split('T')[0];
+                let isPopupFound = false;
+
+                snapshot.forEach((childSnapshot) => {
+                    if (isPopupFound) return;
+                    const data = childSnapshot.val();
+                    const isWithinDate = (!data.startDate || now >= data.startDate) &&
+                        (!data.endDate || now <= data.endDate);
+
+                    if (data.popupActive && isWithinDate) {
+                        isPopupFound = true;
+
+                        // 초기 설정 복구
+                        popupElement.style.display = 'flex';
+                        popupElement.style.opacity = '1';
+                        popupText.innerHTML = data.content;
+                        popupBox.className = 'popup-box shadow-[0_0_50px_rgba(34,211,238,0.15)]';
+                        popupElement.style.alignItems = 'center';
+                        popupElement.style.justifyContent = 'center';
+                        popupElement.style.background = 'rgba(0, 0, 0, 0.7)';
+                        popupElement.style.pointerEvents = 'auto';
+
+                        switch (data.effect) {
+                            case 'cleavage':
+                                popupBox.classList.add('effect-cleavage');
+                                setTimeout(() => {
+                                    popupBox.classList.add('exit');
+                                    setTimeout(closePopup, 800);
+                                }, 3000);
+                                break;
+
+                            case 'wave':
+                                popupBox.classList.add('effect-wave');
+                                setTimeout(() => {
+                                    closeWithFade(popupElement);
+                                }, 3000);
+                                break;
+
+                            case 'rotation':
+                                popupBox.classList.add('effect-rotation');
+                                setTimeout(() => {
+                                    popupBox.classList.add('exit');
+                                    setTimeout(closePopup, 800);
+                                }, 3000);
+                                break;
+
+                            case 'slide':
+                                // 하단 중앙 배치 수정
+                                popupElement.style.background = 'transparent';
+                                popupElement.style.alignItems = 'flex-end';
+                                popupElement.style.paddingBottom = '60px';
+                                popupElement.style.pointerEvents = 'none';
+                                popupBox.style.pointerEvents = 'auto';
+                                popupBox.classList.add('effect-slide-center');
+                                setTimeout(() => { closeWithFade(popupElement); }, 3000);
+                                break;
+
+                            case 'classic':
+                            default:
+                                // 수동 종료 (효과 없음/타이머 없음)
+                                break;
+                        }
+                    }
+                });
+                if (!isPopupFound) popupElement.style.display = 'none';
+            });
+        }
+
+        // 부드럽게 사라지는 공통 함수
+        function closeWithFade(el) {
+            el.style.transition = 'opacity 0.8s ease';
+            el.style.opacity = '0';
+            setTimeout(() => { closePopup(); }, 800);
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('mainPopup');
+            if (popup) {
+                popup.style.display = 'none';
+                popup.style.opacity = '1'; // 다음 팝업을 위해 복구
+            }
+        }
+
+
+    </script>
+
+    <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="css/main.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body { 
-            font-family: "Pretendard", sans-serif; 
-            /* 배경 이미지 설정 */
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('images/gif/1.gif');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+        /* [수정] BGM 토글 버튼 - 최상단 우선순위 부여 */
+        #musicToggleBtn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 999999 !important;
+            width: 44px;
+            height: 44px;
+            background: rgba(23, 23, 23, 0.8);
+            border: 1px solid rgba(34, 211, 238, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #22d3ee;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s;
+            pointer-events: auto !important;
+        }
+
+        #musicToggleBtn:hover {
+            transform: scale(1.1);
+            border-color: #22d3ee;
+        }
+
+        /* 실시간 제어 UI & 모달 스타일 */
+        #emergencyBanner {
+            display: none;
+            background: #ef4444;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-weight: bold;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 99999;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #mainPopup {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #adminAuthModal {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .popup-box {
+            background: #0a0a0a;
+            border: 1px solid #22d3ee;
+            padding: 40px;
+            border-radius: 24px;
+            max-width: 600px;
+            width: 95%;
+            text-align: center;
+        }
+
+        #imageModal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .9);
+            z-index: 10000;
+        }
+
+        #modalDetailImage {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        /* 드롭다운 및 유틸리티 */
+        .dropdown-link {
+            padding: 12px 20px;
+            display: block;
+            color: #ccc;
+            border-bottom: 1px solid #262626;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .dropdown-link:hover {
+            background-color: #1a1a1a;
+            color: #22d3ee;
+        }
+
+        .dropdown-quote-btn {
+            padding: 12px 20px;
+            display: block;
+            background: #22d3ee;
+            color: #000;
+            font-weight: 600;
+            text-align: center;
+            border-radius: 0 0 11px 11px;
+            transition: background 0.2s;
+        }
+
+        .dropdown-quote-btn:hover {
+            background: #67e8f9;
+        }
+
+        .whitespace-nowrap {
+            white-space: nowrap !important;
+        }
+
+        #triggerWord {
+            color: inherit !important;
+            font-weight: inherit !important;
+            text-decoration: none !important;
+            cursor: text !important;
+            display: inline;
+            position: relative;
+            z-index: 9998;
+            pointer-events: auto !important;
+        }
+
+        /* 레이아웃 구조 */
+        body,
+        .hero-section,
+        .video-bg-container {
+            background-color: #000000 !important;
+        }
+
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-bg-container {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .video-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4) contrast(1.1);
+        }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 100%);
+            z-index: 5;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --------------------------------------------------
+    배경 이미지 설정 (bg-3.gif)
+-------------------------------------------------- */
+        .bg-slide {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background-color: #000000;
+            background-image: url('images/bg/bg-3.gif');
+            /* 이미지 경로 */
+            background-size: 60%;
             background-repeat: no-repeat;
-            color: #f1f5f9; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-        
-        /* 입력창 투명도 조절로 배경과 어울리게 설정 */
-        select, input { 
-            background-color: rgba(30, 41, 59, 0.8) !important; 
-            backdrop-filter: blur(10px);
-            color: white !important; 
-            border-color: rgba(51, 65, 85, 0.5) !important; 
-            font-size: 16px !important; 
+            background-position: center;
+            opacity: 1;
+
+            /* 외곽 경계선 제거를 위한 마스크 */
+            mask-image: radial-gradient(circle, black 70%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle, black 70%, transparent 100%);
+
+            /* 줌 애니메이션 */
+            animation: smoothZoom 15s ease-in-out infinite alternate;
         }
 
-        /* 로그인 박스 반투명 효과 */
-        .login-card {
-            background-color: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        @keyframes smoothZoom {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.05);
+            }
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fadeIn { animation: fadeIn 0.6s ease-out forwards; }
+        /* 펄스 효과가 필요할 때만 추가로 사용하는 클래스 (선택 사항) */
+        .single-bg-effect {
+            filter: brightness(0.6);
+            animation: pulseFade 8s ease-in-out infinite;
+        }
+
+        @keyframes pulseFade {
+            0% {
+                opacity: 0;
+                transform: scale(1.0);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1.1);
+            }
+        }
+
+
+        /* 팝업 효과 애니메이션 정의 */
+
+        /* 1. Cleavage: 상하 분리 합체 효과 */
+        @keyframes cleavage-in {
+            0% {
+                opacity: 0;
+                clip-path: inset(0 0 50% 0);
+                transform: translateY(-20px);
+            }
+
+            100% {
+                opacity: 1;
+                clip-path: inset(0 0 0 0);
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes cleavage-out {
+            0% {
+                opacity: 1;
+                clip-path: inset(0 0 0 0);
+            }
+
+            100% {
+                opacity: 0;
+                clip-path: inset(0 0 50% 0);
+                transform: translateY(-20px);
+            }
+        }
+
+        /* 2. Wave: 출렁이는 효과 */
+        @keyframes wave-effect {
+            0% {
+                transform: scale(0.8) rotate(-5deg);
+                opacity: 0;
+                filter: blur(10px);
+            }
+
+            20% {
+                transform: scale(1.05) rotate(3deg);
+                opacity: 1;
+                filter: blur(0);
+            }
+
+            40% {
+                transform: scale(0.98) rotate(-2deg);
+            }
+
+            60% {
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        /* 3. Rotation: 360도 회전 */
+        @keyframes rotate-in {
+            0% {
+                transform: rotate(-360deg) scale(0);
+                opacity: 0;
+            }
+
+            100% {
+                transform: rotate(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes rotate-out {
+            0% {
+                transform: rotate(0deg) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: rotate(360deg) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* 4. Slide: 하단 중앙 슬라이드 */
+        @keyframes slide-up {
+            0% {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 효과 클래스 적용 */
+        .effect-cleavage {
+            animation: cleavage-in 0.8s ease-out forwards;
+        }
+
+        .effect-cleavage.exit {
+            animation: cleavage-out 0.8s ease-in forwards;
+        }
+
+        .effect-wave {
+            animation: wave-effect 1.2s ease-in-out forwards;
+        }
+
+        .effect-rotation {
+            animation: rotate-in 0.8s ease-out forwards;
+        }
+
+        .effect-rotation.exit {
+            animation: rotate-out 0.8s ease-in forwards;
+        }
+
+        .effect-slide-center {
+            animation: slide-up 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
     </style>
-</head>
-<body class="flex flex-col justify-center items-center min-h-screen p-4 md:p-8">
 
-    <div class="text-center mb-8 md:mb-12 animate-fadeIn w-full max-w-lg">
-        <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
-            <img src="images/login/login.gif" alt="Logo" class="w-24 h-24 md:w-32 md:h-32 object-contain">
-            <div class="text-center md:text-left">
-                <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter leading-tight drop-shadow-2xl">
-                    TDLiD<br class="hidden md:block"> Staff Login
-                </h2>
-                <p class="text-slate-300 text-xs md:text-sm font-medium tracking-[0.2em] uppercase mt-2 drop-shadow-lg">
-                    Daily Report System
+
+</head>
+
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
+
+    <div id="mainPopup">
+        <div class="popup-box shadow-[0_0_50px_rgba(34,211,238,0.15)]">
+            <h3 class="text-cyan-400 font-black text-2xl mb-4 italic">NOTICE</h3>
+            <p id="popupText" class="text-neutral-300 mb-8 leading-relaxed whitespace-pre-wrap"></p>
+            <button onclick="document.getElementById('mainPopup').style.display='none'"
+                class="w-full py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition-all active:scale-95">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <div id="bgm-placeholder"></div>
+    <div id="header-placeholder"></div>
+
+    <main class="flex-grow">
+
+        <section class="hero-section flex flex-col items-center justify-center min-h-screen">
+            <div id="image-bg-container" class="video-bg-container">
+                <div class="video-overlay" style="z-index: 2;"></div>
+            </div>
+
+            <div
+                class="hero-content max-w-6xl w-full px-12 text-center flex flex-col items-center justify-center h-full">
+
+                <div class="flex flex-col items-center justify-center">
+                    <h1 class="hero-logo-gradient" style="font-size: 2.5rem; line-height: 1.2;">NO MORE CARBON</h1>
+                    <p class="hero-slogan-gradient"
+                        style="font-size: 1.8rem; letter-spacing: 0.5em; margin-top: 1.5rem;">NO MORE FOSSIL FUEL</p>
+                </div>
+
+                <p class="hero-description text-xl md:text-2xl mt-80 mb-12 max-w-4xl mx-auto leading-relaxed">
+                    <span>TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of
+                    providing electric motorcycle services and renewable energy-related businesses in Indonesia.
                 </p>
+            </div>
+        </section>
+
+        <section id="trust-certs-showcase"
+            class="py-24 bg-neutral-900 border-t border-b border-neutral-800 relative z-10">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-20">
+                    <h2 class="text-2xl font-extralight mb-12 text-cyan-400">A Pillar of Trust in the E-Scooter
+                        Ecosystem</h2>
+                    <div
+                        class="flex items-center justify-center gap-24 opacity-75 grayscale hover:grayscale-0 transition-all duration-700">
+                        <img src="images/home/DAVIGO.webp" alt="DAVIGO" class="h-16">
+                        <img src="images/home/GESITS.webp" alt="GESITS" class="h-16">
+                        <img src="images/home/ALESSA.webp" alt="ALESSA" class="h-16">
+                    </div>
+                </div>
+
+                <div class="mt-20">
+                    <h2 class="text-2xl font-extralight text-center mb-16 text-cyan-400">Global Compliance and Safety
+                        Standards</h2>
+                    <div id="certifications-inside-hero"
+                        class="flex flex-wrap gap-10 items-center justify-center interactive-certs">
+                        <a href="#" class="cert-link cert-zoom-wrapper"
+                            data-original-src="images/certification/CE-EMC-TEST.webp">
+                            <img src="images/certification/CE-EMC-TEST.webp"
+                                class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110">
+                        </a>
+                        <a href="#" class="cert-link cert-zoom-wrapper"
+                            data-original-src="images/certification/CB-TEST.webp"><img
+                                src="images/certification/CB-TEST.webp"
+                                class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                        <a href="#" class="cert-link cert-zoom-wrapper"
+                            data-original-src="images/certification/EMC-COMPLIANCE.webp"><img
+                                src="images/certification/EMC-COMPLIANCE.webp"
+                                class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                        <a href="#" class="cert-link cert-zoom-wrapper"
+                            data-original-src="images/certification/IEC-62619.webp"><img
+                                src="images/certification/IEC-62619.webp"
+                                class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                        <a href="#" class="cert-link cert-zoom-wrapper"
+                            data-original-src="images/certification/Material-Safety.webp"><img
+                                src="images/certification/Material-Safety.webp"
+                                class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                        <a href="#" class="cert-link cert-zoom-wrapper"
+                            data-original-src="images/certification/UN38.3.webp"><img
+                                src="images/certification/UN38.3.webp"
+                                class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                        <a href="#" class="cert-link cert-zoom-wrapper"
+                            data-original-src="images/certification/Dangerous-Goods.webp"><img
+                                src="images/certification/Dangerous-Goods.webp"
+                                class="h-24 transition-transform duration-300 shadow-2xl hover:scale-110"></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="adminAuthModal"
+        class="hidden fixed inset-0 bg-black/95 z-[30000] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div
+            class="bg-neutral-900 border border-cyan-500/30 p-8 rounded-2xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(0,0,0,1)]">
+            <h3 class="text-cyan-400 font-bold text-xl mb-1 uppercase tracking-tighter">Admin Access</h3>
+            <p class="text-neutral-500 text-xs mb-6">Database Authentication Required</p>
+            <input type="password" id="adminPasswordInput"
+                class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white mb-6 focus:border-cyan-500 outline-none transition-all text-center tracking-widest"
+                placeholder="••••••••">
+            <div class="flex gap-3">
+                <button onclick="closeAdminAuth()"
+                    class="flex-1 py-3 bg-neutral-800 text-neutral-400 rounded-xl font-semibold text-sm">Cancel</button>
+                <button onclick="verifyAdminPassword()"
+                    class="flex-1 py-3 bg-cyan-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-900/20 hover:bg-cyan-500 transition-colors">Verify</button>
             </div>
         </div>
     </div>
 
-    <div class="login-card p-6 md:p-10 rounded-[2.5rem] shadow-2xl w-full max-w-[440px] animate-fadeIn" style="animation-delay: 0.2s;">
-        <div class="mb-8 text-center md:text-left">
-            <p class="text-slate-200 text-xl md:text-2xl font-bold">Welcome back</p>
-            <p class="text-slate-400 text-sm mt-1">Select your name to continue</p>
+    <div id="imageModal" class="hidden">
+        <div class="flex items-center justify-center w-full h-full">
+            <img id="modalDetailImage" src="" class="max-w-[90%] max-h-[90%] object-contain">
         </div>
+    </div>
 
-        <div class="space-y-6">
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Staff Member</label>
-                <div class="relative">
-                    <select id="userName" class="w-full border p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none cursor-pointer shadow-xl">
-                        <option value="" disabled selected>Loading staff list...</option>
-                    </select>
-                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-xs">▼</div>
-                </div>
-            </div>
-            
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Password</label>
-                <input type="password" id="password" class="w-full border p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition shadow-xl" placeholder="••••••••">
-                
-                <div class="flex justify-end px-1 mt-2">
-                    <button onclick="findPassword()" class="text-[10px] text-slate-400 hover:text-blue-400 transition font-bold uppercase tracking-wider">
-                        Forgot Password?
-                    </button>
-                </div>
-            </div>
+    <div id="footer-placeholder"></div>
 
-            <div class="pt-2">
-                <button id="loginBtn" onclick="handleLogin()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black hover:bg-blue-500 shadow-xl shadow-blue-900/30 transition-all active:scale-95 text-base uppercase tracking-widest">
-                    Sign In
-                </button>
-            </div>
-        </div>
+    <div id="emergencyBanner">
+        📢 <span id="bannerText">Notice</span>
     </div>
 
     <script>
-        // 기존 스크립트 내용과 동일 (변동 없음)
-        (function() {
-            const firebaseConfig = { databaseURL: "https://tdlid-dailyreport-default-rtdb.firebaseio.com" };
-            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-            const database = firebase.database();
-            const userSelect = document.getElementById('userName');
-            const passwordInput = document.getElementById('password');
-
-            passwordInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleLogin();
+        /** 1. 레이아웃 로드 **/
+        async function loadLayout() {
+            try {
+                // 1. 헤더 로드
+                const headerRes = await fetch('components/header.html');
+                if (headerRes.ok) {
+                    const headerPlaceholder = document.getElementById('header-placeholder');
+                    headerPlaceholder.innerHTML = await headerRes.text();
+                    // 스크립트 실행 로직... (기존 코드 유지)
                 }
-            });
 
-            database.ref('users').once('value', (snapshot) => {
-                const users = snapshot.val();
-                if (!userSelect) return;
-                userSelect.innerHTML = '<option value="" disabled selected>Select Name</option>';
-                if (users) {
-                    const fragment = document.createDocumentFragment();
-                    Object.keys(users).forEach(name => {
-                        const option = document.createElement('option');
-                        option.value = name;
-                        option.textContent = name + (users[name].role === 'admin' ? ' (Manager)' : '');
-                        fragment.appendChild(option);
+                // 2. admin-auth.html 로드 부분 수정 (에러 방지)
+                // 외부 파일을 못 가져올 경우를 대비해, 이미 HTML에 작성된 
+                // <div id="adminAuthModal">를 사용하도록 하고 fetch는 건너뜁니다.
+                console.log("Admin Auth Modal is already embedded in index.html");
+
+                // 3. 푸터 로드 및 스크립트 강제 실행
+                const footerRes = await fetch('components/footer.html');
+                if (footerRes.ok) {
+                    const footerPlaceholder = document.getElementById('footer-placeholder');
+                    footerPlaceholder.innerHTML = await footerRes.text();
+
+                    // ⭐ 추가: 푸터 내의 스크립트(pcHeartTrigger 등) 추출 및 실행
+                    const footerScripts = footerPlaceholder.querySelectorAll("script");
+                    footerScripts.forEach(oldScript => {
+                        const newScript = document.createElement("script");
+                        newScript.text = oldScript.text;
+                        document.body.appendChild(newScript).parentNode.removeChild(newScript);
                     });
-                    userSelect.appendChild(fragment);
                 }
-            });
 
-            window.handleLogin = function() {
-                const name = document.getElementById('userName').value;
-                const pw = document.getElementById('password').value;
-                if(!name || !pw) return alert("Please check your credentials.");
+                // 4. BGM 로드
+                const bgmRes = await fetch('components/bgm.html');
+                if (bgmRes.ok) {
+                    const bgmPlaceholder = document.getElementById('bgm-placeholder');
+                    const htmlText = await bgmRes.text();
+                    bgmPlaceholder.innerHTML = htmlText;
 
-                database.ref('users/' + name).once('value', (snapshot) => {
-                    const userData = snapshot.val();
-                    if (!userData) return alert("User not found.");
-                    if (userData.password === pw) {
-                        sessionStorage.setItem('loggedInUser', name);
-                        sessionStorage.setItem('userRole', userData.role);
-                        location.href = (userData.role === 'admin' || name === 'Admin') ? "admin.html" : "staff.html";
+                    // 중요: innerHTML로 삽입된 <script> 태그는 자동으로 실행되지 않습니다.
+                    // script 태그를 찾아 강제로 재실행하거나, 초기화 함수를 호출해야 합니다.
+                    const scripts = bgmPlaceholder.querySelectorAll("script");
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement("script");
+                        newScript.textContent = oldScript.textContent;
+                        document.body.appendChild(newScript);
+                        oldScript.remove();
+                    });
+                }
+
+                // 초기화 실행
+                if (typeof initNavigation === "function") initNavigation();
+
+            } catch (err) {
+                console.error("Layout Load Error:", err);
+            }
+        }
+
+
+        /** 2. 내비게이션 **/
+        function initNavigation() {
+            const menuBtn = document.getElementById("menuToggleBtn");
+            const dropdown = document.getElementById("dropdownMenu");
+            const menuIcon = document.getElementById("menuIcon");
+            if (menuBtn && dropdown) {
+                menuBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const isOpen = dropdown.classList.contains("visible");
+                    if (isOpen) {
+                        dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                        dropdown.classList.add("opacity-0", "invisible");
+                        menuIcon.innerText = "☰";
                     } else {
-                        alert("Incorrect password.");
+                        dropdown.classList.remove("opacity-0", "invisible");
+                        dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                        menuIcon.innerText = "✕";
                     }
-                });
-            };
+                };
+            }
+        }
 
-            window.findPassword = function() {
-                const name = document.getElementById('userName').value;
-                if (!name) return alert("Please select your name from the list first.");
-                if (confirm(`Do you want to see a password hint for '${name}'?`)) {
-                    database.ref('users/' + name).once('value', (snapshot) => {
-                        const userData = snapshot.val();
-                        if (userData && userData.password) {
-                            const pw = userData.password;
-                            const hint = pw.length > 2 ? pw.substring(0, 2) + "*".repeat(pw.length - 2) : pw;
-                            alert(`[Password Hint for ${name}]\n\nHint: ${hint}\n\nIf you still cannot remember your password, please contact the System Manager.`);
-                        } else {
-                            alert("User information or password not found.");
-                        }
-                    });
-                }
+        /** 3. 관리자 페이지 트리거 **/
+        function initAdminTriggers() {
+
+        }
+
+        /** 4. 초기화 및 공통 기능 **/
+        /** 4. 초기화 및 공통 기능 **/
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // [수정] 다중 슬라이드 제거 후 단일 배경 설정
+            const bgContainer = document.getElementById('image-bg-container');
+            if (bgContainer) {
+                // 내부를 비우고 오버레이(z-index:5)와 배경슬라이드(z-index:1)를 생성
+                bgContainer.innerHTML = `
+        <div class="video-overlay" style="z-index: 5;"></div>
+        <div class="bg-slide"></div>
+    `;
+            }
+
+            // 2. 인증 및 기타 함수 호출 (중괄호 누락 주의)
+            loadLayout();
+            initLiveSettings();
+
+            // 3. 인증창 엔터키 이벤트 (함수 내부로 이동)
+            document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') verifyAdminPassword();
+            });
+
+            // 4. 인증서 클릭 모달 이벤트
+            document.querySelectorAll('.cert-link').forEach(link => {
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    const modal = document.getElementById('imageModal');
+                    document.getElementById('modalDetailImage').src = link.getAttribute('data-original-src');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    document.body.style.overflow = 'hidden';
+                };
+            });
+
+            // 5. 이미지 모달 닫기
+            const imgModal = document.getElementById('imageModal');
+            if (imgModal) {
+                imgModal.onclick = (e) => {
+                    if (e.target.id !== 'modalDetailImage') {
+                        imgModal.classList.add('hidden');
+                        imgModal.classList.remove('flex');
+                        document.body.style.overflow = '';
+                    }
+                };
+            }
+        }); // <--- DOMContentLoaded 마침
+
+        document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verifyAdminPassword();
+        });
+
+
+        /* ==========================================
+            TDLiD -> BIG HEART ANIMATION SCRIPT (수정본)
+           ========================================== */
+        var isHeartRunning = false;
+        var inputBuffer = "";
+        const secretWord = "awesome";
+
+        // [오류 해결] e.key 존재 여부를 먼저 체크하여 toLowerCase 오류 방지
+        document.addEventListener('keydown', (e) => {
+            if (isHeartRunning || !e.key) return;
+
+            inputBuffer += e.key.toLowerCase();
+            if (inputBuffer.length > secretWord.length) {
+                inputBuffer = inputBuffer.substring(inputBuffer.length - secretWord.length);
+            }
+            if (inputBuffer === secretWord) {
+                inputBuffer = "";
+                activateTdlidHeart();
+            }
+        });
+
+        // 전역에서 접근 가능하도록 window 객체에 할당 (푸터 클릭용)
+        window.activateTdlidHeart = function () {
+            if (isHeartRunning) return;
+            isHeartRunning = true;
+
+            const points = [
+                { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 1 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 1, y: 4 }, // T
+                { x: 3.5, y: 0 }, { x: 3.5, y: 1 }, { x: 3.5, y: 2 }, { x: 3.5, y: 3 }, { x: 3.5, y: 4 }, { x: 4.5, y: 0 }, { x: 5.5, y: 1 }, { x: 5.5, y: 2 }, { x: 5.5, y: 3 }, { x: 4.5, y: 4 }, // D
+                { x: 7, y: 0 }, { x: 7, y: 1 }, { x: 7, y: 2 }, { x: 7, y: 3 }, { x: 7, y: 4 }, { x: 8, y: 4 }, { x: 9, y: 4 }, // L
+                { x: 10.5, y: 0.5 }, { x: 10.5, y: 2 }, { x: 10.5, y: 3 }, { x: 10.5, y: 4 }, // i
+                { x: 12, y: 0 }, { x: 12, y: 1 }, { x: 12, y: 2 }, { x: 12, y: 3 }, { x: 12, y: 4 }, { x: 13, y: 0 }, { x: 14, y: 1 }, { x: 14, y: 2 }, { x: 14, y: 3 }, { x: 13, y: 4 } // D
+            ];
+
+            const hearts = [];
+            const sw = window.innerWidth;
+            const sh = window.innerHeight;
+
+            points.forEach((p, i) => {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.style.cssText = `
+            position: fixed; left: ${Math.random() * 100}vw; top: ${Math.random() * 100}vh;
+            font-size: 22px; z-index: 2147483647; opacity: 0; pointer-events: none;
+            transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+        `;
+                document.body.appendChild(heart);
+                hearts.push({ el: heart, target: p });
+                setTimeout(() => { heart.style.opacity = '1'; }, i * 10);
+            });
+
+            // TDLiD 형성
+            setTimeout(() => {
+                const gapSize = Math.min(sw / 20, 45);
+                const startX = (sw - (14 * gapSize)) / 2;
+                const startY = (sh / 2) - (2 * gapSize);
+                hearts.forEach((obj) => {
+                    obj.el.style.left = (startX + obj.target.x * gapSize) + 'px';
+                    obj.el.style.top = (startY + obj.target.y * gapSize) + 'px';
+                    obj.el.style.transform = `scale(1.5)`;
+                    obj.el.style.textShadow = "0 0 15px rgba(34, 211, 238, 0.6)";
+                });
+            }, 1200);
+
+            // 하트 형성
+            setTimeout(() => {
+                const centerX = sw / 2;
+                const centerY = sh / 2;
+                const heartScale = Math.min(sw, sh) / 28;
+                hearts.forEach((obj, i) => {
+                    const t = (i / hearts.length) * 2 * Math.PI;
+                    const hx = 16 * Math.pow(Math.sin(t), 3);
+                    const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                    obj.el.style.transition = "all 2s cubic-bezier(0.25, 1, 0.5, 1)";
+                    obj.el.style.left = (centerX + hx * heartScale) + 'px';
+                    obj.el.style.top = (centerY + hy * heartScale) + 'px';
+                    obj.el.style.transform = `scale(2.2)`;
+                    obj.el.style.textShadow = "0 0 20px rgba(255, 0, 0, 0.8)";
+                });
+            }, 4500);
+
+            // 제거
+            setTimeout(() => {
+                hearts.forEach(obj => {
+                    obj.el.style.transition = "all 1.5s ease-in";
+                    obj.el.style.opacity = '0';
+                    obj.el.style.transform = `translate(${(Math.random() - 0.5) * 500}px, ${(Math.random() - 0.5) * 500}px) scale(0)`;
+                    setTimeout(() => obj.el.remove(), 1500);
+                });
+                isHeartRunning = false;
+            }, 8500);
+        };
+
+        // [중요] 푸터 로드 후 이벤트 바인딩 로직 추가
+        function bindHeartTrigger() {
+            const trigger = document.getElementById('pcHeartTrigger') || document.getElementById('mobileHeartTrigger');
+            if (trigger) {
+                trigger.onclick = (e) => {
+                    e.preventDefault();
+                    window.activateTdlidHeart();
+                };
+            } else {
+                // 푸터가 비동기로 로드되므로, 아직 없으면 잠시 후 다시 시도
+                setTimeout(bindHeartTrigger, 500);
+            }
+        }
+        bindHeartTrigger();
+
+
+        // 모바일용 트리거
+        const mobileTrigger = document.getElementById('mobileHeartTrigger');
+        if (mobileTrigger) {
+            mobileTrigger.onclick = (e) => {
+                e.preventDefault();
+                activateTdlidHeart();
             };
-        })();
+        }
+
+
     </script>
 </body>
+
 </html>
