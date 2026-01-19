@@ -415,25 +415,28 @@
             z-index: 10;
         }
 
-/* [수정] 배경 이미지 설정 - 전체 화면으로 확장 */
-.bg-slide {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background-color: #000000;
-    /* 60%를 cover로 수정하여 전체 화면을 꽉 채웁니다 */
-    background-size: cover; 
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 1;
+        /* --------------------------------------------------
+    배경 이미지 설정 (bg-3.gif)
+-------------------------------------------------- */
+        .bg-slide {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background-color: #000000;
+            background-image: url('images/bg/bg-3.gif');
+            /* 이미지 경로 */
+            background-size: 60%;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 1;
 
-    /* 마스크 범위를 넓혀서 경계선을 자연스럽게 처리 */
-    mask-image: radial-gradient(circle, black 80%, transparent 100%);
-    -webkit-mask-image: radial-gradient(circle, black 80%, transparent 100%);
+            /* 외곽 경계선 제거를 위한 마스크 */
+            mask-image: radial-gradient(circle, black 70%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle, black 70%, transparent 100%);
 
-    /* 줌 애니메이션 (유지) */
-    animation: smoothZoom 15s ease-in-out infinite alternate;
-}
+            /* 줌 애니메이션 */
+            animation: smoothZoom 15s ease-in-out infinite alternate;
+        }
 
         @keyframes smoothZoom {
             from {
@@ -798,19 +801,19 @@
 
         }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const bgContainer = document.getElementById('image-bg-container');
-    if (bgContainer) {
-        const dayOfWeek = new Date().getDay(); 
-        let bgNum = (dayOfWeek === 0) ? 7 : dayOfWeek;
-        const bgImageUrl = `images/bg/bg-${bgNum}.gif`;
+        /** 4. 초기화 및 공통 기능 **/
+        /** 4. 초기화 및 공통 기능 **/
+        document.addEventListener("DOMContentLoaded", () => {
 
-        // 배경 이미지를 동적으로 삽입 (전체 화면 적용 확인)
-        bgContainer.innerHTML = `
-            <div class="video-overlay" style="z-index: 5;"></div>
-            <div class="bg-slide" style="background-image: url('${bgImageUrl}');"></div>
-        `;
-    }
+            // [수정] 다중 슬라이드 제거 후 단일 배경 설정
+            const bgContainer = document.getElementById('image-bg-container');
+            if (bgContainer) {
+                // 내부를 비우고 오버레이(z-index:5)와 배경슬라이드(z-index:1)를 생성
+                bgContainer.innerHTML = `
+        <div class="video-overlay" style="z-index: 5;"></div>
+        <div class="bg-slide"></div>
+    `;
+            }
 
             // 2. 인증 및 기타 함수 호출 (중괄호 누락 주의)
             loadLayout();
