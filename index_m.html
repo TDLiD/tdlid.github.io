@@ -549,6 +549,27 @@
             transform: scale(0.9);
             transition: all 0.5s ease-in;
         }
+
+/* [수정] 배경 이미지 설정 - 전체 화면 및 요일별 적용 준비 */
+.bg-slide {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background-color: #000000;
+    /* 고정 이미지는 삭제하고 스크립트에서 넣습니다. */
+    background-size: cover; /* 전체 화면을 꽉 채우도록 설정 */
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 1;
+    /* 줌 애니메이션 추가 (선택사항) */
+    animation: smoothZoom 15s ease-in-out infinite alternate;
+}
+
+@keyframes smoothZoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+
     </style>
 
 
@@ -765,19 +786,27 @@
 
         // ... 앞부분 함수들(loadLayout, initNavigation 등)은 그대로 유지 ...
 
-        function initImageSlider() {
-            const sliderContainer = document.getElementById('heroSlider');
-            if (!sliderContainer) return;
+function initImageSlider() {
+    const sliderContainer = document.getElementById('heroSlider');
+    if (!sliderContainer) return;
 
-            // 1. 이미지 파일명 배열 생성 (bg-01.jpg ~ bg-25.jpg)
-            const totalImages = 25;
-            const images = [];
-            for (let i = 1; i <= totalImages; i++) {
-                /* const fileName = `bg-${i.toString().padStart(2, '0')}.jpg`; */
-                const fileName = `bg-3.gif`;
+    // 1. 현재 요일에 맞는 이미지 번호 계산 (월:1 ~ 금:5, 토:6, 일:7)
+    const dayOfWeek = new Date().getDay(); // 0(일)~6(토)
+    let bgNum = dayOfWeek;
+    if (dayOfWeek === 0) bgNum = 7; // 일요일은 7번으로 지정
 
-                images.push(`images/bg/${fileName}`);
-            }
+    const bgImageUrl = `images/bg/bg-${bgNum}.gif`;
+
+    // 2. 배경 이미지 요소 생성 (기존 슬라이더 구조 대신 단일 배경 주입)
+    // 전체 화면을 꽉 채우기 위해 bg-slide 클래스를 사용합니다.
+    sliderContainer.innerHTML = `
+        <div class="video-overlay" style="z-index: 5;"></div>
+        <div class="bg-slide" style="background-image: url('${bgImageUrl}');"></div>
+    `;
+    
+    // [참고] 만약 기존처럼 여러 장이 돌아가는 슬라이더가 아니라 
+    // 요일별 '고정 배경'을 원하신다면 위와 같이 innerHTML을 교체하는 것이 가장 정확합니다.
+}
 
             // 2. DOM에 이미지 요소 추가
             images.forEach((src, idx) => {
