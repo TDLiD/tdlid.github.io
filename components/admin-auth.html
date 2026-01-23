@@ -2,15 +2,15 @@
     class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[10000] hidden flex items-center justify-center p-6">
     <div class="max-w-sm w-full bg-neutral-900 border border-white/10 p-8 rounded-3xl shadow-2xl">
         <h3 class="text-xl font-bold text-white mb-2">Admin Access</h3>
-        <p class="text-neutral-500 text-sm mb-6">관리자 비밀번호를 입력하세요.</p>
+        <p class="text-neutral-500 text-sm mb-6">Please enter your administrator password.</p>
         <input type="password" id="adminPasswordInput"
             class="w-full bg-black border border-neutral-800 p-4 rounded-xl mb-4 text-white outline-none focus:border-cyan-500 transition"
             placeholder="Password">
         <div class="flex gap-2">
             <button onclick="closeAdminAuth()"
-                class="flex-1 py-3 bg-neutral-800 text-white rounded-xl font-bold">취소</button>
+                class="flex-1 py-3 bg-neutral-800 text-white rounded-xl font-bold">Cancel</button>
             <button onclick="verifyAdminPassword()"
-                class="flex-1 py-3 bg-cyan-600 text-white rounded-xl font-bold">확인</button>
+                class="flex-1 py-3 bg-cyan-600 text-white rounded-xl font-bold">Confirm</button>
         </div>
     </div>
 </div>
@@ -34,7 +34,7 @@
                 const isAdminFolder = window.location.pathname.includes('/admin/');
                 window.location.href = isAdminFolder ? "admin.html" : "admin/admin.html";
             } else {
-                alert("비밀번호가 틀렸습니다.");
+                alert("Password is incorrect.");
                 document.getElementById('adminPasswordInput').value = '';
             }
         } catch (err) {
