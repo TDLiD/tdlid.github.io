@@ -57,44 +57,64 @@
         </div>
     </div>
 
-    <script>
-        // 1. Firebase 설정 (index.html에서 사용하신 설정을 그대로 복사하세요)
-        const firebaseConfig = {
-            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
-            authDomain: "tdlid-107669.firebaseapp.com",
-            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
-            projectId: "tdlid-107669",
-            storageBucket: "tdlid-107669.firebasestorage.app",
-            messagingSenderId: "604782345004",
-            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
-        };
+<script>
+    // 1. Firebase 설정
+    const firebaseConfig = {
+        apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+        authDomain: "tdlid-107669.firebaseapp.com",
+        databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+        projectId: "tdlid-107669",
+        storageBucket: "tdlid-107669.firebasestorage.app",
+        messagingSenderId: "604782345004",
+        appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+    };
 
-        // Initialize Firebase
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+    // Initialize Firebase
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-        // 2. 로그인 이벤트 처리
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+    /**
+     * [추가된 로직] 자동 입장 체크
+     * 메인 페이지에서 성공적으로 인증된 세션이 있는지 확인합니다.
+     */
+    function checkPreAuth() {
+        const isPreAuth = sessionStorage.getItem('admin_pre_auth');
+        if (isPreAuth === 'true') {
+            // 메인에서 비밀번호를 이미 입력했다면 바로 admin.html로 이동
+            window.location.replace("admin.html");
+        }
+    }
 
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // 로그인 성공 시 어드민 메인 페이지로 이동
-                    window.location.href = "admin.html";
-                })
-                .catch((error) => {
-                    console.error("Login Error:", error.code);
-                    alert("Invalid email or password.");
-                });
-        });
+    // 페이지 로드 시 즉시 실행
+    checkPreAuth();
 
-        // 이미 로그인된 사용자인지 확인
-        auth.onAuthStateChanged((user) => {
-            if (user) window.location.href = "admin.html";
-        });
-    </script>
+    // 2. 로그인 이벤트 처리 (수동 로그인 필요한 경우 대비)
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        auth.signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                // 수동 로그인 성공 시에도 세션 기록 후 이동
+                sessionStorage.setItem('admin_pre_auth', 'true');
+                window.location.href = "admin.html";
+            })
+            .catch((error) => {
+                console.error("Login Error:", error.code);
+                alert("Invalid email or password.");
+            });
+    });
+
+    // Firebase Auth 상태 감지 (기존 로그인 세션 유지용)
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            sessionStorage.setItem('admin_pre_auth', 'true');
+            window.location.href = "admin.html";
+        }
+    });
+</script>
+
 </body>
 
 </html>
