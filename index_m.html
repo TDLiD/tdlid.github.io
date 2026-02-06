@@ -318,40 +318,31 @@
             modal.style.display = 'none';
             document.body.style.overflow = '';
         }
-function initImageSlider() {
-    const sliderContainer = document.getElementById('heroSlider');
-    if (!sliderContainer) return;
-
-    // 1. 요일 계산 (0: 일요일, 1: 월요일, ..., 6: 토요일)
-    const now = new Date();
-    const day = now.getDay();
-    // PC 버전과 동일하게 월(1)~일(7) 매칭
-    const bgNum = (day === 0) ? 7 : day; 
-    const bgUrl = `images/bg/bg-${bgNum}.gif`;
-
-    // 2. 배경 스타일 설정 (1, 4, 5, 6번 이미지는 cover, 나머지는 60% 크기)
-    let bgSize = [1, 4, 5, 6].includes(bgNum) ? 'cover' : '60%';
-
-    // 3. 슬라이더 컨테이너 내용 교체
-    // 모바일 성능을 위해 불필요한 이미지 25개 생성 루프와 인터벌 함수를 제거하고 
-    // 현재 요일에 맞는 배경 하나를 고정으로 렌더링합니다.
-    sliderContainer.innerHTML = `
-        <div class="video-overlay" style="z-index: 2;"></div>
-        <div class="slide active" style="
-            background-image: url('${bgUrl}');
-            background-size: ${bgSize};
-            background-position: center;
-            background-repeat: no-repeat;
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 1;
-            z-index: 1;
-            filter: brightness(0.35) contrast(1.1);
-        "></div>
-    `;
-}
+        function initImageSlider() {
+            const sliderContainer = document.getElementById('heroSlider');
+            if (!sliderContainer) return;
+            const totalImages = 25;
+            const images = [];
+            for (let i = 1; i <= totalImages; i++) { images.push(`images/bg/bg-3.gif`); }
+            images.forEach((src, idx) => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = 'slide' + (idx === 0 ? ' active' : '');
+                sliderContainer.appendChild(img);
+            });
+            const slides = sliderContainer.querySelectorAll('.slide');
+            let currentIdx = 0;
+            function waveTransition() {
+                const prevSlide = slides[currentIdx];
+                currentIdx = (currentIdx + 1) % slides.length;
+                const nextSlide = slides[currentIdx];
+                prevSlide.classList.add('exit');
+                prevSlide.classList.remove('active');
+                nextSlide.classList.add('active');
+                setTimeout(() => { prevSlide.classList.remove('exit'); }, 2000);
+            }
+            setInterval(waveTransition, 4000);
+        }
         let isHeartActive = false;
         function initPillarEgg() {
             const pillar = document.getElementById('pillarTrigger');
