@@ -175,7 +175,20 @@ async function verifyAdminPassword() {
         .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4) contrast(1.1); }
         .video-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%); z-index: 5; }
         .hero-content { position: relative; z-index: 10; }
-        .bg-slide { position: absolute; inset: 0; z-index: 1; background: #000 url('images/bg/bg-3.gif') no-repeat center/60%; mask-image: radial-gradient(circle, black 70%, transparent 100%); -webkit-mask-image: radial-gradient(circle, black 70%, transparent 100%); animation: smoothZoom 15s ease-in-out infinite alternate; }
+/* 기존 .bg-slide 부분을 아래와 같이 수정하세요 */
+.bg-slide { 
+    position: absolute; 
+    inset: 0; 
+    z-index: 1; 
+    background-color: #000; 
+    background-repeat: no-repeat; 
+    background-position: center; 
+    /* 마스크 및 애니메이션 유지 */
+    mask-image: radial-gradient(circle, black 70%, transparent 100%); 
+    -webkit-mask-image: radial-gradient(circle, black 70%, transparent 100%); 
+    animation: smoothZoom 15s ease-in-out infinite alternate; 
+}
+
         @keyframes smoothZoom { from { transform: scale(1); } to { transform: scale(1.05); } }
         .single-bg-effect { filter: brightness(0.6); animation: pulseFade 8s ease-in-out infinite; }
         @keyframes pulseFade { 0% { opacity: 0; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0; transform: scale(1.1); } }
@@ -208,7 +221,7 @@ async function verifyAdminPassword() {
             <div id="image-bg-container" class="video-bg-container"><div class="video-overlay" style="z-index: 2;"></div></div>
             <div class="hero-content max-w-6xl w-full px-12 text-center flex flex-col items-center justify-center h-full">
                 <div class="flex flex-col items-center justify-center">
-                    <h1 class="hero-logo-gradient" style="font-size: 2.5rem; line-height: 1.2;">NO MORE CARBON</h1>
+                    <h1 class="hero-logo-gradient" style="font-size: 3.5rem; line-height: 1.2;">NO MORE CARBON</h1>
                     <p class="hero-slogan-gradient" style="font-size: 1.8rem; letter-spacing: 0.5em; margin-top: 1.5rem;">NO MORE FOSSIL FUEL</p>
                 </div>
                 <p class="hero-description text-xl md:text-2xl mt-80 mb-12 max-w-4xl mx-auto leading-relaxed">
@@ -256,7 +269,7 @@ async function verifyAdminPassword() {
     <div id="footer-placeholder"></div>
     <div id="emergencyBanner">📢 <span id="bannerText">Notice</span></div>
 
-    <script>
+<script>
         async function loadLayout() {
             try {
                 const h = await fetch('components/header.html'); if(h.ok) document.getElementById('header-placeholder').innerHTML = await h.text();
@@ -271,6 +284,7 @@ async function verifyAdminPassword() {
                 if (typeof initNavigation === "function") initNavigation();
             } catch (err) { console.error(err); }
         }
+
         function initNavigation() {
             const btn = document.getElementById("menuToggleBtn"), menu = document.getElementById("dropdownMenu"), icon = document.getElementById("menuIcon");
             if (btn && menu) btn.onclick = (e) => {
@@ -280,9 +294,35 @@ async function verifyAdminPassword() {
                 icon.innerText = isOpen ? "☰" : "✕";
             };
         }
-        document.addEventListener("DOMContentLoaded", () => {
-            const bg = document.getElementById('image-bg-container'); if(bg) bg.innerHTML = `<div class="video-overlay" style="z-index: 5;"></div><div class="bg-slide"></div>`;
+
+document.addEventListener("DOMContentLoaded", () => {
+            const bg = document.getElementById('image-bg-container'); 
+            if(bg) {
+                const day = new Date().getDay(); // 0:일, 1:월, ..., 6:토
+                const bgNum = (day === 0) ? 7 : day; // 월(1)~일(7)
+                
+                // 배경 이미지 경로
+                const bgUrl = `images/bg/bg-${bgNum}.gif`;
+                
+                // 스타일 분기 처리 (1, 4, 5, 6은 꽉 차게 / 나머지는 가운데 60%)
+                let bgStyle = "";
+                if ([1, 4, 5, 6].includes(bgNum)) {
+                    // 꽉 차는 스타일 (mask-image 제거를 원하시면 추가 가능)
+                    bgStyle = `background-image: url('${bgUrl}'); background-size: cover; -webkit-mask-image: none; mask-image: none;`;
+                } else {
+                    // 기존 가운데 60% 스타일
+                    bgStyle = `background-image: url('${bgUrl}'); background-size: 60%;`;
+                }
+
+                bg.innerHTML = `
+                    <div class="video-overlay" style="z-index: 5;"></div>
+                    <div class="bg-slide" style="${bgStyle}"></div>
+                `;
+            }
+
             loadLayout(); initLiveSettings();
+            // ... 이하 기존 코드 동일
+
             document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') verifyAdminPassword(); });
             document.querySelectorAll('.cert-link').forEach(link => {
                 link.onclick = (e) => {
@@ -300,6 +340,7 @@ async function verifyAdminPassword() {
             inputBuffer = (inputBuffer + e.key.toLowerCase()).slice(-secretWord.length);
             if (inputBuffer === secretWord) { inputBuffer = ""; activateTdlidHeart(); }
         });
+
         window.activateTdlidHeart = function() {
             if (isHeartRunning) return; isHeartRunning = true;
             const pts = [{x:0,y:0},{x:1,y:0},{x:2,y:0},{x:1,y:1},{x:1,y:2},{x:1,y:3},{x:1,y:4},{x:3.5,y:0},{x:3.5,y:1},{x:3.5,y:2},{x:3.5,y:3},{x:3.5,y:4},{x:4.5,y:0},{x:5.5,y:1},{x:5.5,y:2},{x:5.5,y:3},{x:4.5,y:4},{x:7,y:0},{x:7,y:1},{x:7,y:2},{x:7,y:3},{x:7,y:4},{x:8,y:4},{x:9,y:4},{x:10.5,y:0.5},{x:10.5,y:2},{x:10.5,y:3},{x:10.5,y:4},{x:12,y:0},{x:12,y:1},{x:12,y:2},{x:12,y:3},{x:12,y:4},{x:13,y:0},{x:14,y:1},{x:14,y:2},{x:14,y:3},{x:13,y:4}];
@@ -326,11 +367,13 @@ async function verifyAdminPassword() {
                 isHeartRunning = false;
             }, 8500);
         };
+
         function bindHeartTrigger() {
             const t = document.getElementById('pcHeartTrigger') || document.getElementById('mobileHeartTrigger');
             if (t) t.onclick = (e) => { e.preventDefault(); window.activateTdlidHeart(); }; else setTimeout(bindHeartTrigger, 500);
         }
         bindHeartTrigger();
     </script>
+
 </body>
 </html>
