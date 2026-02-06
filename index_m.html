@@ -336,34 +336,36 @@
             document.body.style.overflow = '';
         }
         document.addEventListener("DOMContentLoaded", loadLayout);
-        function initImageSlider() {
+
+function initImageSlider() {
             const sliderContainer = document.getElementById('heroSlider');
             if (!sliderContainer) return;
-            const totalImages = 25;
-            const images = [];
-            for (let i = 1; i <= totalImages; i++) {
-                const fileName = `bg-3.gif`;
-                images.push(`images/bg/${fileName}`);
-            }
-            images.forEach((src, idx) => {
-                const img = document.createElement('img');
-                img.src = src;
-                img.className = 'slide' + (idx === 0 ? ' active' : '');
-                sliderContainer.appendChild(img);
-            });
-            const slides = sliderContainer.querySelectorAll('.slide');
-            let currentIdx = 0;
-            function waveTransition() {
-                const prevSlide = slides[currentIdx];
-                currentIdx = (currentIdx + 1) % slides.length;
-                const nextSlide = slides[currentIdx];
-                prevSlide.classList.add('exit');
-                prevSlide.classList.remove('active');
-                nextSlide.classList.add('active');
-                setTimeout(() => { prevSlide.classList.remove('exit'); }, 2000);
-            }
-            setInterval(waveTransition, 4000);
+
+            // 요일 구하기 (0: 일요일, 1: 월요일, ..., 6: 토요일)
+            const dayOfWeek = new Date().getDay();
+            
+            /* 요일별로 매칭되는 GIF 파일명 설정
+               예: bg-0.gif (일), bg-1.gif (월) ...
+               만약 파일명이 모두 같다면 아래 fileName 변수를 수정하세요.
+            */
+            const fileName = `bg-${dayOfWeek}.gif`;
+            const imageSrc = `images/bg/${fileName}`;
+
+            // 배경 이미지 생성 및 추가 (모바일은 리소스 절약을 위해 단일 배경 권장)
+            const img = document.createElement('img');
+            img.src = imageSrc;
+            img.className = 'slide active'; // 바로 활성화
+            
+            // 이미지 로드 실패 시 기본값(예: bg-3.gif) 설정 (옵션)
+            img.onerror = () => {
+                img.src = 'images/bg/bg-3.gif';
+            };
+
+            sliderContainer.appendChild(img);
+
+            // 요일별 단일 배경인 경우 기존의 waveTransition(슬라이드 교체) 로직은 필요하지 않으므로 생략하거나 유지할 수 있습니다.
         }
+
         let isHeartActive = false;
         function initPillarEgg() {
             const pillar = document.getElementById('pillarTrigger');
