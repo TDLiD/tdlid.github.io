@@ -1,20 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="description" id="metaDescription" content="">
     <meta name="keywords" id="metaKeywords" content="">
-
     <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-
     <script>
-        // 1. Firebase 설정
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -24,14 +18,8 @@
             messagingSenderId: "604782345004",
             appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
         };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
-
-        // [수정] Firebase 데이터 구조 변경(배열형)에 따른 모바일용 실시간 설정 감지 함수
-        // [수정된 버전] 팝업 변수명 일치 및 데이터 검증 강화
         function initLiveSettings() {
             database.ref('siteSettings/seo').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -40,48 +28,33 @@
                     if (data.keywords) document.getElementById('metaKeywords').content = data.keywords;
                 }
             });
-
             database.ref('siteSettings/popups').on('value', (snapshot) => {
                 const popups = snapshot.val();
                 const popup = document.getElementById('mainPopup');
-                const popupBox = popup.querySelector('.popup-box'); // 실제 박스 요소
+                const popupBox = popup.querySelector('.popup-box');
                 const popupText = document.getElementById('popupText');
-
                 let isAnyPopupVisible = false;
-
                 if (popups && Array.isArray(popups)) {
                     const now = new Date().toISOString().split('T')[0];
-
                     popups.forEach(item => {
                         if (item && item.popupActive && !isAnyPopupVisible) {
-                            const isDateValid = (!item.startDate || now >= item.startDate) &&
-                                (!item.endDate || now <= item.endDate);
-
+                            const isDateValid = (!item.startDate || now >= item.startDate) && (!item.endDate || now <= item.endDate);
                             if (isDateValid) {
-                                // 1. 기존 효과 클래스 초기화
                                 popupBox.className = "popup-box";
-
-                                // 2. 효과 적용 (item.effect 값에 따라)
                                 const effectClass = `effect-${item.effect || 'classic'}`;
                                 popupBox.classList.add(effectClass);
-
-                                // 3. 내용 삽입 및 표시
                                 popup.style.display = 'flex';
                                 popupText.innerHTML = item.content || item.text || '';
                                 isAnyPopupVisible = true;
-
-                                // 4. 자동 종료 처리 (Classic 제외 모든 효과는 3초 후 사라짐)
                                 if (item.effect && item.effect !== 'classic') {
                                     setTimeout(() => {
                                         popupBox.classList.add('popup-exit-active');
                                         setTimeout(() => {
                                             closeMainPopup();
                                             popupBox.classList.remove('popup-exit-active');
-                                        }, 500); // 사라지는 애니메이션 시간
-                                    }, 3000); // 3초 대기
+                                        }, 500);
+                                    }, 3000);
                                 }
-
-                                // 하트 효과가 있는 경우 실행
                                 if (item.effect === 'heart' && typeof activateHeartEasterEgg === 'function') {
                                     activateHeartEasterEgg();
                                 }
@@ -92,45 +65,32 @@
                 if (!isAnyPopupVisible) closeMainPopup();
             });
         }
-
-        // 닫기 함수 보강
         function closeMainPopup() {
             const popup = document.getElementById('mainPopup');
             popup.style.display = 'none';
             document.body.classList.remove('overflow-hidden');
         }
-
-
-        // 2. 관리자 인증 로직
         function openAdminAuth() {
             const modal = document.getElementById('adminAuthModal');
             modal.classList.remove('hidden');
             document.getElementById('adminPasswordInput').focus();
             document.body.style.overflow = 'hidden';
         }
-
         function closeAdminAuth() {
             const modal = document.getElementById('adminAuthModal');
             modal.classList.add('hidden');
             document.getElementById('adminPasswordInput').value = '';
             document.body.style.overflow = '';
         }
-
         async function verifyAdminPassword() {
             const inputPw = document.getElementById('adminPasswordInput').value;
-            const errorMsg = document.getElementById('adminErrorMsg');
-
             if (inputPw.length > 0) {
-                // DB 조회를 하지 않고, 일단 로그인 페이지로 보냅니다.
-                // 실제 보안은 login.html과 그 이후 admin 페이지의 Auth 체크에서 담당합니다.
                 sessionStorage.setItem('admin_pre_auth', 'true');
-                window.location.href = "admin/login.html"; // 경로가 다를 경우 "login.html"로 수정
+                window.location.href = "admin/login.html";
             } else {
                 alert("Please enter password.");
             }
         }
-
-        // 3. 접속 기록 함수
         async function recordVisit() {
             try {
                 let geoData = { ip: "0.0.0.0", country: "Unknown", city: "Unknown" };
@@ -139,7 +99,6 @@
                     const data = await response.json();
                     geoData = { ip: data.ip, country: data.country_name, city: data.city };
                 } catch (e) { console.error("Geo API Error:", e); }
-
                 const ua = navigator.userAgent;
                 const now = new Date();
                 const visitData = {
@@ -158,7 +117,6 @@
                 database.ref('visits').push(visitData);
             } catch (e) { console.error("History error:", e); }
         }
-
         function getOS(ua) {
             if (ua.indexOf("Windows") !== -1) return "Windows";
             if (ua.indexOf("Mac") !== -1) return "macOS";
@@ -166,7 +124,6 @@
             if (ua.indexOf("iPhone") !== -1 || ua.indexOf("iPad") !== -1) return "iOS";
             return "Unknown";
         }
-
         function getBrowser(ua) {
             if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) return "Edge";
             if (ua.indexOf("Chrome") !== -1) return "Chrome";
@@ -174,539 +131,151 @@
             if (ua.indexOf("Firefox") !== -1) return "Firefox";
             return "Others";
         }
-
         function getSessionId() {
             if (!sessionStorage.getItem('session_id')) {
                 sessionStorage.setItem('session_id', 's_' + Math.random().toString(36).substr(2, 9));
             }
             return sessionStorage.getItem('session_id');
         }
-
         recordVisit();
     </script>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
-
     <style>
-        /* [추가] 실시간 공지/팝업 스타일 (모바일 최적화) */
-        #emergencyBanner {
-            display: none;
-            background: #ef4444;
-            color: white;
-            text-align: center;
-            padding: 10px 15px;
-            font-weight: bold;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            z-index: 99999;
-            font-size: 13px;
-            line-height: 1.4;
-        }
-
-        /* 1. 메인 공지 팝업 수정 */
-        #mainPopup {
-            display: none;
-            position: fixed;
-            inset: 0;
-            /* 배경 투명도를 0.9에서 0.7로 낮추어 배경이 더 잘 보이게 하고, blur를 제거했습니다 */
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 100000;
-            align-items: center;
-            justify-content: center;
-            /* backdrop-filter: blur(5px); <-- 이 부분을 제거하여 배경을 선명하게 만듭니다 */
-        }
-
-        /* 2. 관리자 인증 모달도 동일하게 수정 (선택 사항) */
-        #adminAuthModal {
-            /* 기존 backdrop-blur-sm 클래스 대신 선명한 배경 유지 */
-            background: rgba(0, 0, 0, 0.8);
-        }
-
-        /* [수정] 팝업 박스 모바일 대응 스크롤 추가 */
-        .popup-box {
-            background: #0a0a0a;
-            border: 1px solid #22d3ee;
-            padding: 25px 20px;
-            border-radius: 20px;
-            width: 90%;
-            /* 모바일에서 좌우 여백 확보 */
-            max-width: 340px;
-            text-align: center;
-            max-height: 80vh;
-            /* 화면 높이의 80%를 넘지 않게 설정 */
-            overflow-y: auto;
-            /* 내용이 길어지면 내부에서 스크롤 */
-            box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
-        }
-
-        /* 팝업 내 텍스트 정렬 및 간격 */
-        #popupText {
-            text-align: left;
-            /* 긴 본문은 왼쪽 정렬이 가독성이 좋습니다 */
-            font-size: 14px;
-            color: #d1d5db;
-        }
-
-        /* 스크롤바 디자인 (선택사항) */
-        .popup-box::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .popup-box::-webkit-scrollbar-thumb {
-            background: #22d3ee;
-            border-radius: 10px;
-        }
-
-        /* 기존 스타일 */
-        #header-placeholder {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 10001;
-        }
-
-        .animated-logo-text-m {
-            font-size: 3.8vw !important;
-            white-space: nowrap;
-        }
-
-        @media (max-width: 380px) {
-            .animated-logo-text-m {
-                font-size: 11px !important;
-            }
-        }
-
-        #imageModal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .9);
-            z-index: 10000;
-            display: none;
-        }
-
-        #modalDetailImage {
-            max-width: 90%;
-            max-height: 70%;
-            object-fit: contain;
-        }
-
-        #musicToggleBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 10005;
-            width: 48px;
-            height: 48px;
-            background: rgba(23, 23, 23, 0.9);
-            border: 1.5px solid rgba(34, 211, 238, 0.6);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #22d3ee;
-            backdrop-filter: blur(8px);
-        }
-
-        #triggerWord {
-            color: inherit !important;
-            font-weight: inherit !important;
-            text-decoration: none !important;
-            cursor: pointer !important;
-            display: inline-block;
-            position: relative;
-            z-index: 50;
-            -webkit-tap-highlight-color: transparent;
-            pointer-events: auto !important;
-        }
-
-        .hero-section {
-            position: relative;
-            width: 100%;
-            height: 100svh;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
-        }
-
-        .video-bg-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
-
-        .video-bg {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: brightness(0.35) contrast(1.1);
-        }
-
-        .video-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
-            z-index: 1;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            padding: 0 32px;
-        }
-
-        /* 수정된 상단 텍스트 스타일 */
-        .hero-logo-gradient {
-            font-size: 5vw;
-            /* 하단 텍스트와 동일한 크기 */
-            letter-spacing: 0.3em;
-            /* 하단 텍스트와 동일한 자간 */
-            color: rgba(34, 211, 238, 0.8);
-            /* 하단 텍스트와 동일한 Cyan 그라데이션 효과(단색 80%) */
-            font-weight: 900;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            line-height: 1;
-        }
-
-        .hero-slogan-gradient {
-            font-size: 5vw;
-            letter-spacing: 0.3em;
-            color: rgba(34, 211, 238, 0.8);
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .hero-description {
-            font-size: 15px;
-            line-height: 1.7;
-            margin-top: 80px;
-            color: #cbd5e1;
-            word-break: keep-all;
-        }
-
-        .partner-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.7;
-        }
-
-        .partner-grid img {
-            height: 28px;
-            width: auto;
-            filter: grayscale(1);
-        }
-
-        .interactive-certs {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            padding: 0 20px;
-        }
-
-        .cert-link img {
-            width: 100%;
-            height: auto;
-            border-radius: 4px;
-        }
-
-        /* 슬라이드 기본 스타일 */
-        .slide {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
-            /* 2초 동안 부드럽게 전환 */
-            filter: brightness(0.35) contrast(1.1);
-        }
-
-        /* 활성화된 이미지 */
-        .slide.active {
-            opacity: 1;
-            z-index: 1;
-        }
-
-        /* 전환 중인 이전 이미지 */
-        .slide.exit {
-            opacity: 0;
-            z-index: 0;
-        }
-
-        /* --- 팝업 효과 (Dissolve Effects) --- */
-
-        /* 1. Cleavage (상하 쪼개짐) */
-        @keyframes cleavageIn {
-            0% {
-                clip-path: polygon(0 0, 100% 0, 100% 0, 0 0, 0 100%, 100% 100%, 100% 100%, 0 100%);
-                opacity: 0;
-            }
-
-            100% {
-                clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%, 0 50%, 100% 50%, 100% 100%, 0 100%);
-                opacity: 1;
-            }
-        }
-
-        .effect-cleavage {
-            animation: cleavageIn 0.8s ease-out forwards;
-        }
-
-        /* 2. Wave (파도 출렁임) */
-        @keyframes waveIn {
-            0% {
-                transform: scale(0.8) translateY(20px);
-                opacity: 0;
-                filter: blur(10px);
-            }
-
-            50% {
-                transform: scale(1.05) translateY(-5px);
-                filter: blur(2px);
-            }
-
-            100% {
-                transform: scale(1) translateY(0);
-                opacity: 1;
-                filter: blur(0);
-            }
-        }
-
-        .effect-wave {
-            animation: waveIn 1s ease-in-out infinite alternate;
-        }
-
-        /* 출렁이는 느낌을 위해 infinite 사용 가능 */
-
-        /* 3. Rotation (360도 회전) */
-        @keyframes rotateIn {
-            0% {
-                transform: rotate(-360deg) scale(0);
-                opacity: 0;
-            }
-
-            100% {
-                transform: rotate(0deg) scale(1);
-                opacity: 1;
-            }
-        }
-
-        .effect-rotation {
-            animation: rotateIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        /* 4. Slide (하단에서 중앙으로) */
-        @keyframes slideInCenter {
-            0% {
-                transform: translateY(100vh);
-                opacity: 0;
-            }
-
-            100% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .effect-slide {
-            animation: slideInCenter 0.6s ease-out forwards;
-        }
-
-        /* 5. Classic (기본 나타남) */
-        .effect-classic {
-            animation: fadeIn 0.4s ease-in forwards;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* 사라지는 애니메이션용 클래스 (JS에서 추가) */
-        .popup-exit-active {
-            opacity: 0;
-            transform: scale(0.9);
-            transition: all 0.5s ease-in;
-        }
+        #emergencyBanner { display: none; background: #ef4444; color: #fff; text-align: center; padding: 10px 15px; font-weight: bold; position: fixed; bottom: 0; width: 100%; z-index: 99999; font-size: 13px; line-height: 1.4; }
+        #mainPopup, #imageModal { display: none; position: fixed; inset: 0; z-index: 100000; align-items: center; justify-content: center; }
+        #mainPopup { background: rgba(0, 0, 0, 0.7); }
+        #adminAuthModal { background: rgba(0, 0, 0, 0.8); }
+        #imageModal { background: rgba(0, 0, 0, .9); z-index: 10000; }
+        .popup-box { background: #0a0a0a; border: 1px solid #22d3ee; padding: 25px 20px; border-radius: 20px; width: 90%; max-width: 340px; text-align: center; max-height: 80vh; overflow-y: auto; box-shadow: 0 0 30px rgba(34, 211, 238, 0.2); }
+        #popupText { text-align: left; font-size: 14px; color: #d1d5db; }
+        .popup-box::-webkit-scrollbar { width: 4px; }
+        .popup-box::-webkit-scrollbar-thumb { background: #22d3ee; border-radius: 10px; }
+        #header-placeholder { position: fixed; top: 0; left: 0; width: 100%; z-index: 10001; }
+        .animated-logo-text-m { font-size: 3.8vw !important; white-space: nowrap; }
+        @media (max-width: 380px) { .animated-logo-text-m { font-size: 11px !important; } }
+        #modalDetailImage { max-width: 90%; max-height: 70%; object-fit: contain; }
+        #musicToggleBtn { position: fixed; bottom: 20px; right: 20px; z-index: 10005; width: 48px; height: 48px; background: rgba(23, 23, 23, 0.9); border: 1.5px solid rgba(34, 211, 238, 0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #22d3ee; backdrop-filter: blur(8px); }
+        #triggerWord { color: inherit!important; font-weight: inherit!important; text-decoration: none!important; cursor: pointer!important; display: inline-block; position: relative; z-index: 50; -webkit-tap-highlight-color: transparent; pointer-events: auto!important; }
+        .hero-section { position: relative; width: 100%; height: 100svh; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 1; }
+        .video-bg-container { position: absolute; inset: 0; z-index: 0; }
+        .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.1); }
+        .video-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7)); z-index: 1; }
+        .hero-content { position: relative; z-index: 10; width: 100%; padding: 0 32px; }
+        .hero-logo-gradient, .hero-slogan-gradient { font-size: 5vw; letter-spacing: 0.3em; color: rgba(34, 211, 238, 0.8); text-transform: uppercase; line-height: 1; }
+        .hero-logo-gradient { font-weight: 900; margin-bottom: 8px; }
+        .hero-slogan-gradient { font-weight: 600; }
+        .hero-description { font-size: 15px; line-height: 1.7; margin-top: 80px; color: #cbd5e1; word-break: keep-all; }
+        .partner-grid { display: flex; flex-wrap: wrap; gap: 30px; align-items: center; justify-content: center; opacity: 0.7; }
+        .partner-grid img { height: 28px; width: auto; filter: grayscale(1); }
+        .interactive-certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 20px; }
+        .cert-link img { width: 100%; height: auto; border-radius: 4px; }
+        .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 2s ease-in-out; filter: brightness(0.35) contrast(1.1); }
+        .slide.active { opacity: 1; z-index: 1; }
+        .slide.exit { opacity: 0; z-index: 0; }
+        @keyframes cleavageIn { 0% { clip-path: inset(0 0 100% 0); opacity: 0; } 100% { clip-path: inset(0 0 0 0); opacity: 1; } }
+        .effect-cleavage { animation: cleavageIn 0.8s ease-out forwards; }
+        @keyframes waveIn { 0% { transform: scale(0.8) translateY(20px); opacity: 0; filter: blur(10px); } 100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0); } }
+        .effect-wave { animation: waveIn 1s ease-in-out infinite alternate; }
+        @keyframes rotateIn { 0% { transform: rotate(-360deg) scale(0); opacity: 0; } 100% { transform: rotate(0deg) scale(1); opacity: 1; } }
+        .effect-rotation { animation: rotateIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes slideInCenter { 0% { transform: translateY(100vh); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        .effect-slide { animation: slideInCenter 0.6s ease-out forwards; }
+        .effect-classic { animation: fadeIn 0.4s ease-in forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .popup-exit-active { opacity: 0; transform: scale(0.9); transition: all 0.5s ease-in; }
     </style>
-
-
 </head>
-
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
-
     <div id="mainPopup">
         <div class="popup-box">
             <h3 class="text-cyan-400 font-black text-xl mb-3 italic">NOTICE</h3>
             <p id="popupText" class="text-neutral-300 text-sm mb-6 leading-relaxed whitespace-pre-wrap"></p>
-            <button onclick="document.getElementById('mainPopup').style.display='none'"
-                class="w-full py-3 bg-cyan-600 text-white font-bold rounded-xl active:bg-cyan-500">
-                Close
-            </button>
+            <button onclick="document.getElementById('mainPopup').style.display='none'" class="w-full py-3 bg-cyan-600 text-white font-bold rounded-xl active:bg-cyan-500">Close</button>
         </div>
     </div>
-
     <div id="header-placeholder"></div>
-
     <main class="flex-grow">
-
         <section class="hero-section">
-            <div class="video-bg-container" id="heroSlider">
-                <div class="video-overlay"></div>
-            </div>
-
+            <div class="video-bg-container" id="heroSlider"><div class="video-overlay"></div></div>
             <div class="hero-content text-center">
                 <h1 class="hero-logo-gradient">NO MORE CARBON</h1>
                 <p class="hero-slogan-gradient">NO MORE FOSSIL FUEL</p>
-                <p class="hero-description">
-                    <span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with
-                    the objective of providing electric motorcycle services and renewable energy-related businesses in
-                    Indonesia.
-                </p>
+                <p class="hero-description"><span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.</p>
             </div>
         </section>
-
         <section class="py-16 bg-neutral-900 border-y border-neutral-800">
             <div class="px-6 mb-16">
-                <h2 id="pillarTrigger"
-                    class="text-sm font-light text-center mb-8 text-cyan-400 tracking-widest uppercase cursor-pointer"
-                    style="padding: 10px; -webkit-tap-highlight-color: transparent;">A Pillar of Trust</h2>
+                <h2 id="pillarTrigger" class="text-sm font-light text-center mb-8 text-cyan-400 tracking-widest uppercase cursor-pointer" style="padding: 10px; -webkit-tap-highlight-color: transparent;">A Pillar of Trust</h2>
                 <div class="partner-grid">
-                    <img src="images/home/DAVIGO.webp" alt="DAVIGO">
-                    <img src="images/home/GESITS.webp" alt="GESITS">
-                    <img src="images/home/ALESSA.webp" alt="ALESSA">
+                    <img src="images/home/DAVIGO.webp" alt="DAVIGO"><img src="images/home/GESITS.webp" alt="GESITS"><img src="images/home/ALESSA.webp" alt="ALESSA">
                 </div>
             </div>
-
             <div class="px-4">
                 <h2 class="text-lg font-light text-center mb-10 text-cyan-400">Global Compliance & Safety</h2>
                 <div id="certifications-inside-hero" class="interactive-certs">
-                    <a href="#" class="cert-link" data-original-src="images/certification/CE-EMC-TEST.webp">
-                        <img src="images/certification/CE-EMC-TEST.webp" alt="CE">
-                    </a>
-                    <a href="#" class="cert-link" data-original-src="images/certification/CB-TEST.webp">
-                        <img src="images/certification/CB-TEST.webp" alt="CB">
-                    </a>
-                    <a href="#" class="cert-link" data-original-src="images/certification/EMC-COMPLIANCE.webp">
-                        <img src="images/certification/EMC-COMPLIANCE.webp" alt="EMC">
-                    </a>
-                    <a href="#" class="cert-link" data-original-src="images/certification/IEC-62619.webp">
-                        <img src="images/certification/IEC-62619.webp" alt="IEC">
-                    </a>
-                    <a href="#" class="cert-link" data-original-src="images/certification/Material-Safety.webp">
-                        <img src="images/certification/Material-Safety.webp" alt="MSDS">
-                    </a>
-                    <a href="#" class="cert-link" data-original-src="images/certification/UN38.3.webp">
-                        <img src="images/certification/UN38.3.webp" alt="UN38.3">
-                    </a>
+                    <a href="#" class="cert-link" data-original-src="images/certification/CE-EMC-TEST.webp"><img src="images/certification/CE-EMC-TEST.webp" alt="CE"></a>
+                    <a href="#" class="cert-link" data-original-src="images/certification/CB-TEST.webp"><img src="images/certification/CB-TEST.webp" alt="CB"></a>
+                    <a href="#" class="cert-link" data-original-src="images/certification/EMC-COMPLIANCE.webp"><img src="images/certification/EMC-COMPLIANCE.webp" alt="EMC"></a>
+                    <a href="#" class="cert-link" data-original-src="images/certification/IEC-62619.webp"><img src="images/certification/IEC-62619.webp" alt="IEC"></a>
+                    <a href="#" class="cert-link" data-original-src="images/certification/Material-Safety.webp"><img src="images/certification/Material-Safety.webp" alt="MSDS"></a>
+                    <a href="#" class="cert-link" data-original-src="images/certification/UN38.3.webp"><img src="images/certification/UN38.3.webp" alt="UN38.3"></a>
                 </div>
             </div>
         </section>
     </main>
-
-    <div id="adminAuthModal"
-        class="hidden fixed inset-0 bg-black/95 z-[30000] flex items-center justify-center p-4 backdrop-blur-sm">
-        <div
-            class="bg-neutral-900 border border-cyan-500/30 p-8 rounded-2xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(0,0,0,1)]">
+    <div id="adminAuthModal" class="hidden fixed inset-0 bg-black/95 z-[30000] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-neutral-900 border border-cyan-500/30 p-8 rounded-2xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(0,0,0,1)]">
             <h3 class="text-cyan-400 font-bold text-xl mb-1 uppercase tracking-tighter">Admin Access</h3>
             <p class="text-neutral-500 text-xs mb-6">Database Authentication Required</p>
-            <input type="password" id="adminPasswordInput"
-                class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white mb-6 focus:border-cyan-500 outline-none transition-all text-center tracking-widest"
-                placeholder="••••••••">
+            <input type="password" id="adminPasswordInput" class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white mb-6 focus:border-cyan-500 outline-none transition-all text-center tracking-widest" placeholder="••••••••">
             <div class="flex gap-3">
-                <button onclick="closeAdminAuth()"
-                    class="flex-1 py-3 bg-neutral-800 text-neutral-400 rounded-xl font-semibold text-sm">Cancel</button>
-                <button onclick="verifyAdminPassword()"
-                    class="flex-1 py-3 bg-cyan-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-900/20 hover:bg-cyan-500 transition-colors">Verify</button>
+                <button onclick="closeAdminAuth()" class="flex-1 py-3 bg-neutral-800 text-neutral-400 rounded-xl font-semibold text-sm">Cancel</button>
+                <button onclick="verifyAdminPassword()" class="flex-1 py-3 bg-cyan-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-900/20 hover:bg-cyan-500 transition-colors">Verify</button>
             </div>
         </div>
     </div>
-
     <div id="imageModal">
         <div class="flex flex-col items-center justify-center w-full h-full p-4" onclick="closeModal()">
             <img id="modalDetailImage" src="" onclick="event.stopPropagation()">
-            <button
-                class="mt-8 px-10 py-3 border border-cyan-500/50 text-cyan-400 rounded-full text-sm bg-black/80 backdrop-blur-md">Close</button>
+            <button class="mt-8 px-10 py-3 border border-cyan-500/50 text-cyan-400 rounded-full text-sm bg-black/80 backdrop-blur-md">Close</button>
         </div>
     </div>
-
     <div id="footer-placeholder"></div>
-
-    <div id="emergencyBanner">
-        📢 <span id="bannerText">Notice</span>
-    </div>
-
+    <div id="emergencyBanner">📢 <span id="bannerText">Notice</span></div>
     <script>
         const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
         const urlParams = new URLSearchParams(window.location.search);
         const isPCMode = urlParams.get('view_mode') === 'pc';
-
         if (!isMobileOnly || isPCMode) {
             let path = window.location.pathname;
             let page = path.split("/").pop();
-            if (page.includes("_m.html")) {
-                window.location.href = page.replace("_m.html", ".html");
-            } else if (page === "index_m.html" || page === "") {
-                window.location.href = "index.html";
-            }
+            if (page.includes("_m.html")) { window.location.href = page.replace("_m.html", ".html"); }
+            else if (page === "index_m.html" || page === "") { window.location.href = "index.html"; }
         }
-
         async function loadLayout() {
             try {
-                const [headerRes, footerRes] = await Promise.all([
-                    fetch('components/header_m.html'),
-                    fetch('components/footer_m.html')
-                ]);
-
+                const [headerRes, footerRes] = await Promise.all([fetch('components/header_m.html'), fetch('components/footer_m.html')]);
                 const headerText = await headerRes.text();
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = headerText;
-
                 const adminLink = tempDiv.querySelector('a[href="admin/admin.html"]');
                 if (adminLink) adminLink.remove();
                 document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
-
                 const footerPlaceholder = document.getElementById('footer-placeholder');
                 footerPlaceholder.innerHTML = await footerRes.text();
-
                 const scripts = footerPlaceholder.querySelectorAll("script");
                 scripts.forEach(oldScript => {
                     const newScript = document.createElement("script");
                     newScript.text = oldScript.text;
                     document.body.appendChild(newScript).parentNode.removeChild(newScript);
                 });
-
-                initNavigation();
-                initAdminTrigger();
-                initCertModal();
-                initLiveSettings(); // [추가] 실시간 설정 활성화
-
-            } catch (err) {
-                console.error("Layout Load Error:", err);
-            }
+                initNavigation(); initAdminTrigger(); initCertModal(); initLiveSettings();
+            } catch (err) { console.error("Layout Load Error:", err); }
         }
-
         function initNavigation() {
             const menuBtn = document.getElementById("menuToggleBtn");
             const dropdown = document.getElementById("dropdownMenu");
@@ -727,21 +296,11 @@
                 };
             }
         }
-
         function initAdminTrigger() {
             const triggerWord = document.getElementById('triggerWord');
-            if (triggerWord) {
-                triggerWord.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    openAdminAuth();
-                });
-            }
+            if (triggerWord) { triggerWord.addEventListener('click', (e) => { e.preventDefault(); openAdminAuth(); }); }
         }
-
-        document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') verifyAdminPassword();
-        });
-
+        document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') verifyAdminPassword(); });
         function initCertModal() {
             document.querySelectorAll('.cert-link').forEach(link => {
                 link.onclick = (e) => {
@@ -754,134 +313,82 @@
                 };
             });
         }
-
         function closeModal() {
             const modal = document.getElementById('imageModal');
             modal.style.display = 'none';
             document.body.style.overflow = '';
         }
+function initImageSlider() {
+    const sliderContainer = document.getElementById('heroSlider');
+    if (!sliderContainer) return;
 
-        document.addEventListener("DOMContentLoaded", loadLayout);
+    // 1. 요일 계산 (0: 일요일, 1: 월요일, ..., 6: 토요일)
+    const now = new Date();
+    const day = now.getDay();
+    // PC 버전과 동일하게 월(1)~일(7) 매칭
+    const bgNum = (day === 0) ? 7 : day; 
+    const bgUrl = `images/bg/bg-${bgNum}.gif`;
 
-        // ... 앞부분 함수들(loadLayout, initNavigation 등)은 그대로 유지 ...
+    // 2. 배경 스타일 설정 (1, 4, 5, 6번 이미지는 cover, 나머지는 60% 크기)
+    let bgSize = [1, 4, 5, 6].includes(bgNum) ? 'cover' : '60%';
 
-        function initImageSlider() {
-            const sliderContainer = document.getElementById('heroSlider');
-            if (!sliderContainer) return;
-
-            // 1. 이미지 파일명 배열 생성 (bg-01.jpg ~ bg-25.jpg)
-            const totalImages = 25;
-            const images = [];
-            for (let i = 1; i <= totalImages; i++) {
-                /* const fileName = `bg-${i.toString().padStart(2, '0')}.jpg`; */
-                const fileName = `bg-3.gif`;
-
-                images.push(`images/bg/${fileName}`);
-            }
-
-            // 2. DOM에 이미지 요소 추가
-            images.forEach((src, idx) => {
-                const img = document.createElement('img');
-                img.src = src;
-                img.className = 'slide' + (idx === 0 ? ' active' : '');
-                sliderContainer.appendChild(img);
-            });
-
-            const slides = sliderContainer.querySelectorAll('.slide');
-            let currentIdx = 0;
-
-            // 3. 슬라이드 전환 함수
-            function waveTransition() {
-                const prevSlide = slides[currentIdx];
-                currentIdx = (currentIdx + 1) % slides.length;
-                const nextSlide = slides[currentIdx];
-
-                prevSlide.classList.add('exit');
-                prevSlide.classList.remove('active');
-                nextSlide.classList.add('active');
-
-                setTimeout(() => {
-                    prevSlide.classList.remove('exit');
-                }, 2000);
-            }
-
-            setInterval(waveTransition, 4000);
-        }
-
-        /* ==========================================
-            ADVANCED HEART FORMATION EFFECT
-           ========================================== */
+    // 3. 슬라이더 컨테이너 내용 교체
+    // 모바일 성능을 위해 불필요한 이미지 25개 생성 루프와 인터벌 함수를 제거하고 
+    // 현재 요일에 맞는 배경 하나를 고정으로 렌더링합니다.
+    sliderContainer.innerHTML = `
+        <div class="video-overlay" style="z-index: 2;"></div>
+        <div class="slide active" style="
+            background-image: url('${bgUrl}');
+            background-size: ${bgSize};
+            background-position: center;
+            background-repeat: no-repeat;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 1;
+            z-index: 1;
+            filter: brightness(0.35) contrast(1.1);
+        "></div>
+    `;
+}
         let isHeartActive = false;
-
         function initPillarEgg() {
             const pillar = document.getElementById('pillarTrigger');
-            if (pillar) {
-                pillar.addEventListener('click', () => {
-                    if (isHeartActive) return;
-                    activateHeartEasterEgg();
-                });
-            }
+            if (pillar) { pillar.addEventListener('click', () => { if (isHeartActive) return; activateHeartEasterEgg(); }); }
         }
-
         function activateHeartEasterEgg() {
             isHeartActive = true;
             if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-
             createHeartFormation();
-
-            // 효과 재생 시간(약 6초) 동안 재클릭 방지
             setTimeout(() => { isHeartActive = false; }, 6000);
         }
-
         function createHeartFormation() {
-            const heartCount = 60; // 하트 개수 (밀도)
+            const heartCount = 60;
             const container = document.body;
             const hearts = [];
-
-            // 화면 중앙 좌표
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
-
             for (let i = 0; i < heartCount; i++) {
                 const heart = document.createElement('div');
                 heart.innerHTML = '❤️';
-                heart.style.cssText = `
-            position: fixed;
-            left: ${Math.random() * 100}vw;
-            top: -10vh;
-            font-size: ${Math.random() * 10 + 15}px;
-            z-index: 999999;
-            pointer-events: none;
-            transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        `;
+                heart.style.cssText = `position: fixed; left: ${Math.random() * 100}vw; top: -10vh; font-size: ${Math.random() * 10 + 15}px; z-index: 999999; pointer-events: none; transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);`;
                 container.appendChild(heart);
                 hearts.push(heart);
-
-                // 1단계: 하트가 비처럼 쏟아짐
-                setTimeout(() => {
-                    heart.style.top = (Math.random() * 80 + 10) + 'vh';
-                }, 100);
+                setTimeout(() => { heart.style.top = (Math.random() * 80 + 10) + 'vh'; }, 100);
             }
-
-            // 2단계: 1.5초 후 중앙으로 모여 큰 하트 형성
             setTimeout(() => {
                 hearts.forEach((heart, idx) => {
-                    // 하트 곡선 공식 (Parametric Heart Equation)
                     const t = (idx / heartCount) * 2 * Math.PI;
                     const scale = Math.min(window.innerWidth, window.innerHeight) / 25;
-
-                    // 공식을 이용한 x, y 좌표 계산
                     const x = 16 * Math.pow(Math.sin(t), 3);
                     const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-
                     heart.style.transition = "all 2s ease-in-out";
                     heart.style.left = (centerX + x * scale) + 'px';
                     heart.style.top = (centerY + y * scale) + 'px';
                     heart.style.transform = `scale(1.5) rotate(${(Math.random() - 0.5) * 20}deg)`;
                 });
             }, 1800);
-
-            // 3단계: 4.5초 후 흩어지며 소멸
             setTimeout(() => {
                 hearts.forEach(heart => {
                     heart.style.transition = "all 1.5s ease-in";
@@ -891,17 +398,10 @@
                 });
             }, 4500);
         }
-
-        // DOMContentLoaded 내부 호출 확인
         document.addEventListener("DOMContentLoaded", () => {
-            loadLayout().then(() => {
-                initPillarEgg();
-            });
+            loadLayout().then(() => { initPillarEgg(); });
             initImageSlider();
-            initPillarEgg();
         });
-
     </script>
 </body>
-
 </html>
