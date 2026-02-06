@@ -150,6 +150,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* 책장 넘어가는 효과 (Page Flip Reveal) */
+        #page-reveal-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 200000; /* 모든 것보다 위에 */
+            transform-origin: left;
+            transition: transform 1.2s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+        #page-reveal-overlay.active {
+            transform: translateX(-100%);
+        }
+
         /* Resn Style Cursor */
         .resn-cursor {
             width: 12px; height: 12px; background: #22d3ee; border-radius: 50%; position: fixed;
@@ -187,22 +200,20 @@
         .hero-content { position: relative; z-index: 10; pointer-events: none; }
         .hero-content * { pointer-events: auto; }
         
-        /* Resn-like Fluid Background Canvas */
         #fluid-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.5; }
 
-/* background 부분을 제거합니다. 나머지는 그대로 둡니다. */
-.bg-slide { 
-    position: absolute; 
-    inset: 0; 
-    z-index: 1; 
-    background-color: #000;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 60%;
-    mask-image: radial-gradient(circle, black 70%, transparent 100%); 
-    -webkit-mask-image: radial-gradient(circle, black 70%, transparent 100%); 
-    animation: smoothZoom 15s ease-in-out infinite alternate; 
-}
+        .bg-slide { 
+            position: absolute; 
+            inset: 0; 
+            z-index: 1; 
+            background-color: #000;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 60%;
+            mask-image: radial-gradient(circle, black 70%, transparent 100%); 
+            -webkit-mask-image: radial-gradient(circle, black 70%, transparent 100%); 
+            animation: smoothZoom 15s ease-in-out infinite alternate; 
+        }
 
         @keyframes smoothZoom { from { transform: scale(1); } to { transform: scale(1.05); } }
         
@@ -224,6 +235,8 @@
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
+    <div id="page-reveal-overlay"></div>
+
     <div class="resn-cursor" id="cursorDot"></div>
     <div class="resn-cursor-outer" id="cursorCircle"></div>
 
@@ -302,6 +315,17 @@
     <div id="emergencyBanner">📢 <span id="bannerText">Notice</span></div>
 
     <script>
+        // --- Page Flip Reveal Logic ---
+        window.addEventListener('load', () => {
+            const overlay = document.getElementById('page-reveal-overlay');
+            if(overlay) {
+                // 약간의 지연 후 실행하여 부드러운 시작 유도
+                setTimeout(() => {
+                    overlay.classList.add('active');
+                }, 300);
+            }
+        });
+
         // --- Fluid Background Interaction Logic ---
         const canvas = document.getElementById('fluid-canvas');
         const ctx = canvas.getContext('2d');
@@ -333,7 +357,6 @@
                 if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
                 if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
 
-                // Mouse interaction
                 const dx = mouse.x - p.x;
                 const dy = mouse.y - p.y;
                 const dist = Math.sqrt(dx*dx + dy*dy);
@@ -363,13 +386,9 @@
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
-            
-            // Dot follows instantly
             dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
-            // Circle follows with a slight delay (CSS transition)
             circle.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
             
-            // Interaction on hover
             const target = e.target;
             if (target.tagName === 'A' || target.tagName === 'BUTTON' || target.closest('.cert-link')) {
                 dot.style.width = '30px'; dot.style.height = '30px'; dot.style.opacity = '0.5';
@@ -404,33 +423,22 @@
             };
         }
 
-document.addEventListener("DOMContentLoaded", () => {
-    initFluid();
-    drawFluid();
-    window.addEventListener('resize', initFluid);
+        document.addEventListener("DOMContentLoaded", () => {
+            initFluid();
+            drawFluid();
+            window.addEventListener('resize', initFluid);
 
-    // --- 요일별 배경 변경 로직 시작 ---
-    const bgContainer = document.getElementById('image-bg-container'); 
-    if(bgContainer) {
-        bgContainer.innerHTML = `<div class="video-overlay" style="z-index: 5;"></div><div class="bg-slide"></div>`;
-        
-        const bgSlide = bgContainer.querySelector('.bg-slide');
-        const day = new Date().getDay(); // 일:0, 월:1, 화:2, 수:3, 목:4, 금:5, 토:6
-        
-        let bgImg = "";
-        // 요일별 조건 설정
-        if (day === 1 || day === 4 || day === 0) { // 월, 목, 일
-            bgImg = "bg-1.gif";
-        } else if (day === 2 || day === 5) { // 화, 금
-            bgImg = "bg-2.gif";
-        } else { // 수, 토 (day === 3 || day === 6)
-            bgImg = "bg-3.gif";
-        }
-
-        // 배경 이미지 적용
-        bgSlide.style.backgroundImage = `url('images/bg/${bgImg}')`;
-    }
-    // --- 요일별 배경 변경 로직 끝 ---
+            const bgContainer = document.getElementById('image-bg-container'); 
+            if(bgContainer) {
+                bgContainer.innerHTML = `<div class="video-overlay" style="z-index: 5;"></div><div class="bg-slide"></div>`;
+                const bgSlide = bgContainer.querySelector('.bg-slide');
+                const day = new Date().getDay(); 
+                let bgImg = "";
+                if (day === 1 || day === 4 || day === 0) { bgImg = "bg-1.gif"; } 
+                else if (day === 2 || day === 5) { bgImg = "bg-2.gif"; } 
+                else { bgImg = "bg-3.gif"; }
+                bgSlide.style.backgroundImage = `url('images/bg/${bgImg}')`;
+            }
 
             loadLayout(); initLiveSettings();
             document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') verifyAdminPassword(); });
