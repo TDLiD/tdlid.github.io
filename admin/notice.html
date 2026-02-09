@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script>
+        (function () {
+            // 1. iPad를 제외하고 iPhone, Android 폰만 감지
+            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPCMode = urlParams.get('view_mode') === 'pc';
+
+            // 2. 리다이렉트 실행
+            if (isMobileOnly && !isPCMode) {
+                let path = window.location.pathname;
+                let page = path.split("/").pop();
+
+                // 메인 페이지(index) 처리
+                if (page === "" || page === "notice.html") {
+                    window.location.href = "notice_m.html";
+                }
+                // 그 외 페이지들 (예: products.html -> products_m.html)
+                else if (page.endsWith(".html") && !page.includes("_m.html")) {
+                    window.location.href = page.replace(".html", "_m.html");
+                }
+            }
+        })();
+    </script>
+
+    <title>Notice | TDL Energy Indonesia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <!-- ⭐ 추가 -->
+
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #f5f5f5;
+            font-family: 'Pretendard', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .hero-slogan-gradient {
+            background: linear-gradient(135deg, #22d3ee 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            padding-right: 0.15em;
+        }
+
+        .notice-item {
+            background-color: rgba(23, 23, 23, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            /* 약간 줄임 */
+            transition: all 0.3s ease;
+            /* [수정] 항목 간의 하단 여백 축소 (1rem -> 0.5rem) */
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .notice-item:hover {
+            transform: translateY(-2px);
+            /* 부동 효과 축소 */
+            border-color: rgba(6, 182, 212, 0.4);
+            background-color: rgba(23, 23, 23, 0.8);
+        }
+
+        .notice-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .notice-item.active .notice-content {
+            max-height: 3000px;
+            padding: 1.5rem 2rem;
+            /* 내용 영역 패딩 소폭 축소 */
+            border-top: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        .arrow-icon {
+            transition: transform 0.3s ease;
+            color: rgba(6, 182, 212, 0.5);
+        }
+
+        .notice-item.active .arrow-icon {
+            transform: rotate(180deg);
+            color: #22d3ee;
+        }
+
+        .notice-content-inner {
+            user-select: text;
+            white-space: normal;
+        }
+
+        .notice-content-inner img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            display: block;
+        }
+
+        /* Core Technology와 동일한 스타일 유지 */
+        .hero-slogan-gradient {
+            display: inline-block !important;
+            font-weight: 900 !important;
+            /* font-black 효과 */
+            line-height: 1.2 !important;
+            padding-bottom: 0.1em;
+
+            /* 타 페이지와 동일한 청록-화이트 그라데이션 */
+            background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+
+            color: transparent !important;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+    <div id="bgm-placeholder"></div>
+    <div id="header-placeholder"></div>
+
+    <main class="pt-32 lg:pt-40 pb-20 px-6 flex-grow">
+        <div class="max-w-6xl mx-auto pt-10 px-4 text-center">
+            <h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
+                Notice
+            </h2>
+
+            <div id="noticeList" class="flex flex-col gap-1 text-left">
+                <div class="text-center py-20 text-neutral-500 animate-pulse tracking-widest">
+                    Fetching All Data...
+                </div>
+            </div>
+
+            <div class="mt-20 text-center">
+                <a href="index.html"
+                    class="inline-block px-8 py-4 rounded-xl border border-neutral-700 hover:bg-neutral-800 hover:border-cyan-500/50 transition-all duration-300 text-lg">
+                    &larr; Back to Home
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        /**
+             * 1. 레이아웃 로드 및 공통 컴포넌트 초기화
+             * 헤더, 푸터, BGM과 함께 공통 관리자 인증 모달(admin-auth.html)을 로드합니다.
+             */
+        async function loadLayout() {
+            try {
+                // [1] 헤더 로드
+                const headerRes = await fetch('components/header.html');
+                const headerHTML = await headerRes.text();
+                const headerPlaceholder = document.getElementById('header-placeholder');
+                headerPlaceholder.innerHTML = headerHTML;
+
+                // [2] 헤더 스크립트 실행
+                const headerScripts = headerPlaceholder.querySelectorAll("script");
+                headerScripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    let scriptText = oldScript.text;
+                    if (scriptText.includes("admin.html")) {
+                        scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
+                    }
+                    newScript.text = scriptText;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
+
+// [3] 공통 관리자 인증 모달 로드
+const authRes = await fetch('components/admin-auth.html');
+const authHTML = await authRes.text();
+let authDiv = document.getElementById('admin-auth-placeholder') || document.createElement('div');
+authDiv.id = 'admin-auth-placeholder';
+if (!document.getElementById('admin-auth-placeholder')) document.body.appendChild(authDiv);
+authDiv.innerHTML = authHTML;
+
+// ⭐ 수정: 감시자(onAuthStateChanged)를 제거하고 즉시 스크립트 실행
+// 이렇게 해야 로그인 전이라도 '비밀번호 확인' 함수가 브라우저 메모리에 등록됩니다.
+const authScripts = authDiv.querySelectorAll("script");
+authScripts.forEach(oldScript => {
+    const newScript = document.createElement("script");
+    if (oldScript.src) {
+        newScript.src = oldScript.src;
+    } else {
+        newScript.text = oldScript.text;
+    }
+    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+});
+
+
+
+                // [4] 푸터 로드 (⭐⭐ 이 부분이 수정되었습니다)
+                const footerRes = await fetch('components/footer.html');
+                const footerHTML = await footerRes.text();
+                const footerPlaceholder = document.getElementById('footer-placeholder');
+                footerPlaceholder.innerHTML = footerHTML;
+
+                // 푸터 내 pcHeartTrigger 등 스크립트 활성화
+                const footerScripts = footerPlaceholder.querySelectorAll("script");
+                footerScripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
+
+                // [5] BGM 로드
+                const bgmRes = await fetch('components/bgm.html');
+                const bgmPlaceholder = document.getElementById('bgm-placeholder');
+                if (bgmPlaceholder) {
+                    bgmPlaceholder.innerHTML = await bgmRes.text();
+                    const bgmScripts = bgmPlaceholder.querySelectorAll("script");
+                    bgmScripts.forEach(oldScript => {
+                        const newScript = document.createElement("script");
+                        newScript.text = oldScript.text;
+                        document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                    });
+                }
+
+                // [6] 메뉴 초기화
+                if (typeof initMenuToggle === 'function') initMenuToggle();
+
+            } catch (err) {
+                console.error("Layout Load Error:", err);
+            }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
+            authDomain: "tdlid-107669.firebaseapp.com",
+            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
+            projectId: "tdlid-107669",
+            storageBucket: "tdlid-107669.firebasestorage.app",
+            messagingSenderId: "604782345004",
+            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();      // ⭐ 추가
+        const database = firebase.database();
+
+        function toggleNotice(element) {
+            const item = element.closest('.notice-item');
+            const isActive = item.classList.contains('active');
+            document.querySelectorAll('.notice-item').forEach(el => el.classList.remove('active'));
+            if (!isActive) item.classList.add('active');
+        }
+
+        database.ref('notices').on('value', (snapshot) => {
+            const noticeList = document.getElementById('noticeList');
+            noticeList.innerHTML = '';
+
+            if (!snapshot.exists()) {
+                noticeList.innerHTML = '<p class="text-center text-neutral-600 py-20">No notices registered.</p>';
+                return;
+            }
+
+            let notices = [];
+            snapshot.forEach((child) => {
+                const data = child.val();
+                // [수정] 카테고리가 'notice'인 항목만 배열에 추가
+                if (data.category === 'notice') {
+                    notices.push(data);
+                }
+            });
+
+            // [추가] 공지사항이 없을 경우 처리
+            if (notices.length === 0) {
+                noticeList.innerHTML = '<p class="text-center text-neutral-600 py-20">No notices registered.</p>';
+                return;
+            }
+
+            // 최신순 정렬
+            notices.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            let finalHtml = '';
+            notices.forEach((notice, index) => {
+                const currentNum = index + 1;
+                const displayNum = currentNum < 10 ? '0' + currentNum : currentNum;
+
+                finalHtml += `
+                <div class="notice-item">
+                    <div class="flex flex-col md:flex-row md:items-center px-6 py-3 md:px-8 md:py-4 cursor-pointer group gap-2 md:gap-4" onclick="toggleNotice(this)">
+                        <div class="flex items-start md:items-center flex-1 gap-3 md:gap-4 overflow-hidden">
+                            <span class="text-cyan-500 font-mono text-sm font-bold shrink-0 mt-0.5 md:mt-0">${displayNum}.</span>
+                            <h2 class="text-white font-bold text-base md:text-lg tracking-tight leading-snug break-words overflow-hidden">
+                                ${notice.title}
+                            </h2>
+                        </div>
+                        <div class="flex items-center justify-between md:justify-end gap-4 shrink-0 mt-2 md:mt-0 pt-2 md:pt-0 border-t border-white/5 md:border-none">
+                            <div class="flex items-center gap-3">
+                                <span class="text-neutral-500 font-mono text-[10px] md:text-xs uppercase whitespace-nowrap">${notice.date}</span>
+                                <span class="text-neutral-700 text-[10px]">|</span>
+                                <span class="text-cyan-500/80 font-mono text-[10px] font-bold tracking-widest uppercase">Admin</span>
+                            </div>
+                            <svg class="arrow-icon w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="notice-content">
+                        <div class="notice-content-inner text-neutral-300 text-[14px] md:text-[15px] leading-relaxed border-l-2 border-cyan-500/30 pl-4 md:pl-6 py-2">
+                            ${notice.content}
+                        </div>
+                    </div>
+                </div>`;
+            });
+            noticeList.innerHTML = finalHtml;
+        });
+
+
+        function initMenuToggle() {
+            const menuBtn = document.getElementById("menuToggleBtn");
+            const dropdown = document.getElementById("dropdownMenu");
+            const menuIcon = document.getElementById("menuIcon");
+            if (menuBtn && dropdown) {
+                menuBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const isOpen = dropdown.classList.contains("opacity-100");
+                    if (!isOpen) {
+                        dropdown.classList.remove("opacity-0", "invisible", "-translate-y-2");
+                        dropdown.classList.add("opacity-100", "visible", "translate-y-0");
+                        if (menuIcon) menuIcon.innerText = "✕";
+                    } else { closeMenu(); }
+                };
+                const closeMenu = () => {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
+                    dropdown.classList.add("opacity-0", "invisible", "-translate-y-2");
+                    if (menuIcon) menuIcon.innerText = "☰";
+                };
+                document.addEventListener("click", (e) => {
+                    if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
+                });
+            }
+        }
+        document.addEventListener("DOMContentLoaded", loadLayout);
+    </script>
+</body>
+
+</html>
