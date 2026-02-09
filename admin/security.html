@@ -298,6 +298,17 @@
                 });
             });
         }
+
+function logout() {
+    if (confirm("Do you want to log out?")) {
+        auth.signOut().then(() => { 
+            window.location.href = "login.html"; 
+        }).catch((error) => {
+            console.error("Logout Error:", error);
+        });
+    }
+}
+
     </script>
 </body>
 

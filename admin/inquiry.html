@@ -312,6 +312,17 @@
             modal.querySelector('div').classList.add('scale-95');
             modal.classList.add('invisible', 'opacity-0');
         }
+
+function logout() {
+    if (confirm("Do you want to log out?")) {
+        auth.signOut().then(() => { 
+            window.location.href = "login.html"; 
+        }).catch((error) => {
+            console.error("Logout Error:", error);
+        });
+    }
+}
+
     </script>
 </body>
 

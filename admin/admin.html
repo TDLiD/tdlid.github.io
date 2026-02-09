@@ -500,7 +500,7 @@
         }
 
         function logout() {
-            if (confirm("로그아웃 하시겠습니까?")) {
+            if (confirm("Do you want to log out?")) {
                 auth.signOut().then(() => { window.location.href = "login.html"; });
             }
         }

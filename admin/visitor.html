@@ -288,6 +288,18 @@
                 tableBody.appendChild(row);
             });
         }
+
+// visitor.html 스크립트 마지막 부분에 추가
+function logout() {
+    if (confirm("Do you want to log out?")) {
+        auth.signOut().then(() => { 
+            window.location.href = "login.html"; 
+        }).catch((error) => {
+            console.error("Logout Error:", error);
+        });
+    }
+}
+
     </script>
 </body>
 

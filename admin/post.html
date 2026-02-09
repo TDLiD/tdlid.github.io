@@ -337,6 +337,17 @@
             document.getElementById('submitBtn').innerHTML = "<span>Register Post</span>";
             document.getElementById('cancelBtn').classList.add('hidden');
         }
+
+function logout() {
+    if (confirm("Do you want to log out?")) {
+        auth.signOut().then(() => { 
+            window.location.href = "login.html"; 
+        }).catch((error) => {
+            console.error("Logout Error:", error);
+        });
+    }
+}
+
     </script>
 </body>
 
