@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
 
-
     <script>
         (function () {
             // 1. iPad를 제외하고 iPhone, Android 폰만 감지
@@ -34,9 +33,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <!-- ⭐ 추가 -->
-
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,10 +42,59 @@
         rel="stylesheet">
 
     <style>
+        :root {
+            --accent: #00ffa3;
+        }
+
         body {
             background-color: #050505;
             color: #f5f5f5;
             font-family: 'Pretendard', sans-serif;
+            overflow-x: hidden; /* 가로 스크롤 방지 */
+            perspective: 1000px; /* 3D 깊이감 설정 */
+        }
+
+        /* 3D 배경 컨테이너 */
+        .background-container {
+            position: fixed; /* 배경으로 고정 */
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            z-index: 0;
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        /* AI 개인화 태그 스타일 */
+        .ai-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            background: rgba(0, 255, 163, 0.05);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: monospace;
+        }
+
+        /* 메인 콘텐츠 래퍼 (마우스 반응형) */
+        #main-wrapper {
+            position: relative;
+            z-index: 10;
+            transition: transform 0.1s ease-out;
         }
 
         .hero-slogan-gradient {
@@ -66,7 +112,7 @@
             transition: all 0.3s ease;
             margin-bottom: 0.5rem;
             overflow: hidden;
-            /* 영역 밖 노출 방지 */
+            backdrop-filter: blur(5px); /* 배경과 분리감을 위해 블러 추가 */
         }
 
         .news-list-item:hover {
@@ -86,36 +132,37 @@
             transform: translateX(4px);
         }
 
-        /* [수정] Core Technology와 동일한 폰트 효과 적용 */
         .hero-slogan-gradient {
             display: inline-block !important;
             font-weight: 900 !important;
-            /* font-black 효과 */
             line-height: 1.2 !important;
             padding-bottom: 0.1em;
-
-            /* 타 페이지와 동일한 청록-화이트 그라데이션 */
             background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
             -webkit-background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
             background-clip: text !important;
-
             color: transparent !important;
         }
     </style>
 </head>
 
 <body class="bg-neutral-950">
+    <div class="background-container" id="bg-stars"></div>
+
     <div id="bgm-placeholder"></div>
     <div id="header-placeholder"></div>
 
-    <main class="pt-32 lg:pt-48 pb-20 px-6 min-h-screen">
-        <div class="max-w-5xl mx-auto pt-10 px-4 text-center">
-            <h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
-                Latest News
-            </h2>
+    <main id="main-wrapper" class="pt-32 lg:pt-48 pb-20 px-6 min-h-screen">
+<div class="max-w-5xl mx-auto pt-10 px-4 text-center">
+    <div class="flex flex-col items-center">
+        <div class="ai-badge" id="ai-msg">System: Initializing News Interface...</div>
+        
+        <h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
+            Latest News
+        </h2>
+    </div>
 
-            <div id="newsListContainer" class="flex flex-col gap-1 text-left">
+    <div id="newsListContainer" class="flex flex-col gap-1 text-left">
                 <p class="text-center text-neutral-500 py-20 text-xl animate-pulse tracking-widest uppercase">Fetching
                     News...</p>
             </div>
@@ -132,6 +179,48 @@
     <div id="footer-placeholder"></div>
 
     <script>
+        // --- 3D 및 AI 기능 추가 영역 ---
+        
+        // 1. 배경 입자 생성
+        const bg = document.getElementById('bg-stars');
+        const count = 150; 
+        for (let i = 0; i < count; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            const z = Math.random() * 500 - 250;
+            dot.style.left = `${x}%`;
+            dot.style.top = `${y}%`;
+            dot.style.transform = `translateZ(${z}px)`;
+            bg.appendChild(dot);
+        }
+
+        // 2. 마우스 인터랙션 (3D Parallax)
+        const contentWrapper = document.getElementById('main-wrapper');
+        document.body.addEventListener('mousemove', (e) => {
+            const moveX = (e.clientX - window.innerWidth / 2) / 35; // 뉴스는 가독성을 위해 기울기 강도를 낮춤
+            const moveY = (e.clientY - window.innerHeight / 2) / 35;
+
+            bg.style.transform = `rotateY(${moveX * 0.5}deg) rotateX(${-moveY * 0.5}deg) translateZ(50px)`;
+            contentWrapper.style.transform = `rotateY(${moveX * 0.3}deg) rotateX(${-moveY * 0.3}deg)`;
+        });
+
+        // 3. AI 개인화 시뮬레이션
+        const aiMessages = [
+            "User Detected: Visual immersion mode enabled",
+            "Context: Real-time synchronization of news data",
+            "Mood: Intelligent Browsing Optimization",
+            "Status: Secure connection maintained"
+        ];
+        setInterval(() => {
+            const msg = aiMessages[Math.floor(Math.random() * aiMessages.length)];
+            const msgElement = document.getElementById('ai-msg');
+            if(msgElement) msgElement.innerText = msg;
+        }, 5000);
+
+        // --- 기존 기능 유지 영역 ---
+
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -142,11 +231,10 @@
             appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
         };
 
-        // 수정 후 (안전함)
         if (typeof firebase !== 'undefined' && !firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-        const auth = firebase.auth();      // ⭐ 추가
+        const auth = firebase.auth();
         const database = firebase.database();
 
         function loadNewsFromFirebase() {
@@ -238,24 +326,17 @@
             }
         }
 
-        /**
-             * 1. 레이아웃 로드 및 공통 컴포넌트 초기화
-             * 헤더, 푸터, BGM 외에 공통 관리자 인증 모달(admin-auth.html)을 추가로 로드합니다.
-             */
         async function loadLayout() {
             try {
-                // [1] 헤더 로드 및 삽입
                 const headerRes = await fetch('components/header.html');
                 const headerHTML = await headerRes.text();
                 const headerPlaceholder = document.getElementById('header-placeholder');
                 headerPlaceholder.innerHTML = headerHTML;
 
-                // [2] 헤더 내 스크립트 실행 및 경로 최적화 (Admin 링크 대응)
                 const headerScripts = headerPlaceholder.querySelectorAll("script");
                 headerScripts.forEach(oldScript => {
                     const newScript = document.createElement("script");
                     let scriptText = oldScript.text;
-                    // admin.html 경로를 하위 폴더 구조(admin/admin.html)에 맞게 치환
                     if (scriptText.includes("admin.html")) {
                         scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
                     }
@@ -263,40 +344,26 @@
                     document.body.appendChild(newScript).parentNode.removeChild(newScript);
                 });
 
-// [3] 공통 관리자 인증 모달 로드 및 삽입
-const authRes = await fetch('components/admin-auth.html');
-const authHTML = await authRes.text();
+                const authRes = await fetch('components/admin-auth.html');
+                const authHTML = await authRes.text();
+                let authDiv = document.getElementById('admin-auth-placeholder');
+                if (!authDiv) {
+                    authDiv = document.createElement('div');
+                    authDiv.id = 'admin-auth-placeholder';
+                    document.body.appendChild(authDiv);
+                }
+                authDiv.innerHTML = authHTML;
+                const authScripts = authDiv.querySelectorAll("script");
+                authScripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    if (oldScript.src) newScript.src = oldScript.src;
+                    else newScript.text = oldScript.text;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
 
-// 모달을 넣을 placeholder가 없으면 body 하단에 자동 생성
-let authDiv = document.getElementById('admin-auth-placeholder');
-if (!authDiv) {
-    authDiv = document.createElement('div');
-    authDiv.id = 'admin-auth-placeholder';
-    document.body.appendChild(authDiv);
-}
-authDiv.innerHTML = authHTML;
-
-const authScripts = authDiv.querySelectorAll("script");
-
-// ⭐ 수정: 감시자(onAuthStateChanged)를 제거하고 즉시 스크립트 실행
-// 이렇게 해야 로그인 전이라도 '비밀번호 확인' 함수가 메모리에 로드됩니다.
-authScripts.forEach(oldScript => {
-    const newScript = document.createElement("script");
-    if (oldScript.src) {
-        newScript.src = oldScript.src;
-    } else {
-        newScript.text = oldScript.text;
-    }
-    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-});
-
-
-                // 4. 푸터 로드 및 스크립트 강제 실행
                 const footerRes = await fetch('components/footer.html');
                 const footerPlaceholder = document.getElementById('footer-placeholder');
                 footerPlaceholder.innerHTML = await footerRes.text();
-
-                // 추가: 푸터 내의 스크립트 추출 및 실행
                 const footerScripts = footerPlaceholder.querySelectorAll("script");
                 footerScripts.forEach(oldScript => {
                     const newScript = document.createElement("script");
@@ -304,7 +371,6 @@ authScripts.forEach(oldScript => {
                     document.body.appendChild(newScript).parentNode.removeChild(newScript);
                 });
 
-                // [5] BGM 로드 및 스크립트 실행
                 const bgmRes = await fetch('components/bgm.html');
                 const bgmPlaceholder = document.getElementById('bgm-placeholder');
                 if (bgmPlaceholder) {
@@ -316,10 +382,7 @@ authScripts.forEach(oldScript => {
                         document.body.appendChild(newScript).parentNode.removeChild(newScript);
                     });
                 }
-
-                // [6] 상단 메뉴 토글 기능 초기화
                 initMenuToggle();
-
             } catch (err) {
                 console.error("Layout Load Error:", err);
             }

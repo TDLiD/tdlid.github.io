@@ -5,9 +5,8 @@
     <meta charset="UTF-8">
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <!-- ⭐ 추가 -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-
 
     <script>
         (function () {
@@ -35,12 +34,52 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* --- [추가] 3D 배경 및 AI 뱃지 스타일 --- */
+        :root {
+            --accent: #06b6d4; /* 기존 테마 색상과 맞춤 */
+        }
+
+        .background-container {
+            position: fixed;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            z-index: 0;
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .ai-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+            background: rgba(6, 182, 212, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        /* ---------------------------------- */
+
         body {
             overflow-x: hidden;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            background-color: #0a0a0a; /* 배경색 명시 */
         }
 
         .modal-backdrop {
@@ -94,6 +133,7 @@
             margin: 40px auto 60px;
             position: relative;
             padding: 0 80px;
+            z-index: 10; /* 배경보다 위로 */
         }
 
         #carousel {
@@ -115,7 +155,9 @@
             pointer-events: none;
             z-index: 5;
             text-align: center;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out;
+            transform-style: preserve-3d;
+            will-change: transform;
+            transition: transform 0.1s ease-out, opacity 0.8s ease-out;
         }
 
         @media (min-width: 1024px) {
@@ -129,9 +171,12 @@
             opacity: 1;
             pointer-events: auto;
             z-index: 10;
-            transform: translateX(0);
             border-color: #06b6d4;
             box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), 0 0 40px rgba(6, 182, 212, 0.15);
+        }
+
+        .tech-card > * {
+            transform: translateZ(50px);
         }
 
         .nav-btn {
@@ -203,16 +248,12 @@
             background: #06b6d4;
         }
 
-        /* [수정] 타이틀 그라데이션 및 중앙 정렬 설정 */
         .hero-slogan-gradient {
             display: inline-block !important;
-            /* 텍스트 너비만큼만 영역 차지 */
             font-weight: 900 !important;
             line-height: 1.2 !important;
             padding-bottom: 0.1em;
             margin: 0 auto;
-            /* 수평 마진 자동 설정 */
-
             background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
             -webkit-background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
@@ -224,6 +265,8 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
 
+    <div class="background-container" id="bg-stars"></div>
+
     <div id="bgm-placeholder"></div>
 
     <script>
@@ -233,13 +276,14 @@
     <div id="header-placeholder"></div>
 
     <main class="flex-grow pt-32 lg:pt-40 pb-24 px-6">
-        <div class="max-w-7xl mx-auto">
+        <div class="max-w-7xl mx-auto relative z-10">
 
-            <div class="text-center mb-4">
-                <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient pb-1">
-                    Core Technology
-                </h3>
-            </div>
+<div class="flex flex-col items-center text-center mb-4">
+    <div class="ai-badge" id="ai-msg">System: Initializing Core...</div>
+    <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient pb-1">
+        Core Technology
+    </h3>
+</div>
 
             <div id="technologyContainer">
                 <button id="prevBtn" class="nav-btn" aria-label="Previous">
@@ -312,7 +356,7 @@
         if (typeof firebase !== 'undefined' && !firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-        const auth = firebase.auth();      // ⭐ 추가
+        const auth = firebase.auth();
         const database = firebase.database();
 
         async function loadLayout() {
@@ -333,33 +377,28 @@
                     document.body.appendChild(newScript).parentNode.removeChild(newScript);
                 });
 
-// 3. [추가] 관리자 전용 모달 로드 및 삽입
-const authRes = await fetch('components/admin-auth.html');
-const authHTML = await authRes.text();
+                const authRes = await fetch('components/admin-auth.html');
+                const authHTML = await authRes.text();
 
-let authPlaceholder = document.getElementById('admin-auth-placeholder');
-if (!authPlaceholder) {
-    authPlaceholder = document.createElement('div');
-    authPlaceholder.id = 'admin-auth-placeholder';
-    document.body.appendChild(authPlaceholder);
-}
-authPlaceholder.innerHTML = authHTML;
+                let authPlaceholder = document.getElementById('admin-auth-placeholder');
+                if (!authPlaceholder) {
+                    authPlaceholder = document.createElement('div');
+                    authPlaceholder.id = 'admin-auth-placeholder';
+                    document.body.appendChild(authPlaceholder);
+                }
+                authPlaceholder.innerHTML = authHTML;
 
-// ⭐ 수정된 부분: onAuthStateChanged 밖으로 꺼내어 즉시 실행
-const authScripts = authPlaceholder.querySelectorAll("script");
-authScripts.forEach(oldScript => {
-    const newScript = document.createElement("script");
-    newScript.text = oldScript.text;
-    // 이 시점에 브라우저 메모리에 verifyAdminPassword 함수가 등록됩니다.
-    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-});
+                const authScripts = authPlaceholder.querySelectorAll("script");
+                authScripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                });
 
-                // 4. 푸터 로드 및 스크립트 강제 실행
                 const footerRes = await fetch('components/footer.html');
                 const footerPlaceholder = document.getElementById('footer-placeholder');
                 footerPlaceholder.innerHTML = await footerRes.text();
 
-                // 추가: 푸터 내의 스크립트 추출 및 실행
                 const footerScripts = footerPlaceholder.querySelectorAll("script");
                 footerScripts.forEach(oldScript => {
                     const newScript = document.createElement("script");
@@ -405,11 +444,80 @@ authScripts.forEach(oldScript => {
             }
         }
 
+        // --- Carousel & 3D Effect Logic ---
         let currentIndex = 0;
         const cards = document.querySelectorAll('.tech-card');
         const CARD_COUNT = cards.length;
         let isAnimating = false;
         let autoTimer;
+
+        // [추가] 3D 배경 및 마우스 트래킹 Parallax
+        const bgStars = document.getElementById('bg-stars');
+        const starCount = 150;
+
+        for (let i = 0; i < starCount; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            const z = Math.random() * 500 - 250;
+            dot.style.left = `${x}%`;
+            dot.style.top = `${y}%`;
+            dot.style.transform = `translateZ(${z}px)`;
+            bgStars.appendChild(dot);
+        }
+
+        function handleMouseMove(e) {
+            if (isAnimating) return;
+            const card = cards[currentIndex];
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = (centerY - y) / 20; 
+            const rotateY = (x - centerX) / 20;
+            
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+            // 배경 별들도 마우스에 반응 (반대 방향)
+            const moveX = (e.clientX - window.innerWidth / 2) / 40;
+            const moveY = (e.clientY - window.innerHeight / 2) / 40;
+            bgStars.style.transform = `rotateY(${moveX}deg) rotateX(${-moveY}deg) translateZ(50px)`;
+        }
+
+        function handleMouseLeave() {
+            const card = cards[currentIndex];
+            card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+            bgStars.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        }
+
+        // [추가] AI 메시지 시뮬레이션
+        const messages = [
+            "Detected: High-Efficiency Mode",
+            "System: Optimizing Battery Data...",
+            "Context: Professional Tech View",
+            "Status: 3D Visualization Active"
+        ];
+        
+        setInterval(() => {
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            const el = document.getElementById('ai-msg');
+            if(el) el.innerText = msg;
+        }, 4000);
+
+        function update3DEvents() {
+            cards.forEach((card, idx) => {
+                card.removeEventListener('mousemove', handleMouseMove);
+                card.removeEventListener('mouseleave', handleMouseLeave);
+                if (idx === currentIndex) {
+                    card.addEventListener('mousemove', handleMouseMove);
+                    card.addEventListener('mouseleave', handleMouseLeave);
+                }
+            });
+        }
 
         function showCard(newIndex, direction) {
             if (isAnimating) return;
@@ -420,6 +528,8 @@ authScripts.forEach(oldScript => {
             const prevCard = cards[oldIndex];
             const currentCard = cards[currentIndex];
 
+            prevCard.style.transform = 'rotateX(0deg) rotateY(0deg)';
+            
             const slideDistance = document.getElementById('technologyContainer').offsetWidth;
 
             prevCard.style.zIndex = '15';
@@ -428,6 +538,7 @@ authScripts.forEach(oldScript => {
             currentCard.classList.add('is-active');
 
             requestAnimationFrame(() => {
+                prevCard.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out';
                 prevCard.style.transform = direction === 'next' ? `translateX(-${slideDistance}px)` : `translateX(${slideDistance}px)`;
                 prevCard.style.opacity = '0';
             });
@@ -435,7 +546,9 @@ authScripts.forEach(oldScript => {
             setTimeout(() => {
                 prevCard.classList.remove('is-active');
                 prevCard.style.transform = 'translateX(0)';
+                prevCard.style.transition = 'transform 0.1s ease-out, opacity 0.8s ease-out';
                 isAnimating = false;
+                update3DEvents();
             }, 800);
         }
 
@@ -447,17 +560,18 @@ authScripts.forEach(oldScript => {
 
         cards.forEach(card => {
             card.querySelectorAll('img').forEach(img => {
-                img.onclick = function () {
+                img.onclick = function (e) {
+                    e.stopPropagation();
                     stopAuto();
                     const popupImgTarget = this.dataset.popupSrc || this.src;
                     const modal = document.createElement('div');
                     modal.className = 'modal-backdrop';
                     modal.innerHTML = `
-                <div class=\"modal-content custom-scrollbar\">
-                    <span class=\"absolute top-5 right-6 text-3xl cursor-pointer opacity-50 hover:opacity-100\" id=\"closeX\">✕</span>
-                    <img src=\"${popupImgTarget}\" class=\"modal-image\">
-                    <p class=\"mt-4 text-neutral-300 text-lg px-4\">${this.dataset.detail || ''}</p>
-                    <button class=\"modal-close-btn\">Close</button>
+                <div class="modal-content custom-scrollbar">
+                    <span class="absolute top-5 right-6 text-3xl cursor-pointer opacity-50 hover:opacity-100" id="closeX">✕</span>
+                    <img src="${popupImgTarget}" class="modal-image">
+                    <p class="mt-4 text-neutral-300 text-lg px-4">${this.dataset.detail || ''}</p>
+                    <button class="modal-close-btn">Close</button>
                 </div>`;
 
                     const close = () => { if (modal.parentNode) document.body.removeChild(modal); startAuto(); };
@@ -472,6 +586,7 @@ authScripts.forEach(oldScript => {
         document.addEventListener("DOMContentLoaded", () => {
             loadLayout();
             startAuto();
+            update3DEvents();
         });
     </script>
 </body>

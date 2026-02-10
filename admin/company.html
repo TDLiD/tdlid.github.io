@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <!-- ⭐ 추가 -->
-
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
@@ -58,6 +57,8 @@
             --header-logo-font-weight: 900;
             --header-subtitle-font-size: 1.50rem;
             --header-subtitle-font-weight: 800;
+            /* 3D 효과용 변수 추가 */
+            --accent: #22d3ee; 
         }
 
         /* Spotlight background */
@@ -71,10 +72,50 @@
             z-index: 0;
         }
 
+        /* ------------------------------------------------ */
+        /* 추가된 3D 배경 및 인터랙션 스타일 */
+        /* ------------------------------------------------ */
+        .background-container {
+            position: fixed; /* 전체 배경 고정 */
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            z-index: 1;
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .ai-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+            background: rgba(34, 211, 238, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            backdrop-filter: blur(4px);
+        }
+        /* ------------------------------------------------ */
+
         /* 3 Image Stage (데스크톱 전용 가로 배열) */
         .image-stage {
             position: relative;
-            z-index: 1;
+            z-index: 10;
+            /* 3D 효과를 위한 perspective 추가 */
+            perspective: 1200px;
         }
 
         .image-card {
@@ -89,6 +130,9 @@
             justify-content: center;
             min-height: 250px;
             width: 100%;
+            /* 3D 트랜지션 부드럽게 */
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+            transform-style: preserve-3d;
         }
 
         .image-card img {
@@ -101,10 +145,13 @@
             position: relative;
             z-index: 1;
             border-radius: 1.5rem;
+            /* 이미지도 3D 공간상에 띄움 */
+            transform: translateZ(20px);
         }
 
+        /* 기존 확대 효과 유지 */
         .image-card.hover-expand:hover img {
-            transform: scale(1.6);
+            transform: scale(1.6) translateZ(50px);
             z-index: 99;
         }
 
@@ -168,6 +215,8 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative overflow-x-hidden">
 
+    <div class="background-container" id="bg-stars"></div>
+
     <div id="bgm-placeholder"></div>
 
     <script>
@@ -176,10 +225,12 @@
 
     <div id="header-placeholder"></div>
 
-    <main class="relative z-10 pt-48 pb-32 max-w-7xl mx-auto px-6">
+    <main class="relative z-10 pt-48 pb-32 max-w-7xl mx-auto px-6 transition-transform duration-100 ease-out" id="main-content">
         <div class="company-bg"></div>
 
         <div class="text-center mb-20 float-in">
+            <div class="ai-badge" id="ai-msg">System: Initializing 3D Environment...</div>
+            
             <h1 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
                 Designing the Energy Infrastructure of Tomorrow
             </h1>
@@ -187,13 +238,13 @@
 
         <section class="mb-24">
             <div class="image-stage flex flex-row gap-10 justify-center">
-                <div class="image-card hover-expand">
+                <div class="image-card hover-expand js-3d-card">
                     <img src="images/company/company1.webp">
                 </div>
-                <div class="image-card hover-expand">
+                <div class="image-card hover-expand js-3d-card">
                     <img src="images/company/company2.webp">
                 </div>
-                <div class="image-card hover-expand">
+                <div class="image-card hover-expand js-3d-card">
                     <img src="images/company/company3.webp">
                 </div>
             </div>
@@ -238,8 +289,7 @@
     <div id="footer-placeholder"></div>
 
     <script>
-
-        // 이 부분을 복사해서 다른 파일의 동일한 위치에 넣으시면 됩니다.
+        // --- Firebase & Layout 로직 (기존 코드 유지) ---
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -250,65 +300,40 @@
             appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
         };
 
-        // 수정 후 (안전함)
         if (typeof firebase !== 'undefined' && !firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-        const auth = firebase.auth();      // ⭐ 추가
+        const auth = firebase.auth();
         const database = firebase.database();
 
-        /**
-         * 1. 레이아웃 로드 및 공통 컴포넌트 초기화
-         */
         async function loadLayout() {
             try {
-                // [1] 헤더 로드
                 const headerRes = await fetch('components/header.html');
                 if (headerRes.ok) {
                     const headerHTML = await headerRes.text();
                     const headerPlaceholder = document.getElementById('header-placeholder');
                     headerPlaceholder.innerHTML = headerHTML;
-
-                    // 헤더 내 스크립트 강제 등록 및 실행
                     executeScriptsInElement(headerPlaceholder);
                 }
 
-// [2] 관리자 인증 모달 로드 (verifyAdminPassword 정의 문제 해결)
-try {
-    const authRes = await fetch('components/admin-auth.html');
-    if (authRes.ok) {
-        const authHTML = await authRes.text();
-        let authDiv = document.getElementById('admin-auth-placeholder');
-        if (!authDiv) {
-            authDiv = document.createElement('div');
-            authDiv.id = 'admin-auth-placeholder';
-            document.body.appendChild(authDiv);
-        }
-        authDiv.innerHTML = authHTML;
+                try {
+                    const authRes = await fetch('components/admin-auth.html');
+                    if (authRes.ok) {
+                        const authHTML = await authRes.text();
+                        let authDiv = document.getElementById('admin-auth-placeholder');
+                        if (!authDiv) {
+                            authDiv = document.createElement('div');
+                            authDiv.id = 'admin-auth-placeholder';
+                            document.body.appendChild(authDiv);
+                        }
+                        authDiv.innerHTML = authHTML;
+                        executeScriptsInElement(authDiv);
+                    }
+                } catch (e) { console.warn("admin-auth.html skip"); }
 
-        // ⭐ 수정: onAuthStateChanged 감시자 밖으로 꺼내서 즉시 실행
-        // 이렇게 해야 로그인을 하지 않은 상태에서도 verifyAdminPassword 함수가 등록됩니다.
-        executeScriptsInElement(authDiv);
-
-        /* 아래 기존 코드는 삭제하거나 주석 처리하세요 */
-        /*
-        firebase.auth().onAuthStateChanged(user => {
-            if (!user) return;
-            executeScriptsInElement(authDiv);
-        });
-        */
-    }
-} catch (e) {
-    console.warn("admin-auth.html을 찾을 수 없지만 계속 진행합니다.");
-}
-
-
-                // 4. 푸터 로드 및 스크립트 강제 실행
                 const footerRes = await fetch('components/footer.html');
                 const footerPlaceholder = document.getElementById('footer-placeholder');
                 footerPlaceholder.innerHTML = await footerRes.text();
-
-                // 추가: 푸터 내의 스크립트 추출 및 실행
                 const footerScripts = footerPlaceholder.querySelectorAll("script");
                 footerScripts.forEach(oldScript => {
                     const newScript = document.createElement("script");
@@ -322,86 +347,126 @@ try {
                     bgmPlaceholder.innerHTML = await bgmRes.text();
                     executeScriptsInElement(bgmPlaceholder);
                 }
-
             } catch (err) {
                 console.error("Layout Load Error:", err);
             } finally {
-                // [4] 중요: 모든 컴포넌트 로드 후 메뉴 초기화 실행
                 setTimeout(() => {
-                    if (typeof initNavigation === "function") {
-                        initNavigation();
-                    } else if (typeof initMenuToggle === "function") {
-                        initMenuToggle();
-                    }
+                    if (typeof initNavigation === "function") initNavigation();
+                    else if (typeof initMenuToggle === "function") initMenuToggle();
                 }, 150);
             }
         }
 
-        /**
-         * [보조 함수] 특정 요소 내의 <script> 태그를 추출하여 브라우저에 강제로 등록/실행시킵니다.
-         */
         function executeScriptsInElement(element) {
             const scripts = element.querySelectorAll("script");
             scripts.forEach(oldScript => {
                 const newScript = document.createElement("script");
-                // 외부 파일 스크립트인 경우 src 복사, 직접 작성된 경우 text 복사
-                if (oldScript.src) {
-                    newScript.src = oldScript.src;
-                } else {
-                    newScript.text = oldScript.text;
-                }
+                if (oldScript.src) newScript.src = oldScript.src;
+                else newScript.text = oldScript.text;
                 document.body.appendChild(newScript);
-                // 등록 직후 스크립트 태그 자체는 삭제 (함수는 메모리에 남음)
                 document.body.removeChild(newScript);
             });
         }
 
-        // 페이지 로드 시 실행
-        document.addEventListener("DOMContentLoaded", loadLayout);
+        // --- 🌟 추가된 3D 배경 및 인터랙션 로직 🌟 ---
+        function initGlobal3DEffect() {
+            // 1. 배경 입자 생성
+            const bg = document.getElementById('bg-stars');
+            const count = 150;
+            for (let i = 0; i < count; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const z = Math.random() * 500 - 250;
+                dot.style.left = `${x}%`;
+                dot.style.top = `${y}%`;
+                dot.style.transform = `translateZ(${z}px)`;
+                bg.appendChild(dot);
+            }
 
+            // 2. 전체 페이지 마우스 Parallax
+            const content = document.getElementById('main-content');
+            document.body.addEventListener('mousemove', (e) => {
+                const moveX = (e.clientX - window.innerWidth / 2) / 40; // 강도 약하게 조절
+                const moveY = (e.clientY - window.innerHeight / 2) / 40;
 
+                bg.style.transform = `rotateY(${moveX * 0.5}deg) rotateX(${-moveY * 0.5}deg) translateZ(50px)`;
+                content.style.transform = `rotateY(${moveX * 0.2}deg) rotateX(${-moveY * 0.2}deg)`;
+            });
 
+            // 3. AI 메시지 시뮬레이션
+            const messages = [
+                "System: Analyzing Energy Infrastructure...",
+                "Status: Optimizing Sustainability Data",
+                "Vision: No More Carbon Mode Active",
+                "Detection: Interactive 3D Environment Ready"
+            ];
+            setInterval(() => {
+                const msg = messages[Math.floor(Math.random() * messages.length)];
+                const badge = document.getElementById('ai-msg');
+                if(badge) badge.innerText = msg;
+            }, 4000);
+        }
 
-        /**
-         * 2. 메뉴 제어 (데스크톱 최적화)
-         */
+        // --- 🌟 3D Card Effect Logic (기존 유지) 🌟 ---
+        function init3DEffect() {
+            const cards = document.querySelectorAll('.js-3d-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = (centerY - y) / 10;
+                    const rotateY = (x - centerX) / 10;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                    card.style.boxShadow = `${-rotateY * 2}px ${rotateX * 2}px 30px rgba(34, 211, 238, 0.2)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+                    card.style.boxShadow = 'none';
+                });
+            });
+        }
+
         function initMenuToggle() {
             const menuBtn = document.getElementById("menuToggleBtn");
             const dropdown = document.getElementById("dropdownMenu");
             const menuIcon = document.getElementById("menuIcon");
-
             if (menuBtn && dropdown) {
                 menuBtn.addEventListener("click", (e) => {
                     e.stopPropagation();
                     const isOpen = dropdown.classList.contains("opacity-100");
-
                     if (!isOpen) {
                         dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
                         dropdown.classList.add("opacity-100", "visible", "translate-y-2");
                         menuIcon.innerText = "✕";
-                    } else {
-                        closeMenu();
-                    }
+                    } else { closeMenu(); }
                 });
-
                 function closeMenu() {
                     dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
                     dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
                     menuIcon.innerText = "☰";
                 }
-
                 document.addEventListener("click", (e) => {
                     if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
                 });
             }
         }
 
-        // 초기 실행
-        document.addEventListener("DOMContentLoaded", loadLayout);
-
-
+        document.addEventListener("DOMContentLoaded", () => {
+            loadLayout();
+            init3DEffect();
+            initGlobal3DEffect(); // 신규 3D 기능 초기화
+        });
     </script>
 
 </body>
-
 </html>
