@@ -20,10 +20,45 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
     <style>
+        :root {
+            --accent: #00ffa3;
+        }
+
         body {
             background-color: #020617;
             color: #e5e7eb;
             font-family: 'Pretendard', sans-serif;
+            /* 3D 효과를 위한 설정 추가 */
+            overflow-x: hidden;
+            perspective: 1000px;
+        }
+
+        /* 3D 배경 컨테이너 스타일 */
+        #bg-stars {
+            position: fixed;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            z-index: 0;
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        /* 메인 콘텐츠 레이어 설정 */
+        #main-wrapper {
+            position: relative;
+            z-index: 10;
+            transition: transform 0.1s ease-out;
         }
 
         .sidebar-item {
@@ -41,6 +76,7 @@
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(34, 211, 238, 0.1);
             border-radius: 24px;
+            backdrop-filter: blur(10px); /* 배경 투명도 향상 */
         }
 
         .dash-widget {
@@ -153,7 +189,6 @@
             box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
         }
 
-        /* 효과 선택 버튼 스타일 추가 */
         .effect-btn {
             transition: all 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -177,12 +212,26 @@
             border-color: #22d3ee;
             color: #22d3ee;
         }
+
+        /* AI 배지 스타일 */
+        .ai-badge-admin {
+            display: inline-block;
+            padding: 4px 12px;
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            font-size: 10px;
+            color: var(--accent);
+            background: rgba(0, 255, 163, 0.05);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+        }
     </style>
-
-
 </head>
 
 <body class="min-h-screen bg-[#020617]">
+
+    <div id="bg-stars"></div>
 
     <div id="authOverlay">
         <p class="text-cyan-400 font-bold tracking-widest animate-pulse">AUTHORIZING...</p>
@@ -190,9 +239,10 @@
 
     <div id="sidebar-target"></div>
 
-    <main class="w-full">
+    <main class="w-full" id="main-wrapper">
         <div class="max-w-[1600px] mx-auto p-8 space-y-8">
             <div class="mb-2">
+                <div class="ai-badge-admin" id="ai-msg-admin">System: UI Optimizing...</div>
                 <h2 class="text-xl font-bold text-white flex items-center gap-2">
                     <span class="w-1 h-5 bg-cyan-500 rounded-full"></span>
                     System Configuration
@@ -200,34 +250,29 @@
             </div>
 
             <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer"
-                    onclick="location.href='visitor.html'">
+                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='visitor.html'">
                     <div class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-2xl">📊</div>
                     <div>
                         <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Total Visitors</p>
                         <h4 id="stat-visitors" class="text-xl font-black text-white">...</h4>
                     </div>
                 </div>
-                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer"
-                    onclick="location.href='inquiry.html'">
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl">📩
-                    </div>
+                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='inquiry.html'">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl">📩</div>
                     <div>
                         <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Inquiries</p>
                         <h4 id="stat-inquiries" class="text-xl font-black text-white">...</h4>
                     </div>
                 </div>
                 <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='post.html'">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-2xl">✍️
-                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-2xl">✍️</div>
                     <div>
                         <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Posts</p>
                         <h4 id="stat-posts" class="text-xl font-black text-white">...</h4>
                     </div>
                 </div>
                 <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='memo.html'">
-                    <div class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl">📝
-                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl">📝</div>
                     <div>
                         <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Memos</p>
                         <h4 id="stat-memos" class="text-xl font-black text-white">...</h4>
@@ -244,29 +289,21 @@
                 <div class="stat-card p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 space-y-4">
                         <div>
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Site
-                                Description</label>
-                            <textarea id="seoDesc"
-                                class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition h-24"></textarea>
+                            <label class="text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Site Description</label>
+                            <textarea id="seoDesc" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition h-24"></textarea>
                         </div>
                         <div>
-                            <label
-                                class="text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Keywords</label>
-                            <input type="text" id="seoKeywords"
-                                class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition">
+                            <label class="text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Keywords</label>
+                            <input type="text" id="seoKeywords" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition">
                         </div>
-                        <button onclick="saveSEO()"
-                            class="w-full py-3.5 bg-cyan-500 text-black font-bold rounded-2xl hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20 text-sm">Save
-                            Meta Settings</button>
+                        <button onclick="saveSEO()" class="w-full py-3.5 bg-cyan-500 text-black font-bold rounded-2xl hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20 text-sm">Save Meta Settings</button>
                     </div>
                     <div class="bg-cyan-500/5 rounded-2xl p-6 border border-cyan-500/10 flex flex-col justify-center">
                         <p class="text-cyan-500 text-xs font-bold mb-2">💡 SEO Guide</p>
-                        <p class="text-neutral-400 text-xs leading-relaxed">KEEP UNDER 160 CHARACTERS. SEPARATE KEYWORDS
-                            WITH COMMAS.</p>
+                        <p class="text-neutral-400 text-xs leading-relaxed">KEEP UNDER 160 CHARACTERS. SEPARATE KEYWORDS WITH COMMAS.</p>
                     </div>
                 </div>
             </section>
-
 
             <section>
                 <div class="flex items-center justify-between mb-4">
@@ -274,85 +311,94 @@
                         <span class="w-2 h-2 bg-amber-500 rounded-full"></span> Notice & Popups
                     </h3>
                     <div class="flex gap-1.5 bg-black/40 p-1 rounded-xl border border-white/5">
-                        <button onclick="switchPopup(0)"
-                            class="slot-btn active px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 1</button>
-                        <button onclick="switchPopup(1)"
-                            class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 2</button>
-                        <button onclick="switchPopup(2)"
-                            class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 3</button>
-                        <button onclick="switchPopup(3)"
-                            class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 4</button>
-                        <button onclick="switchPopup(4)"
-                            class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 5</button>
+                        <button onclick="switchPopup(0)" class="slot-btn active px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 1</button>
+                        <button onclick="switchPopup(1)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 2</button>
+                        <button onclick="switchPopup(2)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 3</button>
+                        <button onclick="switchPopup(3)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 4</button>
+                        <button onclick="switchPopup(4)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 5</button>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <div class="lg:col-span-4 space-y-4">
                         <div class="stat-card p-5 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-bold">Main Popup</p>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="popupActive"><span
-                                    class="slider"></span></label>
+                            <div><p class="text-sm font-bold">Main Popup</p></div>
+                            <label class="switch"><input type="checkbox" id="popupActive"><span class="slider"></span></label>
                         </div>
                         <div class="stat-card p-5 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-bold text-amber-500">Emergency Banner</p>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="bannerActive"><span
-                                    class="slider"></span></label>
+                            <div><p class="text-sm font-bold text-amber-500">Emergency Banner</p></div>
+                            <label class="switch"><input type="checkbox" id="bannerActive"><span class="slider"></span></label>
                         </div>
 
                         <div class="stat-card p-5 space-y-3">
-                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Popup Dissolve
-                                Effect</p>
+                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Popup Dissolve Effect</p>
                             <div class="grid grid-cols-2 gap-2" id="effectContainer">
-                                <button onclick="selectEffect('cleavage')" data-effect="cleavage" class="effect-btn">🫧
-                                    Cleavage (3s)</button>
-                                <button onclick="selectEffect('wave')" data-effect="wave" class="effect-btn">💨 Wave
-                                    (3s)</button>
-                                <button onclick="selectEffect('rotation')" data-effect="rotation" class="effect-btn">🤏
-                                    Rotation (3s)</button>
-                                <button onclick="selectEffect('slide')" data-effect="slide" class="effect-btn">👉 Slide
-                                    (3s)</button>
-                                <button onclick="selectEffect('classic')" data-effect="classic"
-                                    class="effect-btn col-span-2">🔒 Classic (Manual)</button>
+                                <button onclick="selectEffect('cleavage')" data-effect="cleavage" class="effect-btn">🫧 Cleavage (3s)</button>
+                                <button onclick="selectEffect('wave')" data-effect="wave" class="effect-btn">💨 Wave (3s)</button>
+                                <button onclick="selectEffect('rotation')" data-effect="rotation" class="effect-btn">🤏 Rotation (3s)</button>
+                                <button onclick="selectEffect('slide')" data-effect="slide" class="effect-btn">👉 Slide (3s)</button>
+                                <button onclick="selectEffect('classic')" data-effect="classic" class="effect-btn col-span-2">🔒 Classic (Manual)</button>
                             </div>
                         </div>
 
                         <div class="stat-card p-6 space-y-4">
-                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Active Schedule
-                            </p>
-                            <input type="text" id="startDate"
-                                class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none"
-                                placeholder="Start Date">
-                            <input type="text" id="endDate"
-                                class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none"
-                                placeholder="End Date">
+                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Active Schedule</p>
+                            <input type="text" id="startDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="Start Date">
+                            <input type="text" id="endDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="End Date">
                         </div>
                     </div>
 
                     <div class="lg:col-span-8">
                         <div class="stat-card p-6 h-full flex flex-col">
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase mb-4">Editor (Slot <span
-                                    id="slotDisplay" class="text-cyan-500">1</span>)</label>
+                            <label class="text-[10px] font-bold text-neutral-500 uppercase mb-4">Editor (Slot <span id="slotDisplay" class="text-cyan-500">1</span>)</label>
                             <div id="editor-container" class="flex-1 min-h-[300px]"></div>
-                            <button onclick="saveNotice()"
-                                class="mt-4 w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-bold transition text-xs">UPDATE
-                                SLOT DATA</button>
+                            <button onclick="saveNotice()" class="mt-4 w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-bold transition text-xs">UPDATE SLOT DATA</button>
                         </div>
                     </div>
                 </div>
             </section>
-
-
-
         </div>
     </main>
 
     <script>
-        // Firebase Config
+        // 1. 3D 배경 입자 생성 (추가됨)
+        const bg = document.getElementById('bg-stars');
+        const count = 100; 
+
+        for (let i = 0; i < count; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            const z = Math.random() * 500 - 250;
+            dot.style.left = `${x}%`;
+            dot.style.top = `${y}%`;
+            dot.style.transform = `translateZ(${z}px)`;
+            bg.appendChild(dot);
+        }
+
+        // 2. 마우스 인터랙션 Parallax (추가됨)
+        const content = document.getElementById('main-wrapper');
+        document.body.addEventListener('mousemove', (e) => {
+            const moveX = (e.clientX - window.innerWidth / 2) / 50;
+            const moveY = (e.clientY - window.innerHeight / 2) / 50;
+            bg.style.transform = `rotateY(${moveX * 0.5}deg) rotateX(${-moveY * 0.5}deg) translateZ(50px)`;
+            content.style.transform = `rotateY(${moveX * 0.2}deg) rotateX(${-moveY * 0.2}deg)`;
+        });
+
+        // 3. AI 개인화 시뮬레이션 (추가됨)
+        const messages = [
+            "Admin Detected: Secure Mode Active",
+            "Performance: 3D Rendering Optimized",
+            "Status: System Core Stabilized"
+        ];
+        setInterval(() => {
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            const msgEl = document.getElementById('ai-msg-admin');
+            if(msgEl) msgEl.innerText = msg;
+        }, 5000);
+
+        // --- 기존 Admin 기능 코드 시작 ---
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -369,10 +415,9 @@
 
         let quill;
         let currentSlot = 0;
-        let currentEffect = 'classic'; // [추가] 현재 선택된 효과 상태값
+        let currentEffect = 'classic';
         let popupDataList = [{}, {}, {}, {}, {}];
 
-        // Initialize Page
         document.addEventListener('DOMContentLoaded', function () {
             quill = new Quill('#editor-container', {
                 theme: 'snow',
@@ -382,7 +427,6 @@
             flatpickr("#startDate", dateConfig);
             flatpickr("#endDate", dateConfig);
 
-            // Sidebar load
             fetch('sidebar.html').then(r => r.text()).then(html => {
                 document.getElementById('sidebar-target').innerHTML = html;
                 const currentPage = window.location.pathname.split("/").pop() || 'admin.html';
@@ -392,7 +436,6 @@
             });
         });
 
-        // Auth Watcher
         auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById('authOverlay').style.display = 'none';
@@ -403,15 +446,11 @@
             }
         });
 
-        // [추가] 효과 선택 버튼 UI 업데이트 함수
         function selectEffect(effectId) {
             currentEffect = effectId;
             document.querySelectorAll('.effect-btn').forEach(btn => {
-                if (btn.dataset.effect === effectId) {
-                    btn.classList.add('selected');
-                } else {
-                    btn.classList.remove('selected');
-                }
+                if (btn.dataset.effect === effectId) btn.classList.add('selected');
+                else btn.classList.remove('selected');
             });
         }
 
@@ -427,26 +466,21 @@
 
         async function loadSettings() {
             try {
-                // 1. SEO 설정
                 database.ref('siteSettings/seo').once('value').then(snap => {
                     if (snap.exists()) {
                         if (document.getElementById('seoDesc')) document.getElementById('seoDesc').value = snap.val().description || '';
                         if (document.getElementById('seoKeywords')) document.getElementById('seoKeywords').value = snap.val().keywords || '';
                     }
-                }).catch(e => console.log("SEO load skipped or denied"));
+                });
 
-                // 2. 팝업 설정
                 database.ref('siteSettings/popups').once('value').then(snap => {
                     if (snap.exists()) {
                         const data = snap.val();
                         for (let i = 0; i < 5; i++) { if (data[i]) popupDataList[i] = data[i]; }
                     }
                     displayCurrentPopup();
-                }).catch(e => console.log("Popups load skipped or denied"));
-
-            } catch (e) {
-                console.error("Settings Load Error:", e);
-            }
+                });
+            } catch (e) { console.error("Settings Load Error:", e); }
         }
 
         function switchPopup(index) {
@@ -461,11 +495,8 @@
             document.getElementById('popupActive').checked = data.popupActive || false;
             document.getElementById('bannerActive').checked = data.bannerActive || false;
             quill.root.innerHTML = data.content || '';
-
-            // [수정] 저장된 효과를 불러와 UI에 적용
             const savedEffect = data.effect || 'classic';
             selectEffect(savedEffect);
-
             if (data.startDate) document.getElementById('startDate')._flatpickr.setDate(data.startDate);
             else document.getElementById('startDate').value = '';
             if (data.endDate) document.getElementById('endDate')._flatpickr.setDate(data.endDate);
@@ -476,7 +507,7 @@
             const data = {
                 popupActive: document.getElementById('popupActive').checked,
                 bannerActive: document.getElementById('bannerActive').checked,
-                effect: currentEffect, // [추가] 선택된 효과 코드 저장
+                effect: currentEffect,
                 content: quill.root.innerHTML,
                 text: quill.getText(),
                 startDate: document.getElementById('startDate').value,
@@ -498,14 +529,6 @@
                 alert("SEO 저장 완료");
             } catch (e) { alert("저장 실패: " + e.message); }
         }
-
-        function logout() {
-            if (confirm("Do you want to log out?")) {
-                auth.signOut().then(() => { window.location.href = "login.html"; });
-            }
-        }
     </script>
-
 </body>
-
 </html>
