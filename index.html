@@ -149,7 +149,8 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
     <style>
         /* 책장 넘어가는 효과 (Page Flip Reveal) */
         #page-reveal-overlay {
@@ -194,14 +195,14 @@
         .whitespace-nowrap { white-space: nowrap !important; }
         #triggerWord { color: inherit!important; font-weight: inherit!important; text-decoration: none!important; cursor: text!important; display: inline; position: relative; z-index: 9998; pointer-events: auto!important; }
         body, .hero-section, .video-bg-container { background-color: #000!important; }
-        .hero-section { position: relative; width: 100%; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .hero-section { position: relative; width: 100%; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 1000px; }
         .video-bg-container { position: absolute; inset: 0; z-index: 0; }
         .video-bg { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4) contrast(1.1); }
         .video-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%); z-index: 5; }
-        .hero-content { position: relative; z-index: 10; pointer-events: none; }
+        .hero-content { position: relative; z-index: 10; pointer-events: none; transition: transform 0.1s ease-out; }
         .hero-content * { pointer-events: auto; }
         
-        #fluid-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.5; }
+        #fluid-canvas { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0.5; }
 
         .bg-slide { 
             position: absolute; 
@@ -232,6 +233,20 @@
         .effect-rotation { animation: rotate-in 0.8s ease-out forwards; }
         .effect-rotation.exit { animation: rotate-out 0.8s ease-in forwards; }
         .effect-slide-center { animation: slide-up 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+
+        /* 3D 배경 입자 추가 스타일 */
+        #bg-stars {
+            position: absolute; width: 120%; height: 120%; top: -10%; left: -10%; z-index: 1;
+            transform-style: preserve-3d; pointer-events: none;
+        }
+        .dot { position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%; opacity: 0.3; }
+        
+        /* AI Badge 스타일 */
+        .ai-badge {
+            display: inline-block; padding: 6px 14px; border: 1px solid #22d3ee; border-radius: 20px;
+            font-size: 0.7rem; color: #22d3ee; margin-bottom: 20px; background: rgba(34, 211, 238, 0.1);
+            text-transform: uppercase; letter-spacing: 0.1em; backdrop-filter: blur(5px);
+        }
     </style>
 </head>
 
@@ -254,13 +269,17 @@
 
     <main class="flex-grow">
         <section class="hero-section flex flex-col items-center justify-center min-h-screen">
+            <div id="bg-stars"></div>
+            
             <canvas id="fluid-canvas"></canvas>
 
             <div id="image-bg-container" class="video-bg-container">
                 <div class="video-overlay" style="z-index: 2;"></div>
             </div>
-            <div class="hero-content max-w-6xl w-full px-12 text-center flex flex-col items-center justify-center h-full">
+
+            <div id="parallax-content" class="hero-content max-w-6xl w-full px-12 text-center flex flex-col items-center justify-center h-full">
                 <div class="flex flex-col items-center justify-center">
+                    <div class="ai-badge" id="ai-msg">System: Initializing Environment...</div>
                     <h1 class="hero-logo-gradient" style="font-size: 3.5rem; line-height: 1.2;">NO MORE CARBON</h1>
                     <p class="hero-slogan-gradient" style="font-size: 1.8rem; letter-spacing: 0.5em; margin-top: 1.5rem;">NO MORE FOSSIL FUEL</p>
                 </div>
@@ -320,7 +339,6 @@
         window.addEventListener('load', () => {
             const overlay = document.getElementById('page-reveal-overlay');
             if(overlay) {
-                // 약간의 지연 후 실행하여 부드러운 시작 유도
                 setTimeout(() => {
                     overlay.classList.add('active');
                 }, 300);
@@ -380,9 +398,11 @@
             requestAnimationFrame(drawFluid);
         }
 
-        // --- Custom Cursor Logic ---
+        // --- Custom Cursor & 3D Interaction Logic ---
         const dot = document.getElementById('cursorDot');
         const circle = document.getElementById('cursorCircle');
+        const parallaxContent = document.getElementById('parallax-content');
+        const bgStars = document.getElementById('bg-stars');
         
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.clientX;
@@ -397,7 +417,49 @@
             } else {
                 dot.style.width = '12px'; dot.style.height = '12px'; dot.style.opacity = '1';
             }
+
+            // --- 3D Parallax Effect ---
+            const moveX = (e.clientX - window.innerWidth / 2) / 25;
+            const moveY = (e.clientY - window.innerHeight / 2) / 25;
+
+            // 배경 별 입자는 반대로 크게 움직임
+            if(bgStars) bgStars.style.transform = `rotateY(${moveX * 0.4}deg) rotateX(${-moveY * 0.4}deg) translateZ(50px)`;
+            // 메인 콘텐츠는 미세하게 따라 움직임
+            if(parallaxContent) parallaxContent.style.transform = `rotateY(${moveX}deg) rotateX(${-moveY}deg)`;
         });
+
+        // --- 3D Star Particles Initialization ---
+        function initStars() {
+            const container = document.getElementById('bg-stars');
+            if(!container) return;
+            const count = 100;
+            for (let i = 0; i < count; i++) {
+                const dotEl = document.createElement('div');
+                dotEl.className = 'dot';
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const z = Math.random() * 600 - 300;
+                dotEl.style.left = `${x}%`;
+                dotEl.style.top = `${y}%`;
+                dotEl.style.transform = `translateZ(${z}px)`;
+                container.appendChild(dotEl);
+            }
+        }
+
+        // --- AI Simulation Messages ---
+        function initAiSimulation() {
+            const aiMsg = document.getElementById('ai-msg');
+            const messages = [
+                "User Detected: Visual Immersion Active",
+                "Context: Optimized for Renewable Energy",
+                "Status: Syncing with TDLiD Ecosystem",
+                "Mood: Minimalist Interface Applied"
+            ];
+            setInterval(() => {
+                const msg = messages[Math.floor(Math.random() * messages.length)];
+                if(aiMsg) aiMsg.innerText = msg;
+            }, 4500);
+        }
 
         // --- Existing Layout & Logic ---
         async function loadLayout() {
@@ -425,6 +487,8 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
+            initStars();
+            initAiSimulation();
             initFluid();
             drawFluid();
             window.addEventListener('resize', initFluid);

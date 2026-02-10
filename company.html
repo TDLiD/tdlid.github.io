@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
         (function () {
@@ -56,6 +57,8 @@
             --header-logo-font-weight: 900;
             --header-subtitle-font-size: 1.50rem;
             --header-subtitle-font-weight: 800;
+            /* 3D 효과용 변수 추가 */
+            --accent: #22d3ee; 
         }
 
         /* Spotlight background */
@@ -69,10 +72,48 @@
             z-index: 0;
         }
 
+        /* ------------------------------------------------ */
+        /* 추가된 3D 배경 및 인터랙션 스타일 */
+        /* ------------------------------------------------ */
+        .background-container {
+            position: fixed; /* 전체 배경 고정 */
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            z-index: 1;
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .ai-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+            background: rgba(34, 211, 238, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            backdrop-filter: blur(4px);
+        }
+        /* ------------------------------------------------ */
+
         /* 3 Image Stage (데스크톱 전용 가로 배열) */
         .image-stage {
             position: relative;
-            z-index: 1;
+            z-index: 10;
             /* 3D 효과를 위한 perspective 추가 */
             perspective: 1200px;
         }
@@ -174,6 +215,8 @@
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative overflow-x-hidden">
 
+    <div class="background-container" id="bg-stars"></div>
+
     <div id="bgm-placeholder"></div>
 
     <script>
@@ -182,10 +225,12 @@
 
     <div id="header-placeholder"></div>
 
-    <main class="relative z-10 pt-48 pb-32 max-w-7xl mx-auto px-6">
+    <main class="relative z-10 pt-48 pb-32 max-w-7xl mx-auto px-6 transition-transform duration-100 ease-out" id="main-content">
         <div class="company-bg"></div>
 
         <div class="text-center mb-20 float-in">
+            <div class="ai-badge" id="ai-msg">System: Initializing 3D Environment...</div>
+            
             <h1 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
                 Designing the Energy Infrastructure of Tomorrow
             </h1>
@@ -323,7 +368,48 @@
             });
         }
 
-        // --- 🌟 3D Card Effect Logic 🌟 ---
+        // --- 🌟 추가된 3D 배경 및 인터랙션 로직 🌟 ---
+        function initGlobal3DEffect() {
+            // 1. 배경 입자 생성
+            const bg = document.getElementById('bg-stars');
+            const count = 150;
+            for (let i = 0; i < count; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const z = Math.random() * 500 - 250;
+                dot.style.left = `${x}%`;
+                dot.style.top = `${y}%`;
+                dot.style.transform = `translateZ(${z}px)`;
+                bg.appendChild(dot);
+            }
+
+            // 2. 전체 페이지 마우스 Parallax
+            const content = document.getElementById('main-content');
+            document.body.addEventListener('mousemove', (e) => {
+                const moveX = (e.clientX - window.innerWidth / 2) / 40; // 강도 약하게 조절
+                const moveY = (e.clientY - window.innerHeight / 2) / 40;
+
+                bg.style.transform = `rotateY(${moveX * 0.5}deg) rotateX(${-moveY * 0.5}deg) translateZ(50px)`;
+                content.style.transform = `rotateY(${moveX * 0.2}deg) rotateX(${-moveY * 0.2}deg)`;
+            });
+
+            // 3. AI 메시지 시뮬레이션
+            const messages = [
+                "System: Analyzing Energy Infrastructure...",
+                "Status: Optimizing Sustainability Data",
+                "Vision: No More Carbon Mode Active",
+                "Detection: Interactive 3D Environment Ready"
+            ];
+            setInterval(() => {
+                const msg = messages[Math.floor(Math.random() * messages.length)];
+                const badge = document.getElementById('ai-msg');
+                if(badge) badge.innerText = msg;
+            }, 4000);
+        }
+
+        // --- 🌟 3D Card Effect Logic (기존 유지) 🌟 ---
         function init3DEffect() {
             const cards = document.querySelectorAll('.js-3d-card');
             
@@ -336,7 +422,6 @@
                     const centerX = rect.width / 2;
                     const centerY = rect.height / 2;
                     
-                    // 기울기 강도 조절 (기본 15도 내외)
                     const rotateX = (centerY - y) / 10;
                     const rotateY = (x - centerX) / 10;
                     
@@ -378,7 +463,8 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             loadLayout();
-            init3DEffect(); // 3D 효과 초기화
+            init3DEffect();
+            initGlobal3DEffect(); // 신규 3D 기능 초기화
         });
     </script>
 

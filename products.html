@@ -5,9 +5,7 @@
     <meta charset="UTF-8">
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <!-- ⭐ 추가 -->
-
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
         (function () {
@@ -45,6 +43,48 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* [3D 효과를 위한 루트 및 기초 설정] */
+        :root {
+            --accent: #00ffa3;
+        }
+
+        /* 3D 몰입형 배경 (순수 CSS 입자) */
+        .background-container {
+            position: fixed; /* 배경으로 고정 */
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            z-index: 0; /* 모든 콘텐츠 뒤로 */
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        /* AI 개인화 태그 스타일 */
+        .ai-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            background: rgba(0, 255, 163, 0.05);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(4px);
+        }
+
+        /* 기존 스타일 유지 */
         #productContentWrapper {
             transition: transform 0.8s ease-out, opacity 0.8s ease-out;
             width: 100%;
@@ -66,7 +106,6 @@
             transition: transform 0.3s ease;
         }
 
-        /* [추가] 팝업 모달 스타일 */
         .modal-backdrop {
             position: fixed;
             inset: 0;
@@ -158,23 +197,25 @@
             overflow-x: hidden;
             -webkit-user-select: none;
             user-select: none;
+            /* 3D 깊이감 설정 */
+            perspective: 1000px; 
         }
 
         .gallery-card {
             width: 100%;
             max-width: 1024px;
+            /* 마우스 반응을 위해 transform-style 추가 */
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
         }
 
-        /* header.html <style> 구간에 추가 */
         #main-nav li {
             position: relative;
             z-index: 10005;
-            /* 충분히 높은 우선순위 */
         }
 
         .nav-link {
             pointer-events: auto !important;
-            /* 클릭 차단 해제 */
         }
 
         .hero-slogan-gradient {
@@ -182,20 +223,18 @@
             font-weight: 900 !important;
             line-height: 1.2 !important;
             padding-bottom: 0.1em;
-
-            /* contact.html과 동일한 반전 그라데이션 설정 */
             background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
             -webkit-background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
             background-clip: text !important;
-
-            /* 안전장치 */
             color: transparent !important;
         }
     </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
+
+    <div class="background-container" id="bg-stars"></div>
 
     <div id="bgm-placeholder"></div>
 
@@ -205,9 +244,12 @@
 
     <div id="header-placeholder"></div>
 
-    <main class="flex-grow pt-32 lg:pt-40 pb-24 px-6">
-        <div class="max-w-7xl mx-auto">
-            <div class="relative flex flex-col items-center justify-center mb-16">
+    <main class="flex-grow pt-32 lg:pt-40 pb-24 px-6 relative z-10">
+        <div class="max-w-7xl mx-auto flex flex-col items-center">
+            
+            <div class="ai-badge" id="ai-msg">System: Initializing 3D Environment...</div>
+
+            <div class="relative flex flex-col items-center justify-center mb-16 w-full">
                 <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient">
                     TDLiD Products
                 </h3>
@@ -223,7 +265,7 @@
             </div>
 
             <div id="productGallery"
-                class="gallery-card mx-auto p-4 md:p-8 bg-neutral-900 rounded-[2rem] md:rounded-[2.5rem] border border-neutral-800 shadow-[0_30px_100px_rgba(0,0,0,0.6)]">
+                class="gallery-card mx-auto p-4 md:p-8 bg-neutral-900/80 backdrop-blur-md rounded-[2rem] md:rounded-[2.5rem] border border-neutral-800 shadow-[0_30px_100px_rgba(0,0,0,0.6)]">
                 <div id="productContentWrapper" class="overflow-hidden">
                     <div id="galleryImageContainer"
                         class="aspect-[16/10] bg-neutral-800/30 rounded-2xl md:rounded-3xl p-4 md:p-10">
@@ -251,12 +293,57 @@
                     </button>
                 </div>
             </div>
+            <p class="mt-8 text-neutral-600 text-xs tracking-widest uppercase">Move your mouse to explore the 3D space</p>
         </div>
     </main>
 
     <div id="footer-placeholder"></div>
 
     <script>
+        // --- [추가된 3D 기능 스크립트] ---
+        
+        // 1. 배경 입자 생성
+        const bg = document.getElementById('bg-stars');
+        const count = 150; 
+        for (let i = 0; i < count; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            const z = Math.random() * 500 - 250;
+            dot.style.left = `${x}%`;
+            dot.style.top = `${y}%`;
+            dot.style.transform = `translateZ(${z}px)`;
+            bg.appendChild(dot);
+        }
+
+        // 2. 마우스 인터랙션 (3D Parallax)
+        const galleryCard = document.getElementById('productGallery');
+        document.body.addEventListener('mousemove', (e) => {
+            const moveX = (e.clientX - window.innerWidth / 2) / 30; // 감도 조절
+            const moveY = (e.clientY - window.innerHeight / 2) / 30;
+
+            // 배경은 반대 방향
+            if(bg) bg.style.transform = `rotateY(${moveX * 0.5}deg) rotateX(${-moveY * 0.5}deg) translateZ(50px)`;
+            
+            // 갤러리 카드는 미세하게 기울어짐
+            if(galleryCard) galleryCard.style.transform = `rotateY(${moveX * 0.8}deg) rotateX(${-moveY * 0.8}deg)`;
+        });
+
+        // 3. AI 개인화 시뮬레이션 메시지
+        const aiMessages = [
+            "User Detected: High-Density Mode Active",
+            "Context: Visualizing Battery Tech",
+            "Mood: Minimalist Interaction Applied",
+            "System: Optimizing for your gaze..."
+        ];
+        setInterval(() => {
+            const msg = aiMessages[Math.floor(Math.random() * aiMessages.length)];
+            const badge = document.getElementById('ai-msg');
+            if(badge) badge.innerText = msg;
+        }, 4000);
+
+        // --- [기존 기능 스크립트] ---
 
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
@@ -268,22 +355,19 @@
             appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
         };
 
-        // 수정 후 (안전함)
         if (typeof firebase !== 'undefined' && !firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-        const auth = firebase.auth();      // ⭐ 추가
+        const auth = firebase.auth();
         const database = firebase.database();
 
         async function loadLayout() {
             try {
-                // 1. 헤더 로드 및 삽입
                 const headerRes = await fetch('components/header.html');
                 const headerHTML = await headerRes.text();
                 const headerPlaceholder = document.getElementById('header-placeholder');
                 headerPlaceholder.innerHTML = headerHTML;
 
-                // 2. 헤더 내 스크립트 실행 (Admin 이동 경로 수정 포함)
                 const headerScripts = headerPlaceholder.querySelectorAll("script");
                 headerScripts.forEach(oldScript => {
                     const newScript = document.createElement("script");
@@ -295,11 +379,8 @@
                     document.body.appendChild(newScript).parentNode.removeChild(newScript);
                 });
 
-                // 3. [추가] 관리자 전용 모달 로드 및 삽입
                 const authRes = await fetch('components/admin-auth.html');
                 const authHTML = await authRes.text();
-
-                // 모달을 담을 공간이 없으면 생성, 있으면 삽입
                 let authPlaceholder = document.getElementById('admin-auth-placeholder');
                 if (!authPlaceholder) {
                     authPlaceholder = document.createElement('div');
@@ -308,25 +389,17 @@
                 }
                 authPlaceholder.innerHTML = authHTML;
 
-                // 모달 내의 스크립트(verifyAdminPassword 등) 실행 및 등록
                 const authScripts = authPlaceholder.querySelectorAll("script");
-                // ⭐ admin-auth 스크립트는 auth 준비 후 실행
-                firebase.auth().onAuthStateChanged(user => {
-                    if (!user) return; // 로그인 안 돼 있으면 실행 금지
-
-                    authScripts.forEach(oldScript => {
-                        const newScript = document.createElement("script");
-                        newScript.text = oldScript.text;
-                        document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                    });
+                authScripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text;
+                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
                 });
 
-                // 4. 푸터 로드 및 스크립트 강제 실행
                 const footerRes = await fetch('components/footer.html');
                 const footerPlaceholder = document.getElementById('footer-placeholder');
                 footerPlaceholder.innerHTML = await footerRes.text();
 
-                // 추가: 푸터 내의 스크립트 추출 및 실행
                 const footerScripts = footerPlaceholder.querySelectorAll("script");
                 footerScripts.forEach(oldScript => {
                     const newScript = document.createElement("script");
@@ -334,7 +407,6 @@
                     document.body.appendChild(newScript).parentNode.removeChild(newScript);
                 });
 
-                // 5. BGM 로드 및 스크립트 실행
                 const bgmRes = await fetch('components/bgm.html');
                 const bgmPlaceholder = document.getElementById('bgm-placeholder');
                 if (bgmPlaceholder) {
@@ -347,10 +419,7 @@
                     });
                 }
 
-                // 6. 메뉴 및 공통 기능 초기화
                 if (typeof initMenuToggle === "function") initMenuToggle();
-
-                // Admin 트리거 버튼(TDLiD 로고 등)이 있다면 다시 바인딩
                 if (typeof initAdminTriggers === "function") initAdminTriggers();
 
             } catch (err) {
@@ -380,7 +449,6 @@
             return window.innerWidth < 768 ? 100 : 150;
         }
 
-        // [수정] 이미지 렌더링 시 클릭 이벤트 추가
         function renderProduct(product, index) {
             galleryImageContainer.innerHTML = `
             <img src="${product.image}" 
@@ -394,10 +462,8 @@
             }
         }
 
-        // [추가] 팝업 열기 로직
         function openImagePopup(src, num) {
-            stopAutoChange(); // 팝업 시 자동 슬라이드 정지
-
+            stopAutoChange();
             const modal = document.createElement('div');
             modal.className = 'modal-backdrop';
             modal.innerHTML = `
@@ -408,16 +474,13 @@
                 <p class="text-neutral-500 mt-2 text-sm uppercase tracking-widest">High-Density Energy Solution</p>
                 <button class="modal-close-btn">Close</button>
             </div>`;
-
             const close = () => {
                 if (document.body.contains(modal)) document.body.removeChild(modal);
-                startAutoChange(); // 닫을 때 다시 자동 슬라이드 시작
+                startAutoChange();
             };
-
             modal.querySelector('.modal-close-btn').onclick = close;
             modal.querySelector('.modal-close-x').onclick = close;
             modal.onclick = (e) => { if (e.target === modal) close(); };
-
             document.body.appendChild(modal);
         }
 
@@ -459,7 +522,6 @@
             const menuBtn = document.getElementById("menuToggleBtn");
             const dropdown = document.getElementById("dropdownMenu");
             const menuIcon = document.getElementById("menuIcon");
-
             if (menuBtn && dropdown) {
                 menuBtn.onclick = (e) => {
                     e.stopPropagation();
@@ -474,7 +536,6 @@
                         if (menuIcon) menuIcon.innerText = "✕";
                     }
                 };
-
                 document.addEventListener('click', (e) => {
                     if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
                         dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
@@ -492,10 +553,6 @@
                 startAutoChange();
             }
         });
-
-
     </script>
-
 </body>
-
 </html>
