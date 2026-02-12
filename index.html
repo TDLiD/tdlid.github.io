@@ -110,36 +110,62 @@
                 alert("Please enter password."); 
             }
         }
-        function initLiveSettings() {
-            database.ref('siteSettings/popups').on('value', (snapshot) => {
-                const popupElement = document.getElementById('mainPopup');
-                const popupBox = popupElement.querySelector('.popup-box');
-                const popupText = document.getElementById('popupText');
-                if (!snapshot.exists()) { popupElement.style.display = 'none'; return; }
-                const now = new Date().toISOString().split('T')[0];
-                let isPopupFound = false;
-                snapshot.forEach((childSnapshot) => {
-                    if (isPopupFound) return;
-                    const data = childSnapshot.val();
-                    const isWithinDate = (!data.startDate || now >= data.startDate) && (!data.endDate || now <= data.endDate);
-                    if (data.popupActive && isWithinDate) {
-                        isPopupFound = true;
-                        popupElement.style.display = 'flex';
-                        popupElement.style.opacity = '1';
-                        popupText.innerHTML = data.content;
-                        popupBox.className = 'popup-box shadow-[0_0_50px_rgba(34,211,238,0.15)]';
-                        Object.assign(popupElement.style, { alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.7)', pointerEvents:'auto' });
-                        switch (data.effect) {
-                            case 'cleavage': popupBox.classList.add('effect-cleavage'); setTimeout(() => { popupBox.classList.add('exit'); setTimeout(closePopup, 800); }, 3000); break;
-                            case 'wave': popupBox.classList.add('effect-wave'); setTimeout(() => { closeWithFade(popupElement); }, 3000); break;
-                            case 'rotation': popupBox.classList.add('effect-rotation'); setTimeout(() => { popupBox.classList.add('exit'); setTimeout(closePopup, 800); }, 3000); break;
-                            case 'slide': Object.assign(popupElement.style, { background:'transparent', alignItems:'flex-end', paddingBottom:'60px', pointerEvents:'none' }); popupBox.style.pointerEvents = 'auto'; popupBox.classList.add('effect-slide-center'); setTimeout(() => { closeWithFade(popupElement); }, 3000); break;
-                        }
-                    }
-                });
-                if (!isPopupFound) popupElement.style.display = 'none';
-            });
+function initLiveSettings() {
+    database.ref('siteSettings/popups').on('value', (snapshot) => {
+        const popupElement = document.getElementById('mainPopup');
+        const popupBox = popupElement.querySelector('.popup-box');
+        const popupText = document.getElementById('popupText');
+        
+        // --- 배너 엘리먼트 가져오기 ---
+        const bannerElement = document.getElementById('emergencyBanner');
+        const bannerText = document.getElementById('bannerText');
+
+        if (!snapshot.exists()) { 
+            popupElement.style.display = 'none'; 
+            if(bannerElement) bannerElement.style.display = 'none'; // 데이터 없으면 배너도 숨김
+            return; 
         }
+
+        const now = new Date().toISOString().split('T')[0];
+        let isPopupFound = false;
+        let isBannerFound = false; // 배너 활성화 여부 체크용
+
+        snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
+            const isWithinDate = (!data.startDate || now >= data.startDate) && (!data.endDate || now <= data.endDate);
+
+            // 1. 팝업 처리 로직 (기존 코드 유지)
+            if (data.popupActive && isWithinDate && !isPopupFound) {
+                isPopupFound = true;
+                popupElement.style.display = 'flex';
+                popupElement.style.opacity = '1';
+                popupText.innerHTML = data.content;
+                popupBox.className = 'popup-box shadow-[0_0_50px_rgba(34,211,238,0.15)]';
+                Object.assign(popupElement.style, { alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.7)', pointerEvents:'auto' });
+                
+                switch (data.effect) {
+                    case 'cleavage': popupBox.classList.add('effect-cleavage'); setTimeout(() => { popupBox.classList.add('exit'); setTimeout(closePopup, 800); }, 3000); break;
+                    case 'wave': popupBox.classList.add('effect-wave'); setTimeout(() => { closeWithFade(popupElement); }, 3000); break;
+                    case 'rotation': popupBox.classList.add('effect-rotation'); setTimeout(() => { popupBox.classList.add('exit'); setTimeout(closePopup, 800); }, 3000); break;
+                    case 'slide': Object.assign(popupElement.style, { background:'transparent', alignItems:'flex-end', paddingBottom:'60px', pointerEvents:'none' }); popupBox.style.pointerEvents = 'auto'; popupBox.classList.add('effect-slide-center'); setTimeout(() => { closeWithFade(popupElement); }, 3000); break;
+                }
+            }
+
+            // 2. 배너 처리 로직 (추가된 부분)
+            if (data.bannerActive && isWithinDate && !isBannerFound) {
+                isBannerFound = true;
+                if (bannerElement && bannerText) {
+                    bannerText.innerText = data.text; // Firebase의 text 필드 적용
+                    bannerElement.style.display = 'block'; // 배너 표시
+                }
+            }
+        });
+
+        if (!isPopupFound) popupElement.style.display = 'none';
+        // 배너가 발견되지 않았다면 숨김 처리
+        if (!isBannerFound && bannerElement) bannerElement.style.display = 'none';
+    });
+}
         function closeWithFade(el) { el.style.transition = 'opacity 0.8s ease'; el.style.opacity = '0'; setTimeout(closePopup, 800); }
         function closePopup() { const p = document.getElementById('mainPopup'); if(p){ p.style.display='none'; p.style.opacity='1'; } }
     </script>
