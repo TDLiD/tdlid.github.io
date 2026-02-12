@@ -30,16 +30,14 @@ function initLiveSettings() {
         }
     });
 
-    // 2. 팝업 및 배너 통합 처리 (index.html 로직 이식)
+    // 2. 팝업 및 배너 통합 처리
     database.ref('siteSettings/popups').on('value', (snapshot) => {
         const popupElement = document.getElementById('mainPopup');
         const popupBox = popupElement.querySelector('.popup-box');
         const popupText = document.getElementById('popupText');
-        
         const bannerElement = document.getElementById('emergencyBanner');
         const bannerText = document.getElementById('bannerText');
 
-        // 데이터가 아예 없을 경우 초기화 후 종료
         if (!snapshot.exists()) {
             popupElement.style.display = 'none';
             if (bannerElement) bannerElement.style.display = 'none';
@@ -47,68 +45,74 @@ function initLiveSettings() {
         }
 
         const now = new Date().toISOString().split('T')[0];
-        let isPopupFound = false;
-        let isBannerFound = false;
+        
+        // 중요: 루프 밖에서 변수 관리
+        let activePopupData = null;
+        let activeBannerData = null;
 
-        // Firebase 데이터를 순회 (배열/객체 모두 대응)
+        // 모든 데이터를 돌면서 "조건에 맞는 마지막(최신) 데이터" 하나만 선정
         snapshot.forEach((childSnapshot) => {
             const data = childSnapshot.val();
-            // 기간 확인 로직
             const isWithinDate = (!data.startDate || now >= data.startDate) && (!data.endDate || now <= data.endDate);
 
-            // --- 1. 팝업 처리 로직 ---
-            // 활성화 상태이고, 기간 내에 있으며, 아직 이번 순회에서 팝업을 띄우지 않았을 때
-            if (data.popupActive && isWithinDate && !isPopupFound) {
-                // 이미 세션에서 닫은 팝업인지 확인 (선택 사항: 원치 않으면 이 if문 삭제)
-                if (!sessionStorage.getItem('popupClosed_' + childSnapshot.key)) {
-                    isPopupFound = true;
-                    popupElement.style.display = 'flex';
-                    popupText.innerHTML = data.content || data.text || '';
-                    
-                    // 효과 초기화 및 적용
-                    popupBox.className = 'popup-box'; 
-                    const effect = data.effect || 'classic';
-                    popupBox.classList.add(`effect-${effect}`);
-
-                    // 자동 종료 로직 (효과가 'classic'이 아닐 때만 작동하도록 설정)
-                    if (effect !== 'classic') {
-                        // 기존에 돌아가던 타이머가 있을 수 있으므로 clearTimeout 처리를 하거나 
-                        // 아래처럼 단순 setTimeout으로 처리 (일회성)
-                        setTimeout(() => {
-                            popupBox.classList.add('popup-exit-active');
-                            setTimeout(() => { popupElement.style.display = 'none'; }, 500);
-                        }, 4000); // 모바일은 가독성을 위해 4초 권장
-                    }
-                }
+            if (data.popupActive && isWithinDate) {
+                activePopupData = { ...data, key: childSnapshot.key };
             }
-
-            // --- 2. 배너 처리 로직 ---
-            if (data.bannerActive && isWithinDate && !isBannerFound) {
-                isBannerFound = true;
-                if (bannerElement && bannerText) {
-                    bannerElement.style.display = 'block';
-                    bannerText.innerHTML = data.text || data.bannerContent || 'Notice';
-                }
+            if (data.bannerActive && isWithinDate) {
+                activeBannerData = data;
             }
         });
 
-        // 순회가 끝난 후에도 발견되지 않았다면 숨김 처리
-        if (!isPopupFound) {
+        // --- 1. 최종 선정된 팝업 하나만 실행 ---
+        if (activePopupData) {
+            // 세션 저장소 체크 (이미 닫았는지 확인)
+            const isClosed = sessionStorage.getItem('popupClosed_' + activePopupData.key);
+            
+            if (!isClosed) {
+                popupElement.style.display = 'flex';
+                popupText.innerHTML = activePopupData.content || activePopupData.text || '';
+                
+                // 애니메이션 초기화 및 적용
+                popupBox.className = 'popup-box'; 
+                const effect = activePopupData.effect || 'classic';
+                popupBox.classList.add(`effect-${effect}`);
+
+                // 자동 종료 로직 (classic이 아닐 때만 4초 후 사라짐)
+                if (effect !== 'classic') {
+                    // 이전 타이머들이 꼬이지 않게 하기 위해 새로운 타임아웃만 적용
+                    if (window.popupTimer) clearTimeout(window.popupTimer);
+                    window.popupTimer = setTimeout(() => {
+                        popupBox.classList.add('popup-exit-active');
+                        setTimeout(() => { 
+                            popupElement.style.display = 'none'; 
+                        }, 500);
+                    }, 4000);
+                }
+            } else {
+                popupElement.style.display = 'none';
+            }
+        } else {
             popupElement.style.display = 'none';
         }
-        if (!isBannerFound && bannerElement) {
+
+        // --- 2. 최종 선정된 배너 하나만 실행 ---
+        if (activeBannerData && bannerElement && bannerText) {
+            bannerElement.style.display = 'block';
+            bannerText.innerHTML = activeBannerData.text || activeBannerData.bannerContent || 'Notice';
+        } else if (bannerElement) {
             bannerElement.style.display = 'none';
         }
     });
 }
 
-// 팝업 닫기 함수 보강
-function closeMainPopup() {
-    const popup = document.getElementById('mainPopup');
-    popup.style.display = 'none';
-    document.body.classList.remove('overflow-hidden');
-    // 현재 세션 동안은 팝업을 다시 보지 않게 하려면 아래 주석 해제
-    // sessionStorage.setItem('popupClosed_any', 'true');
+// 팝업 닫기 버튼용 함수 (HTML의 Close 버튼에 연결)
+function closePopupManually() {
+    const popupElement = document.getElementById('mainPopup');
+    const popupBox = popupElement.querySelector('.popup-box');
+    
+    // 만약 어떤 팝업이 띄워져 있는지 알 수 있다면 해당 키를 세션에 저장하여 
+    // 새로고침 전까지 다시 안 뜨게 할 수 있습니다. (현재는 단순히 숨김)
+    popupElement.style.display = 'none';
 }
         function openAdminAuth() {
             const modal = document.getElementById('adminAuthModal');
