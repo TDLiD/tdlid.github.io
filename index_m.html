@@ -30,68 +30,86 @@ function initLiveSettings() {
         }
     });
 
-    // 2. 팝업 및 배너 통합 처리 (이 부분이 핵심입니다)
+    // 2. 팝업 및 배너 통합 처리 (index.html 로직 이식)
     database.ref('siteSettings/popups').on('value', (snapshot) => {
-        const popups = snapshot.val();
-        const popup = document.getElementById('mainPopup');
-        const popupBox = popup.querySelector('.popup-box');
+        const popupElement = document.getElementById('mainPopup');
+        const popupBox = popupElement.querySelector('.popup-box');
         const popupText = document.getElementById('popupText');
         
-        const banner = document.getElementById('emergencyBanner');
+        const bannerElement = document.getElementById('emergencyBanner');
         const bannerText = document.getElementById('bannerText');
 
-        let isAnyPopupVisible = false;
-        let isAnyBannerVisible = false;
+        // 데이터가 아예 없을 경우 초기화 후 종료
+        if (!snapshot.exists()) {
+            popupElement.style.display = 'none';
+            if (bannerElement) bannerElement.style.display = 'none';
+            return;
+        }
 
-        if (popups) {
-            const now = new Date().toISOString().split('T')[0];
-            
-            // 데이터가 배열이거나 객체일 경우 모두 대응
-            const popupItems = Array.isArray(popups) ? popups : Object.values(popups);
+        const now = new Date().toISOString().split('T')[0];
+        let isPopupFound = false;
+        let isBannerFound = false;
 
-            for (const item of popupItems) {
-                if (!item) continue;
-                const isDateValid = (!item.startDate || now >= item.startDate) && (!item.endDate || now <= item.endDate);
-                
-                // [팝업 로직]
-                if (item.popupActive && isDateValid && !isAnyPopupVisible) {
-                    popupBox.className = "popup-box"; 
-                    popupBox.classList.add(`effect-${item.effect || 'classic'}`);
-                    popupText.innerHTML = item.content || item.text || '';
-                    popup.style.display = 'flex';
-                    isAnyPopupVisible = true;
+        // Firebase 데이터를 순회 (배열/객체 모두 대응)
+        snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
+            // 기간 확인 로직
+            const isWithinDate = (!data.startDate || now >= data.startDate) && (!data.endDate || now <= data.endDate);
+
+            // --- 1. 팝업 처리 로직 ---
+            // 활성화 상태이고, 기간 내에 있으며, 아직 이번 순회에서 팝업을 띄우지 않았을 때
+            if (data.popupActive && isWithinDate && !isPopupFound) {
+                // 이미 세션에서 닫은 팝업인지 확인 (선택 사항: 원치 않으면 이 if문 삭제)
+                if (!sessionStorage.getItem('popupClosed_' + childSnapshot.key)) {
+                    isPopupFound = true;
+                    popupElement.style.display = 'flex';
+                    popupText.innerHTML = data.content || data.text || '';
                     
-                    // 자동 종료 효과
-                    if (item.effect && item.effect !== 'classic') {
+                    // 효과 초기화 및 적용
+                    popupBox.className = 'popup-box'; 
+                    const effect = data.effect || 'classic';
+                    popupBox.classList.add(`effect-${effect}`);
+
+                    // 자동 종료 로직 (효과가 'classic'이 아닐 때만 작동하도록 설정)
+                    if (effect !== 'classic') {
+                        // 기존에 돌아가던 타이머가 있을 수 있으므로 clearTimeout 처리를 하거나 
+                        // 아래처럼 단순 setTimeout으로 처리 (일회성)
                         setTimeout(() => {
                             popupBox.classList.add('popup-exit-active');
-                            setTimeout(() => { popup.style.display = 'none'; }, 500);
-                        }, 3000);
-                    }
-                }
-
-                // [배너 로직] - index.html과 동일하게 item 내부의 bannerActive를 확인
-                if (item.bannerActive && isDateValid && !isAnyBannerVisible) {
-                    if (banner && bannerText) {
-                        banner.style.display = 'block';
-                        bannerText.innerHTML = item.bannerContent || item.text || 'Notice';
-                        isAnyBannerVisible = true;
+                            setTimeout(() => { popupElement.style.display = 'none'; }, 500);
+                        }, 4000); // 모바일은 가독성을 위해 4초 권장
                     }
                 }
             }
+
+            // --- 2. 배너 처리 로직 ---
+            if (data.bannerActive && isWithinDate && !isBannerFound) {
+                isBannerFound = true;
+                if (bannerElement && bannerText) {
+                    bannerElement.style.display = 'block';
+                    bannerText.innerHTML = data.text || data.bannerContent || 'Notice';
+                }
+            }
+        });
+
+        // 순회가 끝난 후에도 발견되지 않았다면 숨김 처리
+        if (!isPopupFound) {
+            popupElement.style.display = 'none';
         }
-        
-        // 유효한 데이터가 없으면 숨김
-        if (!isAnyPopupVisible) popup.style.display = 'none';
-        if (!isAnyBannerVisible && banner) banner.style.display = 'none';
+        if (!isBannerFound && bannerElement) {
+            bannerElement.style.display = 'none';
+        }
     });
 }
 
-        function closeMainPopup() {
-            const popup = document.getElementById('mainPopup');
-            popup.style.display = 'none';
-            document.body.classList.remove('overflow-hidden');
-        }
+// 팝업 닫기 함수 보강
+function closeMainPopup() {
+    const popup = document.getElementById('mainPopup');
+    popup.style.display = 'none';
+    document.body.classList.remove('overflow-hidden');
+    // 현재 세션 동안은 팝업을 다시 보지 않게 하려면 아래 주석 해제
+    // sessionStorage.setItem('popupClosed_any', 'true');
+}
         function openAdminAuth() {
             const modal = document.getElementById('adminAuthModal');
             modal.classList.remove('hidden');
