@@ -20,51 +20,74 @@
         };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
-        function initLiveSettings() {
-            database.ref('siteSettings/seo').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    if (data.description) document.getElementById('metaDescription').content = data.description;
-                    if (data.keywords) document.getElementById('metaKeywords').content = data.keywords;
-                }
-            });
-            database.ref('siteSettings/popups').on('value', (snapshot) => {
-                const popups = snapshot.val();
-                const popup = document.getElementById('mainPopup');
-                const popupBox = popup.querySelector('.popup-box');
-                const popupText = document.getElementById('popupText');
-                let isAnyPopupVisible = false;
-                if (popups && Array.isArray(popups)) {
-                    const now = new Date().toISOString().split('T')[0];
-                    popups.forEach(item => {
-                        if (item && item.popupActive && !isAnyPopupVisible) {
-                            const isDateValid = (!item.startDate || now >= item.startDate) && (!item.endDate || now <= item.endDate);
-                            if (isDateValid) {
-                                popupBox.className = "popup-box";
-                                const effectClass = `effect-${item.effect || 'classic'}`;
-                                popupBox.classList.add(effectClass);
-                                popup.style.display = 'flex';
-                                popupText.innerHTML = item.content || item.text || '';
-                                isAnyPopupVisible = true;
-                                if (item.effect && item.effect !== 'classic') {
-                                    setTimeout(() => {
-                                        popupBox.classList.add('popup-exit-active');
-                                        setTimeout(() => {
-                                            closeMainPopup();
-                                            popupBox.classList.remove('popup-exit-active');
-                                        }, 500);
-                                    }, 3000);
-                                }
-                                if (item.effect === 'heart' && typeof activateHeartEasterEgg === 'function') {
-                                    activateHeartEasterEgg();
-                                }
-                            }
+function initLiveSettings() {
+    // 1. SEO 설정 업데이트
+    database.ref('siteSettings/seo').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            if (data.description) document.getElementById('metaDescription').content = data.description;
+            if (data.keywords) document.getElementById('metaKeywords').content = data.keywords;
+        }
+    });
+
+    // 2. 팝업 설정 업데이트
+    database.ref('siteSettings/popups').on('value', (snapshot) => {
+        const popups = snapshot.val();
+        const popup = document.getElementById('mainPopup');
+        const popupBox = popup.querySelector('.popup-box');
+        const popupText = document.getElementById('popupText');
+        let isAnyPopupVisible = false;
+
+        if (popups && Array.isArray(popups)) {
+            const now = new Date().toISOString().split('T')[0];
+            popups.forEach(item => {
+                if (item && item.popupActive && !isAnyPopupVisible) {
+                    const isDateValid = (!item.startDate || now >= item.startDate) && (!item.endDate || now <= item.endDate);
+                    if (isDateValid) {
+                        popupBox.className = "popup-box";
+                        const effectClass = `effect-${item.effect || 'classic'}`;
+                        popupBox.classList.add(effectClass);
+                        popup.style.display = 'flex';
+                        popupText.innerHTML = item.content || item.text || '';
+                        isAnyPopupVisible = true;
+                        
+                        if (item.effect && item.effect !== 'classic') {
+                            setTimeout(() => {
+                                popupBox.classList.add('popup-exit-active');
+                                setTimeout(() => {
+                                    closeMainPopup();
+                                    popupBox.classList.remove('popup-exit-active');
+                                }, 500);
+                            }, 3000);
                         }
-                    });
+                        if (item.effect === 'heart' && typeof activateHeartEasterEgg === 'function') {
+                            activateHeartEasterEgg();
+                        }
+                    }
                 }
-                if (!isAnyPopupVisible) closeMainPopup();
             });
         }
+        if (!isAnyPopupVisible) closeMainPopup();
+    });
+
+    // 3. 긴급 배너(Emergency Banner) 설정 업데이트 (추가된 부분)
+    database.ref('siteSettings/banner').on('value', (snapshot) => {
+        const data = snapshot.val();
+        const banner = document.getElementById('emergencyBanner');
+        const bannerText = document.getElementById('bannerText');
+
+        if (data && data.bannerActive) {
+            banner.style.display = 'block';
+            // bannerContent 또는 text 필드 중 존재하는 값을 사용
+            bannerText.innerHTML = data.bannerContent || data.text || 'Notice';
+            
+            // 필요 시 배경색도 실시간으로 변경하고 싶다면 아래 주석 해제
+            // if (data.backgroundColor) banner.style.backgroundColor = data.backgroundColor;
+        } else {
+            banner.style.display = 'none';
+        }
+    });
+}
         function closeMainPopup() {
             const popup = document.getElementById('mainPopup');
             popup.style.display = 'none';
