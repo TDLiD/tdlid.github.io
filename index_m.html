@@ -30,59 +30,70 @@ function initLiveSettings() {
         }
     });
 
-    // 2. 팝업 설정 업데이트
+    // 2. 팝업 설정 업데이트 (로직 개선)
     database.ref('siteSettings/popups').on('value', (snapshot) => {
         const popups = snapshot.val();
         const popup = document.getElementById('mainPopup');
         const popupBox = popup.querySelector('.popup-box');
         const popupText = document.getElementById('popupText');
+        
+        // 팝업이 이미 떠있는지 확인하는 플래그 (중복 실행 방지)
         let isAnyPopupVisible = false;
 
         if (popups && Array.isArray(popups)) {
             const now = new Date().toISOString().split('T')[0];
-            popups.forEach(item => {
-                if (item && item.popupActive && !isAnyPopupVisible) {
+            
+            // 모든 팝업을 돌지만, 첫 번째 유효한 팝업만 처리
+            for (const item of popups) {
+                if (item && item.popupActive) {
                     const isDateValid = (!item.startDate || now >= item.startDate) && (!item.endDate || now <= item.endDate);
+                    
                     if (isDateValid) {
-                        popupBox.className = "popup-box";
+                        // 팝업 데이터 설정
+                        popupBox.className = "popup-box"; // 클래스 초기화
                         const effectClass = `effect-${item.effect || 'classic'}`;
                         popupBox.classList.add(effectClass);
-                        popup.style.display = 'flex';
-                        popupText.innerHTML = item.content || item.text || '';
-                        isAnyPopupVisible = true;
                         
-                        if (item.effect && item.effect !== 'classic') {
+                        popupText.innerHTML = item.content || item.text || '';
+                        popup.style.display = 'flex';
+                        isAnyPopupVisible = true;
+
+                        // 자동 종료 효과가 있는 경우 (단, 이미 종료 애니메이션 중이면 실행 안 함)
+                        if (item.effect && item.effect !== 'classic' && !popupBox.classList.contains('popup-exit-active')) {
                             setTimeout(() => {
                                 popupBox.classList.add('popup-exit-active');
                                 setTimeout(() => {
-                                    closeMainPopup();
+                                    popup.style.display = 'none';
                                     popupBox.classList.remove('popup-exit-active');
                                 }, 500);
                             }, 3000);
                         }
+
                         if (item.effect === 'heart' && typeof activateHeartEasterEgg === 'function') {
                             activateHeartEasterEgg();
                         }
+                        
+                        break; // 유효한 팝업 하나를 찾았으면 루프 종료 (중복 팝업 방지)
                     }
                 }
-            });
+            }
         }
-        if (!isAnyPopupVisible) closeMainPopup();
+        
+        // 표시할 팝업이 없으면 닫기
+        if (!isAnyPopupVisible) {
+            popup.style.display = 'none';
+        }
     });
 
-    // 3. 긴급 배너(Emergency Banner) 설정 업데이트 (추가된 부분)
+    // 3. 긴급 배너(Emergency Banner) 설정 업데이트
     database.ref('siteSettings/banner').on('value', (snapshot) => {
         const data = snapshot.val();
         const banner = document.getElementById('emergencyBanner');
         const bannerText = document.getElementById('bannerText');
 
-        if (data && data.bannerActive) {
+        if (data && data.bannerActive === true) {
             banner.style.display = 'block';
-            // bannerContent 또는 text 필드 중 존재하는 값을 사용
             bannerText.innerHTML = data.bannerContent || data.text || 'Notice';
-            
-            // 필요 시 배경색도 실시간으로 변경하고 싶다면 아래 주석 해제
-            // if (data.backgroundColor) banner.style.backgroundColor = data.backgroundColor;
         } else {
             banner.style.display = 'none';
         }
