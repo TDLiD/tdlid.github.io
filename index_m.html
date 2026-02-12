@@ -21,7 +21,7 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
 function initLiveSettings() {
-    // 1. SEO 설정 업데이트
+    // 1. SEO 설정 (기존 유지)
     database.ref('siteSettings/seo').on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -30,75 +30,63 @@ function initLiveSettings() {
         }
     });
 
-    // 2. 팝업 설정 업데이트 (로직 개선)
+    // 2. 팝업 및 배너 통합 처리 (이 부분이 핵심입니다)
     database.ref('siteSettings/popups').on('value', (snapshot) => {
         const popups = snapshot.val();
         const popup = document.getElementById('mainPopup');
         const popupBox = popup.querySelector('.popup-box');
         const popupText = document.getElementById('popupText');
         
-        // 팝업이 이미 떠있는지 확인하는 플래그 (중복 실행 방지)
-        let isAnyPopupVisible = false;
+        const banner = document.getElementById('emergencyBanner');
+        const bannerText = document.getElementById('bannerText');
 
-        if (popups && Array.isArray(popups)) {
+        let isAnyPopupVisible = false;
+        let isAnyBannerVisible = false;
+
+        if (popups) {
             const now = new Date().toISOString().split('T')[0];
             
-            // 모든 팝업을 돌지만, 첫 번째 유효한 팝업만 처리
-            for (const item of popups) {
-                if (item && item.popupActive) {
-                    const isDateValid = (!item.startDate || now >= item.startDate) && (!item.endDate || now <= item.endDate);
+            // 데이터가 배열이거나 객체일 경우 모두 대응
+            const popupItems = Array.isArray(popups) ? popups : Object.values(popups);
+
+            for (const item of popupItems) {
+                if (!item) continue;
+                const isDateValid = (!item.startDate || now >= item.startDate) && (!item.endDate || now <= item.endDate);
+                
+                // [팝업 로직]
+                if (item.popupActive && isDateValid && !isAnyPopupVisible) {
+                    popupBox.className = "popup-box"; 
+                    popupBox.classList.add(`effect-${item.effect || 'classic'}`);
+                    popupText.innerHTML = item.content || item.text || '';
+                    popup.style.display = 'flex';
+                    isAnyPopupVisible = true;
                     
-                    if (isDateValid) {
-                        // 팝업 데이터 설정
-                        popupBox.className = "popup-box"; // 클래스 초기화
-                        const effectClass = `effect-${item.effect || 'classic'}`;
-                        popupBox.classList.add(effectClass);
-                        
-                        popupText.innerHTML = item.content || item.text || '';
-                        popup.style.display = 'flex';
-                        isAnyPopupVisible = true;
+                    // 자동 종료 효과
+                    if (item.effect && item.effect !== 'classic') {
+                        setTimeout(() => {
+                            popupBox.classList.add('popup-exit-active');
+                            setTimeout(() => { popup.style.display = 'none'; }, 500);
+                        }, 3000);
+                    }
+                }
 
-                        // 자동 종료 효과가 있는 경우 (단, 이미 종료 애니메이션 중이면 실행 안 함)
-                        if (item.effect && item.effect !== 'classic' && !popupBox.classList.contains('popup-exit-active')) {
-                            setTimeout(() => {
-                                popupBox.classList.add('popup-exit-active');
-                                setTimeout(() => {
-                                    popup.style.display = 'none';
-                                    popupBox.classList.remove('popup-exit-active');
-                                }, 500);
-                            }, 3000);
-                        }
-
-                        if (item.effect === 'heart' && typeof activateHeartEasterEgg === 'function') {
-                            activateHeartEasterEgg();
-                        }
-                        
-                        break; // 유효한 팝업 하나를 찾았으면 루프 종료 (중복 팝업 방지)
+                // [배너 로직] - index.html과 동일하게 item 내부의 bannerActive를 확인
+                if (item.bannerActive && isDateValid && !isAnyBannerVisible) {
+                    if (banner && bannerText) {
+                        banner.style.display = 'block';
+                        bannerText.innerHTML = item.bannerContent || item.text || 'Notice';
+                        isAnyBannerVisible = true;
                     }
                 }
             }
         }
         
-        // 표시할 팝업이 없으면 닫기
-        if (!isAnyPopupVisible) {
-            popup.style.display = 'none';
-        }
-    });
-
-    // 3. 긴급 배너(Emergency Banner) 설정 업데이트
-    database.ref('siteSettings/banner').on('value', (snapshot) => {
-        const data = snapshot.val();
-        const banner = document.getElementById('emergencyBanner');
-        const bannerText = document.getElementById('bannerText');
-
-        if (data && data.bannerActive === true) {
-            banner.style.display = 'block';
-            bannerText.innerHTML = data.bannerContent || data.text || 'Notice';
-        } else {
-            banner.style.display = 'none';
-        }
+        // 유효한 데이터가 없으면 숨김
+        if (!isAnyPopupVisible) popup.style.display = 'none';
+        if (!isAnyBannerVisible && banner) banner.style.display = 'none';
     });
 }
+
         function closeMainPopup() {
             const popup = document.getElementById('mainPopup');
             popup.style.display = 'none';
@@ -461,11 +449,13 @@ function initImageSlider() {
                 });
             }, 4500);
         }
-        document.addEventListener("DOMContentLoaded", () => {
-            loadLayout().then(() => { initPillarEgg(); });
-            initImageSlider();
-            initPillarEgg();
-        });
+document.addEventListener("DOMContentLoaded", () => {
+    loadLayout().then(() => { 
+        initImageSlider();
+        initPillarEgg(); 
+    });
+});
+
     </script>
 </body>
 </html>
