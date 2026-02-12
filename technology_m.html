@@ -410,7 +410,7 @@
                         <span class="modal-close-x">✕</span>
                         <img src="${popupImgTarget}" class="modal-image">
                         <p class="text-sm text-neutral-400 leading-relaxed text-left">${this.dataset.detail || ''}</p>
-                        <button class="modal-close-btn">닫기</button>
+                        <button class="modal-close-btn">CLOSE</button>
                     </div>`;
                     const close = () => { document.body.removeChild(modal); startAuto(); };
                     modal.querySelector('.modal-close-btn').onclick = close;
@@ -427,5 +427,6 @@
         });
     </script>
 </body>
+
 
 </html>
