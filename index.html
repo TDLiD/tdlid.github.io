@@ -53,16 +53,18 @@
         .dropdown-quote-btn:hover{background:#67e8f9}
         .whitespace-nowrap{white-space:nowrap!important}
         #triggerWord{color:inherit!important;font-weight:inherit!important;text-decoration:none!important;cursor:text!important;display:inline;position:relative;z-index:9998;pointer-events:auto!important}
+        
+        /* Video Background 최적화 */
         body,.hero-section,.video-bg-container{background-color:#000!important}
         .hero-section{position:relative;width:100%;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;perspective:1000px}
         .video-bg-container{position:absolute;inset:0;z-index:0}
-        .video-bg{width:100%;height:100%;object-fit:cover;filter:brightness(0.4) contrast(1.1)}
-        .video-overlay{position:absolute;inset:0;background:radial-gradient(circle,rgba(0,0,0,0) 0%,rgba(0,0,0,0.4) 100%);z-index:5}
+        .video-bg{width:100%;height:100%;object-fit:cover;filter:brightness(0.5) contrast(1.1)}
+        .video-overlay{position:absolute;inset:0;background:radial-gradient(circle,rgba(0,0,0,0) 0%,rgba(0,0,0,0.6) 100%);z-index:5}
+        
         .hero-content{position:relative;z-index:10;pointer-events:none;transition:transform 0.1s ease-out}
         .hero-content *{pointer-events:auto}
         #fluid-canvas{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0.5}
-        .bg-slide{position:absolute;inset:0;z-index:1;background-color:#000;background-repeat:no-repeat;background-position:center;background-size:60%;mask-image:radial-gradient(circle,black 70%,transparent 100%);-webkit-mask-image:radial-gradient(circle,black 70%,transparent 100%);animation:smoothZoom 15s ease-in-out infinite alternate}
-        @keyframes smoothZoom{from{transform:scale(1)}to{transform:scale(1.05)}}
+        
         .hero-logo-gradient:hover{filter:drop-shadow(0 0 15px rgba(34,211,238,0.8));transition:all 0.3s}
         @keyframes cleavage-in{0%{opacity:0;clip-path:inset(0 0 50% 0);transform:translateY(-20px)}100%{opacity:1;clip-path:inset(0 0 0 0);transform:translateY(0)}}
         @keyframes cleavage-out{0%{opacity:1;clip-path:inset(0 0 0 0)}100%{opacity:0;clip-path:inset(0 0 50% 0);transform:translateY(-20px)}}
@@ -99,9 +101,11 @@
         <section class="hero-section flex flex-col items-center justify-center min-h-screen">
             <div id="bg-stars"></div>
             <canvas id="fluid-canvas"></canvas>
+            
             <div id="image-bg-container" class="video-bg-container">
-                <div class="video-overlay" style="z-index: 2;"></div>
+                <div class="video-overlay" style="z-index: 5;"></div>
             </div>
+
             <div id="parallax-content" class="hero-content max-w-6xl w-full px-12 text-center flex flex-col items-center justify-center h-full">
                 <div class="flex flex-col items-center justify-center">
                     <div class="ai-badge" id="ai-msg">System: Initializing Environment...</div>
@@ -154,6 +158,7 @@
     </div>
     <div id="footer-placeholder"></div>
     <div id="emergencyBanner">📢 <span id="bannerText">Notice</span></div>
+    
     <script>
         window.addEventListener('load', () => { const overlay = document.getElementById('page-reveal-overlay'); if(overlay) { setTimeout(() => { overlay.classList.add('active'); }, 300); } });
         const canvas = document.getElementById('fluid-canvas'), ctx = canvas.getContext('2d');
@@ -166,7 +171,33 @@
         function initAiSimulation() { const aiMsg = document.getElementById('ai-msg'); const messages = ["TDL Energy Indonesia", "Deliver the best products and services to our customers", "Promote leadership consistently", "Create and Innovate value"]; setInterval(() => { const msg = messages[Math.floor(Math.random() * messages.length)]; if(aiMsg) aiMsg.innerText = msg; }, 4500); }
         async function loadLayout() { try { const h = await fetch('components/header.html'); if(h.ok) document.getElementById('header-placeholder').innerHTML = await h.text(); const f = await fetch('components/footer.html'); if(f.ok) { const fp = document.getElementById('footer-placeholder'); fp.innerHTML = await f.text(); fp.querySelectorAll("script").forEach(s => { const ns = document.createElement("script"); ns.text = s.text; document.body.appendChild(ns).parentNode.removeChild(ns); }); } const b = await fetch('components/bgm.html'); if(b.ok) { const bp = document.getElementById('bgm-placeholder'); bp.innerHTML = await b.text(); bp.querySelectorAll("script").forEach(s => { const ns = document.createElement("script"); ns.textContent = s.textContent; document.body.appendChild(ns); s.remove(); }); } if (typeof initNavigation === "function") initNavigation(); } catch (err) { console.error(err); } }
         function initNavigation() { const btn = document.getElementById("menuToggleBtn"), menu = document.getElementById("dropdownMenu"), icon = document.getElementById("menuIcon"); if (btn && menu) btn.onclick = (e) => { e.stopPropagation(); const isOpen = menu.classList.contains("visible"); menu.classList.toggle("opacity-100", !isOpen); menu.classList.toggle("visible", !isOpen); menu.classList.toggle("translate-y-2", !isOpen); menu.classList.toggle("opacity-0", isOpen); menu.classList.toggle("invisible", isOpen); icon.innerText = isOpen ? "☰" : "✕"; }; }
-        document.addEventListener("DOMContentLoaded", () => { initStars(); initAiSimulation(); initFluid(); drawFluid(); window.addEventListener('resize', initFluid); const bgContainer = document.getElementById('image-bg-container'); if(bgContainer) { bgContainer.innerHTML = `<div class="video-overlay" style="z-index: 5;"></div><div class="bg-slide"></div>`; const bgSlide = bgContainer.querySelector('.bg-slide'), day = new Date().getDay(); let bgImg = (day === 1 || day === 4 || day === 0) ? "bg-1.gif" : (day === 2 || day === 5) ? "bg-2.gif" : "bg-3.gif"; bgSlide.style.backgroundImage = `url('images/bg/${bgImg}')`; } loadLayout(); initLiveSettings(); document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') verifyAdminPassword(); }); document.querySelectorAll('.cert-link').forEach(link => { link.onclick = (e) => { e.preventDefault(); const m = document.getElementById('imageModal'); document.getElementById('modalDetailImage').src = link.getAttribute('data-original-src'); m.classList.replace('hidden', 'flex'); document.body.style.overflow = 'hidden'; }; }); document.getElementById('imageModal').onclick = (e) => { if(e.target.id !== 'modalDetailImage') { e.currentTarget.classList.replace('flex', 'hidden'); document.body.style.overflow = ''; } }; });
+        
+        document.addEventListener("DOMContentLoaded", () => { 
+            initStars(); 
+            initAiSimulation(); 
+            initFluid(); 
+            drawFluid(); 
+            window.addEventListener('resize', initFluid); 
+            
+            // 배경 비디오 삽입 로직
+            const bgContainer = document.getElementById('image-bg-container'); 
+            if(bgContainer) { 
+                bgContainer.innerHTML = `
+                    <div class="video-overlay" style="z-index: 5;"></div>
+                    <video class="video-bg" autoplay muted loop playsinline poster="images/bg/bg-3.gif">
+                        <source src="images/bg/blue.mp4" type="video/mp4">
+                    </video>
+                `; 
+            } 
+            
+            loadLayout(); 
+            initLiveSettings(); 
+            document.getElementById('adminPasswordInput')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') verifyAdminPassword(); }); 
+            document.querySelectorAll('.cert-link').forEach(link => { link.onclick = (e) => { e.preventDefault(); const m = document.getElementById('imageModal'); document.getElementById('modalDetailImage').src = link.getAttribute('data-original-src'); m.classList.replace('hidden', 'flex'); document.body.style.overflow = 'hidden'; }; }); 
+            document.getElementById('imageModal').onclick = (e) => { if(e.target.id !== 'modalDetailImage') { e.currentTarget.classList.replace('flex', 'hidden'); document.body.style.overflow = ''; } }; 
+        });
+        
+        // 하트 이스터 에그 등 나머지 스크립트는 원본과 동일하게 유지...
         let isHeartRunning = false, inputBuffer = ""; const secretWord = "awesome";
         document.addEventListener('keydown', (e) => { if (isHeartRunning || !e.key) return; inputBuffer = (inputBuffer + e.key.toLowerCase()).slice(-secretWord.length); if (inputBuffer === secretWord) { inputBuffer = ""; activateTdlidHeart(); } });
         window.activateTdlidHeart = function() { if (isHeartRunning) return; isHeartRunning = true; const pts = [{x:0,y:0},{x:1,y:0},{x:2,y:0},{x:1,y:1},{x:1,y:2},{x:1,y:3},{x:1,y:4},{x:3.5,y:0},{x:3.5,y:1},{x:3.5,y:2},{x:3.5,y:3},{x:3.5,y:4},{x:4.5,y:0},{x:5.5,y:1},{x:5.5,y:2},{x:5.5,y:3},{x:4.5,y:4},{x:7,y:0},{x:7,y:1},{x:7,y:2},{x:7,y:3},{x:7,y:4},{x:8,y:4},{x:9,y:4},{x:10.5,y:0.5},{x:10.5,y:2},{x:10.5,y:3},{x:10.5,y:4},{x:12,y:0},{x:12,y:1},{x:12,y:2},{x:12,y:3},{x:12,y:4},{x:13,y:0},{x:14,y:1},{x:14,y:2},{x:14,y:3},{x:13,y:4}], hearts = [], sw = window.innerWidth, sh = window.innerHeight; pts.forEach((p, i) => { const h = document.createElement('div'); h.innerHTML = '❤️'; h.style.cssText = `position:fixed; left:${Math.random()*100}vw; top:${Math.random()*100}vh; font-size:22px; z-index:2147483647; opacity:0; pointer-events:none; transition:all 1.2s cubic-bezier(0.19,1,0.22,1);`; document.body.appendChild(h); hearts.push({el:h, target:p}); setTimeout(() => h.style.opacity = '1', i * 10); }); setTimeout(() => { const gap = Math.min(sw/20, 45), sx = (sw - (14*gap))/2, sy = (sh/2) - (2*gap); hearts.forEach(o => { Object.assign(o.el.style, {left: (sx+o.target.x*gap)+'px', top:(sy+o.target.y*gap)+'px', transform:'scale(1.5)', textShadow:'0 0 15px rgba(34,211,238,0.6)'}); }); }, 1200); setTimeout(() => { const cx = sw/2, cy = sh/2, hs = Math.min(sw, sh)/28; hearts.forEach((o, i) => { const t = (i/hearts.length)*2*Math.PI, hx = 16*Math.pow(Math.sin(t),3), hy = -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)); Object.assign(o.el.style, {transition:'all 2s ease-out', left:(cx+hx*hs)+'px', top:(cy+hy*hs)+'px', transform:'scale(2.2)', textShadow:'0 0 20px rgba(255,0,0,0.8)'}); }); }, 4500); setTimeout(() => { hearts.forEach(o => { Object.assign(o.el.style, {transition:'all 1.5s ease-in', opacity:'0', transform:`translate(${(Math.random()-0.5)*500}px,${(Math.random()-0.5)*500}px) scale(0)`}); setTimeout(() => o.el.remove(), 1500); }); isHeartRunning = false; }, 8500); };
