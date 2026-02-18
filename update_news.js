@@ -20,7 +20,7 @@ async function fetchNews() {
     // 4. "motor listrik" (인도네시아어 키워드)
     // 5. "swap battery Indonesia" (인프라 관련)
     const keywords = [
-      '"motorcycle" Indonesia',
+      '"electric motorcycle" Indonesia',
       '"EV battery" Indonesia',
       '"motor listrik" Indonesia',
       'Gesits OR "Alva One"',
@@ -69,4 +69,5 @@ async function fetchNews() {
 }
 
 fetchNews();
+
 
