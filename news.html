@@ -1,398 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
     <script>
-        (function () {
-            // 1. iPad를 제외하고 iPhone, Android 폰만 감지
-            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPCMode = urlParams.get('view_mode') === 'pc';
-
-            // 2. 리다이렉트 실행
-            if (isMobileOnly && !isPCMode) {
-                let path = window.location.pathname;
-                let page = path.split("/").pop();
-
-                // 메인 페이지(index) 처리
-                if (page === "" || page === "news.html") {
-                    window.location.href = "news_m.html";
-                }
-                // 그 외 페이지들 (예: products.html -> products_m.html)
-                else if (page.endsWith(".html") && !page.includes("_m.html")) {
-                    window.location.href = page.replace(".html", "_m.html");
-                }
-            }
-        })();
+        (function(){const isMobileOnly=/iPhone|iPod|Android/i.test(navigator.userAgent);const urlParams=new URLSearchParams(window.location.search);const isPCMode=urlParams.get('view_mode')==='pc';if(isMobileOnly&&!isPCMode){let path=window.location.pathname;let page=path.split("/").pop();if(page===""||page==="news.html"){window.location.href="news_m.html"}else if(page.endsWith(".html")&&!page.includes("_m.html")){window.location.href=page.replace(".html","_m.html")}}})();
     </script>
-
     <title>Latest News | TDL Energy Indonesia</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700;900&display=swap"
-        rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --accent: #00ffa3;
-        }
-
-        body {
-            background-color: #050505;
-            color: #f5f5f5;
-            font-family: 'Pretendard', sans-serif;
-            overflow-x: hidden; /* 가로 스크롤 방지 */
-            perspective: 1000px; /* 3D 깊이감 설정 */
-        }
-
-        /* 3D 배경 컨테이너 */
-        .background-container {
-            position: fixed; /* 배경으로 고정 */
-            width: 150%;
-            height: 150%;
-            top: -25%;
-            left: -25%;
-            z-index: 0;
-            transform-style: preserve-3d;
-            pointer-events: none;
-        }
-
-        .dot {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.3;
-        }
-
-        /* AI 개인화 태그 스타일 */
-        .ai-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border: 1px solid var(--accent);
-            border-radius: 20px;
-            font-size: 0.7rem;
-            color: var(--accent);
-            margin-bottom: 1.5rem;
-            background: rgba(0, 255, 163, 0.05);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-family: monospace;
-        }
-
-        /* 메인 콘텐츠 래퍼 (마우스 반응형) */
-        #main-wrapper {
-            position: relative;
-            z-index: 10;
-            transition: transform 0.1s ease-out;
-        }
-
-        .hero-slogan-gradient {
-            background: linear-gradient(135deg, #22d3ee 0%, #10b981 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-            padding-right: 0.15em;
-        }
-
-        .news-list-item {
-            background-color: rgba(23, 23, 23, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 0.75rem;
-            transition: all 0.3s ease;
-            margin-bottom: 0.5rem;
-            overflow: hidden;
-            backdrop-filter: blur(5px); /* 배경과 분리감을 위해 블러 추가 */
-        }
-
-        .news-list-item:hover {
-            transform: translateY(-2px);
-            border-color: rgba(6, 182, 212, 0.4);
-            background-color: rgba(23, 23, 23, 0.8);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        .arrow-icon {
-            color: rgba(6, 182, 212, 0.5);
-            transition: all 0.3s;
-        }
-
-        .news-list-item:hover .arrow-icon {
-            color: #22d3ee;
-            transform: translateX(4px);
-        }
-
-        .hero-slogan-gradient {
-            display: inline-block !important;
-            font-weight: 900 !important;
-            line-height: 1.2 !important;
-            padding-bottom: 0.1em;
-            background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            background-clip: text !important;
-            color: transparent !important;
-        }
+        :root{--accent:#00ffa3}body{background-color:#050505;color:#f5f5f5;font-family:'Pretendard',sans-serif;margin:0;padding:0;overflow-x:hidden;position:relative}.background-container{position:fixed;width:100vw;height:100vh;top:0;left:0;z-index:0;transform-style:preserve-3d;pointer-events:none;overflow:hidden}.dot{position:absolute;width:2px;height:2px;background:white;border-radius:50%;opacity:0.3}.ai-badge{display:inline-block;padding:6px 14px;border:1px solid var(--accent);border-radius:20px;font-size:0.7rem;color:var(--accent);margin-bottom:1.5rem;background:rgba(0,255,163,0.05);text-transform:uppercase;letter-spacing:0.1em;font-family:monospace}#main-wrapper{position:relative;z-index:10;transition:transform 0.1s ease-out;min-height:calc(100vh - 200px);display:block}.news-list-item{background-color:rgba(23,23,23,0.4);border:1px solid rgba(255,255,255,0.05);border-radius:0.75rem;transition:all 0.3s ease;margin-bottom:0.5rem;overflow:hidden;backdrop-filter:blur(5px)}.news-list-item:hover{transform:translateY(-2px);border-color:rgba(6,182,212,0.4);background-color:rgba(23,23,23,0.8);box-shadow:0 4px 20px rgba(0,0,0,0.4)}.arrow-icon{color:rgba(6,182,212,0.5);transition:all 0.3s}.news-list-item:hover .arrow-icon{color:#22d3ee;transform:translateX(4px)}.hero-slogan-gradient{display:inline-block !important;font-weight:900 !important;line-height:1.2 !important;padding-bottom:0.1em;background:linear-gradient(to right,#0891b2 0%,#22d3ee 50%,#ffffff 100%) !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;background-clip:text !important;color:transparent !important}
     </style>
 </head>
-
 <body class="bg-neutral-950">
     <div class="background-container" id="bg-stars"></div>
-
     <div id="bgm-placeholder"></div>
     <div id="header-placeholder"></div>
-
     <main id="main-wrapper" class="pt-32 lg:pt-48 pb-20 px-6 min-h-screen">
-<div class="max-w-5xl mx-auto pt-10 px-4 text-center">
-    <div class="flex flex-col items-center">
-        <div class="ai-badge" id="ai-msg">System: Initializing News Interface...</div>
-        
-        <h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
-            Latest News
-        </h2>
-    </div>
-
-    <div id="newsListContainer" class="flex flex-col gap-1 text-left">
-                <p class="text-center text-neutral-500 py-20 text-xl animate-pulse tracking-widest uppercase">Fetching
-                    News...</p>
+        <div class="max-w-5xl mx-auto pt-10 px-4 text-center">
+            <div class="flex flex-col items-center">
+                <div class="ai-badge" id="ai-msg">System: Initializing News Interface...</div>
+                <h2 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">Latest News</h2>
             </div>
-
+            <div id="newsListContainer" class="flex flex-col gap-1 text-left">
+                <p class="text-center text-neutral-500 py-20 text-xl animate-pulse tracking-widest uppercase">Fetching News...</p>
+            </div>
             <div class="mt-20 text-center">
-                <a href="index.html"
-                    class="inline-block px-8 py-4 rounded-xl border border-neutral-700 hover:bg-neutral-800 hover:border-cyan-500/50 transition-all duration-300 text-lg">
-                    &larr; Back to Home
-                </a>
+                <a href="index.html" class="inline-block px-8 py-4 rounded-xl border border-neutral-700 hover:bg-neutral-800 hover:border-cyan-500/50 transition-all duration-300 text-lg">&larr; Back to Home</a>
             </div>
         </div>
     </main>
-
     <div id="footer-placeholder"></div>
-
     <script>
-        // --- 3D 및 AI 기능 추가 영역 ---
-        
-        // 1. 배경 입자 생성
-        const bg = document.getElementById('bg-stars');
-        const count = 150; 
-        for (let i = 0; i < count; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'dot';
-            const x = Math.random() * 100;
-            const y = Math.random() * 100;
-            const z = Math.random() * 500 - 250;
-            dot.style.left = `${x}%`;
-            dot.style.top = `${y}%`;
-            dot.style.transform = `translateZ(${z}px)`;
-            bg.appendChild(dot);
-        }
-
-        // 2. 마우스 인터랙션 (3D Parallax)
-        const contentWrapper = document.getElementById('main-wrapper');
-        document.body.addEventListener('mousemove', (e) => {
-            const moveX = (e.clientX - window.innerWidth / 2) / 35; // 뉴스는 가독성을 위해 기울기 강도를 낮춤
-            const moveY = (e.clientY - window.innerHeight / 2) / 35;
-
-            bg.style.transform = `rotateY(${moveX * 0.5}deg) rotateX(${-moveY * 0.5}deg) translateZ(50px)`;
-            contentWrapper.style.transform = `rotateY(${moveX * 0.3}deg) rotateX(${-moveY * 0.3}deg)`;
-        });
-
-        // 3. AI 개인화 시뮬레이션
-        const aiMessages = [
-                "TDL Energy Indonesia",
-                "Deliver the best products and services to our customers",
-                "Promote leadership consistently",
-                "Create and Innovate value"
-        ];
-        setInterval(() => {
-            const msg = aiMessages[Math.floor(Math.random() * aiMessages.length)];
-            const msgElement = document.getElementById('ai-msg');
-            if(msgElement) msgElement.innerText = msg;
-        }, 5000);
-
-        // --- 기존 기능 유지 영역 ---
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
-            authDomain: "tdlid-107669.firebaseapp.com",
-            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
-            projectId: "tdlid-107669",
-            storageBucket: "tdlid-107669.firebasestorage.app",
-            messagingSenderId: "604782345004",
-            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
-        };
-
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-        const database = firebase.database();
-
-        function loadNewsFromFirebase() {
-            const container = document.getElementById('newsListContainer');
-            database.ref('notices').on('value', (snapshot) => {
-                if (!snapshot.exists()) {
-                    container.innerHTML = '<p class="text-center text-neutral-600 py-20">No news articles found.</p>';
-                    return;
-                }
-
-                let newsItems = [];
-                snapshot.forEach(child => {
-                    const data = child.val();
-                    if (data.category === 'news') {
-                        newsItems.push({ id: child.key, ...data });
-                    }
-                });
-
-                if (newsItems.length === 0) {
-                    container.innerHTML = '<p class="text-center text-neutral-600 py-20">No news articles found.</p>';
-                    return;
-                }
-
-                newsItems.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-                container.innerHTML = newsItems.map((item, index) => {
-                    const num = index + 1;
-                    const displayNum = num < 10 ? '0' + num : num;
-                    const linkUrl = item.content.replace(/<[^>]*>?/gm, '').trim();
-
-                    return `
-                <div class="news-list-item cursor-pointer" onclick="goToLink('${linkUrl}')">
-                    <div class="flex flex-col md:flex-row md:items-center px-6 py-3 md:px-8 md:py-4 gap-2 md:gap-4">
-                        <div class="flex items-start md:items-center flex-1 gap-3 md:gap-4 overflow-hidden">
-                            <span class="text-cyan-500 font-mono text-sm font-bold shrink-0 mt-1 md:mt-0">${displayNum}.</span>
-                            <h2 class="text-white font-bold text-base md:text-lg tracking-tight leading-snug break-words">
-                                ${item.title}
-                            </h2>
-                        </div>
-                        <div class="flex items-center justify-between md:justify-end gap-4 shrink-0 mt-2 md:mt-0 pt-2 md:pt-0 border-t border-white/5 md:border-none">
-                            <div class="flex items-center gap-3">
-                                <span class="text-neutral-500 font-mono text-[10px] md:text-xs uppercase whitespace-nowrap">${item.date}</span>
-                                <span class="text-neutral-700 text-[10px]">|</span>
-                                <span class="text-cyan-500/80 font-mono text-[10px] font-bold tracking-widest uppercase">News</span>
-                            </div>
-                            <svg class="arrow-icon w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </div>`;
-                }).join('');
-            });
-        }
-
-        function goToLink(url) {
-            if (!url) return;
-            const targetUrl = (url.startsWith('http://') || url.startsWith('https://')) ? url : 'https://' + url;
-            try { window.open(targetUrl, '_blank'); } catch (e) { alert("Invalid Link."); }
-        }
-
-        function initMenuToggle() {
-            const menuBtn = document.getElementById("menuToggleBtn");
-            const dropdown = document.getElementById("dropdownMenu");
-            const menuIcon = document.getElementById("menuIcon");
-
-            if (menuBtn && dropdown) {
-                menuBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    const isOpen = dropdown.classList.contains("opacity-100");
-                    if (!isOpen) {
-                        dropdown.classList.remove("opacity-0", "invisible", "-translate-y-2");
-                        dropdown.classList.add("opacity-100", "visible", "translate-y-0");
-                        if (menuIcon) menuIcon.innerText = "✕";
-                    } else {
-                        closeMenu();
-                    }
-                };
-
-                function closeMenu() {
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
-                    dropdown.classList.add("opacity-0", "invisible", "-translate-y-2");
-                    if (menuIcon) menuIcon.innerText = "☰";
-                }
-
-                document.addEventListener("click", (e) => {
-                    if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
-                });
-            }
-        }
-
-        async function loadLayout() {
-            try {
-                const headerRes = await fetch('components/header.html');
-                const headerHTML = await headerRes.text();
-                const headerPlaceholder = document.getElementById('header-placeholder');
-                headerPlaceholder.innerHTML = headerHTML;
-
-                const headerScripts = headerPlaceholder.querySelectorAll("script");
-                headerScripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    let scriptText = oldScript.text;
-                    if (scriptText.includes("admin.html")) {
-                        scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
-                    }
-                    newScript.text = scriptText;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-
-                const authRes = await fetch('components/admin-auth.html');
-                const authHTML = await authRes.text();
-                let authDiv = document.getElementById('admin-auth-placeholder');
-                if (!authDiv) {
-                    authDiv = document.createElement('div');
-                    authDiv.id = 'admin-auth-placeholder';
-                    document.body.appendChild(authDiv);
-                }
-                authDiv.innerHTML = authHTML;
-                const authScripts = authDiv.querySelectorAll("script");
-                authScripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    if (oldScript.src) newScript.src = oldScript.src;
-                    else newScript.text = oldScript.text;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-
-                const footerRes = await fetch('components/footer.html');
-                const footerPlaceholder = document.getElementById('footer-placeholder');
-                footerPlaceholder.innerHTML = await footerRes.text();
-                const footerScripts = footerPlaceholder.querySelectorAll("script");
-                footerScripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    newScript.text = oldScript.text;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-
-                const bgmRes = await fetch('components/bgm.html');
-                const bgmPlaceholder = document.getElementById('bgm-placeholder');
-                if (bgmPlaceholder) {
-                    bgmPlaceholder.innerHTML = await bgmRes.text();
-                    const bgmScripts = bgmPlaceholder.querySelectorAll("script");
-                    bgmScripts.forEach(oldScript => {
-                        const newScript = document.createElement("script");
-                        newScript.text = oldScript.text;
-                        document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                    });
-                }
-                initMenuToggle();
-            } catch (err) {
-                console.error("Layout Load Error:", err);
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            loadLayout();
-            loadNewsFromFirebase();
-        });
+        const bg=document.getElementById('bg-stars');for(let i=0;i<150;i++){const dot=document.createElement('div');dot.className='dot';dot.style.left=`${Math.random()*100}%`;dot.style.top=`${Math.random()*100}%`;dot.style.transform=`translateZ(${Math.random()*500-250}px)`;bg.appendChild(dot)}
+        const contentWrapper=document.getElementById('main-wrapper');
+        document.body.addEventListener('mousemove',(e)=>{const moveX=(e.clientX-window.innerWidth/2)/35;const moveY=(e.clientY-window.innerHeight/2)/35;bg.style.transform=`rotateY(${moveX*0.5}deg) rotateX(${-moveY*0.5}deg) translateZ(50px)`;contentWrapper.style.transform=`rotateY(${moveX*0.3}deg) rotateX(${-moveY*0.3}deg)`});
+        const aiMessages=["TDL Energy Indonesia","Deliver the best products and services to our customers","Promote leadership consistently","Create and Innovate value"];
+        setInterval(()=>{const msg=aiMessages[Math.floor(Math.random()*aiMessages.length)];const msgElement=document.getElementById('ai-msg');if(msgElement)msgElement.innerText=msg},5000);
+        const firebaseConfig={apiKey:"AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",authDomain:"tdlid-107669.firebaseapp.com",databaseURL:"https://tdlid-107669-default-rtdb.firebaseio.com",projectId:"tdlid-107669",storageBucket:"tdlid-107669.firebasestorage.app",messagingSenderId:"604782345004",appId:"1:604782345004:web:029aeaa81f4d11c2254a89"};
+        if(typeof firebase!=='undefined'&&!firebase.apps.length){firebase.initializeApp(firebaseConfig)}
+        const database=firebase.database();
+        function loadNewsFromFirebase(){const container=document.getElementById('newsListContainer');database.ref('notices').on('value',(snapshot)=>{if(!snapshot.exists()){container.innerHTML='<p class="text-center text-neutral-600 py-20">No news articles found.</p>';return}let newsItems=[];snapshot.forEach(child=>{const data=child.val();if(data.category==='news'){newsItems.push({id:child.key,...data})}});if(newsItems.length===0){container.innerHTML='<p class="text-center text-neutral-600 py-20">No news articles found.</p>';return}newsItems.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));container.innerHTML=newsItems.map((item,index)=>{const displayNum=(index+1)<10?'0'+(index+1):(index+1);const linkUrl=item.content.replace(/<[^>]*>?/gm,'').trim();return `<div class="news-list-item cursor-pointer" onclick="goToLink('${linkUrl}')"><div class="flex flex-col md:flex-row md:items-center px-6 py-3 md:px-8 md:py-4 gap-2 md:gap-4"><div class="flex items-start md:items-center flex-1 gap-3 md:gap-4 overflow-hidden"><span class="text-cyan-500 font-mono text-sm font-bold shrink-0 mt-1 md:mt-0">${displayNum}.</span><h2 class="text-white font-bold text-base md:text-lg tracking-tight leading-snug break-words">${item.title}</h2></div><div class="flex items-center justify-between md:justify-end gap-4 shrink-0 mt-2 md:mt-0 pt-2 md:pt-0 border-t border-white/5 md:border-none"><div class="flex items-center gap-3"><span class="text-neutral-500 font-mono text-[10px] md:text-xs uppercase whitespace-nowrap">${item.date}</span><span class="text-neutral-700 text-[10px]">|</span><span class="text-cyan-500/80 font-mono text-[10px] font-bold tracking-widest uppercase">News</span></div><svg class="arrow-icon w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg></div></div></div>`}).join('')})}
+        function goToLink(url){if(!url)return;const targetUrl=(url.startsWith('http://')||url.startsWith('https://'))?url:'https://'+url;try{window.open(targetUrl,'_blank')}catch(e){alert("Invalid Link.")}}
+        function initMenuToggle(){const menuBtn=document.getElementById("menuToggleBtn"),dropdown=document.getElementById("dropdownMenu"),menuIcon=document.getElementById("menuIcon");if(menuBtn&&dropdown){menuBtn.onclick=(e)=>{e.stopPropagation();if(!dropdown.classList.contains("opacity-100")){dropdown.classList.remove("opacity-0","invisible","-translate-y-2");dropdown.classList.add("opacity-100","visible","translate-y-0");if(menuIcon)menuIcon.innerText="✕"}else{closeMenu()}};const closeMenu=()=>{dropdown.classList.remove("opacity-100","visible","translate-y-0");dropdown.classList.add("opacity-0","invisible","-translate-y-2");if(menuIcon)menuIcon.innerText="☰"};document.addEventListener("click",(e)=>{if(!dropdown.contains(e.target)&&!menuBtn.contains(e.target))closeMenu()})}}
+        async function loadLayout(){try{const hRes=await fetch('components/header.html'),hHTML=await hRes.text(),hPlace=document.getElementById('header-placeholder');hPlace.innerHTML=hHTML;hPlace.querySelectorAll("script").forEach(oldScript=>{const newScript=document.createElement("script");let txt=oldScript.text;if(txt.includes("admin.html")){txt=txt.replace(/admin\.html/g,"admin/admin.html")}newScript.text=txt;document.body.appendChild(newScript).parentNode.removeChild(newScript)});const aRes=await fetch('components/admin-auth.html'),aHTML=await aRes.text();let aDiv=document.getElementById('admin-auth-placeholder')||Object.assign(document.createElement('div'),{id:'admin-auth-placeholder'});if(!aDiv.parentNode)document.body.appendChild(aDiv);aDiv.innerHTML=aHTML;aDiv.querySelectorAll("script").forEach(s=>{const ns=document.createElement("script");if(s.src)ns.src=s.src;else ns.text=s.text;document.body.appendChild(ns).parentNode.removeChild(ns)});const fRes=await fetch('components/footer.html');document.getElementById('footer-placeholder').innerHTML=await fRes.text();const bRes=await fetch('components/bgm.html'),bPlace=document.getElementById('bgm-placeholder');if(bPlace){bPlace.innerHTML=await bRes.text();bPlace.querySelectorAll("script").forEach(s=>{const ns=document.createElement("script");ns.text=s.text;document.body.appendChild(ns).parentNode.removeChild(ns)})}initMenuToggle()}catch(err){console.error("Layout Error:",err)}}
+        document.addEventListener("DOMContentLoaded",()=>{loadLayout();loadNewsFromFirebase()});
     </script>
 </body>
-
 </html>

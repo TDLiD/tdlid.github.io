@@ -1,472 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-
-    <script>
-        (function () {
-            // 1. iPad를 제외하고 iPhone, Android 폰만 감지
-            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPCMode = urlParams.get('view_mode') === 'pc';
-
-            // 2. 리다이렉트 실행
-            if (isMobileOnly && !isPCMode) {
-                let path = window.location.pathname;
-                let page = path.split("/").pop();
-
-                // 메인 페이지(index) 처리
-                if (page === "" || page === "company.html") {
-                    window.location.href = "company_m.html";
-                }
-                // 그 외 페이지들 (예: products.html -> products_m.html)
-                else if (page.endsWith(".html") && !page.includes("_m.html")) {
-                    window.location.href = page.replace(".html", "_m.html");
-                }
-            }
-        })();
-    </script>
-
+    <script>(function(){const isMobileOnly=/iPhone|iPod|Android/i.test(navigator.userAgent);const urlParams=new URLSearchParams(window.location.search);const isPCMode=urlParams.get('view_mode')==='pc';if(isMobileOnly&&!isPCMode){let path=window.location.pathname;let page=path.split("/").pop();if(page===""||page==="company.html"){window.location.href="company_m.html"}else if(page.endsWith(".html")&&!page.includes("_m.html")){window.location.href=page.replace(".html","_m.html")}}})();</script>
     <title>Company Profile | TDL Energy Indonesia</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
-
     <style>
-        /* 전체 페이지 드래그 방지 (입력창 제외) */
-        body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        /* 🌟 로고 크기 통일화를 위한 :root 변수 🌟 */
-        :root {
-            --header-logo-font-size: 8.2rem;
-            --header-logo-font-weight: 900;
-            --header-subtitle-font-size: 1.50rem;
-            --header-subtitle-font-weight: 800;
-            /* 3D 효과용 변수 추가 */
-            --accent: #22d3ee; 
-        }
-
-        /* Spotlight background */
-        .company-bg {
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(circle at 50% 30%, rgba(34, 211, 238, .12), transparent 60%),
-                radial-gradient(circle at 20% 70%, rgba(124, 58, 237, .08), transparent 60%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* ------------------------------------------------ */
-        /* 추가된 3D 배경 및 인터랙션 스타일 */
-        /* ------------------------------------------------ */
-        .background-container {
-            position: fixed; /* 전체 배경 고정 */
-            width: 150%;
-            height: 150%;
-            top: -25%;
-            left: -25%;
-            z-index: 1;
-            transform-style: preserve-3d;
-            pointer-events: none;
-        }
-
-        .dot {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.3;
-        }
-
-        .ai-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border: 1px solid var(--accent);
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: var(--accent);
-            margin-bottom: 20px;
-            background: rgba(34, 211, 238, 0.1);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            backdrop-filter: blur(4px);
-        }
-        /* ------------------------------------------------ */
-
-        /* 3 Image Stage (데스크톱 전용 가로 배열) */
-        .image-stage {
-            position: relative;
-            z-index: 10;
-            /* 3D 효과를 위한 perspective 추가 */
-            perspective: 1200px;
-        }
-
-        .image-card {
-            position: relative;
-            border-radius: 1.5rem;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, .08);
-            background: #020617;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 250px;
-            width: 100%;
-            /* 3D 트랜지션 부드럽게 */
-            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-            transform-style: preserve-3d;
-        }
-
-        .image-card img {
-            max-height: 100%;
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: transform 0.6s ease;
-            transform-origin: center center;
-            position: relative;
-            z-index: 1;
-            border-radius: 1.5rem;
-            /* 이미지도 3D 공간상에 띄움 */
-            transform: translateZ(20px);
-        }
-
-        /* 기존 확대 효과 유지 */
-        .image-card.hover-expand:hover img {
-            transform: scale(1.6) translateZ(50px);
-            z-index: 99;
-        }
-
-        /* Floating text animation */
-        .float-in {
-            animation: floatIn 1s ease both;
-        }
-
-        @keyframes floatIn {
-            from {
-                opacity: 0;
-                transform: translateY(50px)
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
-        }
-
-        /* 드롭다운 스타일 */
-        .dropdown-link {
-            padding: 12px 20px;
-            display: block;
-            color: #ccc;
-            transition: background 0.2s;
-            border-bottom: 1px solid #262626;
-        }
-
-        .dropdown-link:hover {
-            background: #1f2937;
-            color: #22d3ee;
-        }
-
-        .dropdown-quote-btn {
-            padding: 12px 20px;
-            display: block;
-            background: #22d3ee;
-            color: #000;
-            font-weight: 600;
-            text-align: center;
-            border-radius: 0 0 11px 11px;
-        }
-
-        .hero-slogan-gradient {
-            display: inline-block !important;
-            font-weight: 900 !important;
-            /* font-black 효과 */
-            line-height: 1.2 !important;
-            padding-bottom: 0.1em;
-
-            background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            background-clip: text !important;
-
-            color: transparent !important;
-        }
+        body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}:root{--header-logo-font-size:8.2rem;--header-logo-font-weight:900;--header-subtitle-font-size:1.50rem;--header-subtitle-font-weight:800;--accent:#22d3ee}.company-bg{position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,rgba(34,211,238,.12),transparent 60%),radial-gradient(circle at 20% 70%,rgba(124,58,237,.08),transparent 60%);pointer-events:none;z-index:0}.background-container{position:fixed;width:150%;height:150%;top:-25%;left:-25%;z-index:0;transform-style:preserve-3d;pointer-events:none}.dot{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.3}.ai-badge{display:inline-block;padding:6px 14px;border:1px solid var(--accent);border-radius:20px;font-size:.75rem;color:var(--accent);margin-bottom:20px;background:rgba(34,211,238,.1);text-transform:uppercase;letter-spacing:.1em;backdrop-filter:blur(4px)}.image-stage{position:relative;z-index:10;perspective:1200px}.image-card{position:relative;border-radius:1.5rem;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#020617;cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:250px;width:100%;transition:transform .2s ease-out,box-shadow .2s ease-out;transform-style:preserve-3d}.image-card img{max-height:100%;width:100%;height:auto;display:block;transition:transform .6s ease;transform-origin:center center;position:relative;z-index:1;border-radius:1.5rem;transform:translateZ(20px)}.image-card.hover-expand:hover img{transform:scale(1.6) translateZ(50px);z-index:99}.float-in{animation:floatIn 1s ease both}@keyframes floatIn{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:translateY(0)}}.dropdown-link{padding:12px 20px;display:block;color:#ccc;transition:background .2s;border-bottom:1px solid #262626}.dropdown-link:hover{background:#1f2937;color:#22d3ee}.dropdown-quote-btn{padding:12px 20px;display:block;background:#22d3ee;color:#000;font-weight:600;text-align:center;border-radius:0 0 11px 11px}.hero-slogan-gradient{display:inline-block!important;font-weight:900!important;line-height:1.2!important;padding-bottom:.1em;background:linear-gradient(to right,#0891b2 0%,#22d3ee 50%,#fff 100%)!important;-webkit-background-clip:text!important;-webkit-text-fill-color:transparent!important;background-clip:text!important;color:transparent!important}
     </style>
 </head>
-
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative overflow-x-hidden">
-
     <div class="background-container" id="bg-stars"></div>
-
     <div id="bgm-placeholder"></div>
-
-    <script>
-        document.addEventListener('contextmenu', e => e.preventDefault());
-    </script>
-
+    <script>document.addEventListener('contextmenu',e=>e.preventDefault());</script>
     <div id="header-placeholder"></div>
-
     <main class="relative z-10 pt-48 pb-32 max-w-7xl mx-auto px-6 transition-transform duration-100 ease-out" id="main-content">
         <div class="company-bg"></div>
-
         <div class="text-center mb-20 float-in">
             <div class="ai-badge" id="ai-msg">System: Initializing 3D Environment...</div>
-            
-            <h1 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
-                Designing the Energy Infrastructure of Tomorrow
-            </h1>
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">Designing the Energy Infrastructure of Tomorrow</h1>
         </div>
-
         <section class="mb-24">
             <div class="image-stage flex flex-row gap-10 justify-center">
-                <div class="image-card hover-expand js-3d-card">
-                    <img src="images/company/company1.webp">
-                </div>
-                <div class="image-card hover-expand js-3d-card">
-                    <img src="images/company/company2.webp">
-                </div>
-                <div class="image-card hover-expand js-3d-card">
-                    <img src="images/company/company3.webp">
-                </div>
+                <div class="image-card hover-expand js-3d-card"><img src="images/company/company1.webp"></div>
+                <div class="image-card hover-expand js-3d-card"><img src="images/company/company2.webp"></div>
+                <div class="image-card hover-expand js-3d-card"><img src="images/company/company3.webp"></div>
             </div>
         </section>
-
         <section class="max-w-7xl mx-auto space-y-24 text-lg text-center">
-            <div class="float-in">
-                <h2 class="text-5xl font-bold text-cyan-400 mb-8">Who We Are</h2>
-            </div>
-
+            <div class="float-in"><h2 class="text-5xl font-bold text-cyan-400 mb-8">Who We Are</h2></div>
             <div class="grid grid-cols-3 gap-10">
-                <div
-                    class="p-10 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-cyan-400/40 transition-all duration-300">
+                <div class="p-10 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-cyan-400/40 transition-all duration-300">
                     <h3 class="text-2xl font-bold text-cyan-300 mb-6">MISSION</h3>
-                    <p class="text-neutral-300 leading-relaxed">
-                        “NO MORE CARBON” <br><br>Deliver the best products and services to our customers.<br>Promote
-                        leadership consistently.<br>Create and Innovate value
-                    </p>
+                    <p class="text-neutral-300 leading-relaxed">“NO MORE CARBON”<br><br>Deliver the best products and services to our customers.<br>Promote leadership consistently.<br>Create and Innovate value</p>
                 </div>
-
-                <div
-                    class="p-10 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-purple-400/40 transition-all duration-300">
+                <div class="p-10 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-purple-400/40 transition-all duration-300">
                     <h3 class="text-2xl font-bold text-purple-300 mb-6">TECHNOLOGY</h3>
-                    <p class="text-neutral-300 leading-relaxed">
-                        TDLiD's high-density lithium-ion batteries, combined with an AI-based BMS, optimize performance,
-                        improve power and range, and maintain thermal stability and safety.
-                    </p>
+                    <p class="text-neutral-300 leading-relaxed">TDLiD's high-density lithium-ion batteries, combined with an AI-based BMS, optimize performance, improve power and range, and maintain thermal stability and safety.</p>
                 </div>
-
-                <div
-                    class="p-10 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-blue-400/40 transition-all duration-300">
+                <div class="p-10 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:border-blue-400/40 transition-all duration-300">
                     <h3 class="text-2xl font-bold text-blue-300 mb-6">VISION</h3>
-                    <p class="text-neutral-300 leading-relaxed">
-                        To provide EV motors and batteries that enhance lifestyles and contribute to a better
-                        environment.
-                    </p>
+                    <p class="text-neutral-300 leading-relaxed">To provide EV motors and batteries that enhance lifestyles and contribute to a better environment.</p>
                 </div>
             </div>
         </section>
     </main>
-
     <div id="footer-placeholder"></div>
-
     <script>
-        // --- Firebase & Layout 로직 (기존 코드 유지) ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
-            authDomain: "tdlid-107669.firebaseapp.com",
-            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
-            projectId: "tdlid-107669",
-            storageBucket: "tdlid-107669.firebasestorage.app",
-            messagingSenderId: "604782345004",
-            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
-        };
-
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-        const database = firebase.database();
-
-        async function loadLayout() {
-            try {
-                const headerRes = await fetch('components/header.html');
-                if (headerRes.ok) {
-                    const headerHTML = await headerRes.text();
-                    const headerPlaceholder = document.getElementById('header-placeholder');
-                    headerPlaceholder.innerHTML = headerHTML;
-                    executeScriptsInElement(headerPlaceholder);
-                }
-
-                try {
-                    const authRes = await fetch('components/admin-auth.html');
-                    if (authRes.ok) {
-                        const authHTML = await authRes.text();
-                        let authDiv = document.getElementById('admin-auth-placeholder');
-                        if (!authDiv) {
-                            authDiv = document.createElement('div');
-                            authDiv.id = 'admin-auth-placeholder';
-                            document.body.appendChild(authDiv);
-                        }
-                        authDiv.innerHTML = authHTML;
-                        executeScriptsInElement(authDiv);
-                    }
-                } catch (e) { console.warn("admin-auth.html skip"); }
-
-                const footerRes = await fetch('components/footer.html');
-                const footerPlaceholder = document.getElementById('footer-placeholder');
-                footerPlaceholder.innerHTML = await footerRes.text();
-                const footerScripts = footerPlaceholder.querySelectorAll("script");
-                footerScripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    newScript.text = oldScript.text;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-
-                const bgmRes = await fetch('components/bgm.html');
-                if (bgmRes.ok) {
-                    const bgmPlaceholder = document.getElementById('bgm-placeholder');
-                    bgmPlaceholder.innerHTML = await bgmRes.text();
-                    executeScriptsInElement(bgmPlaceholder);
-                }
-            } catch (err) {
-                console.error("Layout Load Error:", err);
-            } finally {
-                setTimeout(() => {
-                    if (typeof initNavigation === "function") initNavigation();
-                    else if (typeof initMenuToggle === "function") initMenuToggle();
-                }, 150);
-            }
-        }
-
-        function executeScriptsInElement(element) {
-            const scripts = element.querySelectorAll("script");
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                if (oldScript.src) newScript.src = oldScript.src;
-                else newScript.text = oldScript.text;
-                document.body.appendChild(newScript);
-                document.body.removeChild(newScript);
-            });
-        }
-
-        // --- 🌟 추가된 3D 배경 및 인터랙션 로직 🌟 ---
-        function initGlobal3DEffect() {
-            // 1. 배경 입자 생성
-            const bg = document.getElementById('bg-stars');
-            const count = 150;
-            for (let i = 0; i < count; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'dot';
-                const x = Math.random() * 100;
-                const y = Math.random() * 100;
-                const z = Math.random() * 500 - 250;
-                dot.style.left = `${x}%`;
-                dot.style.top = `${y}%`;
-                dot.style.transform = `translateZ(${z}px)`;
-                bg.appendChild(dot);
-            }
-
-            // 2. 전체 페이지 마우스 Parallax
-            const content = document.getElementById('main-content');
-            document.body.addEventListener('mousemove', (e) => {
-                const moveX = (e.clientX - window.innerWidth / 2) / 40; // 강도 약하게 조절
-                const moveY = (e.clientY - window.innerHeight / 2) / 40;
-
-                bg.style.transform = `rotateY(${moveX * 0.5}deg) rotateX(${-moveY * 0.5}deg) translateZ(50px)`;
-                content.style.transform = `rotateY(${moveX * 0.2}deg) rotateX(${-moveY * 0.2}deg)`;
-            });
-
-            // 3. AI 메시지 시뮬레이션
-            const messages = [
-                    "TDL Energy Indonesia",
-                "Deliver the best products and services to our customers",
-                "Promote leadership consistently",
-                "Create and Innovate value"
-            ];
-            setInterval(() => {
-                const msg = messages[Math.floor(Math.random() * messages.length)];
-                const badge = document.getElementById('ai-msg');
-                if(badge) badge.innerText = msg;
-            }, 4000);
-        }
-
-        // --- 🌟 3D Card Effect Logic (기존 유지) 🌟 ---
-        function init3DEffect() {
-            const cards = document.querySelectorAll('.js-3d-card');
-            
-            cards.forEach(card => {
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    
-                    const rotateX = (centerY - y) / 10;
-                    const rotateY = (x - centerX) / 10;
-                    
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-                    card.style.boxShadow = `${-rotateY * 2}px ${rotateX * 2}px 30px rgba(34, 211, 238, 0.2)`;
-                });
-                
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-                    card.style.boxShadow = 'none';
-                });
-            });
-        }
-
-        function initMenuToggle() {
-            const menuBtn = document.getElementById("menuToggleBtn");
-            const dropdown = document.getElementById("dropdownMenu");
-            const menuIcon = document.getElementById("menuIcon");
-            if (menuBtn && dropdown) {
-                menuBtn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    const isOpen = dropdown.classList.contains("opacity-100");
-                    if (!isOpen) {
-                        dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
-                        dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                        menuIcon.innerText = "✕";
-                    } else { closeMenu(); }
-                });
-                function closeMenu() {
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                    dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
-                    menuIcon.innerText = "☰";
-                }
-                document.addEventListener("click", (e) => {
-                    if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
-                });
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            loadLayout();
-            init3DEffect();
-            initGlobal3DEffect(); // 신규 3D 기능 초기화
-        });
+        const firebaseConfig={apiKey:"AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",authDomain:"tdlid-107669.firebaseapp.com",databaseURL:"https://tdlid-107669-default-rtdb.firebaseio.com",projectId:"tdlid-107669",storageBucket:"tdlid-107669.firebasestorage.app",messagingSenderId:"604782345004",appId:"1:604782345004:web:029aeaa81f4d11c2254a89"};
+        if(typeof firebase!=='undefined'&&!firebase.apps.length){firebase.initializeApp(firebaseConfig)}
+        const auth=firebase.auth(),database=firebase.database();
+        async function loadLayout(){try{const hRes=await fetch('components/header.html');if(hRes.ok){const hHTML=await hRes.text(),hPlace=document.getElementById('header-placeholder');hPlace.innerHTML=hHTML;executeScriptsInElement(hPlace)}try{const aRes=await fetch('components/admin-auth.html');if(aRes.ok){const aHTML=await aRes.text();let aDiv=document.getElementById('admin-auth-placeholder');if(!aDiv){aDiv=document.createElement('div');aDiv.id='admin-auth-placeholder';document.body.appendChild(aDiv)}aDiv.innerHTML=aHTML;executeScriptsInElement(aDiv)}}catch(e){}const fRes=await fetch('components/footer.html'),fPlace=document.getElementById('footer-placeholder');fPlace.innerHTML=await fRes.text();fPlace.querySelectorAll("script").forEach(s=>{const ns=document.createElement("script");ns.text=s.text;document.body.appendChild(ns).parentNode.removeChild(ns)});const bRes=await fetch('components/bgm.html');if(bRes.ok){const bPlace=document.getElementById('bgm-placeholder');bPlace.innerHTML=await bRes.text();executeScriptsInElement(bPlace)}}catch(err){console.error(err)}finally{setTimeout(()=>{if(typeof initNavigation==="function")initNavigation();else if(typeof initMenuToggle==="function")initMenuToggle()},150)}}
+        function executeScriptsInElement(el){el.querySelectorAll("script").forEach(s=>{const ns=document.createElement("script");if(s.src)ns.src=s.src;else ns.text=s.text;document.body.appendChild(ns);document.body.removeChild(ns)})}
+        function initGlobal3DEffect(){const bg=document.getElementById('bg-stars'),count=150;for(let i=0;i<count;i++){const d=document.createElement('div');d.className='dot';d.style.left=`${Math.random()*100}%`;d.style.top=`${Math.random()*100}%`;d.style.transform=`translateZ(${Math.random()*500-250}px)`;bg.appendChild(d)}const c=document.getElementById('main-content');document.body.addEventListener('mousemove',(e)=>{const mx=(e.clientX-window.innerWidth/2)/40,my=(e.clientY-window.innerHeight/2)/40;bg.style.transform=`rotateY(${mx*0.5}deg) rotateX(${-my*0.5}deg) translateZ(50px)`;c.style.transform=`rotateY(${mx*0.2}deg) rotateX(${-my*0.2}deg)`});const msgs=["TDL Energy Indonesia","Deliver the best products and services to our customers","Promote leadership consistently","Create and Innovate value"];setInterval(()=>{const m=msgs[Math.floor(Math.random()*msgs.length)],b=document.getElementById('ai-msg');if(b)b.innerText=m},4000)}
+        function init3DEffect(){const cards=document.querySelectorAll('.js-3d-card');cards.forEach(card=>{card.addEventListener('mousemove',(e)=>{const r=card.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,cx=r.width/2,cy=r.height/2,rx=(cy-y)/10,ry=(x-cx)/10;card.style.transform=`perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg)`;card.style.boxShadow=`${-ry*2}px ${rx*2}px 30px rgba(34,211,238,0.2)`});card.addEventListener('mouseleave',()=>{card.style.transform=`perspective(1000px) rotateX(0deg) rotateY(0deg)`;card.style.boxShadow='none'})})}
+        function initMenuToggle(){const b=document.getElementById("menuToggleBtn"),d=document.getElementById("dropdownMenu"),i=document.getElementById("menuIcon");if(b&&d){b.addEventListener("click",(e)=>{e.stopPropagation();if(!d.classList.contains("opacity-100")){d.classList.remove("opacity-0","invisible","translate-y-[-10px]");d.classList.add("opacity-100","visible","translate-y-2");i.innerText="✕"}else{c()}});const c=()=>{d.classList.remove("opacity-100","visible","translate-y-2");d.classList.add("opacity-0","invisible","translate-y-[-10px]");i.innerText="☰"};document.addEventListener("click",(e)=>{if(!d.contains(e.target)&&!b.contains(e.target))c()})}}
+        document.addEventListener("DOMContentLoaded",()=>{loadLayout();init3DEffect();initGlobal3DEffect()});
     </script>
-
 </body>
 </html>

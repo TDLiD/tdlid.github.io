@@ -1,594 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-
-    <script>
-        (function () {
-            const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPCMode = urlParams.get('view_mode') === 'pc';
-
-            if (isMobileOnly && !isPCMode) {
-                let path = window.location.pathname;
-                let page = path.split("/").pop();
-                if (page === "" || page === "technology.html") {
-                    window.location.href = "technology_m.html";
-                }
-                else if (page.endsWith(".html") && !page.includes("_m.html")) {
-                    window.location.href = page.replace(".html", "_m.html");
-                }
-            }
-        })();
-    </script>
-
-    <title>Technology | TDLiD</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        /* --- [추가] 3D 배경 및 AI 뱃지 스타일 --- */
-        :root {
-            --accent: #06b6d4; /* 기존 테마 색상과 맞춤 */
-        }
-
-        .background-container {
-            position: fixed;
-            width: 150%;
-            height: 150%;
-            top: -25%;
-            left: -25%;
-            z-index: 0;
-            transform-style: preserve-3d;
-            pointer-events: none;
-        }
-
-        .dot {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.3;
-        }
-
-        .ai-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border: 1px solid var(--accent);
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: var(--accent);
-            margin-bottom: 15px;
-            background: rgba(6, 182, 212, 0.1);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        /* ---------------------------------- */
-
-        body {
-            overflow-x: hidden;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            background-color: #0a0a0a; /* 배경색 명시 */
-        }
-
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10002;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: #171717;
-            color: #ddd;
-            padding: 2rem;
-            border-radius: 20px;
-            max-width: 900px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            text-align: center;
-            border: 1px solid #333;
-            position: relative;
-        }
-
-        .modal-image {
-            max-width: 100%;
-            max-height: 60vh;
-            object-fit: contain;
-            border-radius: 12px;
-            margin: 0 auto 25px;
-        }
-
-        .modal-close-btn {
-            margin-top: 20px;
-            padding: 12px 32px;
-            background: #06b6d4;
-            color: black;
-            font-weight: 700;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        #technologyContainer {
-            perspective: 2000px;
-            width: 100%;
-            max-width: 1000px;
-            margin: 40px auto 60px;
-            position: relative;
-            padding: 0 80px;
-            z-index: 10; /* 배경보다 위로 */
-        }
-
-        #carousel {
-            width: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            display: grid;
-        }
-
-        .tech-card {
-            grid-area: 1 / 1 / 2 / 2;
-            width: 100%;
-            height: auto;
-            padding: 2.5rem;
-            border: 1px solid #222;
-            border-radius: 2.5rem;
-            background-color: #0f0f0f;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 5;
-            text-align: center;
-            transform-style: preserve-3d;
-            will-change: transform;
-            transition: transform 0.1s ease-out, opacity 0.8s ease-out;
-        }
-
-        @media (min-width: 1024px) {
-            .tech-card {
-                padding: 4rem;
-            }
-        }
-
-        .tech-card.is-active {
-            position: relative;
-            opacity: 1;
-            pointer-events: auto;
-            z-index: 10;
-            border-color: #06b6d4;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), 0 0 40px rgba(6, 182, 212, 0.15);
-        }
-
-        .tech-card > * {
-            transform: translateZ(50px);
-        }
-
-        .nav-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 30;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(20, 20, 20, 0.8);
-            border: 1px solid #333;
-            border-radius: 50%;
-            color: #06b6d4;
-            transition: all 0.4s;
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-btn:hover {
-            background: #06b6d4;
-            color: #000;
-            border-color: #06b6d4;
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        #prevBtn {
-            left: 0;
-        }
-
-        #nextBtn {
-            right: 0;
-        }
-
-        .dropdown-link {
-            padding: 12px 20px;
-            display: block;
-            color: #ccc;
-            border-bottom: 1px solid #262626;
-            transition: all 0.2s;
-        }
-
-        .dropdown-link:hover {
-            background-color: #1a1a1a;
-            color: #22d3ee;
-        }
-
-        .dropdown-quote-btn {
-            padding: 12px 20px;
-            display: block;
-            background: #22d3ee;
-            color: #000;
-            font-weight: 600;
-            text-align: center;
-            border-radius: 0 0 11px 11px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 10px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #06b6d4;
-        }
-
-        .hero-slogan-gradient {
-            display: inline-block !important;
-            font-weight: 900 !important;
-            line-height: 1.2 !important;
-            padding-bottom: 0.1em;
-            margin: 0 auto;
-            background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            background-clip: text !important;
-            color: transparent !important;
-        }
-    </style>
+<meta charset="UTF-8">
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+<script>(function(){const isMobileOnly=/iPhone|iPod|Android/i.test(navigator.userAgent);const urlParams=new URLSearchParams(window.location.search);const isPCMode=urlParams.get('view_mode')==='pc';if(isMobileOnly&&!isPCMode){let path=window.location.pathname;let page=path.split("/").pop();if(page===""||page==="technology.html"){window.location.href="technology_m.html"}else if(page.endsWith(".html")&&!page.includes("_m.html")){window.location.href=page.replace(".html","_m.html")}}})()</script>
+<title>Technology | TDLiD</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>:root{--accent:#06b6d4}.background-container{position:fixed;width:150%;height:150%;top:-25%;left:-25%;z-index:0;transform-style:preserve-3d;pointer-events:none}.dot{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.3}.ai-badge{display:inline-block;padding:6px 14px;border:1px solid var(--accent);border-radius:20px;font-size:.75rem;color:var(--accent);margin-bottom:15px;background:rgba(6,182,212,.1);text-transform:uppercase;letter-spacing:.05em}body{overflow-x:hidden;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-color:#0a0a0a}.modal-backdrop{position:fixed;inset:0;background-color:rgba(0,0,0,.95);display:flex;justify-content:center;align-items:center;z-index:10002;padding:20px}.modal-content{background:#171717;color:#ddd;padding:2rem;border-radius:20px;max-width:900px;width:100%;max-height:90vh;overflow-y:auto;text-align:center;border:1px solid #333;position:relative}.modal-image{max-width:100%;max-height:60vh;object-fit:contain;border-radius:12px;margin:0 auto 25px}.modal-close-btn{margin-top:20px;padding:12px 32px;background:#06b6d4;color:#000;font-weight:700;border-radius:50px;cursor:pointer;transition:.2s}#technologyContainer{perspective:2000px;width:100%;max-width:1000px;margin:40px auto 60px;position:relative;padding:0 80px;z-index:10}#carousel{width:100%;position:relative;transform-style:preserve-3d;display:grid}.tech-card{grid-area:1/1/2/2;width:100%;height:auto;padding:2.5rem;border:1px solid #222;border-radius:2.5rem;background-color:#0f0f0f;opacity:0;pointer-events:none;z-index:5;text-align:center;transform-style:preserve-3d;will-change:transform;transition:transform .1s ease-out,opacity .8s ease-out}@media (min-width:1024px){.tech-card{padding:4rem}}.tech-card.is-active{position:relative;opacity:1;pointer-events:auto;z-index:10;border-color:#06b6d4;box-shadow:0 40px 100px rgba(0,0,0,.8),0 0 40px rgba(6,182,212,.15)}.tech-card>*{transform:translateZ(50px)}.nav-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:30;width:60px;height:60px;display:flex;align-items:center;justify-content:center;background:rgba(20,20,20,.8);border:1px solid #333;border-radius:50%;color:#06b6d4;transition:all .4s;backdrop-filter:blur(10px)}.nav-btn:hover{background:#06b6d4;color:#000;border-color:#06b6d4;transform:translateY(-50%) scale(1.1)}#prevBtn{left:0}#nextBtn{right:0}.dropdown-link{padding:12px 20px;display:block;color:#ccc;border-bottom:1px solid #262626;transition:all .2s}.dropdown-link:hover{background-color:#1a1a1a;color:#22d3ee}.dropdown-quote-btn{padding:12px 20px;display:block;background:#22d3ee;color:#000;font-weight:600;text-align:center;border-radius:0 0 11px 11px}.custom-scrollbar::-webkit-scrollbar{width:6px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#333;border-radius:10px}.custom-scrollbar::-webkit-scrollbar-thumb:hover{background:#06b6d4}.hero-slogan-gradient{display:inline-block!important;font-weight:900!important;line-height:1.2!important;padding-bottom:.1em;margin:0 auto;background:linear-gradient(to right,#0891b2 0%,#22d3ee 50%,#fff 100%)!important;-webkit-background-clip:text!important;-webkit-text-fill-color:transparent!important;background-clip:text!important;color:transparent!important}</style>
 </head>
-
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
-
-    <div class="background-container" id="bg-stars"></div>
-
-    <div id="bgm-placeholder"></div>
-
-    <script>
-        document.addEventListener('contextmenu', e => e.preventDefault());
-    </script>
-
-    <div id="header-placeholder"></div>
-
-    <main class="flex-grow pt-32 lg:pt-40 pb-24 px-6">
-        <div class="max-w-7xl mx-auto relative z-10">
-
+<div class="background-container" id="bg-stars"></div>
+<div id="bgm-placeholder"></div>
+<script>document.addEventListener('contextmenu',e=>e.preventDefault())</script>
+<div id="header-placeholder"></div>
+<main class="flex-grow pt-32 lg:pt-40 pb-24 px-6">
+<div class="max-w-7xl mx-auto relative z-10">
 <div class="flex flex-col items-center text-center mb-4">
-    <div class="ai-badge" id="ai-msg">System: Initializing Core...</div>
-    <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient pb-1">
-        Core Technology
-    </h3>
+<div class="ai-badge" id="ai-msg">System: Initializing Core...</div>
+<h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient pb-1">Core Technology</h3>
 </div>
-
-            <div id="technologyContainer">
-                <button id="prevBtn" class="nav-btn" aria-label="Previous">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-
-                <div id="carousel">
-                    <div class="tech-card is-active" data-index="0">
-                        <img src="images/technology/72V20A.webp" data-popup-src="images/technology/72V20A-1.webp"
-                            class="mx-auto mb-8 max-h-[400px] lg:max-h-[500px] object-contain cursor-pointer hover:scale-105 transition-transform duration-500"
-                            data-detail="TDLiD’s 72V battery system utilizes LG NMC INR21700 cell architecture...">
-                        <h4 class="text-xl md:text-2xl font-bold mb-4 text-cyan-400">72V 20Ah Battery</h4>
-                        <p class="text-lg md:text-xl mb-4 text-neutral-300">Cell Model: LG INR21700M50VT</p>
-                    </div>
-
-                    <div class="tech-card" data-index="1">
-                        <div class="max-h-[400px] overflow-y-auto pr-4 mb-8 custom-scrollbar">
-                            <img src="images/technology/72V20A-2.webp"
-                                class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition">
-                            <img src="images/technology/72V20A-3.webp"
-                                class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition">
-                            <img src="images/technology/72V20A-5.webp"
-                                class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition"
-                                data-detail="BMS Protection System">
-                            <img src="images/technology/72V20A-6.webp"
-                                class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition">
-                        </div>
-                        <h4 class="text-xl md:text-2xl font-bold mb-4 text-cyan-400">Smart Monitoring</h4>
-                        <p class="text-lg md:text-xl mb-4 text-neutral-300">Advanced BMS integration for safety and
-                            longevity.</p>
-                    </div>
-
-                    <div class="tech-card" data-index="2">
-                        <div class="grid grid-cols-2 gap-4 md:gap-6 mb-8">
-                            <img src="images/technology/YEDEA-1.webp"
-                                class="mx-auto max-h-60 md:max-h-72 object-contain cursor-pointer hover:scale-105 transition"
-                                data-detail="YADEA electric motorcycles integration.">
-                            <img src="images/technology/72V5A-charger-2.webp"
-                                class="mx-auto max-h-60 md:max-h-72 object-contain cursor-pointer hover:scale-105 transition"
-                                data-detail="Smart lithium charger pairing.">
-                        </div>
-                        <h4 class="text-xl md:text-2xl font-bold mb-4 text-cyan-400">EV Integration</h4>
-                    </div>
-                </div>
-
-                <button id="nextBtn" class="nav-btn" aria-label="Next">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <div id="footer-placeholder"></div>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
-            authDomain: "tdlid-107669.firebaseapp.com",
-            databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com",
-            projectId: "tdlid-107669",
-            storageBucket: "tdlid-107669.firebasestorage.app",
-            messagingSenderId: "604782345004",
-            appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
-        };
-
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-        const database = firebase.database();
-
-        async function loadLayout() {
-            try {
-                const headerRes = await fetch('components/header.html');
-                const headerHTML = await headerRes.text();
-                const headerPlaceholder = document.getElementById('header-placeholder');
-                headerPlaceholder.innerHTML = headerHTML;
-
-                const headerScripts = headerPlaceholder.querySelectorAll("script");
-                headerScripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    let scriptText = oldScript.text;
-                    if (scriptText.includes("admin.html")) {
-                        scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
-                    }
-                    newScript.text = scriptText;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-
-                const authRes = await fetch('components/admin-auth.html');
-                const authHTML = await authRes.text();
-
-                let authPlaceholder = document.getElementById('admin-auth-placeholder');
-                if (!authPlaceholder) {
-                    authPlaceholder = document.createElement('div');
-                    authPlaceholder.id = 'admin-auth-placeholder';
-                    document.body.appendChild(authPlaceholder);
-                }
-                authPlaceholder.innerHTML = authHTML;
-
-                const authScripts = authPlaceholder.querySelectorAll("script");
-                authScripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    newScript.text = oldScript.text;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-
-                const footerRes = await fetch('components/footer.html');
-                const footerPlaceholder = document.getElementById('footer-placeholder');
-                footerPlaceholder.innerHTML = await footerRes.text();
-
-                const footerScripts = footerPlaceholder.querySelectorAll("script");
-                footerScripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    newScript.text = oldScript.text;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-
-                const bgmRes = await fetch('components/bgm.html');
-                const bgmPlaceholder = document.getElementById('bgm-placeholder');
-                if (bgmPlaceholder) {
-                    bgmPlaceholder.innerHTML = await bgmRes.text();
-                    const bgmScripts = bgmPlaceholder.querySelectorAll("script");
-                    bgmScripts.forEach(oldScript => {
-                        const newScript = document.createElement("script");
-                        newScript.text = oldScript.text;
-                        document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                    });
-                }
-                initMenuToggle();
-            } catch (err) {
-                console.error("Layout load failed:", err);
-            }
-        }
-
-        function initMenuToggle() {
-            const menuBtn = document.getElementById("menuToggleBtn");
-            const dropdown = document.getElementById("dropdownMenu");
-            const menuIcon = document.getElementById("menuIcon");
-            if (menuBtn && dropdown) {
-                menuBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    const isOpen = dropdown.classList.contains("visible");
-                    if (isOpen) {
-                        dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                        dropdown.classList.add("opacity-0", "invisible");
-                        if (menuIcon) menuIcon.innerText = "☰";
-                    } else {
-                        dropdown.classList.remove("opacity-0", "invisible");
-                        dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                        if (menuIcon) menuIcon.innerText = "✕";
-                    }
-                };
-            }
-        }
-
-        // --- Carousel & 3D Effect Logic ---
-        let currentIndex = 0;
-        const cards = document.querySelectorAll('.tech-card');
-        const CARD_COUNT = cards.length;
-        let isAnimating = false;
-        let autoTimer;
-
-        // [추가] 3D 배경 및 마우스 트래킹 Parallax
-        const bgStars = document.getElementById('bg-stars');
-        const starCount = 150;
-
-        for (let i = 0; i < starCount; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'dot';
-            const x = Math.random() * 100;
-            const y = Math.random() * 100;
-            const z = Math.random() * 500 - 250;
-            dot.style.left = `${x}%`;
-            dot.style.top = `${y}%`;
-            dot.style.transform = `translateZ(${z}px)`;
-            bgStars.appendChild(dot);
-        }
-
-        function handleMouseMove(e) {
-            if (isAnimating) return;
-            const card = cards[currentIndex];
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = (centerY - y) / 20; 
-            const rotateY = (x - centerX) / 20;
-            
-            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-
-            // 배경 별들도 마우스에 반응 (반대 방향)
-            const moveX = (e.clientX - window.innerWidth / 2) / 40;
-            const moveY = (e.clientY - window.innerHeight / 2) / 40;
-            bgStars.style.transform = `rotateY(${moveX}deg) rotateX(${-moveY}deg) translateZ(50px)`;
-        }
-
-        function handleMouseLeave() {
-            const card = cards[currentIndex];
-            card.style.transform = `rotateX(0deg) rotateY(0deg)`;
-            bgStars.style.transform = `rotateY(0deg) rotateX(0deg)`;
-        }
-
-        // [추가] AI 메시지 시뮬레이션
-        const messages = [
-                "TDL Energy Indonesia",
-                "Deliver the best products and services to our customers",
-                "Promote leadership consistently",
-                "Create and Innovate value"
-        ];
-        
-        setInterval(() => {
-            const msg = messages[Math.floor(Math.random() * messages.length)];
-            const el = document.getElementById('ai-msg');
-            if(el) el.innerText = msg;
-        }, 4000);
-
-        function update3DEvents() {
-            cards.forEach((card, idx) => {
-                card.removeEventListener('mousemove', handleMouseMove);
-                card.removeEventListener('mouseleave', handleMouseLeave);
-                if (idx === currentIndex) {
-                    card.addEventListener('mousemove', handleMouseMove);
-                    card.addEventListener('mouseleave', handleMouseLeave);
-                }
-            });
-        }
-
-        function showCard(newIndex, direction) {
-            if (isAnimating) return;
-            isAnimating = true;
-
-            const oldIndex = currentIndex;
-            currentIndex = newIndex;
-            const prevCard = cards[oldIndex];
-            const currentCard = cards[currentIndex];
-
-            prevCard.style.transform = 'rotateX(0deg) rotateY(0deg)';
-            
-            const slideDistance = document.getElementById('technologyContainer').offsetWidth;
-
-            prevCard.style.zIndex = '15';
-            currentCard.style.zIndex = '10';
-            currentCard.style.opacity = '1';
-            currentCard.classList.add('is-active');
-
-            requestAnimationFrame(() => {
-                prevCard.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out';
-                prevCard.style.transform = direction === 'next' ? `translateX(-${slideDistance}px)` : `translateX(${slideDistance}px)`;
-                prevCard.style.opacity = '0';
-            });
-
-            setTimeout(() => {
-                prevCard.classList.remove('is-active');
-                prevCard.style.transform = 'translateX(0)';
-                prevCard.style.transition = 'transform 0.1s ease-out, opacity 0.8s ease-out';
-                isAnimating = false;
-                update3DEvents();
-            }, 800);
-        }
-
-        const startAuto = () => { stopAuto(); autoTimer = setInterval(() => showCard((currentIndex + 1) % CARD_COUNT, 'next'), 5000); };
-        const stopAuto = () => clearInterval(autoTimer);
-
-        document.getElementById('prevBtn').onclick = () => { stopAuto(); showCard((currentIndex - 1 + CARD_COUNT) % CARD_COUNT, 'prev'); startAuto(); };
-        document.getElementById('nextBtn').onclick = () => { stopAuto(); showCard((currentIndex + 1) % CARD_COUNT, 'next'); startAuto(); };
-
-        cards.forEach(card => {
-            card.querySelectorAll('img').forEach(img => {
-                img.onclick = function (e) {
-                    e.stopPropagation();
-                    stopAuto();
-                    const popupImgTarget = this.dataset.popupSrc || this.src;
-                    const modal = document.createElement('div');
-                    modal.className = 'modal-backdrop';
-                    modal.innerHTML = `
-                <div class="modal-content custom-scrollbar">
-                    <span class="absolute top-5 right-6 text-3xl cursor-pointer opacity-50 hover:opacity-100" id="closeX">✕</span>
-                    <img src="${popupImgTarget}" class="modal-image">
-                    <p class="mt-4 text-neutral-300 text-lg px-4">${this.dataset.detail || ''}</p>
-                    <button class="modal-close-btn">Close</button>
-                </div>`;
-
-                    const close = () => { if (modal.parentNode) document.body.removeChild(modal); startAuto(); };
-                    modal.querySelector('.modal-close-btn').onclick = close;
-                    modal.querySelector('#closeX').onclick = close;
-                    modal.onclick = (e) => { if (e.target === modal) close(); };
-                    document.body.appendChild(modal);
-                };
-            });
-        });
-
-        document.addEventListener("DOMContentLoaded", () => {
-            loadLayout();
-            startAuto();
-            update3DEvents();
-        });
-    </script>
+<div id="technologyContainer">
+<button id="prevBtn" class="nav-btn" aria-label="Previous"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+<div id="carousel">
+<div class="tech-card is-active" data-index="0">
+<img src="images/technology/72V20A.webp" data-popup-src="images/technology/72V20A-1.webp" class="mx-auto mb-8 max-h-[400px] lg:max-h-[500px] object-contain cursor-pointer hover:scale-105 transition-transform duration-500" data-detail="TDLiD’s 72V battery system utilizes LG NMC INR21700 cell architecture...">
+<h4 class="text-xl md:text-2xl font-bold mb-4 text-cyan-400">72V 20Ah Battery</h4>
+<p class="text-lg md:text-xl mb-4 text-neutral-300">Cell Model: LG INR21700M50VT</p>
+</div>
+<div class="tech-card" data-index="1">
+<div class="max-h-[400px] overflow-y-auto pr-4 mb-8 custom-scrollbar">
+<img src="images/technology/72V20A-2.webp" class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition">
+<img src="images/technology/72V20A-3.webp" class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition">
+<img src="images/technology/72V20A-5.webp" class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition" data-detail="BMS Protection System">
+<img src="images/technology/72V20A-6.webp" class="mx-auto mb-6 max-h-72 object-contain cursor-pointer hover:brightness-110 transition">
+</div>
+<h4 class="text-xl md:text-2xl font-bold mb-4 text-cyan-400">Smart Monitoring</h4>
+<p class="text-lg md:text-xl mb-4 text-neutral-300">Advanced BMS integration for safety and longevity.</p>
+</div>
+<div class="tech-card" data-index="2">
+<div class="grid grid-cols-2 gap-4 md:gap-6 mb-8">
+<img src="images/technology/YEDEA-1.webp" class="mx-auto max-h-60 md:max-h-72 object-contain cursor-pointer hover:scale-105 transition" data-detail="YADEA electric motorcycles integration.">
+<img src="images/technology/72V5A-charger-2.webp" class="mx-auto max-h-60 md:max-h-72 object-contain cursor-pointer hover:scale-105 transition" data-detail="Smart lithium charger pairing.">
+</div>
+<h4 class="text-xl md:text-2xl font-bold mb-4 text-cyan-400">EV Integration</h4>
+</div>
+</div>
+<button id="nextBtn" class="nav-btn" aria-label="Next"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+</div>
+</div>
+</main>
+<div id="footer-placeholder"></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",authDomain:"tdlid-107669.firebaseapp.com",databaseURL:"https://tdlid-107669-default-rtdb.firebaseio.com",projectId:"tdlid-107669",storageBucket:"tdlid-107669.firebasestorage.app",messagingSenderId:"604782345004",appId:"1:604782345004:web:029aeaa81f4d11c2254a89"};
+if(typeof firebase!=='undefined'&&!firebase.apps.length){firebase.initializeApp(firebaseConfig)}
+const auth=firebase.auth(),database=firebase.database();
+async function loadLayout(){try{const hRes=await fetch('components/header.html'),hHTML=await hRes.text(),hP=document.getElementById('header-placeholder');hP.innerHTML=hHTML;hP.querySelectorAll("script").forEach(o=>{const n=document.createElement("script");let t=o.text;if(t.includes("admin.html")){t=t.replace(/admin\.html/g,"admin/admin.html")}n.text=t;document.body.appendChild(n).parentNode.removeChild(n)});const aRes=await fetch('components/admin-auth.html'),aHTML=await aRes.text();let aP=document.getElementById('admin-auth-placeholder');if(!aP){aP=document.createElement('div');aP.id='admin-auth-placeholder';document.body.appendChild(aP)}aP.innerHTML=aHTML;aP.querySelectorAll("script").forEach(o=>{const n=document.createElement("script");n.text=o.text;document.body.appendChild(n).parentNode.removeChild(n)});const fRes=await fetch('components/footer.html');document.getElementById('footer-placeholder').innerHTML=await fRes.text();const bRes=await fetch('components/bgm.html'),bP=document.getElementById('bgm-placeholder');if(bP){bP.innerHTML=await bRes.text();bP.querySelectorAll("script").forEach(o=>{const n=document.createElement("script");n.text=o.text;document.body.appendChild(n).parentNode.removeChild(n)})}initMenuToggle()}catch(e){console.error("Layout load failed:",e)}}
+function initMenuToggle(){const b=document.getElementById("menuToggleBtn"),d=document.getElementById("dropdownMenu"),i=document.getElementById("menuIcon");if(b&&d){b.onclick=(e)=>{e.stopPropagation();if(d.classList.contains("visible")){d.classList.remove("opacity-100","visible","translate-y-2");d.classList.add("opacity-0","invisible");if(i)i.innerText="☰"}else{d.classList.remove("opacity-0","invisible");d.classList.add("opacity-100","visible","translate-y-2");if(i)i.innerText="✕"}}}}
+let currentIndex=0;const cards=document.querySelectorAll('.tech-card'),CARD_COUNT=cards.length;let isAnimating=false,autoTimer;const bgStars=document.getElementById('bg-stars'),starCount=150;for(let i=0;i<starCount;i++){const d=document.createElement('div');d.className='dot';d.style.left=`${Math.random()*100}%`;d.style.top=`${Math.random()*100}%`;d.style.transform=`translateZ(${Math.random()*500-250}px)`;bgStars.appendChild(d)}
+function handleMouseMove(e){if(isAnimating)return;const c=cards[currentIndex],r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,cX=r.width/2,cY=r.height/2,rtX=(cY-y)/20,rtY=(x-cX)/20;c.style.transform=`rotateX(${rtX}deg) rotateY(${rtY}deg)`;const mX=(e.clientX-window.innerWidth/2)/40,mY=(e.clientY-window.innerHeight/2)/40;bgStars.style.transform=`rotateY(${mX}deg) rotateX(${-mY}deg) translateZ(50px)`}
+function handleMouseLeave(){cards[currentIndex].style.transform=`rotateX(0deg) rotateY(0deg)`;bgStars.style.transform=`rotateY(0deg) rotateX(0deg)`}
+const messages=["TDL Energy Indonesia","Deliver the best products and services to our customers","Promote leadership consistently","Create and Innovate value"];
+setInterval(()=>{const m=messages[Math.floor(Math.random()*messages.length)],e=document.getElementById('ai-msg');if(e)e.innerText=m},4000);
+function update3DEvents(){cards.forEach((c,idx)=>{c.removeEventListener('mousemove',handleMouseMove);c.removeEventListener('mouseleave',handleMouseLeave);if(idx===currentIndex){c.addEventListener('mousemove',handleMouseMove);c.addEventListener('mouseleave',handleMouseLeave)}})}
+function showCard(n,d){if(isAnimating)return;isAnimating=true;const o=currentIndex;currentIndex=n;const pC=cards[o],cC=cards[currentIndex];pC.style.transform='rotateX(0deg) rotateY(0deg)';const sD=document.getElementById('technologyContainer').offsetWidth;pC.style.zIndex='15';cC.style.zIndex='10';cC.style.opacity='1';cC.classList.add('is-active');requestAnimationFrame(()=>{pC.style.transition='transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out';pC.style.transform=d==='next'?`translateX(-${sD}px)`:`translateX(${sD}px)`;pC.style.opacity='0'});setTimeout(()=>{pC.classList.remove('is-active');pC.style.transform='translateX(0)';pC.style.transition='transform 0.1s ease-out, opacity 0.8s ease-out';isAnimating=false;update3DEvents()},800)}
+const startAuto=()=>{stopAuto();autoTimer=setInterval(()=>showCard((currentIndex+1)%CARD_COUNT,'next'),5000)};
+const stopAuto=()=>clearInterval(autoTimer);
+document.getElementById('prevBtn').onclick=()=>{stopAuto();showCard((currentIndex-1+CARD_COUNT)%CARD_COUNT,'prev');startAuto()};
+document.getElementById('nextBtn').onclick=()=>{stopAuto();showCard((currentIndex+1)%CARD_COUNT,'next');startAuto()};
+cards.forEach(c=>{c.querySelectorAll('img').forEach(img=>{img.onclick=function(e){e.stopPropagation();stopAuto();const p=this.dataset.popupSrc||this.src,m=document.createElement('div');m.className='modal-backdrop';m.innerHTML=`<div class="modal-content custom-scrollbar"><span class="absolute top-5 right-6 text-3xl cursor-pointer opacity-50 hover:opacity-100" id="closeX">✕</span><img src="${p}" class="modal-image"><p class="mt-4 text-neutral-300 text-lg px-4">${this.dataset.detail||''}</p><button class="modal-close-btn">Close</button></div>`;const cl=()=>{if(m.parentNode)document.body.removeChild(m);startAuto()};m.querySelector('.modal-close-btn').onclick=cl;m.querySelector('#closeX').onclick=cl;m.onclick=(e)=>{if(e.target===m)cl()};document.body.appendChild(m)}})});
+document.addEventListener("DOMContentLoaded",()=>{loadLayout();startAuto();update3DEvents()});
+</script>
 </body>
-
 </html>

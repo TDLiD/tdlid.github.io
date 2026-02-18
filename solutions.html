@@ -1,299 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-
     <script>
         (function () {
             const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
             const urlParams = new URLSearchParams(window.location.search);
             const isPCMode = urlParams.get('view_mode') === 'pc';
-
             if (isMobileOnly && !isPCMode) {
                 let path = window.location.pathname;
                 let page = path.split("/").pop();
-
                 if (page === "" || page === "solutions.html") {
                     window.location.href = "solutions_m.html";
-                }
-                else if (page.endsWith(".html") && !page.includes("_m.html")) {
+                } else if (page.endsWith(".html") && !page.includes("_m.html")) {
                     window.location.href = page.replace(".html", "_m.html");
                 }
             }
         })();
     </script>
-
     <title>Solutions | TDLiD</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
-
     <style>
-        :root {
-            --accent: #00ffa3;
-        }
-
-        body {
-            overflow-x: hidden;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            background-color: #0a0a0c; /* index.html 배경색 적용 */
-            perspective: 1000px;
-        }
-
-        /* --- 3D 배경 스타일 추가 --- */
-        .background-container {
-            position: fixed; /* 전체 배경 고정 */
-            width: 150%;
-            height: 150%;
-            top: -25%;
-            left: -25%;
-            z-index: 0;
-            transform-style: preserve-3d;
-            pointer-events: none;
-        }
-
-        .dot {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.3;
-        }
-
-        /* --- AI 배지 스타일 추가 --- */
-        .ai-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border: 1px solid var(--accent);
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: var(--accent);
-            margin-bottom: 15px;
-            background: rgba(0, 255, 163, 0.05);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            transition: all 0.3s ease;
-        }
-
-        /* 기존 스타일 유지 */
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10002;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: #171717;
-            color: #ddd;
-            padding: 2rem;
-            border-radius: 20px;
-            max-width: 900px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            text-align: center;
-            border: 1px solid #333;
-            position: relative;
-        }
-
-        .modal-image {
-            max-width: 100%;
-            max-height: 60vh;
-            object-fit: contain;
-            border-radius: 12px;
-            margin: 0 auto 25px;
-        }
-
-        .modal-close-btn {
-            margin-top: 20px;
-            padding: 12px 32px;
-            background: #06b6d4;
-            color: black;
-            font-weight: 700;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .modal-close-x {
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            color: #fff;
-            font-size: 32px;
-            cursor: pointer;
-            opacity: 0.6;
-        }
-
-        .carousel-wrapper {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            overflow: hidden;
-            padding: 20px 0 40px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #solutionsContainer {
-            perspective: 2000px;
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            position: relative;
-            display: grid;
-            padding: 0 80px;
-        }
-
-        .solution-card {
-            grid-area: 1 / 1 / 2 / 2;
-            width: 100%;
-            height: auto;
-            padding: 2.5rem;
-            background-color: rgba(15, 15, 15, 0.9);
-            border: 1px solid #222;
-            border-radius: 2.5rem;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 5;
-            transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out, box-shadow 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .solution-card.is-tracking {
-            transition: transform 0.1s ease-out, opacity 0.8s ease-out, box-shadow 0.3s ease;
-        }
-
-        @media (min-width: 1024px) {
-            .solution-card {
-                padding: 4rem;
-            }
-        }
-
-        .solution-card.is-active {
-            position: relative;
-            opacity: 1;
-            pointer-events: auto;
-            z-index: 10;
-            transform: translateX(0);
-            border-color: #06b6d4;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), 0 0 40px rgba(6, 182, 212, 0.1);
-        }
-
-        .solution-card h4, .solution-card p, .solution-card .grid {
-            transform: translateZ(30px);
-        }
-
-        .nav-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 100;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(15, 15, 15, 0.8);
-            border: 1px solid #333;
-            border-radius: 50%;
-            color: #06b6d4;
-            transition: all 0.4s;
-            backdrop-filter: blur(8px);
-        }
-
-        .nav-btn:hover {
-            background: #06b6d4;
-            color: #000;
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
-        }
-
+        :root { --accent: #00ffa3; }
+        body { overflow-x: hidden; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; background-color: #0a0a0c; perspective: 1000px; }
+        .background-container { position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; z-index: 0; transform-style: preserve-3d; pointer-events: none; overflow: hidden; }
+        .dot { position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%; opacity: 0.3; }
+        .ai-badge { display: inline-block; padding: 6px 14px; border: 1px solid var(--accent); border-radius: 20px; font-size: 0.75rem; color: var(--accent); margin-bottom: 15px; background: rgba(0, 255, 163, 0.05); text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.3s ease; }
+        .modal-backdrop { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.95); display: flex; justify-content: center; align-items: center; z-index: 10002; padding: 20px; }
+        .modal-content { background: #171717; color: #ddd; padding: 2rem; border-radius: 20px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; text-align: center; border: 1px solid #333; position: relative; }
+        .modal-image { max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 12px; margin: 0 auto 25px; }
+        .modal-close-btn { margin-top: 20px; padding: 12px 32px; background: #06b6d4; color: black; font-weight: 700; border-radius: 50px; cursor: pointer; transition: 0.2s; }
+        .modal-close-x { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 32px; cursor: pointer; opacity: 0.6; }
+        .carousel-wrapper { position: relative; z-index: 10; width: 100%; overflow: hidden; padding: 20px 0 40px 0; display: flex; align-items: center; justify-content: center; }
+        #solutionsContainer { perspective: 2000px; width: 100%; max-width: 1100px; margin: 0 auto; position: relative; display: grid; padding: 0 80px; }
+        .solution-card { grid-area: 1 / 1 / 2 / 2; width: 100%; height: auto; padding: 2.5rem; background-color: rgba(15, 15, 15, 0.9); border: 1px solid #222; border-radius: 2.5rem; opacity: 0; pointer-events: none; z-index: 5; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out, box-shadow 0.3s ease; backdrop-filter: blur(10px); }
+        .solution-card.is-tracking { transition: transform 0.1s ease-out, opacity 0.8s ease-out, box-shadow 0.3s ease; }
+        @media (min-width: 1024px) { .solution-card { padding: 4rem; } }
+        .solution-card.is-active { position: relative; opacity: 1; pointer-events: auto; z-index: 10; transform: translateX(0); border-color: #06b6d4; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), 0 0 40px rgba(6, 182, 212, 0.1); }
+        .solution-card h4, .solution-card p, .solution-card .grid { transform: translateZ(30px); }
+        .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); z-index: 100; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: rgba(15, 15, 15, 0.8); border: 1px solid #333; border-radius: 50%; color: #06b6d4; transition: all 0.4s; backdrop-filter: blur(8px); }
+        .nav-btn:hover { background: #06b6d4; color: #000; transform: translateY(-50%) scale(1.1); box-shadow: 0 0 30px rgba(6, 182, 212, 0.4); }
         #prevBtn { left: 10px; }
         #nextBtn { right: 10px; }
-
-        @media (min-width: 1280px) {
-            #prevBtn { left: 40px; }
-            #nextBtn { right: 40px; }
-        }
-
+        @media (min-width: 1280px) { #prevBtn { left: 40px; } #nextBtn { right: 40px; } }
         #stackContainer::-webkit-scrollbar { height: 6px; }
         #stackContainer::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-
-        .hero-slogan-gradient {
-            display: inline-block !important;
-            font-weight: 900 !important;
-            line-height: 1.2 !important;
-            padding-bottom: 0.1em;
-            margin: 0 auto;
-            background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            background-clip: text !important;
-            color: transparent !important;
-        }
-
-        /* 메인 콘텐츠 래퍼 (3D 반응용) */
-        #main-content-wrapper {
-            position: relative;
-            z-index: 10;
-            transition: transform 0.1s ease-out;
-        }
+        .hero-slogan-gradient { display: inline-block !important; font-weight: 900 !important; line-height: 1.2 !important; padding-bottom: 0.1em; margin: 0 auto; background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; color: transparent !important; }
+        #main-content-wrapper { position: relative; z-index: 10; transition: transform 0.1s ease-out; min-height: calc(100vh - 200px); }
+        #stackContainer { padding-bottom: 2rem; margin-top: 2rem; }
     </style>
 </head>
-
 <body class="text-neutral-100 font-[Pretendard] flex flex-col min-h-screen">
-
     <div class="background-container" id="bg-stars"></div>
-
     <div id="bgm-placeholder"></div>
-
-    <script>
-        document.addEventListener('contextmenu', e => e.preventDefault());
-    </script>
-
+    <script>document.addEventListener('contextmenu', e => e.preventDefault());</script>
     <div id="header-placeholder"></div>
-
-<main id="main-content-wrapper" class="flex-grow pt-32 lg:pt-40 pb-20 px-4">
-    <div class="text-center mb-16 flex flex-col items-center">
-        <div class="ai-badge" id="ai-msg">System: Optimizing for your gaze...</div>
-        <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient pb-1">
-            Custom Solutions
-        </h3>
-    </div>
-
+    <main id="main-content-wrapper" class="flex-grow pt-32 lg:pt-40 pb-20 px-4">
+        <div class="text-center mb-16 flex flex-col items-center">
+            <div class="ai-badge" id="ai-msg">System: Optimizing for your gaze...</div>
+            <h3 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient pb-1">Custom Solutions</h3>
+        </div>
         <div class="carousel-wrapper">
             <button id="prevBtn" class="nav-btn">❮</button>
             <button id="nextBtn" class="nav-btn">❯</button>
-
-            <div id="solutionsContainer">
-            </div>
+            <div id="solutionsContainer"></div>
         </div>
-
-        <div id="stackContainer"
-            class="flex gap-4 md:gap-6 overflow-x-auto pb-10 mt-16 justify-start md:justify-center px-6">
-        </div>
+        <div id="stackContainer" class="flex gap-4 md:gap-6 overflow-x-auto pb-10 mt-16 justify-start md:justify-center px-6"></div>
     </main>
-
     <div id="footer-placeholder"></div>
-
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
@@ -304,18 +84,12 @@
             messagingSenderId: "604782345004",
             appId: "1:604782345004:web:029aeaa81f4d11c2254a89"
         };
-
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const auth = firebase.auth();
         const database = firebase.database();
-
-        // --- 3D 배경 및 인터랙션 로직 통합 ---
         function initGlobal3DEffects() {
-            // 1. 배경 입자 생성
             const bg = document.getElementById('bg-stars');
-            const count = 150; 
+            const count = 150;
             for (let i = 0; i < count; i++) {
                 const dot = document.createElement('div');
                 dot.className = 'dot';
@@ -327,27 +101,14 @@
                 dot.style.transform = `translateZ(${z}px)`;
                 bg.appendChild(dot);
             }
-
-            // 2. 전체 화면 마우스 Parallax
             const contentWrapper = document.getElementById('main-content-wrapper');
             document.body.addEventListener('mousemove', (e) => {
                 const moveX = (e.clientX - window.innerWidth / 2) / 40;
                 const moveY = (e.clientY - window.innerHeight / 2) / 40;
-
-                // 배경 입자 움직임
                 bg.style.transform = `rotateY(${moveX * 0.5}deg) rotateX(${-moveY * 0.5}deg) translateZ(50px)`;
-                
-                // 메인 콘텐츠 기울기 (기존 카드 3D와 별개로 전체적인 깊이감 제공)
                 contentWrapper.style.transform = `rotateY(${moveX * 0.2}deg) rotateX(${-moveY * 0.2}deg)`;
             });
-
-            // 3. AI 메시지 순환
-            const messages = [
-                "TDL Energy Indonesia",
-                "Deliver the best products and services to our customers",
-                "Promote leadership consistently",
-                "Create and Innovate value"
-            ];
+            const messages = ["TDL Energy Indonesia", "Deliver the best products and services to our customers", "Promote leadership consistently", "Create and Innovate value"];
             setInterval(() => {
                 const aiMsg = document.getElementById('ai-msg');
                 if(aiMsg) {
@@ -360,71 +121,49 @@
                 }
             }, 4000);
         }
-
         async function loadLayout() {
             try {
                 const headerRes = await fetch('components/header.html');
-                const headerHTML = await headerRes.text();
                 const headerPlaceholder = document.getElementById('header-placeholder');
-                headerPlaceholder.innerHTML = headerHTML;
-
-                const headerScripts = headerPlaceholder.querySelectorAll("script");
-                headerScripts.forEach(oldScript => {
+                headerPlaceholder.innerHTML = await headerRes.text();
+                headerPlaceholder.querySelectorAll("script").forEach(oldScript => {
                     const newScript = document.createElement("script");
                     let scriptText = oldScript.text;
-                    if (scriptText.includes("admin.html")) {
-                        scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
-                    }
+                    if (scriptText.includes("admin.html")) scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
                     newScript.text = scriptText;
                     document.body.appendChild(newScript).parentNode.removeChild(newScript);
                 });
-
                 const authRes = await fetch('components/admin-auth.html');
-                const authHTML = await authRes.text();
-                let authDiv = document.getElementById('admin-auth-placeholder');
-                if (!authDiv) {
-                    authDiv = document.createElement('div');
-                    authDiv.id = 'admin-auth-placeholder';
-                    document.body.appendChild(authDiv);
-                }
-                authDiv.innerHTML = authHTML;
-
-                const authScripts = authDiv.querySelectorAll("script");
-                authScripts.forEach(oldScript => {
+                let authDiv = document.getElementById('admin-auth-placeholder') || document.createElement('div');
+                authDiv.id = 'admin-auth-placeholder';
+                if(!authDiv.parentNode) document.body.appendChild(authDiv);
+                authDiv.innerHTML = await authRes.text();
+                authDiv.querySelectorAll("script").forEach(oldScript => {
                     const newScript = document.createElement("script");
                     newScript.text = oldScript.text;
                     document.body.appendChild(newScript).parentNode.removeChild(newScript);
                 });
-
                 const footerRes = await fetch('components/footer.html');
                 const footerPlaceholder = document.getElementById('footer-placeholder');
                 footerPlaceholder.innerHTML = await footerRes.text();
-
-                const footerScripts = footerPlaceholder.querySelectorAll("script");
-                footerScripts.forEach(oldScript => {
+                footerPlaceholder.querySelectorAll("script").forEach(oldScript => {
                     const newScript = document.createElement("script");
                     newScript.text = oldScript.text;
                     document.body.appendChild(newScript).parentNode.removeChild(newScript);
                 });
-
                 const bgmRes = await fetch('components/bgm.html');
-                const bgmHTML = await bgmRes.text();
                 const bgmPlaceholder = document.getElementById('bgm-placeholder');
                 if (bgmPlaceholder) {
-                    bgmPlaceholder.innerHTML = bgmHTML;
-                    const scripts = bgmPlaceholder.querySelectorAll("script");
-                    scripts.forEach(oldScript => {
+                    bgmPlaceholder.innerHTML = await bgmRes.text();
+                    bgmPlaceholder.querySelectorAll("script").forEach(oldScript => {
                         const newScript = document.createElement("script");
                         newScript.text = oldScript.text;
                         document.body.appendChild(newScript).parentNode.removeChild(newScript);
                     });
                 }
                 initMenuToggle();
-            } catch (err) {
-                console.error("Layout Load Error:", err);
-            }
+            } catch (err) { console.error("Layout Load Error:", err); }
         }
-
         function initMenuToggle() {
             const menuBtn = document.getElementById("menuToggleBtn");
             const dropdown = document.getElementById("dropdownMenu");
@@ -445,7 +184,6 @@
                 };
             }
         }
-
         const solutionsData = [
             { id: 'A', title: 'A. EV Motorcycle Conversion Business', desc: 'TDLID supplies electric motorcycle conversion kits and battery packs to local governments and universities in Indonesia.', images: ['images/solutions/solution1.webp', 'images/solutions/solution1-1.webp'] },
             { id: 'B', title: 'B. Employee Ownership', desc: "TDLID announced the 'Employee Ownership Program' with GESITS and MOTORIZ on April 30, 2024.", images: ['images/solutions/solution2.webp', 'images/solutions/solution2-1.webp'] },
@@ -453,72 +191,37 @@
             { id: 'D', title: 'D. Solar home charging', desc: 'TDLiD offers solar power generation systems that can be utilized by individual households and small businesses.', images: ['images/solutions/solution4.webp', 'images/solutions/solution4-1.webp'] },
             { id: 'E', title: 'E. Battery Recycling', desc: 'TDLiD contributes to building a virtuous cycle ecosystem for raw materials of Indonesian nickel and recycled batteries.', images: ['images/solutions/solution5.webp', 'images/solutions/solution5-1.webp'] }
         ];
-
-        let currentIndex = 0;
-        let isAnimating = false;
-        let autoTimer;
-
+        let currentIndex = 0, isAnimating = false, autoTimer;
         function openPopup(imgSrc, detail) {
             stopAuto();
             const modal = document.createElement('div');
             modal.className = 'modal-backdrop';
-            modal.innerHTML = `
-            <div class="modal-content custom-scrollbar">
-                <span class="modal-close-x">✕</span>
-                <img src="${imgSrc}" class="modal-image">
-                <p class="mt-4 text-neutral-300 text-lg px-4">${detail}</p>
-                <button class="modal-close-btn">Close</button>
-            </div>`;
+            modal.innerHTML = `<div class="modal-content custom-scrollbar"><span class="modal-close-x">✕</span><img src="${imgSrc}" class="modal-image"><p class="mt-4 text-neutral-300 text-lg px-4">${detail}</p><button class="modal-close-btn">Close</button></div>`;
             const close = () => { if (modal.parentNode) document.body.removeChild(modal); startAuto(); };
             modal.querySelector('.modal-close-btn').onclick = close;
             modal.querySelector('.modal-close-x').onclick = close;
             modal.onclick = (e) => { if (e.target === modal) close(); };
             document.body.appendChild(modal);
         }
-
         function initSolutions() {
             const container = document.getElementById('solutionsContainer');
-            container.innerHTML = solutionsData.map((s, idx) => `
-            <div class="solution-card js-3d-card ${idx === currentIndex ? 'is-active' : ''}" data-index="${idx}">
-                <h4 class="text-2xl md:text-3xl font-bold mb-6 md:mb-10 text-cyan-400 text-center">${s.title}</h4>
-                <div class="grid md:grid-cols-2 gap-6 md:gap-10 mb-10">
-                    ${s.images.map(img => `
-                        <img src="${img}" 
-                             class="popup-trigger w-full h-64 md:h-80 object-contain bg-neutral-800/20 rounded-2xl cursor-pointer hover:scale-105 transition-all duration-500"
-                             data-desc="${s.desc.replace(/"/g, '&quot;')}">
-                    `).join('')}
-                </div>
-                <p class="text-lg md:text-xl text-neutral-300 text-center max-w-3xl mx-auto leading-relaxed font-light">${s.desc}</p>
-            </div>
-        `).join('');
-
+            container.innerHTML = solutionsData.map((s, idx) => `<div class="solution-card js-3d-card ${idx === currentIndex ? 'is-active' : ''}" data-index="${idx}"><h4 class="text-2xl md:text-3xl font-bold mb-6 md:mb-10 text-cyan-400 text-center">${s.title}</h4><div class="grid md:grid-cols-2 gap-6 md:gap-10 mb-10">${s.images.map(img => `<img src="${img}" class="popup-trigger w-full h-64 md:h-80 object-contain bg-neutral-800/20 rounded-2xl cursor-pointer hover:scale-105 transition-all duration-500" data-desc="${s.desc.replace(/"/g, '&quot;')}">`).join('')}</div><p class="text-lg md:text-xl text-neutral-300 text-center max-w-3xl mx-auto leading-relaxed font-light">${s.desc}</p></div>`).join('');
             renderStack();
             initPopupEvents();
-            init3DEffect(); 
+            init3DEffect();
         }
-
         function init3DEffect() {
             const container = document.getElementById('solutionsContainer');
-            
             container.addEventListener('mousemove', (e) => {
                 const activeCard = container.querySelector('.solution-card.is-active');
                 if (!activeCard || isAnimating) return;
-
                 const rect = activeCard.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = (centerY - y) / 25; 
-                const rotateY = (x - centerX) / 25;
-                
+                const x = e.clientX - rect.left, y = e.clientY - rect.top;
+                const rotateX = (rect.height / 2 - y) / 25, rotateY = (x - rect.width / 2) / 25;
                 activeCard.classList.add('is-tracking');
                 activeCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
                 activeCard.style.boxShadow = `${-rotateY * 2}px ${rotateX * 2}px 50px rgba(0, 0, 0, 0.9), 0 0 40px rgba(6, 182, 212, 0.2)`;
             });
-            
             container.addEventListener('mouseleave', () => {
                 const activeCard = container.querySelector('.solution-card.is-active');
                 if (activeCard) {
@@ -527,89 +230,39 @@
                 }
             });
         }
-
         function initPopupEvents() {
             document.querySelectorAll('.popup-trigger').forEach(img => {
                 img.onclick = function (e) {
                     e.stopPropagation();
-                    const imgSrc = this.getAttribute('src');
-                    const detail = this.getAttribute('data-desc');
-                    openPopup(imgSrc, detail);
+                    openPopup(this.getAttribute('src'), this.getAttribute('data-desc'));
                 };
             });
         }
-
         function renderStack() {
-            const stackContainer = document.getElementById('stackContainer');
-            stackContainer.innerHTML = solutionsData.map((s, idx) => `
-            <div class="flex-shrink-0 p-4 bg-neutral-900/50 border-2 ${idx === currentIndex ? 'border-cyan-500 bg-neutral-800 scale-105' : 'border-neutral-800 hover:border-neutral-700'} rounded-2xl cursor-pointer w-40 md:w-44 text-center transition-all duration-500 shadow-xl" onclick="jumpTo(${idx})">
-                <h5 class="text-[10px] md:text-xs mb-3 font-bold ${idx === currentIndex ? 'text-cyan-400' : 'text-neutral-500'} line-clamp-1 uppercase tracking-wider">${s.title}</h5>
-                <div class="flex flex-col gap-2">
-                    ${s.images.map(img => `
-                        <img src="${img}" class="w-full h-10 md:h-12 object-cover rounded-lg ${idx === currentIndex ? 'opacity-100 shadow-lg' : 'opacity-20'} transition-all duration-500">
-                    `).join('')}
-                </div>
-            </div>
-        `).join('');
+            document.getElementById('stackContainer').innerHTML = solutionsData.map((s, idx) => `<div class="flex-shrink-0 p-4 bg-neutral-900/50 border-2 ${idx === currentIndex ? 'border-cyan-500 bg-neutral-800 scale-105' : 'border-neutral-800 hover:border-neutral-700'} rounded-2xl cursor-pointer w-40 md:w-44 text-center transition-all duration-500 shadow-xl" onclick="jumpTo(${idx})"><h5 class="text-[10px] md:text-xs mb-3 font-bold ${idx === currentIndex ? 'text-cyan-400' : 'text-neutral-500'} line-clamp-1 uppercase tracking-wider">${s.title}</h5><div class="flex flex-col gap-2">${s.images.map(img => `<img src="${img}" class="w-full h-10 md:h-12 object-cover rounded-lg ${idx === currentIndex ? 'opacity-100 shadow-lg' : 'opacity-20'} transition-all duration-500">`).join('')}</div></div>`).join('');
         }
-
         function showCard(newIndex, direction) {
             if (isAnimating || newIndex === currentIndex) return;
             isAnimating = true;
-
-            const cards = document.querySelectorAll('.solution-card');
-            const prevCard = cards[currentIndex];
-            const nextCard = cards[newIndex];
+            const cards = document.querySelectorAll('.solution-card'), prevCard = cards[currentIndex], nextCard = cards[newIndex];
             const slideDistance = document.getElementById('solutionsContainer').offsetWidth;
-
-            prevCard.classList.remove('is-tracking');
-            nextCard.classList.remove('is-tracking');
-
-            nextCard.style.transition = 'none';
-            nextCard.style.opacity = '0';
-            nextCard.classList.add('is-active');
+            prevCard.classList.remove('is-tracking'); nextCard.classList.remove('is-tracking');
+            nextCard.style.transition = 'none'; nextCard.style.opacity = '0'; nextCard.classList.add('is-active');
             void nextCard.offsetWidth;
-
-            nextCard.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out';
-            prevCard.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out';
-
+            nextCard.style.transition = prevCard.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out';
             requestAnimationFrame(() => {
                 prevCard.style.transform = `translateX(${direction === 'next' ? -slideDistance : slideDistance}px) rotateY(${direction === 'next' ? -20 : 20}deg)`;
-                prevCard.style.opacity = '0';
-                nextCard.style.transform = 'translateX(0) rotateY(0)';
-                nextCard.style.opacity = '1';
+                prevCard.style.opacity = '0'; nextCard.style.transform = 'translateX(0) rotateY(0)'; nextCard.style.opacity = '1';
             });
-
-            currentIndex = newIndex;
-            renderStack();
-
-            setTimeout(() => {
-                prevCard.classList.remove('is-active');
-                prevCard.style.transform = 'translateX(0) rotateY(0)';
-                isAnimating = false;
-            }, 800);
+            currentIndex = newIndex; renderStack();
+            setTimeout(() => { prevCard.classList.remove('is-active'); prevCard.style.transform = 'translateX(0) rotateY(0)'; isAnimating = false; }, 800);
         }
-
-        function jumpTo(idx) {
-            if (idx === currentIndex) return;
-            stopAuto();
-            showCard(idx, idx > currentIndex ? 'next' : 'prev');
-            startAuto();
-        }
-
+        function jumpTo(idx) { if (idx === currentIndex) return; stopAuto(); showCard(idx, idx > currentIndex ? 'next' : 'prev'); startAuto(); }
         const startAuto = () => { stopAuto(); autoTimer = setInterval(() => showCard((currentIndex + 1) % solutionsData.length, 'next'), 6000); };
         const stopAuto = () => clearInterval(autoTimer);
-
         document.getElementById('prevBtn').onclick = () => { stopAuto(); showCard((currentIndex - 1 + solutionsData.length) % solutionsData.length, 'prev'); startAuto(); };
         document.getElementById('nextBtn').onclick = () => { stopAuto(); showCard((currentIndex + 1) % solutionsData.length, 'next'), startAuto(); };
-
-        document.addEventListener("DOMContentLoaded", () => {
-            loadLayout();
-            initSolutions();
-            initGlobal3DEffects(); // 🌟 새로운 3D 배경/효과 초기화
-            startAuto();
-        });
+        document.addEventListener("DOMContentLoaded", () => { loadLayout(); initSolutions(); initGlobal3DEffects(); startAuto(); });
     </script>
 </body>
-
 </html>
