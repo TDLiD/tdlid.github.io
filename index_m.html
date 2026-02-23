@@ -91,7 +91,35 @@ function initAdminTrigger(){const triggerWord=document.getElementById('triggerWo
 document.getElementById('adminPasswordInput')?.addEventListener('keypress',(e)=>{if(e.key==='Enter')verifyAdminPassword()});
 function initCertModal(){document.querySelectorAll('.cert-link').forEach(link=>{link.onclick=(e)=>{e.preventDefault();const modal=document.getElementById('imageModal');const modalImg=document.getElementById('modalDetailImage');modalImg.src=link.getAttribute('data-original-src');modal.style.display='block';document.body.style.overflow='hidden'}})}
 function closeModal(){const modal=document.getElementById('imageModal');modal.style.display='none';document.body.style.overflow=''}
-function initImageSlider(){const sliderContainer=document.getElementById('heroSlider');if(!sliderContainer)return;const day=new Date().getDay();const bgMap={1:'bg-1.gif',2:'bg-2.gif',3:'bg-3.gif',4:'bg-1.gif',5:'bg-2.gif',6:'bg-3.gif',0:'bg-1.gif'};const fileName=bgMap[day];const imageSrc=`images/bg/${fileName}`;const img=document.createElement('img');img.src=imageSrc;img.className='slide active';img.onerror=()=>{img.src='images/bg/bg-1.gif'};sliderContainer.appendChild(img)}
+function initImageSlider() {
+    const sliderContainer = document.getElementById('heroSlider');
+    if (!sliderContainer) return;
+
+    // 요일 계산 (월:1 ~ 일:7)
+    const now = new Date();
+    let dayOfWeek = now.getDay(); // 0(일) ~ 6(토)
+    const bgNumber = (dayOfWeek === 0) ? 7 : dayOfWeek;
+    const fileName = `bg-${bgNumber}.gif`;
+    const imageSrc = `images/bg/${fileName}`;
+
+    // 배경 이미지 생성 및 설정
+    const img = document.createElement('img');
+    img.src = imageSrc;
+    img.className = 'slide active'; // 기존 CSS 클래스 활용
+    
+    // 이미지 로드 실패 시 대비(Fallback)
+    img.onerror = () => { 
+        img.src = 'images/bg/bg-3.gif'; 
+    };
+
+    // 컨테이너 초기화 후 삽입 (기존 내용 유지하며 추가)
+    const overlay = sliderContainer.querySelector('.video-overlay');
+    sliderContainer.innerHTML = ''; 
+    if(overlay) sliderContainer.appendChild(overlay);
+    sliderContainer.appendChild(img);
+
+    console.log(`Mobile Background: ${fileName}`);
+}
 let isHeartActive=false;
 function initPillarEgg(){const pillar=document.getElementById('pillarTrigger');if(pillar){pillar.addEventListener('click',()=>{if(isHeartActive)return;activateHeartEasterEgg()})}}
 function activateHeartEasterEgg(){isHeartActive=true;if(navigator.vibrate)navigator.vibrate([50,30,50]);createHeartFormation();setTimeout(()=>{isHeartActive=false},6000)}
