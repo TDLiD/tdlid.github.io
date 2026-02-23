@@ -179,21 +179,25 @@
             drawFluid(); 
             window.addEventListener('resize', initFluid); 
             
-            // --- 날짜별 배경 비디오 자동 선택 로직 ---
-            const today = new Date().getDate(); // 오늘 날짜 (1~31)
-            const lastDigit = today % 10;      // 날짜의 끝자리 (0~9)
-            const videoFileName = `blue${lastDigit}.mp4`;
-            
-            const bgContainer = document.getElementById('image-bg-container'); 
-            if(bgContainer) { 
-                bgContainer.innerHTML = `
-                    <div class="video-overlay" style="z-index: 5;"></div>
-                    <video class="video-bg" autoplay muted loop playsinline poster="images/bg/bg-3.gif">
-                        <source src="images/bg/${videoFileName}" type="video/mp4">
-                    </video>
-                `; 
-                console.log(`Today's Background: ${videoFileName}`);
-            } 
+           // --- [수정] 요일별 배경 GIF 자동 선택 로직 (월:1 ~ 일:7) ---
+const now = new Date();
+let dayOfWeek = now.getDay(); // 0(일) ~ 6(토)
+
+// 요일 숫자를 파일명 규칙에 맞게 변환 (일요일 0 -> 7, 나머지는 그대로)
+const bgNumber = (dayOfWeek === 0) ? 7 : dayOfWeek;
+const bgFileName = `bg-${bgNumber}.gif`;
+
+const bgContainer = document.getElementById('image-bg-container'); 
+if(bgContainer) { 
+    bgContainer.innerHTML = `
+        <div class="video-overlay" style="z-index: 5;"></div>
+        <img src="images/bg/${bgFileName}" 
+             alt="Daily Background" 
+             class="video-bg w-full h-full object-cover">
+    `; 
+    console.log(`Today is Day ${bgNumber} (${bgFileName})`);
+}
+
             
             loadLayout(); 
             initLiveSettings(); 
