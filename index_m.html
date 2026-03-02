@@ -6,6 +6,7 @@
 <meta name="keywords" id="metaKeywords" content="">
 <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 <script>
@@ -24,108 +25,276 @@ async function recordVisit(){try{let geoData={ip:"0.0.0.0",country:"Unknown",cit
 const ua=navigator.userAgent;const now=new Date();const visitData={timestamp:now.getTime(),timeStr:now.toLocaleString(),page:window.location.pathname.split('/').pop()||'index_m.html',ip:geoData.ip,country:geoData.country,city:geoData.city,device:"Mobile",os:getOS(ua),browser:getBrowser(ua),sid:getSessionId(),referrer:document.referrer||"Direct"};database.ref('visits').push(visitData)}catch(e){console.error("History error:",e)}}
 function getOS(ua){if(ua.indexOf("Windows")!==-1)return "Windows";if(ua.indexOf("Mac")!==-1)return "macOS";if(ua.indexOf("Android")!==-1)return "Android";if(ua.indexOf("iPhone")!==-1||ua.indexOf("iPad")!==-1)return "iOS";return "Unknown"}
 function getBrowser(ua){if(ua.indexOf("Edge")!==-1||ua.indexOf("Edg")!==-1)return "Edge";if(ua.indexOf("Chrome")!==-1)return "Chrome";if(ua.indexOf("Safari")!==-1)return "Safari";if(ua.indexOf("Firefox")!==-1)return "Firefox";return "Others"}
-function getSessionId(){if(!sessionStorage.getItem('session_id')){sessionStorage.setItem('session_id','s_'+Math.random().toString(36).substr(2,9))}
-return sessionStorage.getItem('session_id')}
+function getSessionId(){if(!sessionStorage.getItem('session_id')){sessionStorage.setItem('session_id','s_'+Math.random().toString(36).substr(2,9))}return sessionStorage.getItem('session_id')}
 recordVisit();
 </script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="css/main.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@800&family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
-#emergencyBanner{display:none;background:#ef4444;color:white;text-align:center;padding:10px 15px;font-weight:bold;position:fixed;bottom:0;width:100%;z-index:99999;font-size:13px;line-height:1.4}#mainPopup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;align-items:center;justify-content:center}#adminAuthModal{background:rgba(0,0,0,0.8)}.popup-box{background:#0a0a0a;border:1px solid #22d3ee;padding:25px 20px;border-radius:20px;width:90%;max-width:340px;text-align:center;max-height:80vh;overflow-y:auto;box-shadow:0 0 30px rgba(34,211,238,0.2)}#popupText{text-align:left;font-size:14px;color:#d1d5db}.popup-box::-webkit-scrollbar{width:4px}.popup-box::-webkit-scrollbar-thumb{background:#22d3ee;border-radius:10px}#header-placeholder{position:fixed;top:0;left:0;width:100%;z-index:10001}.animated-logo-text-m{font-size:3.8vw!important;white-space:nowrap}@media (max-width:380px){.animated-logo-text-m{font-size:11px!important}}#imageModal{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:10000;display:none}#modalDetailImage{max-width:90%;max-height:70%;object-fit:contain}#musicToggleBtn{position:fixed;bottom:20px;right:20px;z-index:10005;width:48px;height:48px;background:rgba(23,23,23,0.9);border:1.5px solid rgba(34,211,238,0.6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#22d3ee;backdrop-filter:blur(8px)}#triggerWord{color:inherit!important;font-weight:inherit!important;text-decoration:none!important;cursor:pointer!important;display:inline-block;position:relative;z-index:50;-webkit-tap-highlight-color:transparent;pointer-events:auto!important}.hero-section{position:relative;width:100%;height:100svh;overflow:hidden;display:flex;align-items:center;justify-content:center;z-index:1}.video-bg-container{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}.video-bg{width:100%;height:100%;object-fit:cover;filter:brightness(0.35) contrast(1.1)}.video-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.7) 100%);z-index:1}.hero-content{position:relative;z-index:10;width:100%;padding:0 32px}.hero-logo-gradient{font-size:5vw;letter-spacing:0.3em;color:rgba(34,211,238,0.8);font-weight:900;text-transform:uppercase;margin-bottom:8px;line-height:1}.hero-slogan-gradient{font-size:5vw;letter-spacing:0.3em;color:rgba(34,211,238,0.8);font-weight:600;text-transform:uppercase}.hero-description{font-size:15px;line-height:1.7;margin-top:80px;color:#cbd5e1;word-break:keep-all}.partner-grid{display:flex;flex-wrap:wrap;gap:30px;align-items:center;justify-content:center;opacity:0.7}.partner-grid img{height:28px;width:auto;filter:grayscale(1)}.interactive-certs{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;padding:0 20px}.cert-link img{width:100%;height:auto;border-radius:4px}.slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 2s ease-in-out;filter:brightness(0.35) contrast(1.1)}.slide.active{opacity:1;z-index:1}.slide.exit{opacity:0;z-index:0}@keyframes cleavageIn{0%{clip-path:polygon(0 0,100% 0,100% 0,0 0,0 100%,100% 100%,100% 100%,0 100%);opacity:0}100%{clip-path:polygon(0 0,100% 0,100% 50%,0 50%,0 50%,100% 50%,100% 100%,0 100%);opacity:1}}.effect-cleavage{animation:cleavageIn 0.8s ease-out forwards}@keyframes waveIn{0%{transform:scale(0.8) translateY(20px);opacity:0;filter:blur(10px)}50%{transform:scale(1.05) translateY(-5px);filter:blur(2px)}100%{transform:scale(1) translateY(0);opacity:1;filter:blur(0)}}.effect-wave{animation:waveIn 1s ease-in-out infinite alternate}@keyframes rotateIn{0%{transform:rotate(-360deg) scale(0);opacity:0}100%{transform:rotate(0deg) scale(1);opacity:1}}.effect-rotation{animation:rotateIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards}@keyframes slideInCenter{0%{transform:translateY(100vh);opacity:0}100%{transform:translateY(0);opacity:1}}.effect-slide{animation:slideInCenter 0.6s ease-out forwards}.effect-classic{animation:fadeIn 0.4s ease-in forwards}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.popup-exit-active{opacity:0;transform:scale(0.9);transition:all 0.5s ease-in}
+/* ════ PC 효과 이식 스타일 ════ */
+:root {
+    --cy: #22d3ee;
+    --b2: rgba(34,211,238,0.2);
+}
+
+/* 3D 컨텍스트 설정 */
+body { perspective: 1200px; }
+
+/* 히어로 섹션 강화 */
+.hero-section { background: #000; perspective: 1000px; }
+.hero-logo-gradient { 
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13vw;
+    line-height: 0.9;
+    background: linear-gradient(180deg, #fff 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 20px rgba(34,211,238,0.3));
+    animation: rise 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-slogan-gradient {
+    font-family: 'Syne', sans-serif;
+    background: linear-gradient(90deg, var(--cy), #a3e635);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 4.5vw;
+    letter-spacing: 0.4em;
+    margin-top: 10px;
+    opacity: 0;
+    animation: rise 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+@keyframes rise {
+    from { transform: translateY(30px) translateZ(-50px); opacity: 0; }
+    to { transform: translateY(0) translateZ(0); opacity: 1; }
+}
+
+/* 3D 카드 효과 (인증서 영역) */
+.cert-link {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+    transform-style: preserve-3d;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    display: block;
+    padding: 10px;
+}
+
+.cert-link:active {
+    transform: scale(0.95) rotateX(10deg);
+    background: rgba(34,211,238,0.08);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 15px rgba(34,211,238,0.2);
+}
+
+/* 3D 플로어 그리드 추가 (PC 버전의 느낌) */
+.hero-grid {
+    position: absolute;
+    bottom: -10%;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background-image: 
+        linear-gradient(rgba(34,211,238,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34,211,238,0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: rotateX(60deg);
+    transform-origin: center bottom;
+    mask-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* 기본 UI 유지용 */
+#emergencyBanner{display:none;background:#ef4444;color:white;text-align:center;padding:10px 15px;font-weight:bold;position:fixed;bottom:0;width:100%;z-index:99999;font-size:13px;line-height:1.4}
+#mainPopup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+.popup-box{background:#0a0a0a;border:1px solid var(--cy);padding:25px 20px;border-radius:20px;width:90%;max-width:340px;text-align:center;box-shadow:0 0 30px rgba(34,211,238,0.2)}
+#imageModal{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:10000;display:none;backdrop-filter:blur(10px)}
+#modalDetailImage{max-width:90%;max-height:70%;object-fit:contain;box-shadow: 0 0 40px rgba(34,211,238,0.2); border-radius: 10px;}
+.slide { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition: opacity 1.5s ease; filter: brightness(0.4); transform: scale(1.1); }
+.slide.active { opacity:1; transform: scale(1); transition: opacity 1.5s ease, transform 10s linear; }
+
+/* AI Tag */
+.sys-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 15px;
+    background: rgba(34,211,238,0.05);
+    border: 1px solid var(--b2);
+    border-radius: 100px;
+    font-size: 10px;
+    color: var(--cy);
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+}
+.sys-dot { width:6px; height:6px; background: #a3e635; border-radius: 50%; box-shadow: 0 0 8px #a3e635; animation: blink 1.5s infinite; }
+@keyframes blink { 0%, 100% { opacity:1; } 50% { opacity:0.3; } }
 </style>
 </head>
+
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
-<div id="mainPopup"><div class="popup-box"><h3 class="text-cyan-400 font-black text-xl mb-3 italic">NOTICE</h3><p id="popupText" class="text-neutral-300 text-sm mb-6 leading-relaxed whitespace-pre-wrap"></p><button onclick="document.getElementById('mainPopup').style.display='none'" class="w-full py-3 bg-cyan-600 text-white font-bold rounded-xl active:bg-cyan-500">Close</button></div></div>
+
+<div id="mainPopup">
+    <div class="popup-box">
+        <h3 class="text-cyan-400 font-black text-xl mb-3 italic tracking-widest">NOTICE</h3>
+        <p id="popupText" class="text-neutral-300 text-sm mb-6 leading-relaxed whitespace-pre-wrap"></p>
+        <button onclick="document.getElementById('mainPopup').style.display='none'" class="w-full py-4 bg-cyan-600 text-white font-bold rounded-xl active:bg-cyan-500 transition-colors">CLOSE</button>
+    </div>
+</div>
+
 <div id="header-placeholder"></div>
+
 <main class="flex-grow">
-<section class="hero-section">
-<div class="video-bg-container" id="heroSlider"><div class="video-overlay"></div></div>
-<div class="hero-content text-center">
-<h1 class="hero-logo-gradient">NO MORE CARBON</h1>
-<p class="hero-slogan-gradient">NO MORE FOSSIL FUEL</p>
-<p class="hero-description"><span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.</p>
-</div>
-</section>
-<section class="py-16 bg-neutral-900 border-y border-neutral-800">
-<div class="px-6 mb-16">
-<h2 id="pillarTrigger" class="text-sm font-light text-center mb-8 text-cyan-400 tracking-widest uppercase cursor-pointer" style="padding:10px;-webkit-tap-highlight-color:transparent">A Pillar of Trust</h2>
-<div class="partner-grid">
-<img src="images/home/DAVIGO.webp" alt="DAVIGO"><img src="images/home/GESITS.webp" alt="GESITS"><img src="images/home/ALESSA.webp" alt="ALESSA">
-</div>
-</div>
-<div class="px-4">
-<h2 class="text-lg font-light text-center mb-10 text-cyan-400">Global Compliance & Safety</h2>
-<div id="certifications-inside-hero" class="interactive-certs">
-<a href="#" class="cert-link" data-original-src="images/certification/CE-EMC-TEST.webp"><img src="images/certification/CE-EMC-TEST.webp" alt="CE"></a>
-<a href="#" class="cert-link" data-original-src="images/certification/CB-TEST.webp"><img src="images/certification/CB-TEST.webp" alt="CB"></a>
-<a href="#" class="cert-link" data-original-src="images/certification/EMC-COMPLIANCE.webp"><img src="images/certification/EMC-COMPLIANCE.webp" alt="EMC"></a>
-<a href="#" class="cert-link" data-original-src="images/certification/IEC-62619.webp"><img src="images/certification/IEC-62619.webp" alt="IEC"></a>
-<a href="#" class="cert-link" data-original-src="images/certification/Material-Safety.webp"><img src="images/certification/Material-Safety.webp" alt="MSDS"></a>
-<a href="#" class="cert-link" data-original-src="images/certification/UN38.3.webp"><img src="images/certification/UN38.3.webp" alt="UN38.3"></a>
-</div>
-</div>
-</section>
+    <section class="hero-section">
+        <div class="video-bg-container" id="heroSlider">
+            <div class="video-overlay"></div>
+        </div>
+        <div class="hero-grid"></div>
+        
+        <div class="hero-content text-center">
+            <div class="sys-tag">
+                <span class="sys-dot"></span>
+                <span id="ai-msg">SYSTEM INITIALIZING...</span>
+            </div>
+            <h1 class="hero-logo-gradient">NO MORE<br>CARBON</h1>
+            <p class="hero-slogan-gradient">NO MORE FOSSIL FUEL</p>
+            <p class="hero-description px-4">
+                <span id="triggerWord" style="color:var(--cy)!important; font-weight:700;">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-20 bg-[#050505] border-y border-neutral-900">
+        <div class="px-6 mb-20">
+            <h2 id="pillarTrigger" class="text-[10px] font-bold text-center mb-10 text-cyan-400 tracking-[0.3em] uppercase">A PILLAR OF TRUST</h2>
+            <div class="partner-grid flex justify-center gap-8 opacity-50">
+                <img src="images/home/DAVIGO.webp" alt="DAVIGO" class="h-6">
+                <img src="images/home/GESITS.webp" alt="GESITS" class="h-6">
+                <img src="images/home/ALESSA.webp" alt="ALESSA" class="h-6">
+            </div>
+        </div>
+
+        <div class="px-4">
+            <h2 class="text-sm font-bold text-center mb-12 text-white/40 tracking-widest uppercase">Global Compliance</h2>
+            <div id="certifications-inside-hero" class="interactive-certs grid grid-cols-3 gap-4">
+                <a href="#" class="cert-link" data-original-src="images/certification/CE-EMC-TEST.webp"><img src="images/certification/CE-EMC-TEST.webp" alt="CE"></a>
+                <a href="#" class="cert-link" data-original-src="images/certification/CB-TEST.webp"><img src="images/certification/CB-TEST.webp" alt="CB"></a>
+                <a href="#" class="cert-link" data-original-src="images/certification/EMC-COMPLIANCE.webp"><img src="images/certification/EMC-COMPLIANCE.webp" alt="EMC"></a>
+                <a href="#" class="cert-link" data-original-src="images/certification/IEC-62619.webp"><img src="images/certification/IEC-62619.webp" alt="IEC"></a>
+                <a href="#" class="cert-link" data-original-src="images/certification/Material-Safety.webp"><img src="images/certification/Material-Safety.webp" alt="MSDS"></a>
+                <a href="#" class="cert-link" data-original-src="images/certification/UN38.3.webp"><img src="images/certification/UN38.3.webp" alt="UN38.3"></a>
+            </div>
+        </div>
+    </section>
 </main>
-<div id="adminAuthModal" class="hidden fixed inset-0 bg-black/95 z-[30000] flex items-center justify-center p-4 backdrop-blur-sm">
-<div class="bg-neutral-900 border border-cyan-500/30 p-8 rounded-2xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(0,0,0,1)]">
-<h3 class="text-cyan-400 font-bold text-xl mb-1 uppercase tracking-tighter">Admin Access</h3>
-<p class="text-neutral-500 text-xs mb-6">Database Authentication Required</p>
-<input type="password" id="adminPasswordInput" class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white mb-6 focus:border-cyan-500 outline-none transition-all text-center tracking-widest" placeholder="••••••••">
-<div class="flex gap-3">
-<button onclick="closeAdminAuth()" class="flex-1 py-3 bg-neutral-800 text-neutral-400 rounded-xl font-semibold text-sm">Cancel</button>
-<button onclick="verifyAdminPassword()" class="flex-1 py-3 bg-cyan-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-900/20 hover:bg-cyan-500 transition-colors">Verify</button>
+
+<div id="adminAuthModal" class="hidden fixed inset-0 bg-black/95 z-[30000] flex items-center justify-center p-6 backdrop-blur-md">
+    <div class="bg-neutral-900 border border-cyan-500/30 p-8 rounded-3xl max-w-sm w-full text-center">
+        <h3 class="text-cyan-400 font-bold text-xl mb-1 uppercase tracking-tighter">ADMIN ACCESS</h3>
+        <p class="text-neutral-500 text-[10px] mb-8 tracking-widest">AUTHENTICATION REQUIRED</p>
+        <input type="password" id="adminPasswordInput" class="w-full bg-black border border-neutral-800 rounded-2xl px-4 py-4 text-white mb-6 focus:border-cyan-500 outline-none text-center tracking-[0.5em]" placeholder="••••">
+        <div class="flex gap-3">
+            <button onclick="closeAdminAuth()" class="flex-1 py-4 bg-neutral-800 text-neutral-400 rounded-2xl font-bold text-xs">CANCEL</button>
+            <button onclick="verifyAdminPassword()" class="flex-1 py-4 bg-cyan-600 text-white rounded-2xl font-bold text-xs shadow-lg shadow-cyan-900/40">VERIFY</button>
+        </div>
+    </div>
 </div>
+
+<div id="imageModal">
+    <div class="flex flex-col items-center justify-center w-full h-full p-4" onclick="closeModal()">
+        <img id="modalDetailImage" src="" onclick="event.stopPropagation()">
+        <button class="mt-12 px-12 py-4 border border-cyan-500/50 text-cyan-400 rounded-full text-xs font-bold bg-black/80 backdrop-blur-md">CLOSE VIEW</button>
+    </div>
 </div>
-</div>
-<div id="imageModal"><div class="flex flex-col items-center justify-center w-full h-full p-4" onclick="closeModal()"><img id="modalDetailImage" src="" onclick="event.stopPropagation()"><button class="mt-8 px-10 py-3 border border-cyan-500/50 text-cyan-400 rounded-full text-sm bg-black/80 backdrop-blur-md">Close</button></div></div>
+
 <div id="footer-placeholder"></div>
 <div id="emergencyBanner">📢 <span id="bannerText">Notice</span></div>
+
 <script>
+// 1. 기존 리다이렉션 로직 (유지)
 const isMobileOnly=/iPhone|iPod|Android/i.test(navigator.userAgent);const urlParams=new URLSearchParams(window.location.search);const isPCMode=urlParams.get('view_mode')==='pc';if(!isMobileOnly||isPCMode){let path=window.location.pathname;let page=path.split("/").pop();if(page.includes("_m.html")){window.location.href=page.replace("_m.html",".html")}else if(page==="index_m.html"||page===""){window.location.href="index.html"}}
+
+// 2. 레이아웃 로드 (유지)
 async function loadLayout(){try{const [headerRes,footerRes]=await Promise.all([fetch('components/header_m.html'),fetch('components/footer_m.html')]);const headerText=await headerRes.text();const tempDiv=document.createElement('div');tempDiv.innerHTML=headerText;const adminLink=tempDiv.querySelector('a[href="admin/admin.html"]');if(adminLink)adminLink.remove();document.getElementById('header-placeholder').innerHTML=tempDiv.innerHTML;const footerPlaceholder=document.getElementById('footer-placeholder');footerPlaceholder.innerHTML=await footerRes.text();const scripts=footerPlaceholder.querySelectorAll("script");scripts.forEach(oldScript=>{const newScript=document.createElement("script");newScript.text=oldScript.text;document.body.appendChild(newScript).parentNode.removeChild(newScript)});initNavigation();initAdminTrigger();initCertModal();initLiveSettings()}catch(err){console.error("Layout Load Error:",err)}}
+
 function initNavigation(){const menuBtn=document.getElementById("menuToggleBtn");const dropdown=document.getElementById("dropdownMenu");const menuIcon=document.getElementById("menuIcon");if(menuBtn&&dropdown){menuBtn.onclick=(e)=>{e.stopPropagation();const isHidden=dropdown.classList.contains("invisible");if(isHidden){dropdown.classList.remove("opacity-0","invisible");dropdown.classList.add("opacity-100","visible","translate-y-2");if(menuIcon)menuIcon.innerText="✕"}else{dropdown.classList.remove("opacity-100","visible","translate-y-2");dropdown.classList.add("opacity-0","invisible");if(menuIcon)menuIcon.innerText="☰"}}}}
+
 function initAdminTrigger(){const triggerWord=document.getElementById('triggerWord');if(triggerWord){triggerWord.addEventListener('click',(e)=>{e.preventDefault();openAdminAuth()})}}
 document.getElementById('adminPasswordInput')?.addEventListener('keypress',(e)=>{if(e.key==='Enter')verifyAdminPassword()});
+
 function initCertModal(){document.querySelectorAll('.cert-link').forEach(link=>{link.onclick=(e)=>{e.preventDefault();const modal=document.getElementById('imageModal');const modalImg=document.getElementById('modalDetailImage');modalImg.src=link.getAttribute('data-original-src');modal.style.display='block';document.body.style.overflow='hidden'}})}
 function closeModal(){const modal=document.getElementById('imageModal');modal.style.display='none';document.body.style.overflow=''}
+
+// 3. PC 효과: 자이로 센서/마우스 추적 배경 효과
+function initParallaxBackground() {
+    const hero = document.querySelector('.hero-section');
+    const slider = document.getElementById('heroSlider');
+    
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', (e) => {
+            const tiltX = Math.min(Math.max(e.gamma, -20), 20) / 2;
+            const tiltY = Math.min(Math.max(e.beta, -20), 20) / 2;
+            slider.style.transform = `scale(1.1) translate(${tiltX}px, ${tiltY}px)`;
+        });
+    }
+}
+
 function initImageSlider() {
     const sliderContainer = document.getElementById('heroSlider');
     if (!sliderContainer) return;
-
-    // 요일 계산 (월:1 ~ 일:7)
     const now = new Date();
-    let dayOfWeek = now.getDay(); // 0(일) ~ 6(토)
+    let dayOfWeek = now.getDay();
     const bgNumber = (dayOfWeek === 0) ? 7 : dayOfWeek;
     const fileName = `bg-${bgNumber}.gif`;
     const imageSrc = `images/bg/${fileName}`;
 
-    // 배경 이미지 생성 및 설정
     const img = document.createElement('img');
     img.src = imageSrc;
-    img.className = 'slide active'; // 기존 CSS 클래스 활용
-    
-    // 이미지 로드 실패 시 대비(Fallback)
-    img.onerror = () => { 
-        img.src = 'images/bg/bg-3.gif'; 
-    };
+    img.className = 'slide active';
+    img.onerror = () => { img.src = 'images/bg/bg-3.gif'; };
 
-    // 컨테이너 초기화 후 삽입 (기존 내용 유지하며 추가)
     const overlay = sliderContainer.querySelector('.video-overlay');
     sliderContainer.innerHTML = ''; 
     if(overlay) sliderContainer.appendChild(overlay);
     sliderContainer.appendChild(img);
-
-    console.log(`Mobile Background: ${fileName}`);
 }
+
+// 4. PC 효과: AI Tag 로테이션
+function initAiTag() {
+    const aiMsg = document.getElementById('ai-msg');
+    const msgs = ["CORE SYSTEM ONLINE", "SCANNING ENVIRONMENT", "TDL ENERGY INDONESIA", "GREEN TECH READY"];
+    let idx = 0;
+    if(aiMsg) {
+        setInterval(() => {
+            idx = (idx + 1) % msgs.length;
+            aiMsg.style.opacity = '0';
+            setTimeout(() => {
+                aiMsg.textContent = msgs[idx];
+                aiMsg.style.opacity = '1';
+            }, 500);
+        }, 3000);
+    }
+}
+
+// 5. 이스터에그 (유지)
 let isHeartActive=false;
 function initPillarEgg(){const pillar=document.getElementById('pillarTrigger');if(pillar){pillar.addEventListener('click',()=>{if(isHeartActive)return;activateHeartEasterEgg()})}}
 function activateHeartEasterEgg(){isHeartActive=true;if(navigator.vibrate)navigator.vibrate([50,30,50]);createHeartFormation();setTimeout(()=>{isHeartActive=false},6000)}
 function createHeartFormation(){const heartCount=60;const container=document.body;const hearts=[];const centerX=window.innerWidth/2;const centerY=window.innerHeight/2;for(let i=0;i<heartCount;i++){const heart=document.createElement('div');heart.innerHTML='❤️';heart.style.cssText=`position: fixed; left: ${Math.random()*100}vw; top: -10vh; font-size: ${Math.random()*10+15}px; z-index: 999999; pointer-events: none; transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);`;container.appendChild(heart);hearts.push(heart);setTimeout(()=>{heart.style.top=(Math.random()*80+10)+'vh'},100)}
 setTimeout(()=>{hearts.forEach((heart,idx)=>{const t=(idx/heartCount)*2*Math.PI;const scale=Math.min(window.innerWidth,window.innerHeight)/25;const x=16*Math.pow(Math.sin(t),3);const y=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));heart.style.transition="all 2s ease-in-out";heart.style.left=(centerX+x*scale)+'px';heart.style.top=(centerY+y*scale)+'px';heart.style.transform=`scale(1.5) rotate(${(Math.random()-0.5)*20}deg)`})},1800);setTimeout(()=>{hearts.forEach(heart=>{heart.style.transition="all 1.5s ease-in";heart.style.opacity='0';heart.style.transform=`translate(${(Math.random()-0.5)*300}px, -100px) scale(0)`;setTimeout(()=>heart.remove(),1500)})},4500)}
-document.addEventListener("DOMContentLoaded",()=>{loadLayout().then(()=>{initImageSlider();initPillarEgg()})});
+
+document.addEventListener("DOMContentLoaded",()=>{
+    loadLayout().then(()=>{
+        initImageSlider();
+        initPillarEgg();
+        initParallaxBackground();
+        initAiTag();
+    })
+});
 </script>
 </body>
 </html>
