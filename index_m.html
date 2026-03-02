@@ -6,7 +6,6 @@
 <meta name="keywords" id="metaKeywords" content="">
 <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 <script>
@@ -25,282 +24,65 @@ async function recordVisit(){try{let geoData={ip:"0.0.0.0",country:"Unknown",cit
 const ua=navigator.userAgent;const now=new Date();const visitData={timestamp:now.getTime(),timeStr:now.toLocaleString(),page:window.location.pathname.split('/').pop()||'index_m.html',ip:geoData.ip,country:geoData.country,city:geoData.city,device:"Mobile",os:getOS(ua),browser:getBrowser(ua),sid:getSessionId(),referrer:document.referrer||"Direct"};database.ref('visits').push(visitData)}catch(e){console.error("History error:",e)}}
 function getOS(ua){if(ua.indexOf("Windows")!==-1)return "Windows";if(ua.indexOf("Mac")!==-1)return "macOS";if(ua.indexOf("Android")!==-1)return "Android";if(ua.indexOf("iPhone")!==-1||ua.indexOf("iPad")!==-1)return "iOS";return "Unknown"}
 function getBrowser(ua){if(ua.indexOf("Edge")!==-1||ua.indexOf("Edg")!==-1)return "Edge";if(ua.indexOf("Chrome")!==-1)return "Chrome";if(ua.indexOf("Safari")!==-1)return "Safari";if(ua.indexOf("Firefox")!==-1)return "Firefox";return "Others"}
-function getSessionId(){if(!sessionStorage.getItem('session_id')){sessionStorage.setItem('session_id','s_'+Math.random().toString(36).substr(2,9))}return sessionStorage.getItem('session_id')}
+function getSessionId(){if(!sessionStorage.getItem('session_id')){sessionStorage.setItem('session_id','s_'+Math.random().toString(36).substr(2,9))}
+return sessionStorage.getItem('session_id')}
 recordVisit();
 </script>
-
+<script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="css/main.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@600;700;800&family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════════════
-   TDL ENERGY MOBILE — DESIGN SYSTEM
-   Industrial Futurism × Electric Dark × 3D Depth
-   Mobile portrait + landscape optimized
-═══════════════════════════════════════════════════ */
-:root{
-    --bg:#000405; --bg1:#020c10; --bg2:#061318;
-    --sf:rgba(6,20,26,.78); --cy:#22d3ee;
-    --cg:rgba(34,211,238,.18); --lm:#a3e635;
-    --cr:#e2eaf0; --tx:#94a3b8; --mt:#334155;
-    --b1:rgba(34,211,238,.09); --b2:rgba(34,211,238,.2);
-    --fi:'Bebas Neue',sans-serif;
-    --fu:'Syne',sans-serif;
-    --fb:'Pretendard',system-ui,sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{font-family:var(--fb);background:var(--bg);color:var(--cr);overflow-x:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
-body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.023}
-#header-placeholder{position:fixed;top:0;left:0;width:100%;z-index:10001}
-
-/* ── HERO ───────────────────────────────────────── */
-.hero-section{position:relative;width:100%;height:100svh;min-height:580px;overflow:hidden;display:flex;align-items:flex-start;justify-content:flex-start;z-index:1;background:var(--bg)}
-.video-bg-container{position:absolute;inset:0;z-index:0}
-.slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 2s ease-in-out;filter:brightness(.22) contrast(1.18) saturate(.55)}
-.slide.active{opacity:1;z-index:1}
-.slide.exit{opacity:0;z-index:0}
-.video-overlay{position:absolute;inset:0;z-index:2;background:radial-gradient(ellipse 90% 55% at 50% 30%,rgba(0,0,0,0) 0%,rgba(0,4,6,.72) 100%),linear-gradient(180deg,rgba(0,4,6,.55) 0%,rgba(0,4,6,.05) 30%,rgba(0,4,6,.08) 55%,rgba(0,4,6,.88) 100%)}
-
-/* 3D grid floor */
-.hero-grid{position:absolute;bottom:0;left:0;right:0;height:28%;z-index:3;pointer-events:none;background-image:linear-gradient(rgba(34,211,238,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.07) 1px,transparent 1px);background-size:38px 38px;transform:perspective(350px) rotateX(58deg) translateY(22%);transform-origin:center bottom;mask-image:linear-gradient(to top,rgba(0,0,0,.55) 0%,transparent 100%);-webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.55) 0%,transparent 100%);animation:gflow 9s linear infinite}
-@keyframes gflow{to{background-position:0 -38px}}
-
-/* Scan beam */
-.scan-beam{position:absolute;left:0;right:0;height:1px;z-index:4;background:linear-gradient(90deg,transparent,var(--cy),transparent);opacity:0;pointer-events:none;animation:beam 9s ease-in-out infinite}
-@keyframes beam{0%{top:102%;opacity:0}6%{opacity:.22}94%{opacity:.12}100%{top:-2%;opacity:0}}
-
-/* Vertical edge lines */
-.v-line{position:absolute;top:0;bottom:0;width:1px;z-index:4;background:linear-gradient(180deg,transparent 0%,rgba(34,211,238,.32) 35%,rgba(34,211,238,.32) 65%,transparent 100%);pointer-events:none;animation:vbr 6s ease-in-out infinite}
-.v-line.l{left:16px}
-.v-line.r{right:16px;animation-delay:-3s}
-@keyframes vbr{0%,100%{opacity:.2}50%{opacity:.55}}
-
-/* HUD corners */
-.hud{position:absolute;width:22px;height:22px;z-index:5;pointer-events:none}
-.hud::before,.hud::after{content:'';position:absolute;background:var(--cy);opacity:.45}
-.hud::before{width:1px;height:100%}
-.hud::after{width:100%;height:1px}
-.hud.tl{top:56px;left:14px}
-.hud.tr{top:56px;right:14px;transform:scaleX(-1)}
-.hud.bl{bottom:52px;left:14px;transform:scaleY(-1)}
-.hud.br{bottom:52px;right:14px;transform:scale(-1)}
-
-/* Orbit rings */
-.orbit{position:absolute;border-radius:50%;border:1px solid rgba(34,211,238,.09);pointer-events:none;z-index:3;animation:orb 5s ease-in-out infinite}
-.orbit.a{width:260px;height:260px;top:50%;left:50%;transform:translate(-50%,-50%) rotateX(68deg)}
-.orbit.b{width:420px;height:420px;top:50%;left:50%;transform:translate(-50%,-50%) rotateX(68deg);border-color:rgba(34,211,238,.05);animation-delay:-2.5s}
-@keyframes orb{0%,100%{opacity:.4}50%{opacity:.9}}
-
-/* Hero content — bottom-anchored */
-.hero-content{position:relative;z-index:10;width:100%;padding:0 22px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;height:100%;padding-bottom:clamp(78px,15vh,128px)}
-
-/* System tag */
-.sys-tag{display:inline-flex;align-items:center;gap:8px;padding:4px 12px;border:1px solid var(--b2);border-radius:2px;font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;color:var(--cy);background:rgba(34,211,238,.04);font-family:'Courier New',monospace;margin-bottom:18px;position:relative;overflow:hidden}
-.sys-tag::after{content:'';position:absolute;top:0;left:-120%;width:80%;height:100%;background:linear-gradient(90deg,transparent,rgba(34,211,238,.14),transparent);animation:sshimmer 2.8s ease-in-out infinite}
-@keyframes sshimmer{to{left:160%}}
-.sys-dot{width:5px;height:5px;border-radius:50%;background:var(--lm);box-shadow:0 0 6px var(--lm);flex-shrink:0;animation:dotb 2s ease-in-out infinite}
-@keyframes dotb{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.55)}}
-
-/* Title */
-.hero-t1{font-family:var(--fi);font-size:clamp(3.2rem,13.5vw,6.5rem);letter-spacing:.03em;line-height:.88;color:var(--cr);text-shadow:0 0 50px rgba(34,211,238,.1);animation:rise .9s cubic-bezier(.16,1,.3,1) .2s both}
-.hero-t2{font-family:var(--fi);font-size:clamp(1.5rem,5.5vw,2.8rem);letter-spacing:.3em;line-height:1;margin-top:6px;margin-bottom:20px;background:linear-gradient(90deg,var(--cy) 0%,var(--lm) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 14px rgba(34,211,238,.28));animation:rise .9s cubic-bezier(.16,1,.3,1) .35s both}
-@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
-
-/* Description */
-.hero-description{font-family:var(--fb);font-size:13.5px;font-weight:300;line-height:1.82;color:rgba(148,163,184,.88);border-left:2px solid var(--b2);padding-left:14px;max-width:94%;animation:rise .9s cubic-bezier(.16,1,.3,1) .5s both}
-#triggerWord{color:var(--cy)!important;font-weight:600!important;text-decoration:none!important;cursor:pointer!important;display:inline;position:relative;z-index:50;-webkit-tap-highlight-color:transparent;pointer-events:auto!important}
-
-/* Scroll cue */
-.scroll-cue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:5px;opacity:.35;pointer-events:none;animation:cue 3s ease-in-out infinite}
-.scroll-line{width:1px;height:30px;background:linear-gradient(180deg,var(--cy),transparent);animation:ldrop 2s ease-in-out infinite}
-.scroll-lbl{font-size:.48rem;letter-spacing:.3em;text-transform:uppercase;color:var(--cy);font-family:'Courier New',monospace}
-@keyframes ldrop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
-@keyframes cue{0%,100%{opacity:.2}50%{opacity:.55}}
-
-/* Landscape */
-@media(orientation:landscape) and (max-height:520px){
-    .hero-section{min-height:100svh}
-    .hero-content{flex-direction:row;align-items:center;gap:28px;padding-bottom:24px;padding-top:60px}
-    .hero-t1{font-size:clamp(2.2rem,9vh,3.8rem)}
-    .hero-t2{font-size:clamp(1rem,3.5vh,1.8rem);margin-bottom:12px}
-    .hero-description{font-size:12px}
-    .orbit{display:none}
-    .hero-grid{height:22%}
-    .scroll-cue{display:none}
-}
-
-/* ── TRUST SECTION ─────────────────────────────── */
-.trust-section{position:relative;z-index:10;background:var(--bg1);overflow:hidden}
-.trust-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cy),var(--lm),transparent);opacity:.42}
-.sec-tag{display:inline-flex;align-items:center;gap:10px;font-size:.57rem;letter-spacing:.28em;text-transform:uppercase;color:var(--cy);font-family:'Courier New',monospace}
-.sec-tag::before{content:'';width:18px;height:1px;background:var(--cy);box-shadow:0 0 5px var(--cy)}
-
-/* Partners */
-.partners-block{padding:52px 22px 40px;border-bottom:1px solid var(--b1)}
-.partners-title{font-family:var(--fi);font-size:clamp(1.9rem,7.5vw,3.2rem);letter-spacing:.07em;color:var(--cr);line-height:1;margin-top:10px;margin-bottom:28px;text-shadow:0 0 30px rgba(34,211,238,.07)}
-#pillarTrigger{cursor:pointer;display:block;width:fit-content;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.partner-grid{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:center}
-.partner-wrap{padding:10px 18px;border:1px solid transparent;border-radius:4px;transition:all .3s;filter:grayscale(1) brightness(.4)}
-.partner-wrap:active{filter:grayscale(0) brightness(1);border-color:var(--b2)}
-.partner-wrap img{height:24px;width:auto;object-fit:contain}
-
-/* Certs */
-.certs-block{padding:40px 18px 60px}
-.certs-title{font-family:var(--fi);font-size:clamp(1.65rem,6.5vw,2.8rem);letter-spacing:.1em;color:var(--cr);margin-top:10px;margin-bottom:4px}
-.certs-sub{font-size:11px;color:var(--tx);font-weight:300;letter-spacing:.06em;margin-top:5px;margin-bottom:24px}
-#certifications-inside-hero{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-@media(orientation:landscape){#certifications-inside-hero{grid-template-columns:repeat(6,1fr)}.partners-block,.certs-block{padding-left:32px;padding-right:32px}}
-.cert-link{display:block;text-decoration:none;position:relative;overflow:hidden;border:1px solid var(--b1);border-radius:8px;background:var(--sf);padding:14px 8px;text-align:center;transition:all .28s cubic-bezier(.16,1,.3,1);-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.cert-link::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cy),transparent);opacity:0;transition:opacity .28s}
-.cert-link::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(34,211,238,.05) 0%,transparent 60%,rgba(163,230,53,.04) 100%);opacity:0;transition:opacity .28s}
-.cert-link:active{transform:scale(.95);border-color:var(--b2);box-shadow:0 0 18px rgba(34,211,238,.1)}
-.cert-link:active::before,.cert-link:active::after{opacity:1}
-.cert-link img{width:100%;height:auto;border-radius:3px;position:relative;z-index:1}
-
-/* ── POPUP ─────────────────────────────────────── */
-#mainPopup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.84);z-index:100000;align-items:center;justify-content:center;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.popup-box{background:var(--bg2);border:1px solid var(--b2);padding:28px 20px;border-radius:16px;width:90%;max-width:340px;text-align:center;max-height:80vh;overflow-y:auto;box-shadow:0 0 50px rgba(34,211,238,.12),0 28px 56px rgba(0,0,0,.8);position:relative;overflow-x:hidden}
-.popup-box::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--cy),transparent)}
-.popup-box::-webkit-scrollbar{width:3px}
-.popup-box::-webkit-scrollbar-thumb{background:var(--cy);border-radius:10px}
-#popupText{text-align:left;font-size:13.5px;color:#d1d5db}
-#adminAuthModal{background:rgba(0,0,0,.97)}
-#imageModal{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:10000;display:none;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-#modalDetailImage{max-width:90%;max-height:70%;object-fit:contain;border-radius:6px;box-shadow:0 0 40px rgba(34,211,238,.1)}
-#emergencyBanner{display:none;background:#ef4444;color:white;text-align:center;padding:10px 15px;font-weight:bold;font-size:13px;line-height:1.4;position:fixed;bottom:0;width:100%;z-index:99999;box-shadow:0 -4px 16px rgba(239,68,68,.5)}
-#musicToggleBtn{position:fixed;bottom:20px;right:20px;z-index:10005;width:48px;height:48px;background:rgba(6,20,26,.9);border:1.5px solid rgba(34,211,238,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--cy);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 0 14px rgba(34,211,238,.18)}
-
-/* Popup animations — 원본 그대로 */
-@keyframes cleavageIn{0%{clip-path:polygon(0 0,100% 0,100% 0,0 0,0 100%,100% 100%,100% 100%,0 100%);opacity:0}100%{clip-path:polygon(0 0,100% 0,100% 50%,0 50%,0 50%,100% 50%,100% 100%,0 100%);opacity:1}}
-.effect-cleavage{animation:cleavageIn .8s ease-out forwards}
-@keyframes waveIn{0%{transform:scale(.8) translateY(20px);opacity:0;filter:blur(10px)}50%{transform:scale(1.05) translateY(-5px);filter:blur(2px)}100%{transform:scale(1) translateY(0);opacity:1;filter:blur(0)}}
-.effect-wave{animation:waveIn 1s ease-in-out infinite alternate}
-@keyframes rotateIn{0%{transform:rotate(-360deg) scale(0);opacity:0}100%{transform:rotate(0deg) scale(1);opacity:1}}
-.effect-rotation{animation:rotateIn .7s cubic-bezier(.34,1.56,.64,1) forwards}
-@keyframes slideInCenter{0%{transform:translateY(100vh);opacity:0}100%{transform:translateY(0);opacity:1}}
-.effect-slide{animation:slideInCenter .6s ease-out forwards}
-.effect-classic{animation:fdin .4s ease-in forwards}
-@keyframes fdin{from{opacity:0}to{opacity:1}}
-.popup-exit-active{opacity:0;transform:scale(.9);transition:all .5s ease-in}
+#emergencyBanner{display:none;background:#ef4444;color:white;text-align:center;padding:10px 15px;font-weight:bold;position:fixed;bottom:0;width:100%;z-index:99999;font-size:13px;line-height:1.4}#mainPopup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;align-items:center;justify-content:center}#adminAuthModal{background:rgba(0,0,0,0.8)}.popup-box{background:#0a0a0a;border:1px solid #22d3ee;padding:25px 20px;border-radius:20px;width:90%;max-width:340px;text-align:center;max-height:80vh;overflow-y:auto;box-shadow:0 0 30px rgba(34,211,238,0.2)}#popupText{text-align:left;font-size:14px;color:#d1d5db}.popup-box::-webkit-scrollbar{width:4px}.popup-box::-webkit-scrollbar-thumb{background:#22d3ee;border-radius:10px}#header-placeholder{position:fixed;top:0;left:0;width:100%;z-index:10001}.animated-logo-text-m{font-size:3.8vw!important;white-space:nowrap}@media (max-width:380px){.animated-logo-text-m{font-size:11px!important}}#imageModal{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:10000;display:none}#modalDetailImage{max-width:90%;max-height:70%;object-fit:contain}#musicToggleBtn{position:fixed;bottom:20px;right:20px;z-index:10005;width:48px;height:48px;background:rgba(23,23,23,0.9);border:1.5px solid rgba(34,211,238,0.6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#22d3ee;backdrop-filter:blur(8px)}#triggerWord{color:inherit!important;font-weight:inherit!important;text-decoration:none!important;cursor:pointer!important;display:inline-block;position:relative;z-index:50;-webkit-tap-highlight-color:transparent;pointer-events:auto!important}.hero-section{position:relative;width:100%;height:100svh;overflow:hidden;display:flex;align-items:center;justify-content:center;z-index:1}.video-bg-container{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}.video-bg{width:100%;height:100%;object-fit:cover;filter:brightness(0.35) contrast(1.1)}.video-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.7) 100%);z-index:1}.hero-content{position:relative;z-index:10;width:100%;padding:0 32px}.hero-logo-gradient{font-size:5vw;letter-spacing:0.3em;color:rgba(34,211,238,0.8);font-weight:900;text-transform:uppercase;margin-bottom:8px;line-height:1}.hero-slogan-gradient{font-size:5vw;letter-spacing:0.3em;color:rgba(34,211,238,0.8);font-weight:600;text-transform:uppercase}.hero-description{font-size:15px;line-height:1.7;margin-top:80px;color:#cbd5e1;word-break:keep-all}.partner-grid{display:flex;flex-wrap:wrap;gap:30px;align-items:center;justify-content:center;opacity:0.7}.partner-grid img{height:28px;width:auto;filter:grayscale(1)}.interactive-certs{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;padding:0 20px}.cert-link img{width:100%;height:auto;border-radius:4px}.slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 2s ease-in-out;filter:brightness(0.35) contrast(1.1)}.slide.active{opacity:1;z-index:1}.slide.exit{opacity:0;z-index:0}@keyframes cleavageIn{0%{clip-path:polygon(0 0,100% 0,100% 0,0 0,0 100%,100% 100%,100% 100%,0 100%);opacity:0}100%{clip-path:polygon(0 0,100% 0,100% 50%,0 50%,0 50%,100% 50%,100% 100%,0 100%);opacity:1}}.effect-cleavage{animation:cleavageIn 0.8s ease-out forwards}@keyframes waveIn{0%{transform:scale(0.8) translateY(20px);opacity:0;filter:blur(10px)}50%{transform:scale(1.05) translateY(-5px);filter:blur(2px)}100%{transform:scale(1) translateY(0);opacity:1;filter:blur(0)}}.effect-wave{animation:waveIn 1s ease-in-out infinite alternate}@keyframes rotateIn{0%{transform:rotate(-360deg) scale(0);opacity:0}100%{transform:rotate(0deg) scale(1);opacity:1}}.effect-rotation{animation:rotateIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards}@keyframes slideInCenter{0%{transform:translateY(100vh);opacity:0}100%{transform:translateY(0);opacity:1}}.effect-slide{animation:slideInCenter 0.6s ease-out forwards}.effect-classic{animation:fadeIn 0.4s ease-in forwards}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.popup-exit-active{opacity:0;transform:scale(0.9);transition:all 0.5s ease-in}
 </style>
 </head>
-
-<body class="flex flex-col min-h-screen overflow-x-hidden">
-
+<body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
+<div id="mainPopup"><div class="popup-box"><h3 class="text-cyan-400 font-black text-xl mb-3 italic">NOTICE</h3><p id="popupText" class="text-neutral-300 text-sm mb-6 leading-relaxed whitespace-pre-wrap"></p><button onclick="document.getElementById('mainPopup').style.display='none'" class="w-full py-3 bg-cyan-600 text-white font-bold rounded-xl active:bg-cyan-500">Close</button></div></div>
 <div id="header-placeholder"></div>
-
-<!-- Popup -->
-<div id="mainPopup">
-    <div class="popup-box">
-        <h3 style="font-family:var(--fi);font-size:1.7rem;letter-spacing:.1em;color:var(--cy);margin-bottom:12px;">NOTICE</h3>
-        <p id="popupText" class="whitespace-pre-wrap"></p>
-        <button onclick="document.getElementById('mainPopup').style.display='none'"
-            style="width:100%;margin-top:20px;padding:14px;background:var(--cy);color:#000;font-family:var(--fu);font-weight:800;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;border:none;border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">
-            CLOSE
-        </button>
-    </div>
-</div>
-
 <main class="flex-grow">
-
-    <!-- HERO -->
-    <section class="hero-section">
-        <div class="video-bg-container" id="heroSlider">
-            <div class="video-overlay"></div>
-        </div>
-        <div class="orbit a"></div>
-        <div class="orbit b"></div>
-        <div class="hero-grid"></div>
-        <div class="scan-beam"></div>
-        <div class="v-line l"></div>
-        <div class="v-line r"></div>
-        <div class="hud tl"></div>
-        <div class="hud tr"></div>
-        <div class="hud bl"></div>
-        <div class="hud br"></div>
-        <div class="hero-content">
-            <div class="sys-tag">
-                <span class="sys-dot"></span>
-                <span id="ai-msg">System: Initializing...</span>
-            </div>
-            <h1 class="hero-t1">NO MORE<br>CARBON</h1>
-            <p class="hero-t2">NO MORE FOSSIL FUEL</p>
-            <p class="hero-description">
-                <span id="triggerWord">TDLiD</span> is an Indonesian corporation established
-                by Enchem Group, with the objective of providing electric motorcycle services
-                and renewable energy-related businesses in Indonesia.
-            </p>
-        </div>
-        <div class="scroll-cue">
-            <span class="scroll-lbl">Scroll</span>
-            <div class="scroll-line"></div>
-        </div>
-    </section>
-
-    <!-- TRUST & CERTS -->
-    <section class="trust-section">
-
-        <div class="partners-block">
-            <div class="sec-tag">Global Ecosystem</div>
-            <h2 class="partners-title" id="pillarTrigger">A PILLAR<br>OF TRUST</h2>
-            <div class="partner-grid">
-                <div class="partner-wrap"><img src="images/home/DAVIGO.webp" alt="DAVIGO"></div>
-                <div class="partner-wrap"><img src="images/home/GESITS.webp" alt="GESITS"></div>
-                <div class="partner-wrap"><img src="images/home/ALESSA.webp" alt="ALESSA"></div>
-            </div>
-        </div>
-
-        <div class="certs-block">
-            <div class="sec-tag" style="color:var(--lm)">
-                <span style="display:inline-block;width:18px;height:1px;background:var(--lm);box-shadow:0 0 5px var(--lm)"></span>
-                International Standards
-            </div>
-            <h2 class="certs-title">GLOBAL<br>COMPLIANCE</h2>
-            <p class="certs-sub">Safety &amp; Quality Certified Worldwide</p>
-            <div id="certifications-inside-hero" class="interactive-certs">
-                <a href="#" class="cert-link" data-original-src="images/certification/CE-EMC-TEST.webp"><img src="images/certification/CE-EMC-TEST.webp" alt="CE"></a>
-                <a href="#" class="cert-link" data-original-src="images/certification/CB-TEST.webp"><img src="images/certification/CB-TEST.webp" alt="CB"></a>
-                <a href="#" class="cert-link" data-original-src="images/certification/EMC-COMPLIANCE.webp"><img src="images/certification/EMC-COMPLIANCE.webp" alt="EMC"></a>
-                <a href="#" class="cert-link" data-original-src="images/certification/IEC-62619.webp"><img src="images/certification/IEC-62619.webp" alt="IEC"></a>
-                <a href="#" class="cert-link" data-original-src="images/certification/Material-Safety.webp"><img src="images/certification/Material-Safety.webp" alt="MSDS"></a>
-                <a href="#" class="cert-link" data-original-src="images/certification/UN38.3.webp"><img src="images/certification/UN38.3.webp" alt="UN38.3"></a>
-            </div>
-        </div>
-
-    </section>
+<section class="hero-section">
+<div class="video-bg-container" id="heroSlider"><div class="video-overlay"></div></div>
+<div class="hero-content text-center">
+<h1 class="hero-logo-gradient">NO MORE CARBON</h1>
+<p class="hero-slogan-gradient">NO MORE FOSSIL FUEL</p>
+<p class="hero-description"><span id="triggerWord">TDLiD</span> is an Indonesian corporation established by Enchem Group, with the objective of providing electric motorcycle services and renewable energy-related businesses in Indonesia.</p>
+</div>
+</section>
+<section class="py-16 bg-neutral-900 border-y border-neutral-800">
+<div class="px-6 mb-16">
+<h2 id="pillarTrigger" class="text-sm font-light text-center mb-8 text-cyan-400 tracking-widest uppercase cursor-pointer" style="padding:10px;-webkit-tap-highlight-color:transparent">A Pillar of Trust</h2>
+<div class="partner-grid">
+<img src="images/home/DAVIGO.webp" alt="DAVIGO"><img src="images/home/GESITS.webp" alt="GESITS"><img src="images/home/ALESSA.webp" alt="ALESSA">
+</div>
+</div>
+<div class="px-4">
+<h2 class="text-lg font-light text-center mb-10 text-cyan-400">Global Compliance & Safety</h2>
+<div id="certifications-inside-hero" class="interactive-certs">
+<a href="#" class="cert-link" data-original-src="images/certification/CE-EMC-TEST.webp"><img src="images/certification/CE-EMC-TEST.webp" alt="CE"></a>
+<a href="#" class="cert-link" data-original-src="images/certification/CB-TEST.webp"><img src="images/certification/CB-TEST.webp" alt="CB"></a>
+<a href="#" class="cert-link" data-original-src="images/certification/EMC-COMPLIANCE.webp"><img src="images/certification/EMC-COMPLIANCE.webp" alt="EMC"></a>
+<a href="#" class="cert-link" data-original-src="images/certification/IEC-62619.webp"><img src="images/certification/IEC-62619.webp" alt="IEC"></a>
+<a href="#" class="cert-link" data-original-src="images/certification/Material-Safety.webp"><img src="images/certification/Material-Safety.webp" alt="MSDS"></a>
+<a href="#" class="cert-link" data-original-src="images/certification/UN38.3.webp"><img src="images/certification/UN38.3.webp" alt="UN38.3"></a>
+</div>
+</div>
+</section>
 </main>
-
-<!-- Admin modal -->
-<div id="adminAuthModal" class="hidden fixed inset-0 z-[30000] flex items-center justify-center p-5"
-     style="background:rgba(0,0,0,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)">
-    <div style="background:var(--bg2);border:1px solid var(--b2);padding:32px 22px;border-radius:14px;max-width:320px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,0,0,.9)">
-        <h3 style="color:var(--cy);font-family:var(--fi);font-size:1.6rem;letter-spacing:.15em;margin-bottom:4px">ADMIN ACCESS</h3>
-        <p style="color:var(--mt);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:22px;font-family:'Courier New',monospace">Authentication Required</p>
-        <input type="password" id="adminPasswordInput"
-            style="width:100%;background:rgba(0,0,0,.55);border:1px solid var(--b2);border-radius:8px;padding:13px 16px;color:white;margin-bottom:20px;outline:none;text-align:center;letter-spacing:.3em;font-size:.9rem;-webkit-appearance:none;appearance:none"
-            placeholder="••••••••">
-        <div style="display:flex;gap:10px">
-            <button onclick="closeAdminAuth()" style="flex:1;padding:13px;background:rgba(255,255,255,.05);border:1px solid var(--b1);color:var(--tx);border-radius:8px;font-size:.8rem;font-weight:600;-webkit-tap-highlight-color:transparent;cursor:pointer;touch-action:manipulation">Cancel</button>
-            <button onclick="verifyAdminPassword()" style="flex:1;padding:13px;background:var(--cy);color:#000;border:none;border-radius:8px;font-family:var(--fu);font-size:.8rem;font-weight:800;letter-spacing:.08em;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation">VERIFY</button>
-        </div>
-    </div>
+<div id="adminAuthModal" class="hidden fixed inset-0 bg-black/95 z-[30000] flex items-center justify-center p-4 backdrop-blur-sm">
+<div class="bg-neutral-900 border border-cyan-500/30 p-8 rounded-2xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(0,0,0,1)]">
+<h3 class="text-cyan-400 font-bold text-xl mb-1 uppercase tracking-tighter">Admin Access</h3>
+<p class="text-neutral-500 text-xs mb-6">Database Authentication Required</p>
+<input type="password" id="adminPasswordInput" class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white mb-6 focus:border-cyan-500 outline-none transition-all text-center tracking-widest" placeholder="••••••••">
+<div class="flex gap-3">
+<button onclick="closeAdminAuth()" class="flex-1 py-3 bg-neutral-800 text-neutral-400 rounded-xl font-semibold text-sm">Cancel</button>
+<button onclick="verifyAdminPassword()" class="flex-1 py-3 bg-cyan-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-900/20 hover:bg-cyan-500 transition-colors">Verify</button>
 </div>
-
-<!-- Image modal -->
-<div id="imageModal">
-    <div class="flex flex-col items-center justify-center w-full h-full p-4" onclick="closeModal()">
-        <img id="modalDetailImage" src="" onclick="event.stopPropagation()">
-        <button style="margin-top:28px;padding:11px 34px;border:1px solid rgba(34,211,238,.4);color:var(--cy);border-radius:50px;font-size:.78rem;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-tap-highlight-color:transparent;cursor:pointer;touch-action:manipulation">Close</button>
-    </div>
 </div>
-
+</div>
+<div id="imageModal"><div class="flex flex-col items-center justify-center w-full h-full p-4" onclick="closeModal()"><img id="modalDetailImage" src="" onclick="event.stopPropagation()"><button class="mt-8 px-10 py-3 border border-cyan-500/50 text-cyan-400 rounded-full text-sm bg-black/80 backdrop-blur-md">Close</button></div></div>
 <div id="footer-placeholder"></div>
 <div id="emergencyBanner">📢 <span id="bannerText">Notice</span></div>
-
-<!-- ════ ALL ORIGINAL JAVASCRIPT — 100% UNTOUCHED ════ -->
 <script>
 const isMobileOnly=/iPhone|iPod|Android/i.test(navigator.userAgent);const urlParams=new URLSearchParams(window.location.search);const isPCMode=urlParams.get('view_mode')==='pc';if(!isMobileOnly||isPCMode){let path=window.location.pathname;let page=path.split("/").pop();if(page.includes("_m.html")){window.location.href=page.replace("_m.html",".html")}else if(page==="index_m.html"||page===""){window.location.href="index.html"}}
 async function loadLayout(){try{const [headerRes,footerRes]=await Promise.all([fetch('components/header_m.html'),fetch('components/footer_m.html')]);const headerText=await headerRes.text();const tempDiv=document.createElement('div');tempDiv.innerHTML=headerText;const adminLink=tempDiv.querySelector('a[href="admin/admin.html"]');if(adminLink)adminLink.remove();document.getElementById('header-placeholder').innerHTML=tempDiv.innerHTML;const footerPlaceholder=document.getElementById('footer-placeholder');footerPlaceholder.innerHTML=await footerRes.text();const scripts=footerPlaceholder.querySelectorAll("script");scripts.forEach(oldScript=>{const newScript=document.createElement("script");newScript.text=oldScript.text;document.body.appendChild(newScript).parentNode.removeChild(newScript)});initNavigation();initAdminTrigger();initCertModal();initLiveSettings()}catch(err){console.error("Layout Load Error:",err)}}
@@ -309,22 +91,33 @@ function initAdminTrigger(){const triggerWord=document.getElementById('triggerWo
 document.getElementById('adminPasswordInput')?.addEventListener('keypress',(e)=>{if(e.key==='Enter')verifyAdminPassword()});
 function initCertModal(){document.querySelectorAll('.cert-link').forEach(link=>{link.onclick=(e)=>{e.preventDefault();const modal=document.getElementById('imageModal');const modalImg=document.getElementById('modalDetailImage');modalImg.src=link.getAttribute('data-original-src');modal.style.display='block';document.body.style.overflow='hidden'}})}
 function closeModal(){const modal=document.getElementById('imageModal');modal.style.display='none';document.body.style.overflow=''}
-function initImageSlider(){
-    const sliderContainer=document.getElementById('heroSlider');
-    if(!sliderContainer)return;
-    const now=new Date();
-    let dayOfWeek=now.getDay();
-    const bgNumber=(dayOfWeek===0)?7:dayOfWeek;
-    const fileName=`bg-${bgNumber}.gif`;
-    const imageSrc=`images/bg/${fileName}`;
-    const img=document.createElement('img');
-    img.src=imageSrc;
-    img.className='slide active';
-    img.onerror=()=>{img.src='images/bg/bg-3.gif'};
-    const overlay=sliderContainer.querySelector('.video-overlay');
-    sliderContainer.innerHTML='';
-    if(overlay)sliderContainer.appendChild(overlay);
+function initImageSlider() {
+    const sliderContainer = document.getElementById('heroSlider');
+    if (!sliderContainer) return;
+
+    // 요일 계산 (월:1 ~ 일:7)
+    const now = new Date();
+    let dayOfWeek = now.getDay(); // 0(일) ~ 6(토)
+    const bgNumber = (dayOfWeek === 0) ? 7 : dayOfWeek;
+    const fileName = `bg-${bgNumber}.gif`;
+    const imageSrc = `images/bg/${fileName}`;
+
+    // 배경 이미지 생성 및 설정
+    const img = document.createElement('img');
+    img.src = imageSrc;
+    img.className = 'slide active'; // 기존 CSS 클래스 활용
+    
+    // 이미지 로드 실패 시 대비(Fallback)
+    img.onerror = () => { 
+        img.src = 'images/bg/bg-3.gif'; 
+    };
+
+    // 컨테이너 초기화 후 삽입 (기존 내용 유지하며 추가)
+    const overlay = sliderContainer.querySelector('.video-overlay');
+    sliderContainer.innerHTML = ''; 
+    if(overlay) sliderContainer.appendChild(overlay);
     sliderContainer.appendChild(img);
+
     console.log(`Mobile Background: ${fileName}`);
 }
 let isHeartActive=false;
@@ -332,14 +125,7 @@ function initPillarEgg(){const pillar=document.getElementById('pillarTrigger');i
 function activateHeartEasterEgg(){isHeartActive=true;if(navigator.vibrate)navigator.vibrate([50,30,50]);createHeartFormation();setTimeout(()=>{isHeartActive=false},6000)}
 function createHeartFormation(){const heartCount=60;const container=document.body;const hearts=[];const centerX=window.innerWidth/2;const centerY=window.innerHeight/2;for(let i=0;i<heartCount;i++){const heart=document.createElement('div');heart.innerHTML='❤️';heart.style.cssText=`position: fixed; left: ${Math.random()*100}vw; top: -10vh; font-size: ${Math.random()*10+15}px; z-index: 999999; pointer-events: none; transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);`;container.appendChild(heart);hearts.push(heart);setTimeout(()=>{heart.style.top=(Math.random()*80+10)+'vh'},100)}
 setTimeout(()=>{hearts.forEach((heart,idx)=>{const t=(idx/heartCount)*2*Math.PI;const scale=Math.min(window.innerWidth,window.innerHeight)/25;const x=16*Math.pow(Math.sin(t),3);const y=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));heart.style.transition="all 2s ease-in-out";heart.style.left=(centerX+x*scale)+'px';heart.style.top=(centerY+y*scale)+'px';heart.style.transform=`scale(1.5) rotate(${(Math.random()-0.5)*20}deg)`})},1800);setTimeout(()=>{hearts.forEach(heart=>{heart.style.transition="all 1.5s ease-in";heart.style.opacity='0';heart.style.transform=`translate(${(Math.random()-0.5)*300}px, -100px) scale(0)`;setTimeout(()=>heart.remove(),1500)})},4500)}
-document.addEventListener("DOMContentLoaded",()=>{
-    loadLayout().then(()=>{initImageSlider();initPillarEgg()});
-    /* AI tag rotation (design-only addition) */
-    const aiMsg=document.getElementById('ai-msg');
-    const msgs=["TDL Energy Indonesia","Deliver the best products","Promote leadership","Create & Innovate value"];
-    let idx=0;
-    if(aiMsg)setInterval(()=>{idx=(idx+1)%msgs.length;aiMsg.textContent=msgs[idx]},4000);
-});
+document.addEventListener("DOMContentLoaded",()=>{loadLayout().then(()=>{initImageSlider();initPillarEgg()})});
 </script>
 </body>
 </html>
