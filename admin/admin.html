@@ -22,18 +22,26 @@
     <style>
         :root {
             --accent: #00ffa3;
+            --cyan: #22d3ee;
+            --purple: #a78bfa;
+            --blue: #3b82f6;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
             background-color: #020617;
             color: #e5e7eb;
             font-family: 'Pretendard', sans-serif;
-            /* 3D 효과를 위한 설정 추가 */
             overflow-x: hidden;
-            perspective: 1000px;
+            perspective: 2000px;
+            margin: 0;
+            padding: 0;
         }
 
-        /* 3D 배경 컨테이너 스타일 */
+        /* Enhanced 3D background container */
         #bg-stars {
             position: fixed;
             width: 150%;
@@ -43,8 +51,54 @@
             z-index: 0;
             transform-style: preserve-3d;
             pointer-events: none;
+            transition: transform 0.1s ease-out;
         }
 
+        /* Animated gradient orbs */
+        .gradient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: 1;
+            animation: floatOrb 20s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            top: 10%;
+            left: 10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--cyan), transparent);
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            bottom: 10%;
+            right: 10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--purple), transparent);
+            animation-delay: 5s;
+        }
+
+        .orb-3 {
+            top: 50%;
+            left: 50%;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, var(--blue), transparent);
+            animation-delay: 10s;
+        }
+
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
+        }
+
+        /* Enhanced dot particles */
         .dot {
             position: absolute;
             width: 2px;
@@ -52,45 +106,125 @@
             background: white;
             border-radius: 50%;
             opacity: 0.3;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            animation: twinkle 3s ease-in-out infinite;
         }
 
-        /* 메인 콘텐츠 레이어 설정 */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+
+        /* Main content layer with 3D depth */
         #main-wrapper {
             position: relative;
             z-index: 10;
             transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
         }
 
+        /* Enhanced sidebar item with 3D */
         .sidebar-item {
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .sidebar-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            background: linear-gradient(to right, var(--cyan), transparent);
+            transition: all 0.3s;
+            border-radius: 0 4px 4px 0;
         }
 
         .sidebar-item:hover,
         .sidebar-item.active {
-            background: rgba(34, 211, 238, 0.1);
+            background: rgba(34, 211, 238, 0.15);
             color: #22d3ee;
+            transform: translateX(5px) translateZ(10px);
+            box-shadow: 0 5px 20px rgba(34, 211, 238, 0.3);
         }
 
+        .sidebar-item:hover::before,
+        .sidebar-item.active::before {
+            width: 4px;
+            height: 70%;
+        }
+
+        /* Enhanced stat card with 3D depth */
         .stat-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(34, 211, 238, 0.1);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
+            border: 1px solid rgba(34, 211, 238, 0.2);
             border-radius: 24px;
-            backdrop-filter: blur(10px); /* 배경 투명도 향상 */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(34, 211, 238, 0.1) inset;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
         }
 
+        .stat-card:hover {
+            transform: translateY(-5px) translateZ(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7),
+                        0 0 0 1px rgba(34, 211, 238, 0.2) inset,
+                        0 0 40px rgba(34, 211, 238, 0.2);
+        }
+
+        /* Enhanced dash widget with maximum 3D */
         .dash-widget {
-            background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.5));
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.7));
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 20px;
-            transition: transform 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Shimmer effect on widgets */
+        .dash-widget::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.05) 50%,
+                transparent 70%
+            );
+            animation: shimmerWidget 3s linear infinite;
+        }
+
+        @keyframes shimmerWidget {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
         .dash-widget:hover {
-            transform: translateY(-3px);
-            border-color: rgba(34, 211, 238, 0.3);
+            transform: translateY(-8px) scale(1.02) rotateX(5deg);
+            border-color: rgba(34, 211, 238, 0.4);
+            box-shadow: 0 15px 50px rgba(34, 211, 238, 0.3),
+                        0 0 40px rgba(34, 211, 238, 0.2);
         }
 
+        .dash-widget:active {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        /* Enhanced switch with 3D */
         .switch {
             position: relative;
             display: inline-block;
@@ -111,9 +245,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #1e293b;
-            transition: .4s;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             border-radius: 22px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) inset;
         }
 
         .slider:before {
@@ -123,40 +258,54 @@
             width: 16px;
             left: 3px;
             bottom: 3px;
-            background-color: white;
-            transition: .4s;
+            background: linear-gradient(135deg, #ffffff, #e5e7eb);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
-        input:checked+.slider {
-            background-color: #22d3ee;
+        input:checked + .slider {
+            background: linear-gradient(135deg, #22d3ee, #06b6d4);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.5),
+                        0 3px 10px rgba(34, 211, 238, 0.3) inset;
         }
 
-        input:checked+.slider:before {
+        input:checked + .slider:before {
             transform: translateX(22px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4),
+                        0 0 10px rgba(255, 255, 255, 0.5);
         }
 
+        /* Auth overlay enhancement */
         #authOverlay {
             position: fixed;
             inset: 0;
-            background: #020617;
+            background: linear-gradient(135deg, #020617, #0f172a);
             z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        #authOverlay p {
+            font-size: 1.2rem;
+            text-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
+        }
+
+        /* Enhanced Quill editor */
         .ql-toolbar.ql-snow {
-            background: #0f172a;
-            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.7));
+            border: 1px solid rgba(34, 211, 238, 0.1) !important;
             border-radius: 12px 12px 0 0;
+            backdrop-filter: blur(10px);
         }
 
         .ql-container.ql-snow {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(34, 211, 238, 0.1) !important;
             border-radius: 0 0 12px 12px;
             min-height: 250px;
+            backdrop-filter: blur(10px);
         }
 
         .ql-editor {
@@ -175,163 +324,467 @@
             color: #94a3b8 !important;
         }
 
+        /* Enhanced slot buttons with animated gradient background */
+        .slot-btn-container {
+            background: linear-gradient(
+                90deg,
+                rgba(15, 23, 42, 0.8) 0%,
+                rgba(30, 41, 59, 0.8) 25%,
+                rgba(34, 211, 238, 0.1) 50%,
+                rgba(30, 41, 59, 0.8) 75%,
+                rgba(15, 23, 42, 0.8) 100%
+            );
+            background-size: 200% 100%;
+            animation: gradientSlide 8s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes gradientSlide {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Rotating border on container */
+        .slot-btn-container::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                rgba(34, 211, 238, 0.3),
+                transparent,
+                rgba(167, 139, 250, 0.2),
+                transparent
+            );
+            border-radius: 12px;
+            z-index: -1;
+            opacity: 0.5;
+            animation: rotateSlotBorder 10s linear infinite;
+        }
+
+        @keyframes rotateSlotBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .slot-btn {
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(15, 23, 42, 0.5);
             color: #64748b;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .slot-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(34, 211, 238, 0.1),
+                transparent
+            );
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .slot-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .slot-btn:hover {
+            background: rgba(34, 211, 238, 0.1);
+            border-color: rgba(34, 211, 238, 0.3);
+            color: #e5e7eb;
+            transform: translateY(-2px);
         }
 
         .slot-btn.active {
-            background: #22d3ee;
+            background: linear-gradient(135deg, #22d3ee, #06b6d4);
             color: #020617;
             font-weight: 700;
-            box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.6),
+                        0 5px 15px rgba(34, 211, 238, 0.4);
+            transform: translateY(-3px) scale(1.05);
+            border-color: transparent;
         }
 
+        .slot-btn:active {
+            transform: translateY(0) scale(1);
+        }
+
+        /* Enhanced effect buttons */
         .effect-btn {
-            transition: all 0.2s;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.4));
             color: #94a3b8;
-            padding: 8px 12px;
+            padding: 10px 14px;
             border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
             text-align: center;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .effect-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .effect-btn:hover {
-            border-color: rgba(34, 211, 238, 0.3);
+            border-color: rgba(34, 211, 238, 0.4);
             color: #e5e7eb;
+            transform: translateY(-2px) translateZ(5px);
+            box-shadow: 0 5px 20px rgba(34, 211, 238, 0.2);
+        }
+
+        .effect-btn:hover::after {
+            opacity: 1;
         }
 
         .effect-btn.selected {
-            background: rgba(34, 211, 238, 0.1);
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(34, 211, 238, 0.1));
             border-color: #22d3ee;
             color: #22d3ee;
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.4),
+                        0 5px 15px rgba(34, 211, 238, 0.2);
+            transform: translateY(-3px) translateZ(10px);
         }
 
-        /* AI 배지 스타일 */
+        .effect-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Enhanced AI badge */
         .ai-badge-admin {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 6px 16px;
             border: 1px solid var(--accent);
             border-radius: 20px;
             font-size: 10px;
             color: var(--accent);
-            background: rgba(0, 255, 163, 0.05);
+            background: linear-gradient(135deg, rgba(0, 255, 163, 0.1), rgba(0, 255, 163, 0.05));
             text-transform: uppercase;
             letter-spacing: 0.1em;
             margin-bottom: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 163, 0.3);
+            animation: badgePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 163, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(0, 255, 163, 0.5); }
+        }
+
+        /* Enhanced buttons */
+        button {
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Input fields enhancement */
+        input[type="text"],
+        textarea {
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: rgba(34, 211, 238, 0.5) !important;
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+        }
+
+        /* Section headers with animated underline */
+        .section-header {
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--cyan), transparent);
+            animation: underlineGrow 2s ease-in-out infinite;
+        }
+
+        @keyframes underlineGrow {
+            0%, 100% { width: 60px; opacity: 0.6; }
+            50% { width: 100px; opacity: 1; }
+        }
+
+        /* Icon containers with 3D depth */
+        .icon-container {
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+
+        .dash-widget:hover .icon-container {
+            transform: translateZ(20px) rotateY(10deg);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .orb-1, .orb-2, .orb-3 {
+                width: 350px;
+                height: 350px;
+            }
+
+            .stat-card {
+                border-radius: 20px;
+            }
+
+            .dash-widget {
+                border-radius: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                perspective: 1000px;
+            }
+
+            .orb-1, .orb-2, .orb-3 {
+                width: 250px;
+                height: 250px;
+            }
+
+            .stat-card {
+                border-radius: 16px;
+                padding: 1rem !important;
+            }
+
+            .dash-widget {
+                border-radius: 14px;
+            }
+
+            .slot-btn-container {
+                flex-direction: column;
+            }
+
+            .slot-btn {
+                width: 100%;
+            }
+
+            .effect-btn {
+                padding: 8px 10px;
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .orb-1, .orb-2, .orb-3 {
+                width: 180px;
+                height: 180px;
+                filter: blur(60px);
+            }
+
+            .ai-badge-admin {
+                font-size: 9px;
+                padding: 4px 12px;
+            }
+
+            .dash-widget {
+                padding: 1rem !important;
+            }
+        }
+
+        /* Loading animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--cyan), var(--purple));
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #06b6d4, #9333ea);
+        }
+
+        /* Touch feedback for mobile */
+        @media (hover: none) {
+            .dash-widget:active {
+                transform: scale(0.98);
+            }
+
+            .slot-btn:active {
+                transform: scale(0.95);
+            }
+
+            .effect-btn:active {
+                transform: scale(0.95);
+            }
         }
     </style>
 </head>
 
 <body class="min-h-screen bg-[#020617]">
 
+    <!-- Animated gradient orbs -->
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+
+    <!-- 3D background stars -->
     <div id="bg-stars"></div>
 
+    <!-- Auth overlay -->
     <div id="authOverlay">
         <p class="text-cyan-400 font-bold tracking-widest animate-pulse">AUTHORIZING...</p>
     </div>
 
+    <!-- Sidebar container -->
     <div id="sidebar-target"></div>
 
+    <!-- Main content -->
     <main class="w-full" id="main-wrapper">
-        <div class="max-w-[1600px] mx-auto p-8 space-y-8">
-            <div class="mb-2">
+        <div class="max-w-[1600px] mx-auto p-4 md:p-8 space-y-6 md:space-y-8">
+            <!-- Header section -->
+            <div class="mb-2 animate-fade-in">
                 <div class="ai-badge-admin" id="ai-msg-admin">System: UI Optimizing...</div>
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <h2 class="text-xl md:text-2xl font-bold text-white flex items-center gap-2 section-header">
                     <span class="w-1 h-5 bg-cyan-500 rounded-full"></span>
                     System Configuration
                 </h2>
             </div>
 
-            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='visitor.html'">
-                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-2xl">📊</div>
+            <!-- Dashboard stats -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="dash-widget p-4 md:p-5 flex items-center gap-3 md:gap-4 cursor-pointer" onclick="location.href='visitor.html'">
+                    <div class="icon-container w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-xl md:text-2xl">📊</div>
                     <div>
-                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Total Visitors</p>
-                        <h4 id="stat-visitors" class="text-xl font-black text-white">...</h4>
+                        <p class="text-[9px] md:text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Total Visitors</p>
+                        <h4 id="stat-visitors" class="text-lg md:text-xl font-black text-white">...</h4>
                     </div>
                 </div>
-                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='inquiry.html'">
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl">📩</div>
+                <div class="dash-widget p-4 md:p-5 flex items-center gap-3 md:gap-4 cursor-pointer" onclick="location.href='inquiry.html'">
+                    <div class="icon-container w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-xl md:text-2xl">📩</div>
                     <div>
-                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Inquiries</p>
-                        <h4 id="stat-inquiries" class="text-xl font-black text-white">...</h4>
+                        <p class="text-[9px] md:text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Inquiries</p>
+                        <h4 id="stat-inquiries" class="text-lg md:text-xl font-black text-white">...</h4>
                     </div>
                 </div>
-                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='post.html'">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-2xl">✍️</div>
+                <div class="dash-widget p-4 md:p-5 flex items-center gap-3 md:gap-4 cursor-pointer" onclick="location.href='post.html'">
+                    <div class="icon-container w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-xl md:text-2xl">✍️</div>
                     <div>
-                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Posts</p>
-                        <h4 id="stat-posts" class="text-xl font-black text-white">...</h4>
+                        <p class="text-[9px] md:text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Posts</p>
+                        <h4 id="stat-posts" class="text-lg md:text-xl font-black text-white">...</h4>
                     </div>
                 </div>
-                <div class="dash-widget p-5 flex items-center gap-4 cursor-pointer" onclick="location.href='memo.html'">
-                    <div class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl">📝</div>
+                <div class="dash-widget p-4 md:p-5 flex items-center gap-3 md:gap-4 cursor-pointer" onclick="location.href='memo.html'">
+                    <div class="icon-container w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-xl md:text-2xl">📝</div>
                     <div>
-                        <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Memos</p>
-                        <h4 id="stat-memos" class="text-xl font-black text-white">...</h4>
+                        <p class="text-[9px] md:text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Memos</p>
+                        <h4 id="stat-memos" class="text-lg md:text-xl font-black text-white">...</h4>
                     </div>
                 </div>
             </section>
 
-            <section>
+            <!-- SEO Section -->
+            <section class="animate-fade-in" style="animation-delay: 0.2s;">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-2">
+                    <h3 class="text-xs md:text-sm font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-2">
                         <span class="w-2 h-2 bg-cyan-500 rounded-full"></span> Search Engine Optimization
                     </h3>
                 </div>
-                <div class="stat-card p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 space-y-4">
+                <div class="stat-card p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+                    <div class="lg:col-span-2 space-y-3 md:space-y-4">
                         <div>
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Site Description</label>
-                            <textarea id="seoDesc" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition h-24"></textarea>
+                            <label class="text-[9px] md:text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Site Description</label>
+                            <textarea id="seoDesc" class="w-full bg-black/40 border border-white/5 rounded-xl md:rounded-2xl p-3 md:p-4 text-xs md:text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition h-20 md:h-24"></textarea>
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Keywords</label>
-                            <input type="text" id="seoKeywords" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition">
+                            <label class="text-[9px] md:text-[10px] font-bold text-neutral-500 uppercase block mb-1.5 ml-1">Keywords</label>
+                            <input type="text" id="seoKeywords" class="w-full bg-black/40 border border-white/5 rounded-xl md:rounded-2xl p-3 md:p-4 text-xs md:text-sm text-neutral-300 focus:border-cyan-500/50 outline-none transition">
                         </div>
-                        <button onclick="saveSEO()" class="w-full py-3.5 bg-cyan-500 text-black font-bold rounded-2xl hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20 text-sm">Save Meta Settings</button>
+                        <button onclick="saveSEO()" class="w-full py-3 md:py-3.5 bg-cyan-500 text-black font-bold rounded-xl md:rounded-2xl hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20 text-xs md:text-sm">Save Meta Settings</button>
                     </div>
-                    <div class="bg-cyan-500/5 rounded-2xl p-6 border border-cyan-500/10 flex flex-col justify-center">
+                    <div class="bg-cyan-500/5 rounded-xl md:rounded-2xl p-4 md:p-6 border border-cyan-500/10 flex flex-col justify-center">
                         <p class="text-cyan-500 text-xs font-bold mb-2">💡 SEO Guide</p>
                         <p class="text-neutral-400 text-xs leading-relaxed">KEEP UNDER 160 CHARACTERS. SEPARATE KEYWORDS WITH COMMAS.</p>
                     </div>
                 </div>
             </section>
 
-            <section>
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-2">
+            <!-- Notice & Popups Section -->
+            <section class="animate-fade-in" style="animation-delay: 0.3s;">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-3">
+                    <h3 class="text-xs md:text-sm font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-2">
                         <span class="w-2 h-2 bg-amber-500 rounded-full"></span> Notice & Popups
                     </h3>
-                    <div class="flex gap-1.5 bg-black/40 p-1 rounded-xl border border-white/5">
-                        <button onclick="switchPopup(0)" class="slot-btn active px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 1</button>
-                        <button onclick="switchPopup(1)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 2</button>
-                        <button onclick="switchPopup(2)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 3</button>
-                        <button onclick="switchPopup(3)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 4</button>
-                        <button onclick="switchPopup(4)" class="slot-btn px-3 py-1.5 rounded-lg text-[10px] font-bold">SLOT 5</button>
+                    <div class="slot-btn-container flex gap-1.5 p-1 rounded-xl w-full md:w-auto">
+                        <button onclick="switchPopup(0)" class="slot-btn active px-2 md:px-3 py-1.5 rounded-lg text-[9px] md:text-[10px] font-bold flex-1 md:flex-initial">SLOT 1</button>
+                        <button onclick="switchPopup(1)" class="slot-btn px-2 md:px-3 py-1.5 rounded-lg text-[9px] md:text-[10px] font-bold flex-1 md:flex-initial">SLOT 2</button>
+                        <button onclick="switchPopup(2)" class="slot-btn px-2 md:px-3 py-1.5 rounded-lg text-[9px] md:text-[10px] font-bold flex-1 md:flex-initial">SLOT 3</button>
+                        <button onclick="switchPopup(3)" class="slot-btn px-2 md:px-3 py-1.5 rounded-lg text-[9px] md:text-[10px] font-bold flex-1 md:flex-initial">SLOT 4</button>
+                        <button onclick="switchPopup(4)" class="slot-btn px-2 md:px-3 py-1.5 rounded-lg text-[9px] md:text-[10px] font-bold flex-1 md:flex-initial">SLOT 5</button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div class="lg:col-span-4 space-y-4">
-                        <div class="stat-card p-5 flex items-center justify-between">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+                    <div class="lg:col-span-4 space-y-3 md:space-y-4">
+                        <div class="stat-card p-4 md:p-5 flex items-center justify-between">
                             <div><p class="text-sm font-bold">Main Popup</p></div>
                             <label class="switch"><input type="checkbox" id="popupActive"><span class="slider"></span></label>
                         </div>
-                        <div class="stat-card p-5 flex items-center justify-between">
+                        <div class="stat-card p-4 md:p-5 flex items-center justify-between">
                             <div><p class="text-sm font-bold text-amber-500">Emergency Banner</p></div>
                             <label class="switch"><input type="checkbox" id="bannerActive"><span class="slider"></span></label>
                         </div>
 
-                        <div class="stat-card p-5 space-y-3">
-                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Popup Dissolve Effect</p>
+                        <div class="stat-card p-4 md:p-5 space-y-3">
+                            <p class="text-[9px] md:text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Popup Dissolve Effect</p>
                             <div class="grid grid-cols-2 gap-2" id="effectContainer">
                                 <button onclick="selectEffect('cleavage')" data-effect="cleavage" class="effect-btn">🫧 Cleavage (3s)</button>
                                 <button onclick="selectEffect('wave')" data-effect="wave" class="effect-btn">💨 Wave (3s)</button>
@@ -341,18 +794,18 @@
                             </div>
                         </div>
 
-                        <div class="stat-card p-6 space-y-4">
-                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Active Schedule</p>
+                        <div class="stat-card p-4 md:p-6 space-y-3 md:space-y-4">
+                            <p class="text-[9px] md:text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Active Schedule</p>
                             <input type="text" id="startDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="Start Date">
                             <input type="text" id="endDate" class="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-xs outline-none" placeholder="End Date">
                         </div>
                     </div>
 
                     <div class="lg:col-span-8">
-                        <div class="stat-card p-6 h-full flex flex-col">
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase mb-4">Editor (Slot <span id="slotDisplay" class="text-cyan-500">1</span>)</label>
-                            <div id="editor-container" class="flex-1 min-h-[300px]"></div>
-                            <button onclick="saveNotice()" class="mt-4 w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-bold transition text-xs">UPDATE SLOT DATA</button>
+                        <div class="stat-card p-4 md:p-6 h-full flex flex-col">
+                            <label class="text-[9px] md:text-[10px] font-bold text-neutral-500 uppercase mb-4">Editor (Slot <span id="slotDisplay" class="text-cyan-500">1</span>)</label>
+                            <div id="editor-container" class="flex-1 min-h-[250px] md:min-h-[300px]"></div>
+                            <button onclick="saveNotice()" class="mt-4 w-full py-3 md:py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl md:rounded-2xl text-white font-bold transition text-xs">UPDATE SLOT DATA</button>
                         </div>
                     </div>
                 </div>
@@ -361,44 +814,69 @@
     </main>
 
     <script>
-        // 1. 3D 배경 입자 생성 (추가됨)
+        // 1. Enhanced 3D background particles
         const bg = document.getElementById('bg-stars');
-        const count = 100; 
+        const count = 120;
 
         for (let i = 0; i < count; i++) {
             const dot = document.createElement('div');
             dot.className = 'dot';
             const x = Math.random() * 100;
             const y = Math.random() * 100;
-            const z = Math.random() * 500 - 250;
+            const z = Math.random() * 600 - 300;
             dot.style.left = `${x}%`;
             dot.style.top = `${y}%`;
             dot.style.transform = `translateZ(${z}px)`;
+            dot.style.animationDelay = `${Math.random() * 3}s`;
             bg.appendChild(dot);
         }
 
-        // 2. 마우스 인터랙션 Parallax (추가됨)
+        // 2. Enhanced mouse interaction Parallax
         const content = document.getElementById('main-wrapper');
+        let mouseX = 0, mouseY = 0;
+        let currentX = 0, currentY = 0;
+
         document.body.addEventListener('mousemove', (e) => {
-            const moveX = (e.clientX - window.innerWidth / 2) / 50;
-            const moveY = (e.clientY - window.innerHeight / 2) / 50;
-            bg.style.transform = `rotateY(${moveX * 0.5}deg) rotateX(${-moveY * 0.5}deg) translateZ(50px)`;
-            content.style.transform = `rotateY(${moveX * 0.2}deg) rotateX(${-moveY * 0.2}deg)`;
+            mouseX = (e.clientX - window.innerWidth / 2) / 50;
+            mouseY = (e.clientY - window.innerHeight / 2) / 50;
         });
 
-        // 3. AI 개인화 시뮬레이션 (추가됨)
+        function animate() {
+            currentX += (mouseX - currentX) * 0.1;
+            currentY += (mouseY - currentY) * 0.1;
+            
+            bg.style.transform = `rotateY(${currentX * 0.5}deg) rotateX(${-currentY * 0.5}deg) translateZ(50px)`;
+            content.style.transform = `rotateY(${currentX * 0.2}deg) rotateX(${-currentY * 0.2}deg)`;
+            
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 3. AI personalization simulation
         const messages = [
-            "Admin Detected: Secure Mode Active",
-            "Performance: 3D Rendering Optimized",
-            "Status: System Core Stabilized"
+            "TDL Energy Indonesia",
+            "Deliver the best products and services to our customers",
+            "Promote leadership consistently",
+            "Create and Innovate value",
+            "System: Performance Optimized",
+            "AI: Interface Learning..."
         ];
+        
+        let msgIndex = 0;
         setInterval(() => {
-            const msg = messages[Math.floor(Math.random() * messages.length)];
             const msgEl = document.getElementById('ai-msg-admin');
-            if(msgEl) msgEl.innerText = msg;
+            if (msgEl) {
+                msgEl.style.transition = 'opacity 0.3s';
+                msgEl.style.opacity = '0';
+                setTimeout(() => {
+                    msgEl.innerText = messages[msgIndex];
+                    msgEl.style.opacity = '1';
+                    msgIndex = (msgIndex + 1) % messages.length;
+                }, 300);
+            }
         }, 5000);
 
-        // --- 기존 Admin 기능 코드 시작 ---
+        // --- Original Admin functionality ---
         const firebaseConfig = {
             apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",
             authDomain: "tdlid-107669.firebaseapp.com",
@@ -423,6 +901,7 @@
                 theme: 'snow',
                 modules: { toolbar: [[{ 'header': [1, 2, false] }], ['bold', 'italic', 'underline'], ['image', 'code-block'], [{ 'color': [] }], ['clean']] }
             });
+            
             const dateConfig = { dateFormat: "Y-m-d", locale: "default", disableMobile: "true" };
             flatpickr("#startDate", dateConfig);
             flatpickr("#endDate", dateConfig);
@@ -517,8 +996,8 @@
             popupDataList[currentSlot] = data;
             try {
                 await database.ref('siteSettings/popups').set(popupDataList);
-                alert("저장되었습니다.");
-            } catch (e) { alert("저장 실패: " + e.message); }
+                alert("Saved.");
+            } catch (e) { alert("Save failed: " + e.message); }
         }
 
         async function saveSEO() {
@@ -526,8 +1005,8 @@
             const keywords = document.getElementById('seoKeywords').value;
             try {
                 await database.ref('siteSettings/seo').set({ description, keywords });
-                alert("SEO 저장 완료");
-            } catch (e) { alert("저장 실패: " + e.message); }
+                alert("SEO saving complete");
+            } catch (e) { alert("Save failed: " + e.message); }
         }
     </script>
 </body>
