@@ -669,12 +669,6 @@
 
             <!-- Fluid particle canvas -->
             <canvas id="fluid-canvas"></canvas>
-
-            <!-- Background image (요일별 GIF — 기존 로직 그대로) -->
-            <div id="image-bg-container" class="video-bg-container">
-                <div class="video-overlay"></div>
-            </div>
-
             <!-- Energy orbit rings -->
             <div class="energy-ring"></div>
             <div class="energy-ring"></div>
@@ -850,20 +844,6 @@
             initFluid();
             drawFluid();
             window.addEventListener('resize', initFluid);
-
-            /* ── 요일별 배경 GIF (원본 그대로) ── */
-            const now = new Date();
-            let dayOfWeek = now.getDay();
-            const bgNumber = (dayOfWeek === 0) ? 7 : dayOfWeek;
-            const bgFileName = `bg-${bgNumber}.gif`;
-            const bgContainer = document.getElementById('image-bg-container');
-            if(bgContainer) {
-                bgContainer.innerHTML = `
-                    <div class="video-overlay"></div>
-                    <img src="images/bg/${bgFileName}" alt="Daily Background" class="video-bg w-full h-full object-cover">
-                `;
-                console.log(`Today is Day ${bgNumber} (${bgFileName})`);
-            }
 
             loadLayout();
             initLiveSettings();
