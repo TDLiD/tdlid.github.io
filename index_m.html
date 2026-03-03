@@ -151,7 +151,6 @@ body { perspective: 1200px; }
 <main class="flex-grow">
     <section class="hero-section">
         <div class="video-bg-container" id="heroSlider">
-            <div class="video-overlay"></div>
         </div>
         <div class="hero-grid"></div>
         
@@ -289,7 +288,6 @@ setTimeout(()=>{hearts.forEach((heart,idx)=>{const t=(idx/heartCount)*2*Math.PI;
 
 document.addEventListener("DOMContentLoaded",()=>{
     loadLayout().then(()=>{
-        initImageSlider();
         initPillarEgg();
         initParallaxBackground();
         initAiTag();
