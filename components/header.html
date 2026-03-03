@@ -1,53 +1,142 @@
 <style>
-    /* 1. 상/하 라인 강조형 오픈 3D 헤더 */
+    /* 1. 상/하 라인 강조형 오픈 3D 헤더 - Enhanced */
     .glass-header {
-        background: rgba(2, 6, 23, 0.75) !important;
-        backdrop-filter: blur(15px) saturate(180%);
-        -webkit-backdrop-filter: blur(15px) saturate(180%);
-        border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-bottom: 1px solid rgba(34, 211, 238, 0.2) !important;
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-        transition: all 0.3s ease;
+        background: linear-gradient(135deg, rgba(2, 6, 23, 0.85), rgba(15, 23, 42, 0.8)) !important;
+        backdrop-filter: blur(25px) saturate(200%);
+        -webkit-backdrop-filter: blur(25px) saturate(200%);
+        border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-bottom: 1px solid rgba(34, 211, 238, 0.3) !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 
+                    0 0 0 1px rgba(34, 211, 238, 0.1) inset,
+                    0 10px 40px rgba(34, 211, 238, 0.15);
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         position: relative;
         z-index: 10001;
+        transform: translateZ(0);
     }
 
-    /* 하단 네온 장식 라인 */
+    .glass-header:hover {
+        transform: translateY(-2px) translateZ(10px);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 
+                    0 0 0 1px rgba(34, 211, 238, 0.2) inset,
+                    0 15px 50px rgba(34, 211, 238, 0.3);
+    }
+
+/* Rotating border gradient effect */
+.glass-header::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    /* 전체적으로 어두운 톤으로 변경 (헤더 배경색 rgba(2, 6, 23, 0.85)와 조화) */
+    background: conic-gradient(
+        from 0deg,
+        rgba(15, 23, 42, 0.5),   /* 어두운 남색 */
+        rgba(34, 211, 238, 0.1),  /* 아주 은은한 청록색 포인트 */
+        rgba(15, 23, 42, 0.5),   /* 다시 어두운 남색 */
+        rgba(2, 6, 23, 0.8),     /* 가장 어두운 부분 */
+        rgba(15, 23, 42, 0.5)    /* 마감 */
+    );
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0.4;               /* 불투명도를 낮춰 배경에 더 묻히게 설정 */
+    animation: rotateBorder 8s linear infinite;
+    pointer-events: none;
+}
+
+    @keyframes rotateBorder {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* 하단 네온 장식 라인 - Enhanced */
     .header-frame-deco {
         position: absolute;
         bottom: -1px;
         left: 0;
-        height: 2px;
-        background: linear-gradient(90deg, transparent 0%, rgba(34, 211, 238, 0.8) 50%, transparent 100%);
+        height: 3px;
+        background: linear-gradient(
+            90deg, 
+            transparent 0%, 
+            rgba(34, 211, 238, 0.3) 20%,
+            rgba(34, 211, 238, 1) 50%, 
+            rgba(34, 211, 238, 0.3) 80%,
+            transparent 100%
+        );
         width: 100%;
-        opacity: 0.7;
+        opacity: 0.8;
+        pointer-events: none;
+        box-shadow: 0 0 15px rgba(34, 211, 238, 0.6),
+                    0 0 30px rgba(34, 211, 238, 0.3);
+        animation: glowPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; }
+    }
+
+    /* Animated particles background */
+    .glass-header::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: 
+            radial-gradient(circle at 20% 50%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(167, 139, 250, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+        border-radius: inherit;
+        z-index: -1;
+        opacity: 0.6;
+        animation: particleShift 15s ease-in-out infinite;
         pointer-events: none;
     }
 
-    /* 로고 애니메이션 */
+    @keyframes particleShift {
+        0%, 100% { transform: translate(0, 0); }
+        33% { transform: translate(10px, -10px); }
+        66% { transform: translate(-10px, 10px); }
+    }
+
+    /* 로고 애니메이션 - Enhanced */
     .animated-logo-text {
         letter-spacing: 0.15em;
-        background: linear-gradient(90deg, #fff, #22d3ee, #fff);
-        background-size: 200% auto;
+        background: linear-gradient(
+            90deg, 
+            #fff, 
+            #22d3ee, 
+            #a78bfa,
+            #22d3ee,
+            #fff
+        );
+        background-size: 300% auto;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        animation: shine 3s linear infinite;
+        animation: shineEnhanced 4s linear infinite;
+        filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.3));
     }
 
-    @keyframes shine {
-        to {
-            background-position: 200% center;
-        }
+    @keyframes shineEnhanced {
+        to { background-position: 300% center; }
     }
 
-    /* 메뉴 순차 등장 애니메이션 */
+    /* Logo 3D depth effect */
+    .glass-header a img {
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.5));
+    }
+
+    .glass-header a img:hover {
+        transform: translateY(-3px) scale(1.05);
+        filter: drop-shadow(0 10px 25px rgba(34, 211, 238, 0.5));
+    }
+
+    /* 메뉴 순차 등장 애니메이션 - Enhanced */
     @keyframes zoomInEntrance {
         from {
             opacity: 0;
-            transform: scale(1.5) translateY(-10px);
-            filter: blur(5px);
+            transform: scale(1.3) translateY(-15px);
+            filter: blur(8px);
         }
-
         to {
             opacity: 1;
             transform: scale(1) translateY(0);
@@ -59,101 +148,303 @@
     #main-nav li,
     .nav-btn-container {
         opacity: 0;
-        animation: zoomInEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        animation: zoomInEntrance 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
 
     /* 순차적 지연 시간 */
-    #main-nav li:nth-child(1) {
-        animation-delay: 0.1s;
-    }
+    #main-nav li:nth-child(1) { animation-delay: 0.1s; }
+    #main-nav li:nth-child(2) { animation-delay: 0.2s; }
+    #main-nav li:nth-child(3) { animation-delay: 0.3s; }
+    #main-nav li:nth-child(4) { animation-delay: 0.4s; }
+    #main-nav li:nth-child(5) { animation-delay: 0.5s; }
+    #main-nav li:nth-child(6) { animation-delay: 0.6s; }
+    #main-nav li:nth-child(7) { animation-delay: 0.7s; }
+    #main-nav li:nth-child(8) { animation-delay: 0.8s; }
+    .nav-btn-container { animation-delay: 0.9s; }
 
-    #main-nav li:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    #main-nav li:nth-child(3) {
-        animation-delay: 0.3s;
-    }
-
-    #main-nav li:nth-child(4) {
-        animation-delay: 0.4s;
-    }
-
-    #main-nav li:nth-child(5) {
-        animation-delay: 0.5s;
-    }
-
-    #main-nav li:nth-child(6) {
-        animation-delay: 0.6s;
-    }
-
-    #main-nav li:nth-child(7) {
-        animation-delay: 0.7s;
-    }
-
-    #main-nav li:nth-child(8) {
-        animation-delay: 0.8s;
-    }
-
-    .nav-btn-container {
-        animation-delay: 0.9s;
-    }
-
+    /* Enhanced nav link with 3D effect */
     .nav-link {
         position: relative;
         color: #94a3b8;
-        transition: all 0.3s ease;
-        padding: 4px 0;
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        padding: 6px 12px;
         white-space: nowrap;
         display: inline-block;
+        border-radius: 8px;
+        transform-style: preserve-3d;
+    }
+
+    /* Underline effect */
+    .nav-link::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #22d3ee, transparent);
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        transform: translateX(-50%);
+        box-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+    }
+
+    /* Background glow on hover */
+    .nav-link::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle, rgba(34, 211, 238, 0.15), transparent);
+        border-radius: 8px;
+        opacity: 0;
+        transition: opacity 0.4s;
+        z-index: -1;
     }
 
     .nav-link:hover,
     .nav-link.active-tab {
         color: #22d3ee !important;
-        transform: translateY(-2px);
-        text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+        transform: translateY(-3px) translateZ(10px);
+        text-shadow: 0 0 15px rgba(34, 211, 238, 0.6),
+                     0 0 30px rgba(34, 211, 238, 0.3);
+        background: rgba(34, 211, 238, 0.05);
     }
 
+    .nav-link:hover::before,
+    .nav-link.active-tab::before {
+        width: 80%;
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active-tab::after {
+        opacity: 1;
+    }
+
+    /* Enhanced neon button with 3D depth */
     .btn-neon {
         display: inline-flex !important;
         align-items: center;
         justify-content: center;
         width: 150px !important;
         height: 42px !important;
-        background: rgba(15, 23, 42, 0.6) !important;
-        border: 1px solid rgba(34, 211, 238, 0.5);
-        transition: all 0.3s ease;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.7)) !important;
+        border: 1px solid rgba(34, 211, 238, 0.6);
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4),
+                    0 0 20px rgba(34, 211, 238, 0.2);
+        transform-style: preserve-3d;
+    }
+
+    /* Button glow effect */
+    .btn-neon::before {
+        content: '';
+        position: absolute;
+        inset: -50%;
+        background: conic-gradient(
+            from 0deg,
+            transparent,
+            rgba(34, 211, 238, 0.5),
+            transparent
+        );
+        animation: buttonRotate 3s linear infinite;
+        opacity: 0;
+        transition: opacity 0.4s;
+    }
+
+    @keyframes buttonRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Inner button gradient */
+    .btn-neon::after {
+        content: '';
+        position: absolute;
+        inset: 1px;
+        background: inherit;
+        border-radius: inherit;
+        z-index: -1;
     }
 
     .btn-neon:hover {
-        background: #22d3ee !important;
+        background: linear-gradient(135deg, #22d3ee, #06b6d4) !important;
         color: #000 !important;
-        box-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 10px 35px rgba(34, 211, 238, 0.6),
+                    0 0 40px rgba(34, 211, 238, 0.4),
+                    0 0 0 2px rgba(34, 211, 238, 0.3) inset;
+        border-color: transparent;
     }
 
+    .btn-neon:hover::before {
+        opacity: 1;
+    }
+
+    .btn-neon:active {
+        transform: translateY(-1px) scale(1.02);
+    }
+
+    /* Enhanced dropdown menu */
     #dropdownMenu {
-        background: rgba(15, 23, 42, 0.98) !important;
-        border: 1px solid rgba(34, 211, 238, 0.3);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.95)) !important;
+        border: 1px solid rgba(34, 211, 238, 0.4);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9),
+                    0 0 0 1px rgba(34, 211, 238, 0.1) inset,
+                    0 0 40px rgba(34, 211, 238, 0.2);
+        backdrop-filter: blur(30px) saturate(180%);
+        -webkit-backdrop-filter: blur(30px) saturate(180%);
     }
 
+    /* Animated border for dropdown */
+    #dropdownMenu::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        background: linear-gradient(
+            135deg,
+            rgba(34, 211, 238, 0.3),
+            rgba(167, 139, 250, 0.2),
+            rgba(34, 211, 238, 0.3)
+        );
+        background-size: 200% 200%;
+        border-radius: inherit;
+        z-index: -1;
+        animation: gradientFlow 3s ease infinite;
+        opacity: 0.5;
+    }
+
+    @keyframes gradientFlow {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    /* Enhanced mobile nav items */
     .nav-item-m {
-        transition: all 0.2s;
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
         border: 1px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Hover effect with sliding background */
+    .nav-item-m::before {
+        content: '';
+        position: absolute;
+        left: -100%;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.15), transparent);
+        transition: left 0.4s ease;
+    }
+
+    .nav-item-m:hover::before {
+        left: 100%;
     }
 
     .nav-item-m:hover {
         background: rgba(34, 211, 238, 0.1);
         color: #22d3ee;
+        border-color: rgba(34, 211, 238, 0.3);
+        transform: translateX(5px);
+        box-shadow: 0 5px 20px rgba(34, 211, 238, 0.2);
     }
 
-    /* Admin 클릭 문제 해결 */
+    /* Admin link enhanced */
     #main-nav li:last-child,
     #main-nav li:last-child a {
         pointer-events: auto !important;
         position: relative;
         z-index: 10010;
+    }
+
+    #main-nav li:last-child a {
+        border-color: rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.5);
+        transition: all 0.3s;
+    }
+
+    #main-nav li:last-child a:hover {
+        border-color: rgba(34, 211, 238, 0.5);
+        background: rgba(34, 211, 238, 0.1);
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+    }
+
+    /* Mobile menu button enhancement */
+    #menuToggleBtn {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.5));
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(34, 211, 238, 0.5);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    #menuToggleBtn:hover {
+        background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(30, 41, 59, 0.7));
+        transform: scale(1.1);
+        box-shadow: 0 8px 25px rgba(34, 211, 238, 0.4);
+        border-color: #22d3ee;
+    }
+
+    #menuToggleBtn:active {
+        transform: scale(0.95);
+    }
+
+    #menuIcon {
+        transition: all 0.3s;
+        filter: drop-shadow(0 0 5px rgba(34, 211, 238, 0.5));
+    }
+
+    /* Request Quote button in mobile */
+    #mobile-nav-container a[href="contact.html"]:last-child {
+        background: linear-gradient(135deg, #22d3ee, #06b6d4);
+        box-shadow: 0 5px 20px rgba(34, 211, 238, 0.4);
+        transition: all 0.3s;
+    }
+
+    #mobile-nav-container a[href="contact.html"]:last-child:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 35px rgba(34, 211, 238, 0.6);
+    }
+
+    /* Floating animation for header */
+    @keyframes headerFloat {
+        0%, 100% { transform: translate(-50%, 0); }
+        50% { transform: translate(-50%, -2px); }
+    }
+
+    .glass-header {
+        animation: headerFloat 6s ease-in-out infinite;
+    }
+
+    /* Shimmer effect on page load */
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .glass-header {
+        background-image: 
+            linear-gradient(135deg, rgba(2, 6, 23, 0.85), rgba(15, 23, 42, 0.8)),
+            linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%);
+        background-size: 100% 100%, 200% 100%;
+        animation: headerFloat 6s ease-in-out infinite, shimmer 3s ease-in-out;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+        .glass-header {
+            width: 98%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .glass-header {
+            top: 8px;
+            border-radius: 16px;
+            padding: 12px 16px;
+        }
     }
 </style>
 
