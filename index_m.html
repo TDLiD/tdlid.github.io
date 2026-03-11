@@ -133,7 +133,73 @@ body { perspective: 1200px; }
 }
 .sys-dot { width:6px; height:6px; background: #a3e635; border-radius: 50%; box-shadow: 0 0 8px #a3e635; animation: blink 1.5s infinite; }
 @keyframes blink { 0%, 100% { opacity:1; } 50% { opacity:0.3; } }
+/* ── 3D Star field ── */
+#bg-stars {
+    position: absolute; width: 120%; height: 120%;
+    top: -10%; left: -10%; z-index: 1;
+    transform-style: preserve-3d;
+    pointer-events: none;
+}
+.star-dot {
+    position: absolute; width: 1.5px; height: 1.5px;
+    background: white; border-radius: 50%; opacity: 0.25;
+}
+
+/* ── Fluid canvas ── */
+#fluid-canvas {
+    position: absolute; inset: 0; z-index: 2;
+    pointer-events: none; opacity: 0.3;
+}
+
+/* ── Energy rings ── */
+.energy-ring {
+    position: absolute; border-radius: 50%;
+    border: 1px solid transparent;
+    pointer-events: none; z-index: 3;
+    animation: ring-pulse 4s ease-in-out infinite;
+}
+.energy-ring:nth-child(1) {
+    width: 280px; height: 280px;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) rotateX(72deg);
+    border-color: rgba(34,211,238,0.15);
+    animation-delay: 0s;
+}
+.energy-ring:nth-child(2) {
+    width: 420px; height: 420px;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) rotateX(72deg);
+    border-color: rgba(34,211,238,0.08);
+    animation-delay: -1.5s;
+}
+.energy-ring:nth-child(3) {
+    width: 560px; height: 560px;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) rotateX(72deg);
+    border-color: rgba(34,211,238,0.04);
+    animation-delay: -3s;
+}
+@keyframes ring-pulse {
+    0%,100% { opacity:0.4; }
+    50%      { opacity:1; }
+}
+
+/* ── Scan beam ── */
+.scan-beam {
+    position: absolute; left: 0; right: 0; height: 1px; z-index: 6;
+    background: linear-gradient(90deg, transparent, #22d3ee, transparent);
+    opacity: 0.2;
+    animation: scan-v 10s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes scan-v {
+    0%   { top: 100%; opacity: 0; }
+    5%   { opacity: 0.2; }
+    95%  { opacity: 0.1; }
+    100% { top: -2%; opacity: 0; }
+}
 </style>
+
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] flex flex-col min-h-screen overflow-x-hidden">
@@ -150,6 +216,20 @@ body { perspective: 1200px; }
 
 <main class="flex-grow">
     <section class="hero-section">
+<!-- 3D Star field -->
+<div id="bg-stars"></div>
+
+<!-- Fluid canvas -->
+<canvas id="fluid-canvas"></canvas>
+
+<!-- Energy rings -->
+<div class="energy-ring"></div>
+<div class="energy-ring"></div>
+<div class="energy-ring"></div>
+
+<!-- Scan beam -->
+<div class="scan-beam"></div>
+
         <div class="video-bg-container" id="heroSlider">
         </div>
         <div class="hero-grid"></div>
@@ -279,6 +359,64 @@ function initAiTag() {
     }
 }
 
+// 3D Star field
+function initStars() {
+    const container = document.getElementById('bg-stars');
+    if (!container) return;
+    for (let i = 0; i < 80; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'star-dot';
+        dot.style.left = Math.random() * 100 + '%';
+        dot.style.top  = Math.random() * 100 + '%';
+        dot.style.transform = `translateZ(${Math.random() * 400 - 200}px)`;
+        container.appendChild(dot);
+    }
+}
+
+// Fluid canvas
+function initFluid() {
+    const canvas = document.getElementById('fluid-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const points = [];
+    for (let i = 0; i < 20; i++) {
+        points.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4
+        });
+    }
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = 'rgba(34,211,238,0.12)';
+        ctx.lineWidth = 1;
+        points.forEach((p, i) => {
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
+            if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+            points.forEach((p2, j) => {
+                if (i === j) return;
+                const d = Math.hypot(p.x - p2.x, p.y - p2.y);
+                if (d < 200) {
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
+            });
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+    window.addEventListener('resize', () => {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+}
+
 // 5. 이스터에그 (유지)
 let isHeartActive=false;
 function initPillarEgg(){const pillar=document.getElementById('pillarTrigger');if(pillar){pillar.addEventListener('click',()=>{if(isHeartActive)return;activateHeartEasterEgg()})}}
@@ -291,6 +429,8 @@ document.addEventListener("DOMContentLoaded",()=>{
         initPillarEgg();
         initParallaxBackground();
         initAiTag();
+    initStars();   // ← 추가
+    initFluid();   // ← 추가
     })
 });
 </script>
