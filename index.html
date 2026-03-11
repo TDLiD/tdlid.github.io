@@ -878,6 +878,8 @@
         /* Heart trigger bind (원본 그대로) */
         function bindHeartTrigger() { const t = document.getElementById('pcHeartTrigger') || document.getElementById('mobileHeartTrigger'); if (t) t.onclick = (e) => { e.preventDefault(); window.activateTdlidHeart(); }; else setTimeout(bindHeartTrigger, 500); }
         bindHeartTrigger();
+// 우클릭 차단
+document.addEventListener('contextmenu', (e) => e.preventDefault());
     </script>
 </body>
 </html>
