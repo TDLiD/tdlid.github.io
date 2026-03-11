@@ -1,302 +1,69 @@
 <style>
-    /* Enhanced mobile header with 3D effects */
     .glass-header-m {
-        background: linear-gradient(135deg, rgba(2, 6, 23, 0.95), rgba(15, 23, 42, 0.9)) !important;
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
-        border-bottom: 1px solid rgba(34, 211, 238, 0.4);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6),
-                    0 0 0 1px rgba(34, 211, 238, 0.1) inset,
-                    0 4px 20px rgba(34, 211, 238, 0.2);
-        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-        transform: translateZ(0);
-        position: relative;
+        background: rgba(2, 6, 23, 0.9) !important;
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(34, 211, 238, 0.3);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     }
 
-    /* Rotating border effect for mobile */
-    .glass-header-m::before {
-        content: '';
-        position: absolute;
-        inset: -1px;
-        background: conic-gradient(
-            from 0deg,
-            transparent,
-            rgba(34, 211, 238, 0.3),
-            transparent,
-            rgba(167, 139, 250, 0.2),
-            transparent
-        );
-        z-index: -1;
-        opacity: 0.5;
-        animation: rotateBorderM 10s linear infinite;
-        pointer-events: none;
-    }
-
-    @keyframes rotateBorderM {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    /* Animated particles background for mobile */
-    .glass-header-m::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image: 
-            radial-gradient(circle at 15% 50%, rgba(34, 211, 238, 0.08) 0%, transparent 50%),
-            radial-gradient(circle at 85% 30%, rgba(167, 139, 250, 0.08) 0%, transparent 50%);
-        z-index: -1;
-        opacity: 0.6;
-        animation: particleShiftM 12s ease-in-out infinite;
-        pointer-events: none;
-    }
-
-    @keyframes particleShiftM {
-        0%, 100% { transform: translate(0, 0); }
-        50% { transform: translate(5px, -5px); }
-    }
-
-    /* Enhanced animated logo with 3D effect */
     .animated-logo-text-m {
-        background: linear-gradient(
-            90deg, 
-            #fff, 
-            #22d3ee, 
-            #a78bfa,
-            #22d3ee,
-            #fff
-        );
-        background-size: 300% auto;
+        background: linear-gradient(90deg, #fff, #22d3ee, #fff);
+        background-size: 200% auto;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        animation: shineM 4s linear infinite;
+        animation: shine 3s linear infinite;
         font-size: 3.8vw;
         white-space: nowrap;
-        filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.3));
-        transition: all 0.3s;
     }
 
-    @keyframes shineM { 
-        to { background-position: 300% center; } 
-    }
+    @keyframes shine { to { background-position: 200% center; } }
 
-    /* Logo image 3D effect */
-    .glass-header-m a img {
-        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-        filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.5));
-    }
-
-    .glass-header-m a:active img {
-        transform: scale(0.95);
-        filter: drop-shadow(0 2px 8px rgba(34, 211, 238, 0.4));
-    }
-
-    /* Enhanced menu button with 3D depth */
-    #menuToggleBtn {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.7), rgba(30, 41, 59, 0.6));
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(34, 211, 238, 0.5);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4),
-                    0 0 20px rgba(34, 211, 238, 0.2);
-        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-        position: relative;
-        overflow: hidden;
-        transform-style: preserve-3d;
-    }
-
-    /* Button glow effect */
-    #menuToggleBtn::before {
-        content: '';
-        position: absolute;
-        inset: -50%;
-        background: radial-gradient(circle, rgba(34, 211, 238, 0.4), transparent);
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-
-    #menuToggleBtn:active {
-        transform: scale(0.95) translateZ(-5px);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6),
-                    0 0 30px rgba(34, 211, 238, 0.4);
-    }
-
-    #menuToggleBtn:active::before {
-        opacity: 1;
-    }
-
-    #menuIcon {
-        transition: all 0.3s;
-        filter: drop-shadow(0 0 5px rgba(34, 211, 238, 0.5));
-        position: relative;
-        z-index: 1;
-    }
-
-    /* 드롭다운 메뉴 위치 및 스크롤 최적화 - Enhanced */
+    /* 드롭다운 메뉴 위치 및 스크롤 최적화 */
     #dropdownMenu {
         max-height: calc(100vh - 70px); 
-        background: linear-gradient(135deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.96)) !important;
+        background: rgba(2, 6, 23, 0.98) !important;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8),
-                    0 0 0 1px rgba(34, 211, 238, 0.2) inset,
-                    0 10px 40px rgba(34, 211, 238, 0.2);
-        backdrop-filter: blur(25px) saturate(180%);
-        -webkit-backdrop-filter: blur(25px) saturate(180%);
     }
 
-    /* Animated border for dropdown */
-    #dropdownMenu::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(34, 211, 238, 0.8) 50%,
-            transparent 100%
-        );
-        animation: scanlineM 3s ease-in-out infinite;
-    }
-
-    @keyframes scanlineM {
-        0%, 100% { opacity: 0.5; }
-        50% { opacity: 1; }
-    }
-
-    /* Custom scrollbar for mobile */
-    #dropdownMenu::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    #dropdownMenu::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.2);
-    }
-
-    #dropdownMenu::-webkit-scrollbar-thumb {
-        background: linear-gradient(to bottom, #22d3ee, #a78bfa);
-        border-radius: 4px;
-        box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
-    }
-
-    /* 언어 스위처 스타일 - Enhanced */
+    /* 언어 스위처 스타일 (기존 PC 스타일 계승) */
     .lang-switcher-m {
-        display: none;
+        display: none; /* 기본 숨김 */
         justify-content: center;
         gap: 20px;
         padding: 15px 0;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         margin-top: 10px;
     }
-
     .lang-btn-m {
         width: 35px;
         height: 22px;
         cursor: pointer;
-        border-radius: 6px;
+        border-radius: 4px;
         overflow: hidden;
         filter: grayscale(100%);
         opacity: 0.5;
-        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        transition: all 0.3s ease;
         border: 1px solid rgba(255,255,255,0.2);
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-        transform-style: preserve-3d;
     }
-
-    .lang-btn-m:active {
-        transform: scale(0.9) translateZ(-5px);
-    }
-
     .lang-btn-m.active {
         filter: grayscale(0%);
         opacity: 1;
         border-color: #22d3ee;
-        box-shadow: 0 0 15px rgba(34, 211, 238, 0.6),
-                    0 5px 20px rgba(34, 211, 238, 0.3);
-        transform: scale(1.05) translateZ(5px);
+        box-shadow: 0 0 10px rgba(34, 211, 238, 0.4);
     }
 
-    /* 네비게이션 아이템 스타일 - Enhanced with 3D */
+    /* 네비게이션 아이템 스타일 */
     .nav-item-m {
         display: block;
-        padding: 0.9rem 1rem;
+        padding: 0.75rem 0;
         font-size: 1.125rem;
         font-weight: 700;
-        color: #94a3b8;
+        color: white;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-        position: relative;
-        overflow: hidden;
-        border-radius: 8px;
-        margin-bottom: 4px;
+        transition: color 0.2s ease;
     }
 
-    /* Sliding background effect */
-    .nav-item-m::before {
-        content: '';
-        position: absolute;
-        left: -100%;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(34, 211, 238, 0.15),
-            transparent
-        );
-        transition: left 0.4s ease;
-    }
-
-    /* Side accent bar */
-    .nav-item-m::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 0;
-        height: 0;
-        background: linear-gradient(to bottom, #22d3ee, #a78bfa);
-        transition: all 0.3s;
-        border-radius: 0 4px 4px 0;
-        box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
-    }
-
-    .nav-item-m:active {
-        background: rgba(34, 211, 238, 0.1);
-        color: #22d3ee;
-        transform: translateX(5px);
-        border-color: rgba(34, 211, 238, 0.3);
-        box-shadow: 0 3px 15px rgba(34, 211, 238, 0.3);
-    }
-
-    .nav-item-m:active::before {
-        left: 100%;
-    }
-
-    .nav-item-m:active::after {
-        width: 4px;
-        height: 60%;
-    }
-
-    .nav-item-m.active-m {
-        color: #22d3ee !important;
-        background: rgba(34, 211, 238, 0.08);
-        border-color: rgba(34, 211, 238, 0.3);
-        border-bottom-color: rgba(34, 211, 238, 0.3);
-        box-shadow: 0 3px 15px rgba(34, 211, 238, 0.2);
-        text-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
-    }
-
-    .nav-item-m.active-m::after {
-        width: 4px;
-        height: 70%;
-    }
-
-    /* Admin access link - Enhanced */
     .nav-item-admin-m {
         font-size: 0.75rem !important;
         color: #4b5563 !important;
@@ -305,177 +72,16 @@
         margin-top: 1rem;
         text-align: center;
         opacity: 0.6;
-        padding: 0.6rem 1rem !important;
-        background: rgba(15, 23, 42, 0.5);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        transition: all 0.3s;
     }
 
-    .nav-item-admin-m:active {
-        opacity: 1;
+    .nav-item-m.active-m {
         color: #22d3ee !important;
-        border-color: rgba(34, 211, 238, 0.4);
-        background: rgba(34, 211, 238, 0.1);
-        box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
-        transform: scale(0.98);
+        border-bottom-color: rgba(34, 211, 238, 0.3);
     }
 
-    /* Enhanced contact button with 3D */
-    .btn-contact-m {
-        background: linear-gradient(135deg, #22d3ee, #06b6d4) !important;
-        box-shadow: 0 6px 25px rgba(34, 211, 238, 0.5),
-                    0 0 30px rgba(34, 211, 238, 0.3) !important;
-        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !important;
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        transform-style: preserve-3d;
-    }
-
-    /* Shimmer effect on button */
-    .btn-contact-m::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(
-            45deg,
-            transparent 30%,
-            rgba(255, 255, 255, 0.3) 50%,
-            transparent 70%
-        );
-        animation: shimmerM 3s linear infinite;
-    }
-
-    @keyframes shimmerM {
-        0% { transform: translateX(-100%) translateY(-100%); }
-        100% { transform: translateX(100%) translateY(100%); }
-    }
-
-    /* Rotating border on button */
-    .btn-contact-m::after {
-        content: '';
-        position: absolute;
-        inset: -2px;
-        background: conic-gradient(
-            from 0deg,
-            transparent,
-            rgba(255, 255, 255, 0.5),
-            transparent
-        );
-        border-radius: inherit;
-        z-index: -1;
-        opacity: 0;
-        transition: opacity 0.3s;
-        animation: rotateBtnM 3s linear infinite;
-    }
-
-    @keyframes rotateBtnM {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .btn-contact-m:active {
-        transform: scale(0.96) translateY(2px) translateZ(-5px) !important;
-        box-shadow: 0 3px 15px rgba(34, 211, 238, 0.6),
-                    0 0 40px rgba(34, 211, 238, 0.4) !important;
-    }
-
-    .btn-contact-m:active::after {
-        opacity: 1;
-    }
-
-    /* Navigation entrance animation */
-    @keyframes navItemFadeIn {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    #dropdownMenu.visible .nav-item-m {
-        animation: navItemFadeIn 0.4s ease-out forwards;
-    }
-
-    #dropdownMenu.visible .nav-item-m:nth-child(1) { animation-delay: 0.05s; }
-    #dropdownMenu.visible .nav-item-m:nth-child(2) { animation-delay: 0.1s; }
-    #dropdownMenu.visible .nav-item-m:nth-child(3) { animation-delay: 0.15s; }
-    #dropdownMenu.visible .nav-item-m:nth-child(4) { animation-delay: 0.2s; }
-    #dropdownMenu.visible .nav-item-m:nth-child(5) { animation-delay: 0.25s; }
-    #dropdownMenu.visible .nav-item-m:nth-child(6) { animation-delay: 0.3s; }
-    #dropdownMenu.visible .nav-item-m:nth-child(7) { animation-delay: 0.35s; }
-
-    /* Responsive adjustments */
     @media (max-width: 380px) {
-        .animated-logo-text-m { 
-            font-size: 11px;
-        }
-        .glass-header-m { 
-            padding-left: 12px !important; 
-            padding-right: 12px !important;
-        }
-        .nav-item-m {
-            font-size: 1rem;
-            padding: 0.75rem 0.8rem;
-        }
-    }
-
-    @media (max-width: 320px) {
-        .animated-logo-text-m { 
-            font-size: 10px;
-        }
-        #menuToggleBtn {
-            width: 36px;
-            height: 36px;
-        }
-        .lang-btn-m {
-            width: 30px;
-            height: 18px;
-        }
-    }
-
-    /* Smooth scrolling for mobile */
-    #dropdownMenu {
-        scroll-behavior: smooth;
-    }
-
-    /* Prevent text selection on rapid taps */
-    .nav-item-m, .btn-contact-m, #menuToggleBtn {
-        -webkit-tap-highlight-color: transparent;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        user-select: none;
-    }
-
-    /* Loading shimmer animation */
-    @keyframes headerShimmer {
-        0% { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
-    }
-
-    .glass-header-m {
-        background-image: 
-            linear-gradient(135deg, rgba(2, 6, 23, 0.95), rgba(15, 23, 42, 0.9)),
-            linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.02) 50%, transparent 100%);
-        background-size: 100% 100%, 200% 100%;
-        animation: headerShimmer 3s ease-in-out;
-    }
-
-    /* Safe area padding for notched devices */
-    .glass-header-m {
-        padding-top: max(1rem, env(safe-area-inset-top));
-        padding-left: max(1rem, env(safe-area-inset-left));
-        padding-right: max(1rem, env(safe-area-inset-right));
-    }
-
-    #dropdownMenu {
-        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        .animated-logo-text-m { font-size: 11px; }
+        .glass-header-m { padding-left: 12px !important; padding-right: 12px !important; }
     }
 </style>
 
@@ -511,9 +117,6 @@
     function initNavigationM() {
         const path = window.location.pathname.split("/").pop() || 'index_m.html';
         const isContactPage = path === 'contact_m.html';
-        const menuBtn = document.getElementById('menuToggleBtn');
-        const dropdown = document.getElementById('dropdownMenu');
-        const menuIcon = document.getElementById('menuIcon');
 
         // 1. Contact 페이지인 경우에만 언어 스위처 노출
         const switcher = document.getElementById('langSwitcherM');
@@ -531,33 +134,6 @@
                 link.classList.add('active-m');
             }
         });
-
-        // 4. 메뉴 토글 기능
-        if (menuBtn && dropdown) {
-            menuBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isVisible = !dropdown.classList.contains('invisible');
-                
-                if (isVisible) {
-                    dropdown.classList.add('opacity-0', 'invisible', '-translate-y-5');
-                    dropdown.classList.remove('visible');
-                    if (menuIcon) menuIcon.innerText = "☰";
-                } else {
-                    dropdown.classList.remove('opacity-0', 'invisible', '-translate-y-5');
-                    dropdown.classList.add('opacity-100', 'visible', 'translate-y-0');
-                    if (menuIcon) menuIcon.innerText = "✕";
-                }
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
-                    dropdown.classList.add('opacity-0', 'invisible', '-translate-y-5');
-                    dropdown.classList.remove('visible');
-                    if (menuIcon) menuIcon.innerText = "☰";
-                }
-            });
-        }
     }
 
     // 관리자 인증 로직
@@ -615,9 +191,9 @@
                 </div>
             </div>
 
-            <a href="javascript:void(0)" onclick="openAdminAuth()" class="nav-item-m nav-item-admin-m">
-                Admin Access
-            </a>
+<a href="javascript:void(0)" onclick="openAdminAuth()" class="nav-item-m nav-item-admin-m" style="font-size:1.3rem;opacity:0.4;text-decoration:none;">
+    🛡️
+</a>
             
             <div class="pt-6">
                 <a href="contact_m.html" class="btn-contact-m w-full py-4 bg-cyan-400 text-black text-center font-black rounded-xl block shadow-[0_0_15px_rgba(34,211,238,0.4)] active:scale-[0.98] transition-transform">
