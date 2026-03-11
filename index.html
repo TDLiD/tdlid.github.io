@@ -18,7 +18,20 @@
         const firebaseConfig={apiKey:"AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs",authDomain:"tdlid-107669.firebaseapp.com",databaseURL:"https://tdlid-107669-default-rtdb.firebaseio.com",projectId:"tdlid-107669",storageBucket:"tdlid-107669.firebasestorage.app",messagingSenderId:"604782345004",appId:"1:604782345004:web:029aeaa81f4d11c2254a89"};
         if(typeof firebase!=='undefined'&&!firebase.apps.length){firebase.initializeApp(firebaseConfig)}
         const auth=firebase.auth(),database=firebase.database();
-        async function recordVisit(){try{let geoData={ip:"0.0.0.0",country:"Unknown",city:"Unknown"};try{const response=await fetch('https://ipapi.co/json/'),data=await response.json();geoData={ip:data.ip,country:data.country_name,city:data.city}}catch(e){console.error(e)}const ua=navigator.userAgent,now=new Date();database.ref('visits').push({timestamp:now.getTime(),timeStr:now.toLocaleString(),page:window.location.pathname.split('/').pop()||'index.html',ip:geoData.ip,country:geoData.country,city:geoData.city,device:/iPhone|iPad|iPod|Android/i.test(ua)?"Mobile":"PC",os:getOS(ua),browser:getBrowser(ua),sid:getSessionId(),referrer:document.referrer||"Direct"})}catch(e){console.error(e)}}
+        async function recordVisit(){try{let geoData={ip:"0.0.0.0",country:"Unknown",city:"Unknown"};
+
+try{
+    const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if(!isLocal){
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        geoData = {ip:data.ip, country:data.country_name, city:data.city};
+    }
+}catch(e){console.error(e)}
+
+const ua=navigator.userAgent,now=new Date();database.ref('visits').push({timestamp:now.getTime(),timeStr:now.toLocaleString(),page:window.location.pathname.split('/').pop()||'index.html',ip:geoData.ip,country:geoData.country,city:geoData.city,device:/iPhone|iPad|iPod|Android/i.test(ua)?"Mobile":"PC",os:getOS(ua),browser:getBrowser(ua),sid:getSessionId(),referrer:document.referrer||"Direct"})}catch(e){console.error(e)}}
+
+
         function getOS(ua){if(ua.indexOf("Windows")!==-1)return"Windows";if(ua.indexOf("Mac")!==-1)return"macOS";if(ua.indexOf("Android")!==-1)return"Android";if(ua.indexOf("iPhone")!==-1||ua.indexOf("iPad")!==-1)return"iOS";return"Unknown"}
         function getBrowser(ua){if(ua.indexOf("Edge")!==-1||ua.indexOf("Edg")!==-1)return"Edge";if(ua.indexOf("Chrome")!==-1)return"Chrome";if(ua.indexOf("Safari")!==-1)return"Safari";if(ua.indexOf("Firefox")!==-1)return"Firefox";return"Others"}
         function getSessionId(){if(!sessionStorage.getItem('session_id')){sessionStorage.setItem('session_id','s_'+Math.random().toString(36).substr(2,9))}return sessionStorage.getItem('session_id')}
