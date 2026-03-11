@@ -137,21 +137,15 @@
     }
 
     // 관리자 인증 로직
-    function openAdminAuth() {
-        const pw = prompt("Enter Administrator Password:");
-        if (!pw) return;
-        let db = (typeof database !== 'undefined') ? database : (typeof firebase !== 'undefined' ? firebase.database() : null);
-        if (db) {
-            db.ref('adminConfig/password').once('value').then((snapshot) => {
-                if (pw === snapshot.val()) {
-                    sessionStorage.setItem('isAdminAuthenticated', 'true');
-                    window.location.href = "admin.html";
-                } else {
-                    alert("Invalid Password.");
-                }
-            });
-        }
+function openAdminAuth() {
+    const modal = document.getElementById('adminAuthModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        const input = document.getElementById('adminPasswordInput');
+        if (input) { input.value = ''; input.focus(); }
+        document.body.style.overflow = 'hidden';
     }
+}
 
     // 초기화 실행
     if (document.readyState === 'complete') initNavigationM();
