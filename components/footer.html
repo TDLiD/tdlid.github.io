@@ -528,19 +528,23 @@
             </p>
         </div>
         
-        <div class="wa-contact-wrapper">
-            <div class="qr-container" onclick="window.open('https://wa.me/6281296075099','_blank')">
-                <img src="images/footer/qr.png" alt="QR" class="qr-image">
-            </div>
-            <a href="https://wa.me/6281296075099" target="_blank" class="wa-icon-link">
-                <img src="images/footer/whatsapp.png" alt="WA" class="wa-image">
-            </a>
-        </div>
+<div class="wa-contact-wrapper">
+    <div class="qr-container" onclick="window.open('https://wa.me/6281296075099','_blank')">
+        <img src="images/footer/qr.png" alt="QR" class="qr-image" style="width:60px; height:60px; object-fit:contain;">
+    </div>
+    <a href="https://wa.me/6281296075099" target="_blank" class="wa-icon-link">
+        <img src="images/footer/whatsapp.png" alt="WA" class="wa-image" style="width:60px; height:60px; object-fit:contain;">
+    </a>
+    <div class="qr-container" onclick="window.open('http://tdl.co.kr','_blank')" style="background:transparent;border-color:rgba(34,211,238,0.2);">
+        <img src="images/logo/logo-0.png" alt="TDL Korea" class="qr-image" style="width:60px; height:60px; object-fit:contain;">
+    </div>
+</div>
+
     </div>
 </footer>
 
 <script>
-// Create floating particles
+// 1. Floating particles
 (function() {
     const container = document.getElementById('footerParticles');
     if (container) {
@@ -555,7 +559,8 @@
     }
 })();
 
-// Original heart animation script
+
+// 3. Heart animation
 (function(){
     let isRunning=false;
     const trigger=document.getElementById('pcHeartTrigger');

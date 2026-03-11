@@ -1,603 +1,55 @@
 <style>
-    /* Enhanced mobile footer with maximum 3D effects */
-    footer {
-        background: linear-gradient(
-            to top,
-            rgba(2, 6, 23, 0.98),
-            rgba(15, 23, 42, 0.92),
-            rgba(2, 6, 23, 0.88)
-        ) !important;
-        backdrop-filter: blur(20px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-        border-top: 1px solid rgba(34, 211, 238, 0.4) !important;
-        position: relative !important;
-        overflow: hidden !important;
-        transform-style: preserve-3d;
-        box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.7),
-                    0 0 0 1px rgba(34, 211, 238, 0.1) inset;
-    }
-
-    /* Left gradient orb - Mobile optimized */
-    footer::before {
-        content: '';
-        position: absolute;
-        left: -20%;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 280px;
-        height: 280px;
-        background: radial-gradient(
-            circle,
-            rgba(34, 211, 238, 0.18) 0%,
-            rgba(59, 130, 246, 0.12) 30%,
-            transparent 70%
-        );
-        border-radius: 50%;
-        filter: blur(50px);
-        animation: floatLeftOrbM 18s ease-in-out infinite;
-        pointer-events: none;
-    }
-
-    @keyframes floatLeftOrbM {
-        0%, 100% {
-            transform: translateY(-50%) scale(1);
-            opacity: 0.7;
-        }
-        50% {
-            transform: translateY(-50%) translateX(25px) scale(1.15);
-            opacity: 0.9;
-        }
-    }
-
-    /* Right gradient orb - Mobile optimized */
-    footer::after {
-        content: '';
-        position: absolute;
-        right: -20%;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(
-            circle,
-            rgba(167, 139, 250, 0.18) 0%,
-            rgba(236, 72, 153, 0.12) 30%,
-            transparent 70%
-        );
-        border-radius: 50%;
-        filter: blur(50px);
-        animation: floatRightOrbM 16s ease-in-out infinite;
-        pointer-events: none;
-    }
-
-    @keyframes floatRightOrbM {
-        0%, 100% {
-            transform: translateY(-50%) scale(1);
-            opacity: 0.7;
-        }
-        50% {
-            transform: translateY(-50%) translateX(-25px) scale(1.12);
-            opacity: 0.9;
-        }
-    }
-
-    /* Rotating border effect */
-    .footer-border-m {
-        position: absolute;
-        inset: -2px;
-        background: conic-gradient(
-            from 0deg,
-            transparent,
-            rgba(34, 211, 238, 0.3),
-            transparent,
-            rgba(167, 139, 250, 0.25),
-            transparent
-        );
-        z-index: 0;
-        opacity: 0.5;
-        animation: rotateBorderM 10s linear infinite;
-        pointer-events: none;
-    }
-
-    @keyframes rotateBorderM {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    /* Top neon line effect */
-    .footer-neon-m {
-        position: absolute;
-        top: -1px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60%;
-        height: 2px;
-        background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(34, 211, 238, 0.5) 20%,
-            #22d3ee 50%,
-            rgba(34, 211, 238, 0.5) 80%,
-            transparent 100%
-        );
-        box-shadow: 0 0 20px #22d3ee,
-                    0 0 40px rgba(34, 211, 238, 0.5),
-                    0 3px 15px rgba(34, 211, 238, 0.3);
-        animation: neonPulseM 2.5s ease-in-out infinite;
-    }
-
-    @keyframes neonPulseM {
-        0%, 100% {
-            opacity: 0.8;
-            box-shadow: 0 0 20px #22d3ee,
-                        0 0 40px rgba(34, 211, 238, 0.5),
-                        0 3px 15px rgba(34, 211, 238, 0.3);
-        }
-        50% {
-            opacity: 1;
-            box-shadow: 0 0 30px #22d3ee,
-                        0 0 60px rgba(34, 211, 238, 0.7),
-                        0 5px 20px rgba(34, 211, 238, 0.5);
-        }
-    }
-
-    /* Scanline effect */
-    .footer-scanline-m {
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(34, 211, 238, 0.04) 50%,
-            transparent 100%
-        );
-        animation: scanlineM 6s linear infinite;
-        pointer-events: none;
-    }
-
-    @keyframes scanlineM {
-        0% { left: -100%; }
-        100% { left: 100%; }
-    }
-
-    /* Floating particles for mobile */
-    .footer-particles-m {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        overflow: hidden;
-        z-index: 1;
-    }
-
-    .footer-particle-m {
-        position: absolute;
-        width: 2px;
-        height: 2px;
-        background: rgba(34, 211, 238, 0.5);
-        border-radius: 50%;
-        animation: floatParticleM 12s infinite;
-        box-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
-    }
-
-    @keyframes floatParticleM {
-        0% {
-            transform: translateY(100%) translateX(0);
-            opacity: 0;
-        }
-        10% { opacity: 0.7; }
-        90% { opacity: 0.7; }
-        100% {
-            transform: translateY(-100%) translateX(40px);
-            opacity: 0;
-        }
-    }
-
-    /* Enhanced company name with 3D text */
-    #mobileHeartTrigger {
-        cursor: pointer !important;
-        -webkit-tap-highlight-color: transparent !important;
-        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1) !important;
-        position: relative;
-        display: inline-block;
-        text-shadow: 0 2px 10px rgba(34, 211, 238, 0.3);
-        transform-style: preserve-3d;
-        z-index: 10;
-    }
-
-    #mobileHeartTrigger::before {
-        content: 'TDL Energy Indonesia';
-        position: absolute;
-        left: 0;
-        top: 0;
-        z-index: -1;
-        color: #22d3ee;
-        text-shadow:
-            -1px -1px 0 rgba(34, 211, 238, 0.3),
-            1px 1px 0 rgba(34, 211, 238, 0.3),
-            2px 2px 8px rgba(34, 211, 238, 0.2);
-        opacity: 0;
-        transition: opacity 0.4s;
-    }
-
-    #mobileHeartTrigger:active {
-        transform: scale(0.95) translateZ(-5px);
-        text-shadow: 
-            0 0 20px rgba(34, 211, 238, 0.9),
-            0 0 40px rgba(34, 211, 238, 0.6);
-    }
-
-    #mobileHeartTrigger:active::before {
-        opacity: 1;
-    }
-
-    /* Enhanced PC version button with 3D */
-    footer a[href*="view_mode=pc"] {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.7)) !important;
-        border: 1px solid rgba(34, 211, 238, 0.5) !important;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4),
-                    0 0 20px rgba(34, 211, 238, 0.2);
-        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !important;
-        position: relative;
-        overflow: hidden;
-        transform-style: preserve-3d;
-    }
-
-    /* Button shimmer effect */
-    footer a[href*="view_mode=pc"]::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(
-            45deg,
-            transparent 30%,
-            rgba(255, 255, 255, 0.1) 50%,
-            transparent 70%
-        );
-        animation: shimmerBtnM 3s linear infinite;
-    }
-
-    @keyframes shimmerBtnM {
-        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-    }
-
-    footer a[href*="view_mode=pc"]:active {
-        transform: scale(0.96) translateY(2px) translateZ(-5px) !important;
-        background: linear-gradient(135deg, #22d3ee, #06b6d4) !important;
-        color: #000 !important;
-        border-color: transparent !important;
-        box-shadow: 0 2px 10px rgba(34, 211, 238, 0.6),
-                    0 0 30px rgba(34, 211, 238, 0.5);
-    }
-
-    /* Enhanced WhatsApp contact wrapper */
+    /* WhatsApp QR 스타일 */
     .wa-contact-wrapper-m {
         display: flex;
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        gap: 18px;
+        gap: 15px;
         margin-bottom: 2rem;
-        position: relative;
-        z-index: 10;
-        transform-style: preserve-3d;
-        perspective: 800px;
     }
 
-    /* Enhanced QR container with 3D card */
     .qr-container-m {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 240, 250, 0.92));
-        padding: 6px;
-        border-radius: 12px;
-        box-shadow: 
-            0 5px 20px rgba(34, 211, 238, 0.35),
-            0 0 0 1px rgba(34, 211, 238, 0.25),
-            0 8px 25px rgba(0, 0, 0, 0.25);
-        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-        position: relative;
-        overflow: hidden;
-        transform-style: preserve-3d;
-        border: 1px solid rgba(34, 211, 238, 0.3);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 4px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
     }
 
-    /* Shimmer effect on QR */
-    .qr-container-m::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(
-            45deg,
-            transparent 30%,
-            rgba(255, 255, 255, 0.6) 50%,
-            transparent 70%
-        );
-        transform: rotate(45deg);
-        animation: shimmerQRM 3s linear infinite;
-    }
-
-    @keyframes shimmerQRM {
-        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-    }
-
-    .qr-container-m:active {
-        transform: scale(1.05) translateY(-3px) rotateX(5deg);
-        background: linear-gradient(135deg, #ffffff, #f0f0fa);
-        box-shadow: 
-            0 8px 30px rgba(34, 211, 238, 0.5),
-            0 0 0 2px rgba(34, 211, 238, 0.4),
-            0 15px 45px rgba(0, 0, 0, 0.3);
-        border-color: #22d3ee;
-    }
-
-    /* Enhanced QR image */
     .qr-image-m {
         width: 48px;
         height: 48px;
         display: block;
         object-fit: contain;
-        position: relative;
-        z-index: 1;
-        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
-        transition: filter 0.3s;
     }
 
-    .qr-container-m:active .qr-image-m {
-        filter: drop-shadow(0 4px 12px rgba(34, 211, 238, 0.4));
-    }
-
-    /* Enhanced WhatsApp icon link */
-    .wa-contact-wrapper-m a {
-        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-        display: flex;
-        align-items: center;
-        position: relative;
-        transform-style: preserve-3d;
-        filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
-    }
-
-    /* Glow effect behind WhatsApp */
-    .wa-contact-wrapper-m a::before {
-        content: '';
-        position: absolute;
-        inset: -10px;
-        background: radial-gradient(circle, rgba(37, 211, 102, 0.3), transparent);
-        border-radius: 50%;
-        opacity: 0;
-        transition: opacity 0.4s;
-    }
-
-    .wa-contact-wrapper-m a:active {
-        transform: scale(1.1) translateY(-3px) rotateZ(-5deg);
-        filter: drop-shadow(0 8px 25px rgba(37, 211, 102, 0.6));
-    }
-
-    .wa-contact-wrapper-m a:active::before {
-        opacity: 1;
-        animation: pulseGlowM 1s ease-in-out infinite;
-    }
-
-    @keyframes pulseGlowM {
-        0%, 100% { transform: scale(1); opacity: 0.6; }
-        50% { transform: scale(1.15); opacity: 0.9; }
-    }
-
-    /* Enhanced WhatsApp image */
     .wa-image-m {
         width: 32px;
         height: 32px;
         object-fit: contain;
-        transition: transform 0.5s;
     }
 
-    .wa-contact-wrapper-m a:active .wa-image-m {
-        transform: rotateY(360deg);
-    }
-
-    /* Enhanced BGM button with 3D */
+    /* BGM 버튼 스타일 */
     #musicToggleBtn {
-        position: fixed !important;
-        bottom: 25px !important;
-        right: 25px !important;
-        z-index: 10005 !important;
-        width: 44px !important;
-        height: 44px !important;
-        background: linear-gradient(135deg, rgba(23, 23, 23, 0.9), rgba(40, 40, 45, 0.85)) !important;
-        border: 1px solid rgba(34, 211, 238, 0.5) !important;
-        border-radius: 50% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        cursor: pointer !important;
-        color: #22d3ee !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5),
-                    0 0 20px rgba(34, 211, 238, 0.3);
-        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-        transform-style: preserve-3d;
-    }
-
-    /* Rotating border on music button */
-    #musicToggleBtn::before {
-        content: '';
-        position: absolute;
-        inset: -2px;
-        background: conic-gradient(
-            from 0deg,
-            transparent,
-            rgba(34, 211, 238, 0.5),
-            transparent
-        );
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        z-index: 10005;
+        width: 44px;
+        height: 44px;
+        background: rgba(23, 23, 23, 0.8);
+        border: 1px solid rgba(34, 211, 238, 0.4);
         border-radius: 50%;
-        z-index: -1;
-        opacity: 0;
-        animation: rotateMusicBtn 2s linear infinite;
-    }
-
-    @keyframes rotateMusicBtn {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    #musicToggleBtn:active {
-        transform: scale(0.9) translateZ(-5px);
-        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.6),
-                    0 0 30px rgba(34, 211, 238, 0.5);
-    }
-
-    #musicToggleBtn:active::before {
-        opacity: 1;
-    }
-
-    /* Music icon animation */
-    #musicIconUI {
-        font-size: 20px;
-        transition: all 0.3s;
-        filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.5));
-    }
-
-    #musicToggleBtn:active #musicIconUI {
-        transform: scale(1.2) rotate(15deg);
-    }
-
-    /* Copyright text with gradient */
-    footer .text-neutral-600 {
-        background: linear-gradient(90deg, #4b5563, #6b7280, #4b5563);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: gradientShiftM 4s ease infinite;
-    }
-
-    @keyframes gradientShiftM {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-    }
-
-    /* Footer content container */
-    footer > div {
-        position: relative;
-        z-index: 2;
-    }
-
-    /* Entrance animations */
-    @keyframes footerFadeInM {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    footer > div > * {
-        animation: footerFadeInM 0.6s ease-out forwards;
-    }
-
-    footer > div > *:nth-child(1) { animation-delay: 0.1s; }
-    footer > div > *:nth-child(2) { animation-delay: 0.2s; }
-    footer > div > *:nth-child(3) { animation-delay: 0.3s; }
-    footer > div > *:nth-child(4) { animation-delay: 0.4s; }
-
-    /* Tagline text enhancement */
-    footer .text-neutral-500 {
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Small screens optimization */
-    @media (max-width: 380px) {
-        footer::before,
-        footer::after {
-            width: 220px;
-            height: 220px;
-        }
-        
-        .qr-image-m {
-            width: 42px;
-            height: 42px;
-        }
-        
-        .wa-image-m {
-            width: 28px;
-            height: 28px;
-        }
-        
-        #musicToggleBtn {
-            width: 40px !important;
-            height: 40px !important;
-            bottom: 20px !important;
-            right: 20px !important;
-        }
-        
-        .footer-neon-m {
-            width: 50%;
-        }
-    }
-
-    @media (max-width: 320px) {
-        footer::before,
-        footer::after {
-            width: 180px;
-            height: 180px;
-        }
-        
-        .qr-image-m {
-            width: 38px;
-            height: 38px;
-        }
-        
-        .wa-image-m {
-            width: 26px;
-            height: 26px;
-        }
-        
-        .wa-contact-wrapper-m {
-            gap: 12px;
-        }
-    }
-
-    /* Safe area support for devices with notches */
-    footer {
-        padding-bottom: max(3rem, env(safe-area-inset-bottom)) !important;
-    }
-
-    #musicToggleBtn {
-        bottom: max(25px, calc(env(safe-area-inset-bottom) + 10px)) !important;
-        right: max(25px, calc(env(safe-area-inset-right) + 10px)) !important;
-    }
-
-    /* Touch feedback improvements */
-    .qr-container-m,
-    .wa-contact-wrapper-m a,
-    #mobileHeartTrigger,
-    #musicToggleBtn,
-    footer a[href*="view_mode=pc"] {
-        -webkit-tap-highlight-color: transparent;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #22d3ee;
+        backdrop-filter: blur(4px);
     }
 </style>
 
 <footer class="bg-[#020617] py-12 px-6 border-t border-cyan-900/30 text-center">
-    <div class="footer-border-m"></div>
-    <div class="footer-particles-m" id="footerParticlesM"></div>
-    <div class="footer-scanline-m"></div>
-    <div class="footer-neon-m"></div>
-    
     <div class="mb-8">
         <p id="mobileHeartTrigger" class="text-cyan-400 font-bold text-sm mb-2"
             style="cursor: pointer; -webkit-tap-highlight-color: transparent;">TDL Energy Indonesia</p>
@@ -611,14 +63,17 @@
         </a>
     </div>
 
-    <div class="wa-contact-wrapper-m">
-        <div class="qr-container-m" onclick="window.open('https://wa.me/6281296075099', '_blank')">
-            <img src="images/footer/qr.png" alt="WhatsApp QR" class="qr-image-m">
-        </div>
-        <a href="https://wa.me/6281296075099" target="_blank">
-            <img src="images/footer/whatsapp.png" alt="WhatsApp" class="wa-image-m">
-        </a>
+<div class="wa-contact-wrapper-m">
+    <div class="qr-container-m" onclick="window.open('https://wa.me/6281296075099', '_blank')">
+        <img src="images/footer/qr.png" alt="WhatsApp QR" class="qr-image-m" style="width:48px; height:48px; object-fit:contain;">
     </div>
+    <a href="https://wa.me/6281296075099" target="_blank">
+        <img src="images/footer/whatsapp.png" alt="WhatsApp" class="wa-image-m" style="width:48px; height:48px; object-fit:contain;">
+    </a>
+    <div class="qr-container" onclick="window.open('http://tdl.co.kr','_blank')" style="background:transparent;border-color:rgba(34,211,238,0.2);">
+        <img src="images/logo/logo-0.png" alt="TDL Korea" class="qr-image" style="width:48px; height:48px; object-fit:contain;">
+    </div>
+</div>
 
     <div class="text-[10px] text-neutral-600 uppercase tracking-widest space-y-1">
         <p>© 2025 TDL Energy Indonesia</p>
@@ -631,157 +86,141 @@
 </button>
 
 <script>
-// Create floating particles
-(function() {
-    const container = document.getElementById('footerParticlesM');
-    if (container) {
-        for (let i = 0; i < 15; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'footer-particle-m';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 12 + 's';
-            particle.style.animationDuration = (8 + Math.random() * 8) + 's';
-            container.appendChild(particle);
-        }
-    }
-})();
+    (function () {
+        /* --- 1. BGM 컨트롤 로직 --- */
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('musicToggleBtn');
+        const musicIcon = document.getElementById('musicIconUI');
 
-// Original functionality script
-(function () {
-    /* --- 1. BGM 컨트롤 로직 --- */
-    const bgm = document.getElementById('bgm');
-    const musicBtn = document.getElementById('musicToggleBtn');
-    const musicIcon = document.getElementById('musicIconUI');
+        const savedTime = sessionStorage.getItem('bgmTime');
+        const isMuted = sessionStorage.getItem('bgmMuted') !== 'false';
 
-    const savedTime = sessionStorage.getItem('bgmTime');
-    const isMuted = sessionStorage.getItem('bgmMuted') !== 'false';
+        if (savedTime) bgm.currentTime = parseFloat(savedTime);
+        bgm.muted = isMuted;
+        musicIcon.innerText = isMuted ? "🔇" : "🎵";
 
-    if (savedTime) bgm.currentTime = parseFloat(savedTime);
-    bgm.muted = isMuted;
-    musicIcon.innerText = isMuted ? "🔇" : "🎵";
-
-    const playBGM = () => {
-        bgm.play().then(() => {
-            if (!bgm.muted) musicIcon.innerText = "🎵";
-            document.removeEventListener('touchstart', playBGM);
-            document.removeEventListener('click', playBGM);
-        }).catch(e => console.log("Interaction required"));
-    };
-
-    document.addEventListener('touchstart', playBGM);
-    document.addEventListener('click', playBGM);
-
-    musicBtn.onclick = (e) => {
-        e.stopPropagation();
-        if (bgm.muted || bgm.paused) {
-            bgm.muted = false;
-            bgm.play();
-            musicIcon.innerText = "🎵";
-            sessionStorage.setItem('bgmMuted', 'false');
-        } else {
-            bgm.muted = true;
-            musicIcon.innerText = "🔇";
-            sessionStorage.setItem('bgmMuted', 'true');
-        }
-    };
-
-    setInterval(() => {
-        if (!bgm.paused) {
-            sessionStorage.setItem('bgmTime', bgm.currentTime);
-        }
-    }, 500);
-
-
-    /* --- 2. 하트 이스터에그 로직 (수정됨: TDLiD -> BIG HEART) --- */
-    let isHeartRunning = false;
-    const trigger = document.getElementById('mobileHeartTrigger');
-
-    // TDLiD 좌표 데이터 (원본 기반)
-    const points = [
-        // T
-        { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 1 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 1, y: 4 },
-        // D
-        { x: 3.5, y: 0 }, { x: 3.5, y: 1 }, { x: 3.5, y: 2 }, { x: 3.5, y: 3 }, { x: 3.5, y: 4 }, { x: 4.5, y: 0 }, { x: 5.5, y: 1 }, { x: 5.5, y: 2 }, { x: 5.5, y: 3 }, { x: 4.5, y: 4 },
-        // L
-        { x: 7, y: 0 }, { x: 7, y: 1 }, { x: 7, y: 2 }, { x: 7, y: 3 }, { x: 7, y: 4 }, { x: 8, y: 4 }, { x: 9, y: 4 },
-        // i
-        { x: 10.5, y: 0.5 }, { x: 10.5, y: 2 }, { x: 10.5, y: 3 }, { x: 10.5, y: 4 },
-        // D
-        { x: 12, y: 0 }, { x: 12, y: 1 }, { x: 12, y: 2 }, { x: 12, y: 3 }, { x: 12, y: 4 }, { x: 13, y: 0 }, { x: 14, y: 1 }, { x: 14, y: 2 }, { x: 14, y: 3 }, { x: 13, y: 4 }
-    ];
-
-    if (trigger) {
-        trigger.onclick = (e) => {
-            e.preventDefault();
-            if (isHeartRunning) return;
-            isHeartRunning = true;
-
-            if (navigator.vibrate) navigator.vibrate(50);
-
-            const hearts = [];
-            const sw = window.innerWidth;
-            const sh = window.innerHeight;
-
-            // [단계 A] 생성 및 랜덤 배치
-            points.forEach((p, i) => {
-                const heart = document.createElement('div');
-                heart.innerHTML = '❤️';
-                heart.style.cssText = `
-                position: fixed; left: ${Math.random() * 100}vw; top: ${Math.random() * 100}vh;
-                font-size: 18px; z-index: 99999; opacity: 0;
-                pointer-events: none; transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
-            `;
-                document.body.appendChild(heart);
-                hearts.push({ el: heart, target: p });
-
-                setTimeout(() => { heart.style.opacity = '1'; }, i * 10);
-            });
-
-            // [단계 B] TDLiD 형성
-            setTimeout(() => {
-                const fontSize = Math.min(sw / 18, 30); // 모바일용 폰트 사이즈 조정
-                const totalWidth = 14 * fontSize;
-                const startX = (sw - totalWidth) / 2;
-                const startY = (sh / 2) - (2 * fontSize);
-
-                hearts.forEach((obj) => {
-                    obj.el.style.transition = "all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)";
-                    obj.el.style.left = (startX + obj.target.x * fontSize) + 'px';
-                    obj.el.style.top = (startY + obj.target.y * fontSize) + 'px';
-                    obj.el.style.transform = `scale(1.2)`;
-                });
-            }, 1200);
-
-            // [단계 C] 커다란 하트로 재집결
-            setTimeout(() => {
-                const centerX = sw / 2;
-                const centerY = sh / 2;
-                const heartScale = Math.min(sw, sh) / 28; // 모바일 화면에 맞춘 하트 크기
-
-                hearts.forEach((obj, i) => {
-                    const t = (i / hearts.length) * 2 * Math.PI;
-                    const hx = 16 * Math.pow(Math.sin(t), 3);
-                    const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-
-                    obj.el.style.transition = "all 2s cubic-bezier(0.25, 1, 0.5, 1)";
-                    obj.el.style.left = (centerX + hx * heartScale) + 'px';
-                    obj.el.style.top = (centerY + hy * heartScale) + 'px';
-                    obj.el.style.transform = `scale(1.8) rotate(${(Math.random() - 0.5) * 20}deg)`;
-                    obj.el.style.textShadow = "0 0 15px rgba(255, 0, 0, 0.7)";
-                });
-            }, 4500);
-
-            // [단계 D] 흩어지며 제거
-            setTimeout(() => {
-                hearts.forEach(obj => {
-                    obj.el.style.transition = "all 1.5s ease-in";
-                    obj.el.style.opacity = '0';
-                    obj.el.style.transform = `translate(${(Math.random() - 0.5) * 300}px, ${(Math.random() - 0.5) * 300}px) scale(0)`;
-                    setTimeout(() => obj.el.remove(), 1500);
-                });
-                isHeartRunning = false;
-            }, 8000);
+        const playBGM = () => {
+            bgm.play().then(() => {
+                if (!bgm.muted) musicIcon.innerText = "🎵";
+                document.removeEventListener('touchstart', playBGM);
+                document.removeEventListener('click', playBGM);
+            }).catch(e => console.log("Interaction required"));
         };
-    }
-})();
+
+        document.addEventListener('touchstart', playBGM);
+        document.addEventListener('click', playBGM);
+
+        musicBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (bgm.muted || bgm.paused) {
+                bgm.muted = false;
+                bgm.play();
+                musicIcon.innerText = "🎵";
+                sessionStorage.setItem('bgmMuted', 'false');
+            } else {
+                bgm.muted = true;
+                musicIcon.innerText = "🔇";
+                sessionStorage.setItem('bgmMuted', 'true');
+            }
+        };
+
+        setInterval(() => {
+            if (!bgm.paused) {
+                sessionStorage.setItem('bgmTime', bgm.currentTime);
+            }
+        }, 500);
+
+
+        /* --- 2. 하트 이스터에그 로직 (수정됨: TDLiD -> BIG HEART) --- */
+        let isHeartRunning = false;
+        const trigger = document.getElementById('mobileHeartTrigger');
+
+        // TDLiD 좌표 데이터 (원본 기반)
+        const points = [
+            // T
+            { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 1 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 1, y: 4 },
+            // D
+            { x: 3.5, y: 0 }, { x: 3.5, y: 1 }, { x: 3.5, y: 2 }, { x: 3.5, y: 3 }, { x: 3.5, y: 4 }, { x: 4.5, y: 0 }, { x: 5.5, y: 1 }, { x: 5.5, y: 2 }, { x: 5.5, y: 3 }, { x: 4.5, y: 4 },
+            // L
+            { x: 7, y: 0 }, { x: 7, y: 1 }, { x: 7, y: 2 }, { x: 7, y: 3 }, { x: 7, y: 4 }, { x: 8, y: 4 }, { x: 9, y: 4 },
+            // i
+            { x: 10.5, y: 0.5 }, { x: 10.5, y: 2 }, { x: 10.5, y: 3 }, { x: 10.5, y: 4 },
+            // D
+            { x: 12, y: 0 }, { x: 12, y: 1 }, { x: 12, y: 2 }, { x: 12, y: 3 }, { x: 12, y: 4 }, { x: 13, y: 0 }, { x: 14, y: 1 }, { x: 14, y: 2 }, { x: 14, y: 3 }, { x: 13, y: 4 }
+        ];
+
+        if (trigger) {
+            trigger.onclick = (e) => {
+                e.preventDefault();
+                if (isHeartRunning) return;
+                isHeartRunning = true;
+
+                if (navigator.vibrate) navigator.vibrate(50);
+
+                const hearts = [];
+                const sw = window.innerWidth;
+                const sh = window.innerHeight;
+
+                // [단계 A] 생성 및 랜덤 배치
+                points.forEach((p, i) => {
+                    const heart = document.createElement('div');
+                    heart.innerHTML = '❤️';
+                    heart.style.cssText = `
+                    position: fixed; left: ${Math.random() * 100}vw; top: ${Math.random() * 100}vh;
+                    font-size: 18px; z-index: 99999; opacity: 0;
+                    pointer-events: none; transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+                `;
+                    document.body.appendChild(heart);
+                    hearts.push({ el: heart, target: p });
+
+                    setTimeout(() => { heart.style.opacity = '1'; }, i * 10);
+                });
+
+                // [단계 B] TDLiD 형성
+                setTimeout(() => {
+                    const fontSize = Math.min(sw / 18, 30); // 모바일용 폰트 사이즈 조정
+                    const totalWidth = 14 * fontSize;
+                    const startX = (sw - totalWidth) / 2;
+                    const startY = (sh / 2) - (2 * fontSize);
+
+                    hearts.forEach((obj) => {
+                        obj.el.style.transition = "all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)";
+                        obj.el.style.left = (startX + obj.target.x * fontSize) + 'px';
+                        obj.el.style.top = (startY + obj.target.y * fontSize) + 'px';
+                        obj.el.style.transform = `scale(1.2)`;
+                    });
+                }, 1200);
+
+                // [단계 C] 커다란 하트로 재집결
+                setTimeout(() => {
+                    const centerX = sw / 2;
+                    const centerY = sh / 2;
+                    const heartScale = Math.min(sw, sh) / 28; // 모바일 화면에 맞춘 하트 크기
+
+                    hearts.forEach((obj, i) => {
+                        const t = (i / hearts.length) * 2 * Math.PI;
+                        const hx = 16 * Math.pow(Math.sin(t), 3);
+                        const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+                        obj.el.style.transition = "all 2s cubic-bezier(0.25, 1, 0.5, 1)";
+                        obj.el.style.left = (centerX + hx * heartScale) + 'px';
+                        obj.el.style.top = (centerY + hy * heartScale) + 'px';
+                        obj.el.style.transform = `scale(1.8) rotate(${(Math.random() - 0.5) * 20}deg)`;
+                        obj.el.style.textShadow = "0 0 15px rgba(255, 0, 0, 0.7)";
+                    });
+                }, 4500);
+
+                // [단계 D] 흩어지며 제거
+                setTimeout(() => {
+                    hearts.forEach(obj => {
+                        obj.el.style.transition = "all 1.5s ease-in";
+                        obj.el.style.opacity = '0';
+                        obj.el.style.transform = `translate(${(Math.random() - 0.5) * 300}px, ${(Math.random() - 0.5) * 300}px) scale(0)`;
+                        setTimeout(() => obj.el.remove(), 1500);
+                    });
+                    isHeartRunning = false;
+                }, 8000);
+            };
+        }
+    })();
 </script>
