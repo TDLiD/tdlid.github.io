@@ -222,5 +222,20 @@
                 }, 8000);
             };
         }
+/* --- 3. Load WhatsApp number from Firebase --- */
+try {
+    firebase.database().ref('siteSettings/whatsapp').once('value').then(snap => {
+        if (!snap.exists()) return;
+        const number = snap.val();
+        const waUrl = 'https://wa.me/' + number;
+
+        const qrDiv = document.querySelector('.qr-container-m');
+        if (qrDiv) qrDiv.setAttribute('onclick', `window.open('${waUrl}','_blank')`);
+
+        const waLink = document.querySelector('a[href*="wa.me"]');
+        if (waLink) waLink.setAttribute('href', waUrl);
+    });
+} catch(e) { console.error('WA load error:', e); }
+
     })();
 </script>

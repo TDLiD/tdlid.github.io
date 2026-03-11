@@ -559,6 +559,25 @@
     }
 })();
 
+// 2. Load WhatsApp number from Firebase
+(function() {
+    try {
+        const waRef = firebase.database().ref('siteSettings/whatsapp');
+        waRef.once('value').then(snap => {
+            if (!snap.exists()) return;
+            const number = snap.val();
+            const waUrl = 'https://wa.me/' + number;
+
+            // QR 컨테이너
+            const qrDiv = document.querySelector('.qr-container[onclick*="wa.me"]');
+            if (qrDiv) qrDiv.setAttribute('onclick', `window.open('${waUrl}','_blank')`);
+
+            // WA 아이콘 링크
+            const waLink = document.querySelector('.wa-icon-link');
+            if (waLink) waLink.setAttribute('href', waUrl);
+        });
+    } catch(e) { console.error('WA load error:', e); }
+})();
 
 // 3. Heart animation
 (function(){
