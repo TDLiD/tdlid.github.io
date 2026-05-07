@@ -642,6 +642,29 @@ const ua=navigator.userAgent,now=new Date();database.ref('visits').push({timesta
     @media (max-width: 1280px) {
         .hero-content { padding: 0 clamp(40px, 6vw, 100px); }
     }
+/* ── Floating bike animation ──────────────────────────── */
+.bike-float-container {
+    position: absolute;
+    bottom: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 8;
+    pointer-events: none;
+}
+
+.bike-float-img {
+    height: clamp(280px, 35vw, 480px);
+    object-fit: contain;
+    filter: drop-shadow(0 20px 60px rgba(34,211,238,0.15));
+    animation: bike-sway 4s ease-in-out infinite;
+}
+
+@keyframes bike-sway {
+    0%, 100% { transform: translateX(0) rotateZ(-2deg); }
+    25%      { transform: translateX(clamp(40px, 8vw, 120px)) rotateZ(1deg); }
+    50%      { transform: translateX(0) rotateZ(-2deg); }
+    75%      { transform: translateX(clamp(-40px, -8vw, -120px)) rotateZ(-1deg); }
+}
     </style>
 </head>
 
@@ -721,6 +744,11 @@ const ua=navigator.userAgent,now=new Date();database.ref('visits').push({timesta
                     renewable energy-related businesses in Indonesia.
                 </p>
             </div>
+
+<!-- Animated bike GIF with side-to-side motion (weekday-based) -->
+<div class="bike-float-container">
+    <img id="weekday-bike" src="images/bg/bike1.gif" alt="Electric Bike" class="bike-float-img">
+</div>
 
             <!-- Scroll indicator -->
             <div class="hero-scroll-hint">
@@ -852,6 +880,23 @@ const ua=navigator.userAgent,now=new Date();database.ref('visits').push({timesta
         function initNavigation() { const btn = document.getElementById("menuToggleBtn"), menu = document.getElementById("dropdownMenu"), icon = document.getElementById("menuIcon"); if (btn && menu) btn.onclick = (e) => { e.stopPropagation(); const isOpen = menu.classList.contains("visible"); menu.classList.toggle("opacity-100", !isOpen); menu.classList.toggle("visible", !isOpen); menu.classList.toggle("translate-y-2", !isOpen); menu.classList.toggle("opacity-0", isOpen); menu.classList.toggle("invisible", isOpen); icon.innerText = isOpen ? "☰" : "✕"; }; }
 
         document.addEventListener("DOMContentLoaded", () => {
+
+/* Weekday bike selector */
+function setWeekdayBike() {
+    const day = new Date().getDay(); // 0=일, 1=월, 2=화, ..., 6=토
+    const bikeImg = document.getElementById('weekday-bike');
+    if (!bikeImg) return;
+    
+    // 월~금만 (1~5), 토일(0,6)은 기본값 유지
+    if (day >= 1 && day <= 5) {
+        bikeImg.src = `images/bg/bike${day}.gif`;
+    } else {
+        // 토요일, 일요일 - 선택사항 (예: bike1.gif 반복)
+        bikeImg.src = 'images/bg/bike6.gif';
+    }
+}
+setWeekdayBike();
+
             initStars();
             initAiSimulation();
             initFluid();
