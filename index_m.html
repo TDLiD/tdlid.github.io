@@ -4,12 +4,21 @@
 <meta charset="UTF-8">
 <meta name="description" id="metaDescription" content="">
 <meta name="keywords" id="metaKeywords" content="">
+
+<!-- ════ DAY THEME — set BEFORE paint to avoid FOUC ════ -->
+<script>
+    (function(){
+        var d = new Date().getDay();
+        var map = {0:7,1:1,2:2,3:3,4:4,5:5,6:6}; // Mon=1..Sun=7
+        document.documentElement.setAttribute('data-day', map[d]);
+    })();
+</script>
+
 <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- 필요한 weight만 명시적 요청 — 불필요한 variant 제거 -->
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@800&family=Space+Mono:wght@400&family=Pretendard:wght@300;400;600&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -67,42 +76,54 @@ recordVisit();
 
 <style>
 /* ══════════════════════════════════════════════
-   TDL ENERGY MOBILE — CPU-Optimized Design System
-   모든 기능 유지 + 모바일 성능 최적화
+   TDL ENERGY MOBILE — Day-of-Week 3D Edition (v2)
+   CPU 최소화: canvas 입자 시뮬레이션 완전 제거,
+   DOM 별 노드 0개, gyro는 이벤트 기반(루프 없음).
+   모든 기능 100% 유지.
 ══════════════════════════════════════════════ */
 :root {
     --cy:   #22d3ee;
     --lime: #a3e635;
     --b2:   rgba(34,211,238,0.2);
+    --glow: rgba(34,211,238,0.3);
     --bg2:  #061318;
-    /* Safe area for notch/home indicator */
     --sat: env(safe-area-inset-top, 0px);
     --sab: env(safe-area-inset-bottom, 0px);
+    --tiltX: 0deg;
+    --tiltY: 0deg;
 }
 
-/* Reduced motion: 모든 애니메이션 OFF */
+/* ═══════════ DAY-OF-WEEK 3D THEME TOKENS ═══════════
+   1 Mon Deep Space/Cyberpunk(cyan) · 2 Tue Ink Wabi-Sabi(gold)
+   3 Wed Art Deco Vault(olive/champagne) · 4 Thu Biophilic Terra(green)
+   5 Fri Synthwave(magenta) · 6 Sat Arctic Glacial(steel blue)
+   7 Sun Sunset Ember(rose/amber)
+═════════════════════════════════════════════════════ */
+[data-day="1"]{--cy:#22d3ee;--lime:#67e8f9;--b2:rgba(34,211,238,0.24);--glow:rgba(34,211,238,0.32);--day-name:"CYBERPUNK · MON";}
+[data-day="2"]{--cy:#d4af6a;--lime:#f3e0b3;--b2:rgba(212,175,106,0.24);--glow:rgba(212,175,106,0.3);--day-name:"INK WABI-SABI · TUE";}
+[data-day="3"]{--cy:#c9b06a;--lime:#8a9a5b;--b2:rgba(201,176,106,0.24);--glow:rgba(201,176,106,0.3);--day-name:"ART DECO VAULT · WED";}
+[data-day="4"]{--cy:#3fae6a;--lime:#9bd66e;--b2:rgba(63,174,106,0.24);--glow:rgba(63,174,106,0.3);--day-name:"BIOPHILIC TERRA · THU";}
+[data-day="5"]{--cy:#ff3fb0;--lime:#7df9ff;--b2:rgba(255,63,176,0.28);--glow:rgba(255,63,176,0.34);--day-name:"VAPORWAVE · FRI";}
+[data-day="6"]{--cy:#5aa9e6;--lime:#bfe3ff;--b2:rgba(90,169,230,0.24);--glow:rgba(90,169,230,0.3);--day-name:"ARCTIC GLACIAL · SAT";}
+[data-day="7"]{--cy:#ff7a45;--lime:#ffd166;--b2:rgba(255,122,69,0.28);--glow:rgba(255,122,69,0.34);--day-name:"SUNSET EMBER · SUN";}
+
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-    #fluid-canvas { display: none !important; }
 }
 
-/* ── Base ─────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
-    /* perspective는 GPU 합성 레이어를 강제 생성해 모바일 battery 소모 증가.
-       모바일에서는 제거, 3D 효과는 필요 요소에만 transform-style 적용 */
     background: #030a0d;
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
-    overscroll-behavior-y: none; /* iOS 고무줄 스크롤 억제 */
+    overscroll-behavior-y: none;
 }
 
-/* Noise grain — CSS only, zero JS */
 body::before {
     content: '';
     position: fixed; inset: 0; z-index: 1;
@@ -110,7 +131,6 @@ body::before {
     opacity: 0.02; pointer-events: none;
 }
 
-/* ── Page reveal ──────────────────────────── */
 #page-reveal-overlay {
     position: fixed; inset: 0;
     background: linear-gradient(135deg, #000 0%, #020c10 100%);
@@ -121,7 +141,6 @@ body::before {
 }
 #page-reveal-overlay.active { transform: translateX(-100%); }
 
-/* ── Popup & banner ───────────────────────── */
 #emergencyBanner {
     display: none; background: #ef4444; color: white;
     text-align: center; padding: 10px 15px; font-weight: bold;
@@ -143,13 +162,12 @@ body::before {
     padding: clamp(18px, 5vw, 28px) clamp(16px, 4.5vw, 24px);
     border-radius: 20px; width: min(90vw, 340px);
     text-align: center; max-height: 80svh; overflow-y: auto;
-    box-shadow: 0 0 30px rgba(34,211,238,0.2);
+    box-shadow: 0 0 30px var(--glow);
 }
 #popupText { text-align: left; font-size: 14px; color: #d1d5db; }
 .popup-box::-webkit-scrollbar { width: 4px; }
 .popup-box::-webkit-scrollbar-thumb { background: var(--cy); border-radius: 10px; }
 
-/* Popup effects — 원본 그대로 */
 @keyframes cleavageIn { 0%{clip-path:polygon(0 0,100% 0,100% 0,0 0,0 100%,100% 100%,100% 100%,0 100%);opacity:0} 100%{clip-path:polygon(0 0,100% 0,100% 50%,0 50%,0 50%,100% 50%,100% 100%,0 100%);opacity:1} }
 @keyframes waveIn { 0%{transform:scale(0.8) translateY(20px);opacity:0;filter:blur(10px)} 50%{transform:scale(1.05) translateY(-5px);filter:blur(2px)} 100%{transform:scale(1) translateY(0);opacity:1;filter:blur(0)} }
 @keyframes rotateIn { 0%{transform:rotate(-360deg) scale(0);opacity:0} 100%{transform:rotate(0deg) scale(1);opacity:1} }
@@ -162,11 +180,7 @@ body::before {
 .effect-classic  { animation: fadeIn 0.4s ease-in forwards }
 .popup-exit-active { opacity: 0; transform: scale(0.9); transition: all 0.5s ease-in; }
 
-/* ── Header placeholder ───────────────────── */
-#header-placeholder {
-    position: fixed; top: 0; left: 0; width: 100%;
-    z-index: 10001;
-}
+#header-placeholder { position: fixed; top: 0; left: 0; width: 100%; z-index: 10001; }
 
 /* ── Hero ─────────────────────────────────── */
 .hero-section {
@@ -175,17 +189,15 @@ body::before {
     overflow: hidden;
     display: flex; align-items: center; justify-content: center;
     z-index: 1; background: #000;
+    perspective: 900px;
 }
 
-.video-bg-container {
-    position: absolute; inset: 0; z-index: 0;
-}
+.video-bg-container { position: absolute; inset: 0; z-index: 0; }
 .video-overlay {
     position: absolute; inset: 0;
     background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
     z-index: 1;
 }
-/* Hero background image */
 .slide {
     position: absolute; inset: 0; width: 100%; height: 100%;
     object-fit: cover; opacity: 0;
@@ -195,18 +207,20 @@ body::before {
 .slide.active { opacity: 1; z-index: 1; }
 .slide.exit   { opacity: 0; z-index: 0; }
 
-/* Hero content */
+/* Hero content — tilts via CSS var set by gyro/touch, NOT a perpetual loop */
 .hero-content {
     position: relative; z-index: 10;
     width: 100%; padding: 0 clamp(16px, 5vw, 28px);
     text-align: center;
+    transform: rotateY(var(--tiltY)) rotateX(var(--tiltX));
+    transition: transform 0.2s ease-out;
+    transform-style: preserve-3d;
 }
 
-/* AI tag */
 .sys-tag {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 5px clamp(12px, 4vw, 18px);
-    background: rgba(34,211,238,0.05);
+    background: color-mix(in srgb, var(--cy) 5%, transparent);
     border: 1px solid var(--b2); border-radius: 100px;
     font-size: clamp(9px, 2.5vw, 11px); color: var(--cy);
     letter-spacing: 0.1em; margin-bottom: clamp(12px, 3.5vw, 18px);
@@ -218,12 +232,18 @@ body::before {
     animation: blink 1.5s ease-in-out infinite;
     will-change: opacity;
 }
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-/* Hero title */
+/* Day badge */
+.day-badge {
+    position: absolute; top: calc(10px + var(--sat)); left: 50%; transform: translateX(-50%);
+    z-index: 9; font-family: 'Space Mono', monospace; font-size: 9px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--cy); opacity: 0.55; pointer-events: none;
+}
+.day-badge::before { content: var(--day-name); }
+
+/* Hero title — 3D extrusion via layered text-shadow, color from day token */
 .hero-logo-gradient {
     font-family: 'Bebas Neue', sans-serif;
     font-size: clamp(2rem, 11vw, 3.2rem);
@@ -231,9 +251,10 @@ body::before {
     background: linear-gradient(180deg, #fff 0%, #94a3b8 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(0 0 20px rgba(34,211,238,0.3));
+    filter: drop-shadow(0 0 20px var(--glow)) drop-shadow(0 4px 0 rgba(0,0,0,0.5));
     animation: rise 1s cubic-bezier(0.16,1,0.3,1) both;
     margin-bottom: clamp(8px, 2.5vw, 14px);
+    transform: translateZ(24px);
 }
 .hero-slogan-gradient {
     font-family: 'Syne', sans-serif;
@@ -245,11 +266,9 @@ body::before {
     margin-bottom: clamp(16px, 4.5vw, 24px);
     opacity: 0;
     animation: rise 1s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
+    transform: translateZ(12px);
 }
-@keyframes rise {
-    from { transform: translateY(24px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
-}
+@keyframes rise { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .hero-description {
     font-size: clamp(0.78rem, 2.8vw, 0.95rem);
     line-height: 1.75; margin-top: clamp(16px, 4vw, 24px);
@@ -258,56 +277,57 @@ body::before {
     margin-left: auto; margin-right: auto;
 }
 
-/* ── 3D Star field ────────────────────────── */
+/* ── Star field: pure CSS box-shadow dots, zero DOM nodes ── */
 #bg-stars {
-    position: absolute; width: 120%; height: 120%;
-    top: -10%; left: -10%; z-index: 1;
+    position: absolute; width: 130%; height: 130%;
+    top: -15%; left: -15%; z-index: 1;
     transform-style: preserve-3d; pointer-events: none;
     will-change: transform;
+    transition: transform 0.25s ease-out;
 }
-.dot {
-    position: absolute; width: 1.5px; height: 1.5px;
-    background: white; border-radius: 50%; opacity: 0.2;
+#bg-stars::before {
+    content: ''; position: absolute; inset: 0;
+    width: 2px; height: 2px; border-radius: 50%;
+    /* box-shadow injected once by JS at load — zero ongoing cost */
 }
 
-/* ── Fluid canvas ─────────────────────────── */
-#fluid-canvas {
-    position: absolute; inset: 0; z-index: 2;
-    pointer-events: none; opacity: 0.25;
+/* Ambient ember glow — CSS-only, replaces canvas particle field */
+#ambient-glow {
+    position: absolute; inset: -20%; z-index: 2;
+    pointer-events: none; opacity: 0.45;
+    background:
+        radial-gradient(circle at 25% 30%, var(--glow) 0%, transparent 24%),
+        radial-gradient(circle at 75% 70%, var(--glow) 0%, transparent 22%);
+    filter: blur(30px);
+    animation: ambient-drift 14s ease-in-out infinite alternate;
+    will-change: transform;
 }
+@keyframes ambient-drift { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(3%, -2%) scale(1.06); } }
 
 /* ── Energy rings ─────────────────────────── */
 .energy-ring {
     position: absolute; border-radius: 50%;
     border: 1px solid transparent; pointer-events: none; z-index: 3;
-    /* opacity만 animate (transform 고정 → composite 최소화) */
     animation: ring-pulse 4s ease-in-out infinite;
     will-change: opacity;
 }
 .energy-ring:nth-child(1) {
     width: clamp(180px, 60vw, 280px); height: clamp(180px, 60vw, 280px);
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) rotateX(72deg);
-    border-color: rgba(34,211,238,0.12); animation-delay: 0s;
+    top: 50%; left: 50%; transform: translate(-50%, -50%) rotateX(72deg);
+    border-color: color-mix(in srgb, var(--cy) 12%, transparent); animation-delay: 0s;
 }
 .energy-ring:nth-child(2) {
     width: clamp(280px, 88vw, 420px); height: clamp(280px, 88vw, 420px);
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) rotateX(72deg);
-    border-color: rgba(34,211,238,0.07); animation-delay: -1.5s;
+    top: 50%; left: 50%; transform: translate(-50%, -50%) rotateX(72deg);
+    border-color: color-mix(in srgb, var(--cy) 7%, transparent); animation-delay: -1.5s;
 }
 .energy-ring:nth-child(3) {
     width: clamp(380px, 116vw, 560px); height: clamp(380px, 116vw, 560px);
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) rotateX(72deg);
-    border-color: rgba(34,211,238,0.04); animation-delay: -3s;
+    top: 50%; left: 50%; transform: translate(-50%, -50%) rotateX(72deg);
+    border-color: color-mix(in srgb, var(--cy) 4%, transparent); animation-delay: -3s;
 }
-@keyframes ring-pulse {
-    0%, 100% { opacity: 0.4; }
-    50%       { opacity: 1; }
-}
+@keyframes ring-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
-/* ── Scan beam ────────────────────────────── */
 .scan-beam {
     position: absolute; left: 0; right: 0; height: 1px; z-index: 6;
     background: linear-gradient(90deg, transparent, var(--cy), transparent);
@@ -315,14 +335,8 @@ body::before {
     animation: scan-v 10s ease-in-out infinite;
     will-change: top;
 }
-@keyframes scan-v {
-    0%  { top: 100%; opacity: 0; }
-    5%  { opacity: 0.2; }
-    95% { opacity: 0.1; }
-    100%{ top: -2%; opacity: 0; }
-}
+@keyframes scan-v { 0% { top: 100%; opacity: 0; } 5% { opacity: 0.2; } 95% { opacity: 0.1; } 100% { top: -2%; opacity: 0; } }
 
-/* ── HUD corners ──────────────────────────── */
 .hud-corner { position: absolute; width: 18px; height: 18px; z-index: 8; pointer-events: none; }
 .hud-corner::before, .hud-corner::after { content: ''; position: absolute; background: var(--cy); opacity: 0.35; }
 .hud-corner::before { width: 1px; height: 100%; }
@@ -332,13 +346,12 @@ body::before {
 .hud-bl { bottom: 58px; left: 14px; transform: scaleY(-1); }
 .hud-br { bottom: 58px; right: 14px; transform: scale(-1); }
 
-/* ── 3D Floor grid ────────────────────────── */
 .hero-grid {
     position: absolute; bottom: -10%; left: 0;
     width: 100%; height: 38%;
     background-image:
-        linear-gradient(rgba(34,211,238,0.09) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(34,211,238,0.09) 1px, transparent 1px);
+        linear-gradient(color-mix(in srgb, var(--cy) 9%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--cy) 9%, transparent) 1px, transparent 1px);
     background-size: clamp(28px, 8vw, 44px) clamp(28px, 8vw, 44px);
     transform: rotateX(60deg); transform-origin: center bottom;
     -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
@@ -349,8 +362,8 @@ body::before {
 /* ── Trust section ────────────────────────── */
 .trust-section {
     background: #0a1218;
-    border-top: 1px solid rgba(34,211,238,0.08);
-    border-bottom: 1px solid rgba(34,211,238,0.08);
+    border-top: 1px solid color-mix(in srgb, var(--cy) 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--cy) 8%, transparent);
     padding: clamp(40px, 10vw, 64px) 0;
 }
 
@@ -360,13 +373,8 @@ body::before {
     opacity: 0.7;
     padding: 0 clamp(16px, 5vw, 28px);
 }
-.partner-grid img {
-    height: clamp(22px, 5.5vw, 32px); width: auto;
-    filter: grayscale(1);
-    /* No hover on mobile — transition 제거 */
-}
+.partner-grid img { height: clamp(22px, 5.5vw, 32px); width: auto; filter: grayscale(1); }
 
-/* Section heading */
 .section-heading {
     font-size: clamp(0.7rem, 3vw, 0.88rem);
     font-weight: 300; text-align: center;
@@ -377,47 +385,38 @@ body::before {
     cursor: pointer;
 }
 
-/* Cert grid — responsive 3→2 col */
 .interactive-certs {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: clamp(10px, 3vw, 16px);
     padding: 0 clamp(16px, 5vw, 28px);
+    perspective: 700px;
 }
-@media (max-width: 320px) {
-    .interactive-certs { grid-template-columns: repeat(2, 1fr); }
-}
+@media (max-width: 320px) { .interactive-certs { grid-template-columns: repeat(2, 1fr); } }
 
 .cert-link {
-    /* 모바일: hover 없음. active만 */
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.06);
     display: block; padding: clamp(8px, 2.5vw, 12px);
     border-radius: 8px;
-    /* touch용 transition 단순화 */
-    transition: background 0.15s, transform 0.15s;
+    transition: background 0.15s, transform 0.15s, border-color 0.15s;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
 }
 .cert-link:active {
-    transform: scale(0.94);
-    background: rgba(34,211,238,0.07);
+    transform: perspective(500px) scale(0.94) rotateX(4deg);
+    background: color-mix(in srgb, var(--cy) 7%, transparent);
+    border-color: var(--b2);
 }
 .cert-link img { width: 100%; height: auto; border-radius: 4px; display: block; }
 
-/* ── Misc ─────────────────────────────────── */
-#imageModal {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.92);
-    z-index: 10000; display: none;
-}
-#modalDetailImage {
-    max-width: 90%; max-height: 70%; object-fit: contain;
-}
+#imageModal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 10000; display: none; }
+#modalDetailImage { max-width: 90%; max-height: 70%; object-fit: contain; }
 #musicToggleBtn {
     position: fixed; bottom: calc(20px + var(--sab)); right: 20px;
     z-index: 10005; width: 48px; height: 48px;
     background: rgba(23,23,23,0.9);
-    border: 1.5px solid rgba(34,211,238,0.6); border-radius: 50%;
+    border: 1.5px solid var(--b2); border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     color: var(--cy);
     backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
@@ -453,7 +452,7 @@ body::before {
     <!-- HERO -->
     <section class="hero-section">
         <div id="bg-stars"></div>
-        <canvas id="fluid-canvas"></canvas>
+        <div id="ambient-glow"></div>
         <div class="energy-ring"></div>
         <div class="energy-ring"></div>
         <div class="energy-ring"></div>
@@ -463,6 +462,7 @@ body::before {
         <div class="hud-corner hud-bl"></div>
         <div class="hud-corner hud-br"></div>
         <div class="hero-grid"></div>
+        <div class="day-badge"></div>
         <div class="video-bg-container" id="heroSlider">
             <div class="video-overlay"></div>
         </div>
@@ -536,16 +536,17 @@ body::before {
 
 <script>
 /* ══════════════════════════════════════════════════════════
-   CPU-OPTIMIZED MOBILE JAVASCRIPT
-   원본 대비 주요 변경:
-   1. body.perspective 제거 → 개별 요소에 transform-style
-   2. Fluid canvas: 15pt → 12pt, 30fps 캡, 연결거리 √ → 제곱 비교
-   3. Stars: 60 → 45, DocumentFragment 일괄삽입
-   4. AI tag: transition 페이드 (requestAnimationFrame X)
-   5. Gyro parallax: 이벤트 throttle 100ms
-   6. resize: 200ms debounce
-   7. passive:true 모든 scroll/touch/resize 리스너
-   8. ring-pulse: opacity만 (transform 제거 → layout 최소화)
+   CPU-OPTIMIZED MOBILE JAVASCRIPT (v2)
+   주요 변경:
+   1. fluid canvas 입자 시뮬레이션(12pt O(n²), 영구 rAF) 완전 제거
+      → CSS box-shadow 정적 별빛 + CSS 그래디언트 ambient-glow로 대체.
+      JS는 로드시 1회 실행, 이후 CPU 비용 0.
+   2. 별: DOM 노드 45개 생성 → 0개 (box-shadow 1개 레이어로 통합).
+   3. Gyro parallax: 그대로 이벤트 기반(루프 아님) + throttle 유지,
+      CSS 변수(--tiltX/--tiltY)로 전환해 hero-content 3D 틸트와 통일.
+   4. resize 리스너 제거(캔버스 없으므로 불필요).
+   5. 나머지 기능(팝업, 배너, 관리자 인증, 인증서 모달, 슬라이더,
+      이스터에그, 네비게이션) 100% 원본 그대로.
 ══════════════════════════════════════════════════════════ */
 
 /* ── 리다이렉션 — 원본 그대로 ─────────────── */
@@ -564,75 +565,22 @@ function initPageReveal() {
     if (overlay) setTimeout(() => overlay.classList.add('active'), 300);
 }
 
-/* ── Stars — 45개, DocumentFragment ──────── */
+/* ── Static CSS starfield — generated ONCE, zero ongoing cost ── */
 function initStars() {
-    const container = document.getElementById('bg-stars');
-    if (!container) return;
-    const frag = document.createDocumentFragment();
-    for (let i = 0; i < 45; i++) {
-        const d = document.createElement('div');
-        d.className = 'dot';
-        d.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;transform:translateZ(${Math.random()*600-300}px)`;
-        frag.appendChild(d);
+    const el = document.getElementById('bg-stars');
+    if (!el) return;
+    const n = 45;
+    const shadows = [];
+    for (let i = 0; i < n; i++) {
+        const x = Math.random() * 100, y = Math.random() * 100;
+        shadows.push(`${x}vw ${y}vh 0 0px rgba(255,255,255,${(0.15 + Math.random() * 0.25).toFixed(2)})`);
     }
-    container.appendChild(frag);
+    const style = document.createElement('style');
+    style.textContent = `#bg-stars::before{box-shadow:${shadows.join(',')};width:2px;height:2px;border-radius:50%;}`;
+    document.head.appendChild(style);
 }
 
-/* ── Fluid canvas — 30fps, 12pt, 제곱 비교 ─ */
-function initFluid() {
-    const canvas = document.getElementById('fluid-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d', { alpha: true });
-    let W = canvas.width  = window.innerWidth;
-    let H = canvas.height = window.innerHeight;
-
-    /* 12 points (모바일은 15도 이미 무거움) */
-    const points = Array.from({ length: 12 }, () => ({
-        x: Math.random() * W, y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3
-    }));
-
-    const STEP = 1000 / 30; // 30fps cap
-    let last   = 0;
-
-    function draw(ts) {
-        if (ts - last < STEP) { requestAnimationFrame(draw); return; }
-        last = ts;
-        ctx.clearRect(0, 0, W, H);
-        ctx.strokeStyle = 'rgba(34,211,238,0.12)';
-        ctx.lineWidth   = 1;
-
-        for (let i = 0; i < points.length; i++) {
-            const p = points[i];
-            p.x += p.vx; p.y += p.vy;
-            if (p.x < 0 || p.x > W) p.vx *= -1;
-            if (p.y < 0 || p.y > H) p.vy *= -1;
-            for (let j = i + 1; j < points.length; j++) {
-                const p2 = points[j];
-                /* 제곱 비교: sqrt 제거 → 모바일 CPU ~20% 절감 */
-                const dx = p.x - p2.x, dy = p.y - p2.y;
-                if (dx*dx + dy*dy < 22500) { // 150^2
-                    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-                }
-            }
-        }
-        requestAnimationFrame(draw);
-    }
-    requestAnimationFrame(draw);
-
-    /* Debounced resize */
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            W = canvas.width  = window.innerWidth;
-            H = canvas.height = window.innerHeight;
-        }, 200);
-    }, { passive: true });
-}
-
-/* ── Image slider (원본 그대로) ──────────── */
+/* ── Image slider (원본 그대로, 요일별 배경) ─ */
 function initImageSlider() {
     const sliderContainer = document.getElementById('heroSlider');
     if (!sliderContainer) return;
@@ -656,23 +604,29 @@ function initAiTag() {
     let idx = 0;
     aiMsg.style.transition = 'opacity 0.45s ease';
     setInterval(() => {
+        if (document.hidden) return;
         idx = (idx + 1) % msgs.length;
         aiMsg.style.opacity = '0';
         setTimeout(() => { aiMsg.textContent = msgs[idx]; aiMsg.style.opacity = '1'; }, 460);
     }, 3000);
 }
 
-/* ── Gyro parallax — throttled 100ms ─────── */
+/* ── Gyro parallax — event-driven, throttled 100ms, no loop ─ */
 function initParallax() {
-    const bgS = document.getElementById('bg-stars');
-    if (!bgS || !window.DeviceOrientationEvent) return;
+    const bgS  = document.getElementById('bg-stars');
+    const root = document.documentElement;
+    if (!window.DeviceOrientationEvent) return;
     let lastGyro = 0;
     window.addEventListener('deviceorientation', (e) => {
         const now = Date.now();
         if (now - lastGyro < 100) return; // 10fps 충분
         lastGyro = now;
         if (e.gamma !== null) {
-            bgS.style.transform = `rotateY(${e.gamma * 0.3}deg) rotateX(${-e.beta * 0.3}deg) translateZ(30px)`;
+            const ty = (e.gamma * 0.3).toFixed(2);
+            const tx = (-e.beta * 0.3).toFixed(2);
+            root.style.setProperty('--tiltY', ty + 'deg');
+            root.style.setProperty('--tiltX', tx + 'deg');
+            if (bgS) bgS.style.transform = `rotateY(${ty}deg) rotateX(${tx}deg) translateZ(30px)`;
         }
     }, { passive: true });
 }
@@ -811,7 +765,6 @@ document.addEventListener('contextmenu', (e) => e.preventDefault());
 document.addEventListener('DOMContentLoaded', () => {
     initPageReveal();
     initStars();
-    initFluid();
     loadLayout().then(() => {
         initImageSlider();
         initPillarEgg();
