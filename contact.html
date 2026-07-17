@@ -2,6 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <!-- ════ DAY THEME — set BEFORE paint to avoid FOUC ════
+         ?day=1~7 (1=Mon...7=Sun) forces a theme for testing.
+         Remove the param (or don't use it) to follow the real date. -->
+    <script>
+        (function(){
+            var d = new Date().getDay(); // 0=Sun..6=Sat
+            var map = {0:7,1:1,2:2,3:3,4:4,5:5,6:6}; // Mon=1..Sun=7
+            var params = new URLSearchParams(window.location.search);
+            var forced = parseInt(params.get('day'), 10);
+            var day = (forced >= 1 && forced <= 7) ? forced : map[d];
+            document.documentElement.setAttribute('data-day', day);
+        })();
+    </script>
+
     <script>
         (function () {
             const isMobileOnly = /iPhone|iPod|Android/i.test(navigator.userAgent);
@@ -21,42 +36,171 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #00ffa3; }
-        body { -webkit-user-select: auto; user-select: auto; background-color: #0a0a0c; perspective: 1000px; overflow-x: hidden; }
-        .background-container { position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; z-index: 0; transform-style: preserve-3d; pointer-events: none; overflow: hidden; }
-        .dot { position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%; opacity: 0.3; }
-        .ai-badge { display: inline-block; padding: 6px 14px; border: 1px solid var(--accent); border-radius: 20px; font-size: 0.7rem; color: var(--accent); margin-bottom: 1.5rem; background: rgba(0, 255, 163, 0.05); text-transform: uppercase; letter-spacing: 0.1em; font-family: monospace; }
-        input, textarea, select { user-select: auto !important; -webkit-user-select: auto !important; }
-        .contact-form-container { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 8rem; padding-bottom: 4rem; position: relative; z-index: 10; transition: transform 0.1s ease-out; }
-        .form-card { max-width: 800px; width: 100%; margin-bottom: 0; backdrop-filter: blur(12px); background: rgba(23, 23, 23, 0.8); }
-        .stealth-link { cursor: text !important; user-select: none; -webkit-tap-highlight-color: transparent; }
-        #musicToggleBtn { position: fixed; bottom: 25px; right: 25px; z-index: 10005; width: 44px; height: 44px; background: rgba(23, 23, 23, 0.8); border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #22d3ee; backdrop-filter: blur(4px); transition: all 0.3s; }
-        #musicToggleBtn:hover { transform: scale(1.1); border-color: #22d3ee; }
-        .hero-slogan-gradient { display: inline-block !important; font-weight: 900 !important; line-height: 1.2 !important; padding-bottom: 0.1em; background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; color: transparent !important; }
+    /* ═══════════════════════════════════════════════════════════
+       TDL ENERGY — CONTACT / QUOTE PAGE (Day-of-Week 3D Edition)
+       CPU-minimal: no per-frame DOM writes beyond one throttled rAF,
+       zero DOM-node star spam, all heavy motion is compositor-only CSS.
+       All original features preserved (Firebase push, admin-auth loader,
+       header/footer/bgm components, e-egg stealth trigger, menu toggle,
+       form validation/status flow, mobile redirect).
+    ═══════════════════════════════════════════════════════════ */
+    :root{
+        --accent:#00ffa3;
+        --bg:#000405;--bg-1:#020c10;--bg-2:#061318;
+        --surface:rgba(6,20,26,0.7);
+        --cyan:#22d3ee;--cyan-glow:rgba(34,211,238,0.25);
+        --lime:#a3e635;--chrome:#e2eaf0;--text:#94a3b8;--muted:#334155;
+        --border:rgba(34,211,238,0.08);--border-2:rgba(34,211,238,0.18);
+        --font-impact:'Bebas Neue',sans-serif;--font-ui:'Syne',sans-serif;
+        --font-mono:'Space Mono',monospace;--font-body:'Pretendard',sans-serif;
+        --tiltX:0deg;--tiltY:0deg;
+    }
+    /* ═══════════ DAY-OF-WEEK 3D THEME TOKENS (site-wide identity) ═══════════ */
+    [data-day="1"]{--cyan:#22d3ee;--lime:#67e8f9;--bg:#00040a;--bg-1:#020a14;--bg-2:#05121f;--border-2:rgba(34,211,238,0.22);--cyan-glow:rgba(34,211,238,0.3);--accent:#22d3ee;--day-name:"CYBERPUNK // MON";--spin-dur:70s;--spin-dir:normal;--tdlid-dur:36s;}
+    [data-day="2"]{--cyan:#d4af6a;--lime:#f3e0b3;--bg:#06050a;--bg-1:#0d0a12;--bg-2:#15101a;--border-2:rgba(212,175,106,0.22);--cyan-glow:rgba(212,175,106,0.28);--accent:#d4af6a;--day-name:"INK WABI-SABI // TUE";--spin-dur:110s;--spin-dir:reverse;--tdlid-dur:52s;}
+    [data-day="3"]{--cyan:#c9b06a;--lime:#8a9a5b;--bg:#08070a;--bg-1:#0f0e10;--bg-2:#17151a;--border-2:rgba(201,176,106,0.22);--cyan-glow:rgba(201,176,106,0.28);--accent:#c9b06a;--day-name:"ART DECO VAULT // WED";--spin-dur:90s;--spin-dir:normal;--tdlid-dur:44s;}
+    [data-day="4"]{--cyan:#3fae6a;--lime:#9bd66e;--bg:#020907;--bg-1:#06120e;--bg-2:#0a1c15;--border-2:rgba(63,174,106,0.22);--cyan-glow:rgba(63,174,106,0.28);--accent:#3fae6a;--day-name:"BIOPHILIC TERRA // THU";--spin-dur:130s;--spin-dir:reverse;--tdlid-dur:60s;}
+    [data-day="5"]{--cyan:#ff3fb0;--lime:#7df9ff;--bg:#0a0212;--bg-1:#160a22;--bg-2:#1f1130;--border-2:rgba(255,63,176,0.26);--cyan-glow:rgba(255,63,176,0.32);--accent:#ff3fb0;--day-name:"VAPORWAVE // FRI";--spin-dur:46s;--spin-dir:normal;--tdlid-dur:26s;}
+    [data-day="6"]{--cyan:#5aa9e6;--lime:#bfe3ff;--bg:#020608;--bg-1:#040d12;--bg-2:#08151c;--border-2:rgba(90,169,230,0.22);--cyan-glow:rgba(90,169,230,0.28);--accent:#5aa9e6;--day-name:"ARCTIC GLACIAL // SAT";--spin-dur:150s;--spin-dir:normal;--tdlid-dur:70s;}
+    [data-day="7"]{--cyan:#ff7a45;--lime:#ffd166;--bg:#0a0402;--bg-1:#170a06;--bg-2:#22100a;--border-2:rgba(255,122,69,0.26);--cyan-glow:rgba(255,122,69,0.32);--accent:#ff7a45;--day-name:"SUNSET EMBER // SUN";--spin-dur:80s;--spin-dir:reverse;--tdlid-dur:40s;}
+
+    *,*::before,*::after{box-sizing:border-box}
+    @media (prefers-reduced-motion: reduce){
+        *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
+    }
+
+    body {
+        -webkit-user-select: auto; user-select: auto;
+        background-color: var(--bg);
+        overflow-x: hidden;
+        transition: background 0.6s ease;
+    }
+
+    /* ── Page reveal ─────────────────────────────────── */
+    #page-reveal-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#000 0%,var(--bg-1) 100%);z-index:200000;transform-origin:left;will-change:transform;transition:transform 1.1s cubic-bezier(.7,0,.3,1)}
+    #page-reveal-overlay.active{transform:translateX(-100%)}
+
+    /* ── Custom dual cursor — event-driven only, NO rAF loop ── */
+    .resn-cursor{width:10px;height:10px;background:var(--cyan);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:999999;mix-blend-mode:difference;transition:width .2s,height .2s,opacity .2s,transform .05s linear;will-change:transform;box-shadow:0 0 12px var(--cyan)}
+    .resn-cursor-outer{width:36px;height:36px;border:1px solid var(--border-2);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:999998;will-change:transform;transition:transform .18s ease-out}
+    @media (hover:none){.resn-cursor,.resn-cursor-outer{display:none}}
+
+    /* ── Static CSS starfield — zero DOM nodes, generated once, GPU-cheap ── */
+    #bg-stars{position:fixed;inset:-15%;width:130%;height:130%;z-index:0;pointer-events:none;will-change:transform;transform:rotateY(0deg) rotateX(0deg);transition:transform .18s ease-out}
+    #bg-stars::before{content:'';position:absolute;inset:0;width:2px;height:2px;border-radius:50%}
+
+    /* ── 3D constellation — static SVG, motion via one CSS 3D rotation only ── */
+    .constellation-3d-wrap{position:fixed;inset:-25%;z-index:0;pointer-events:none;transform-style:preserve-3d;will-change:transform;animation:constellation-spin var(--spin-dur,90s) linear infinite;animation-direction:var(--spin-dir,normal);opacity:.45}
+    @keyframes constellation-spin{0%{transform:rotateX(58deg) rotateZ(0deg)}100%{transform:rotateX(58deg) rotateZ(360deg)}}
+    .constellation-3d-wrap svg{width:100%;height:100%;overflow:visible}
+    .constellation-3d-wrap circle{fill:var(--cyan)}
+    .constellation-3d-wrap line{stroke:var(--cyan);stroke-width:.6;opacity:.3}
+    .constellation-3d-wrap .c-far{opacity:.3}.constellation-3d-wrap .c-mid{opacity:.55}.constellation-3d-wrap .c-near{opacity:.85}
+
+    /* ── 3D floating "TDLiD" monogram — stacked depth layers, one CSS rotation ── */
+    .tdlid-3d-stage{position:fixed;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;pointer-events:none;perspective:1600px;overflow:hidden}
+    .tdlid-3d-rotor{position:relative;transform-style:preserve-3d;animation:tdlid-spin var(--tdlid-dur,40s) linear infinite;will-change:transform}
+    @keyframes tdlid-spin{0%{transform:rotateY(0deg) rotateX(8deg)}100%{transform:rotateY(360deg) rotateX(8deg)}}
+    .tdlid-3d-layer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-impact);font-size:clamp(4rem,13vw,14rem);letter-spacing:.05em;color:transparent;-webkit-text-stroke:1px color-mix(in srgb, var(--cyan) 26%, transparent);white-space:nowrap;user-select:none}
+
+    /* ── Day signature pattern — distinct geometric motif per day, CSS-only ── */
+    .day-pattern{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35}
+    [data-day="1"] .day-pattern{background-image:linear-gradient(color-mix(in srgb, var(--cyan) 12%, transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb, var(--cyan) 12%, transparent) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 70% 55% at 50% 20%,black 0%,transparent 75%)}
+    [data-day="2"] .day-pattern{background-image:radial-gradient(ellipse 26% 18% at 15% 15%,color-mix(in srgb, var(--cyan) 18%, transparent) 0%,transparent 70%),radial-gradient(ellipse 20% 26% at 85% 30%,color-mix(in srgb, var(--cyan) 14%, transparent) 0%,transparent 70%),repeating-linear-gradient(115deg,transparent 0 40px,color-mix(in srgb, var(--cyan) 4%, transparent) 40px 41px)}
+    [data-day="3"] .day-pattern{background-image:repeating-conic-gradient(from 0deg at 50% 10%,color-mix(in srgb, var(--cyan) 9%, transparent) 0deg 2deg,transparent 2deg 12deg);mask-image:radial-gradient(circle at 50% 10%,black 0%,transparent 60%)}
+    [data-day="4"] .day-pattern{background-image:radial-gradient(ellipse 45% 55% at 8% 10%,color-mix(in srgb, var(--lime) 12%, transparent) 0%,transparent 70%),radial-gradient(ellipse 40% 45% at 95% 25%,color-mix(in srgb, var(--cyan) 10%, transparent) 0%,transparent 70%),repeating-radial-gradient(circle at 50% 0%,transparent 0 90px,color-mix(in srgb, var(--lime) 3%, transparent) 90px 92px)}
+    [data-day="5"] .day-pattern{background-image:radial-gradient(circle at 50% 8%,color-mix(in srgb, var(--lime) 18%, transparent) 0%,transparent 18%),repeating-linear-gradient(90deg,color-mix(in srgb, var(--cyan) 12%, transparent) 0 1px,transparent 1px 60px)}
+    [data-day="6"] .day-pattern{background-image:linear-gradient(135deg,color-mix(in srgb, var(--cyan) 7%, transparent) 25%,transparent 25.5%),linear-gradient(225deg,color-mix(in srgb, var(--cyan) 7%, transparent) 25%,transparent 25.5%),linear-gradient(45deg,color-mix(in srgb, var(--cyan) 5%, transparent) 25%,transparent 25.5%);background-size:140px 140px;mask-image:radial-gradient(ellipse 75% 55% at 50% 15%,black 0%,transparent 78%)}
+    [data-day="7"] .day-pattern{background-image:repeating-linear-gradient(0deg,color-mix(in srgb, var(--cyan) 7%, transparent) 0 2px,transparent 2px 26px),radial-gradient(circle at 50% 0%,color-mix(in srgb, var(--lime) 15%, transparent) 0%,transparent 40%)}
+
+    .ai-badge { display: inline-flex; align-items:center; gap:8px; padding: 7px 16px; border: 1px solid var(--accent); border-radius: 20px; font-size: 0.7rem; color: var(--accent); margin-bottom: 1.5rem; background: color-mix(in srgb, var(--accent) 6%, transparent); text-transform: uppercase; letter-spacing: 0.1em; font-family: var(--font-mono); position:relative; overflow:hidden; }
+    .ai-badge::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,color-mix(in srgb, var(--accent) 18%, transparent),transparent);animation:badge-shimmer 3s ease infinite}
+    @keyframes badge-shimmer{to{left:160%}}
+
+    input, textarea, select { user-select: auto !important; -webkit-user-select: auto !important; }
+
+    .contact-form-container { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 8rem; padding-bottom: 4rem; position: relative; z-index: 10; transform: rotateY(var(--tiltY)) rotateX(var(--tiltX)); transition: transform 0.12s ease-out; }
+
+    .form-card { max-width: 800px; width: 100%; margin-bottom: 0; backdrop-filter: blur(14px); background: var(--surface); border: 1px solid var(--border); box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 60px var(--cyan-glow); transition: border-color .4s; }
+    .form-card:hover { border-color: var(--border-2); }
+
+    /* ── Day badge — small floating theme label ── */
+    .day-badge{display:block;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--cyan);opacity:.55;margin-bottom:14px}
+    .day-badge::before{content:var(--day-name)}
+
+    .hero-slogan-gradient { display: inline-block !important; font-family: var(--font-impact); font-weight: 400 !important; letter-spacing:.01em; line-height: 1.1 !important; padding-bottom: 0.1em; background: linear-gradient(to right, var(--cyan) 0%, var(--lime) 55%, #ffffff 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; color: transparent !important; filter: drop-shadow(0 0 40px var(--cyan-glow)); }
+
+    /* ── Stealth link — visually identical to surrounding text, unchanged behavior ── */
+    .stealth-link { cursor: text !important; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+    /* ── Form fields — day-reactive focus/border colors ── */
+    .qform-input { padding: 1.25rem; border-radius: 1rem; background: color-mix(in srgb, var(--bg-2) 88%, black); border: 1px solid var(--border-2); outline: none; transition: border-color .25s, box-shadow .25s; color: var(--chrome); }
+    .qform-input::placeholder { color: var(--text); }
+    .qform-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px var(--cyan-glow); }
+    .qform-submit { width: 100%; margin-top: 1.5rem; padding: 1.1rem; border-radius: 1rem; background: var(--cyan); color: #000; font-size: 1.15rem; font-weight: 800; letter-spacing: .02em; transition: filter .25s, transform .25s; box-shadow: 0 10px 30px var(--cyan-glow); }
+    .qform-submit:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    #musicToggleBtn { position: fixed; bottom: 25px; right: 25px; z-index: 10005; width: 44px; height: 44px; background: var(--surface); border: 1px solid var(--border-2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--cyan); backdrop-filter: blur(4px); transition: all 0.3s; }
+    #musicToggleBtn:hover { transform: scale(1.1); border-color: var(--cyan); box-shadow: 0 0 16px var(--cyan-glow); }
+
+    /* ── PC-OPTIMIZED RESPONSIVE TUNING ─────────────────────── */
+    @media (min-width:1920px){
+        .form-card{max-width:960px}
+        .tdlid-3d-layer{font-size:clamp(6rem,11vw,16rem)}
+    }
+    @media (min-width:1280px) and (max-width:1599px){
+        .tdlid-3d-layer{font-size:clamp(5rem,11vw,10rem)}
+    }
+    @media (max-width:1279px){
+        .constellation-3d-wrap{opacity:.3}
+        .tdlid-3d-layer{font-size:clamp(3.5rem,18vw,8rem)}
+    }
+    @media (min-width:2200px){
+        .constellation-3d-wrap{inset:-35%}
+    }
+    @media (max-width: 640px){
+        .form-card{padding:2rem!important}
+        .form-card .grid-cols-2{grid-template-columns:1fr}
+    }
     </style>
 </head>
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] overflow-x-hidden">
-    <div class="background-container" id="bg-stars"></div>
+
+    <div id="page-reveal-overlay"></div>
+    <div class="resn-cursor" id="cursorDot"></div>
+    <div class="resn-cursor-outer" id="cursorCircle"></div>
+
+    <div class="day-pattern"></div>
+    <div id="bg-stars"></div>
+    <div class="constellation-3d-wrap" id="constellation3d" aria-hidden="true">
+        <svg viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice"></svg>
+    </div>
+    <div class="tdlid-3d-stage" aria-hidden="true">
+        <div class="tdlid-3d-rotor" id="tdlidRotor"></div>
+    </div>
+
     <div id="bgm-placeholder"></div>
     <div id="header-placeholder"></div>
+
     <main class="px-6 contact-form-container" id="main-content">
-        <div class="form-card border border-neutral-800 p-12 rounded-3xl shadow-2xl relative">
+        <div class="form-card p-12 rounded-3xl relative">
+            <span class="day-badge"></span>
             <div class="ai-badge" id="ai-msg">System: Initializing Secure Uplink...</div>
-            <h2 class="text-5xl font-black tracking-tight hero-slogan-gradient mb-4">Talk to us about your goals</h2>
+            <h2 class="text-5xl tracking-tight hero-slogan-gradient mb-4">Talk to us about your goals</h2>
             <p class="text-neutral-400 text-lg mb-10">
                 <span>Complete the form below and discover how we can help</span>
                 <span id="triggerOur" class="stealth-link">you</span>.
             </p>
             <form id="quoteForm" class="grid gap-6">
                 <div class="grid grid-cols-2 gap-6">
-                    <input name="company" placeholder="Company / Name" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required>
-                    <input name="email" type="email" placeholder="Email Address" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition" required>
+                    <input name="company" placeholder="Company / Name" class="qform-input" required>
+                    <input name="email" type="email" placeholder="Email Address" class="qform-input" required>
                 </div>
                 <div class="grid grid-cols-2 gap-6">
-                    <input name="phone" placeholder="Phone / WhatsApp (Optional)" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition">
-                    <select name="product" id="quoteProductSelect" class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition text-neutral-400">
+                    <input name="phone" placeholder="Phone / WhatsApp (Optional)" class="qform-input">
+                    <select name="product" id="quoteProductSelect" class="qform-input">
                         <option value="" class="text-neutral-400">-- Select Product / Service (Optional) --</option>
                         <option value="72V 20Ah Battery Pack">72V 20Ah Battery Pack</option>
                         <option value="EV Conversion Kit">EV Conversion Kit</option>
@@ -65,132 +209,227 @@
                         <option value="Other / General Inquiry">Other / General Inquiry</option>
                     </select>
                 </div>
-                <textarea name="details" rows="8" placeholder="Project details, required quantity, use-case, delivery location, etc." class="p-5 rounded-2xl bg-neutral-800 border border-neutral-700 focus:border-cyan-500 outline-none transition"></textarea>
-                <button type="submit" class="w-full mt-6 py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black text-xl font-bold transition shadow-lg shadow-cyan-500/20">Submit Request</button>
+                <textarea name="details" rows="8" placeholder="Project details, required quantity, use-case, delivery location, etc." class="qform-input"></textarea>
+                <button type="submit" class="qform-submit">Submit Request</button>
             </form>
             <p id="formStatus" class="mt-6 text-center text-lg font-medium"></p>
         </div>
     </main>
+
     <div id="footer-placeholder"></div>
+
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <script>
-        const bg = document.getElementById('bg-stars');
-        for (let i = 0; i < 150; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'dot';
-            dot.style.left = `${Math.random() * 100}%`;
-            dot.style.top = `${Math.random() * 100}%`;
-            dot.style.transform = `translateZ(${Math.random() * 400 - 200}px)`;
-            bg.appendChild(dot);
+    /* ══════════════════════════════════════════════════════════
+       CPU-OPTIMIZED JAVASCRIPT (v2)
+       Key changes vs previous version:
+       1. REMOVED the 150-DOM-node ".dot" star field + its unthrottled
+          mousemove handler → replaced by a static CSS box-shadow
+          starfield generated ONCE, plus a single rAF-throttled
+          mousemove listener that only runs in response to a real event.
+       2. 3D constellation + TDLiD monogram are static markup generated
+          once at load — motion afterwards is pure compositor-only CSS.
+       All original functionality (Firebase push, admin-auth loader,
+       header/footer/bgm components, e-egg stealth trigger, menu toggle,
+       form validation/status flow) is preserved 100%.
+    ══════════════════════════════════════════════════════════ */
+
+    /* ── Static CSS starfield — generated once, no animation loop ── */
+    function initStars() {
+        const el = document.getElementById('bg-stars');
+        if (!el) return;
+        const n = 90, shadows = [];
+        for (let i = 0; i < n; i++) {
+            const x = Math.random() * 100, y = Math.random() * 100;
+            shadows.push(`${x}vw ${y}vh 0 ${Math.random() > 0.7 ? '1px' : '0px'} rgba(255,255,255,${(0.12 + Math.random() * 0.25).toFixed(2)})`);
         }
+        const style = document.createElement('style');
+        style.textContent = `#bg-stars::before{box-shadow:${shadows.join(',')};}`;
+        document.head.appendChild(style);
+    }
+
+    /* ── 3D constellation — build once as static SVG markup, zero ongoing JS cost ── */
+    function initConstellation3D() {
+        const svg = document.querySelector('#constellation3d svg');
+        if (!svg) return;
+        const NUM_STARS = 55, stars = [];
+        for (let i = 0; i < NUM_STARS; i++) { stars.push({ x: Math.random() * 1000, y: Math.random() * 1000, r: Math.random() * 1.6 + 0.5 }); }
+        let linesMarkup = '';
+        for (let i = 0; i < stars.length; i++) {
+            let best = -1, bestDist = Infinity;
+            for (let j = 0; j < stars.length; j++) {
+                if (i === j) continue;
+                const dx = stars[i].x - stars[j].x, dy = stars[i].y - stars[j].y, d = dx * dx + dy * dy;
+                if (d < bestDist && d < 40000) { bestDist = d; best = j; }
+            }
+            if (best !== -1) linesMarkup += `<line x1="${stars[i].x.toFixed(1)}" y1="${stars[i].y.toFixed(1)}" x2="${stars[best].x.toFixed(1)}" y2="${stars[best].y.toFixed(1)}"/>`;
+        }
+        const starsMarkup = stars.map(s => {
+            const cls = s.r > 1.4 ? 'c-near' : (s.r > 0.9 ? 'c-mid' : 'c-far');
+            return `<circle class="${cls}" cx="${s.x.toFixed(1)}" cy="${s.y.toFixed(1)}" r="${s.r.toFixed(2)}"/>`;
+        }).join('');
+        svg.innerHTML = linesMarkup + starsMarkup;
+    }
+
+    /* ── 3D TDLiD monogram — build once as stacked depth layers, zero ongoing JS cost ── */
+    function initTdlid3D() {
+        const rotor = document.getElementById('tdlidRotor');
+        if (!rotor) return;
+        const DEPTH_LAYERS = 12, SPACING = 14;
+        let markup = '';
+        for (let i = 0; i < DEPTH_LAYERS; i++) {
+            const z = -(i * SPACING), fade = (0.4 - (i / DEPTH_LAYERS) * 0.32).toFixed(2);
+            markup += `<span class="tdlid-3d-layer" style="transform:translate(-50%,-50%) translateZ(${z}px);opacity:${fade};">TDLiD</span>`;
+        }
+        rotor.innerHTML = markup;
+    }
+
+    /* ── Global parallax — throttled rAF, only fires on real mousemove ── */
+    function initGlobal3DEffect() {
+        const bgStars = document.getElementById('bg-stars');
         const content = document.getElementById('main-content');
-        document.body.addEventListener('mousemove', (e) => {
-            const moveX = (e.clientX - window.innerWidth / 2) / 40;
-            const moveY = (e.clientY - window.innerHeight / 2) / 40;
-            bg.style.transform = `rotateY(${moveX * 0.5}deg) rotateX(${-moveY * 0.5}deg) translateZ(50px)`;
-            content.style.transform = `rotateY(${moveX * 0.2}deg) rotateX(${-moveY * 0.2}deg)`;
-        });
+        const root = document.documentElement;
+        const hasHover = window.matchMedia('(hover: hover)').matches;
+        let mouseX = 0, mouseY = 0, rafPending = false;
+
+        function updateParallax() {
+            const hw = window.innerWidth / 2, hh = window.innerHeight / 2;
+            const mxN = (mouseX - hw) / 40, myN = (mouseY - hh) / 40;
+            root.style.setProperty('--tiltY', mxN.toFixed(2) + 'deg');
+            root.style.setProperty('--tiltX', (-myN).toFixed(2) + 'deg');
+            if (bgStars) bgStars.style.transform = `rotateY(${(mxN * 0.5).toFixed(2)}deg) rotateX(${(-myN * 0.5).toFixed(2)}deg)`;
+            rafPending = false;
+        }
+
+        if (hasHover) {
+            document.body.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX; mouseY = e.clientY;
+                if (!rafPending) { rafPending = true; requestAnimationFrame(updateParallax); }
+            }, { passive: true });
+
+            const dot = document.getElementById('cursorDot'), circle = document.getElementById('cursorCircle');
+            document.addEventListener('mousemove', (e) => {
+                if (dot) dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+                if (circle) circle.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+            }, { passive: true });
+        }
+
         const aiMessages = ["TDL Energy Indonesia", "Deliver the best products and services to our customers", "Promote leadership consistently", "Create and Innovate value"];
         setInterval(() => {
+            if (document.hidden) return;
             const msg = aiMessages[Math.floor(Math.random() * aiMessages.length)];
             const msgElement = document.getElementById('ai-msg');
-            if(msgElement) msgElement.innerText = msg;
+            if (msgElement) msgElement.innerText = msg;
         }, 5500);
-        const firebaseConfig = { apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs", authDomain: "tdlid-107669.firebaseapp.com", databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com", projectId: "tdlid-107669", storageBucket: "tdlid-107669.firebasestorage.app", messagingSenderId: "604782345004", appId: "1:604782345004:web:029aeaa81f4d11c2254a89" };
-        let database;
-        if (typeof firebase !== 'undefined') { if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } database = firebase.database(); }
-        async function loadLayout() {
-            try {
-                const headerRes = await fetch('components/header.html');
-                const headerPlaceholder = document.getElementById('header-placeholder');
-                headerPlaceholder.innerHTML = await headerRes.text();
-                headerPlaceholder.querySelectorAll("script").forEach(oldScript => {
+    }
+
+    window.addEventListener('load', () => {
+        const overlay = document.getElementById('page-reveal-overlay');
+        if (overlay) setTimeout(() => overlay.classList.add('active'), 250);
+    });
+
+    const firebaseConfig = { apiKey: "AIzaSyDwF8_Q9S1-naaAgyfMWhFYJ2u_be3wsBs", authDomain: "tdlid-107669.firebaseapp.com", databaseURL: "https://tdlid-107669-default-rtdb.firebaseio.com", projectId: "tdlid-107669", storageBucket: "tdlid-107669.firebasestorage.app", messagingSenderId: "604782345004", appId: "1:604782345004:web:029aeaa81f4d11c2254a89" };
+    let database;
+    if (typeof firebase !== 'undefined') { if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } database = firebase.database(); }
+
+    async function loadLayout() {
+        try {
+            const headerRes = await fetch('components/header.html');
+            const headerPlaceholder = document.getElementById('header-placeholder');
+            headerPlaceholder.innerHTML = await headerRes.text();
+            headerPlaceholder.querySelectorAll("script").forEach(oldScript => {
+                if (oldScript.src) return;
+                const newScript = document.createElement("script");
+                let scriptText = oldScript.text;
+                if (scriptText.includes("admin.html")) scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
+                newScript.text = scriptText;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+            const authRes = await fetch('components/admin-auth.html');
+            let authDiv = document.getElementById('admin-auth-placeholder') || document.createElement('div');
+            authDiv.id = 'admin-auth-placeholder';
+            if (!document.getElementById('admin-auth-placeholder')) document.body.appendChild(authDiv);
+            authDiv.innerHTML = await authRes.text();
+            authDiv.querySelectorAll("script").forEach(oldScript => {
+                const newScript = document.createElement("script");
+                if (oldScript.src) newScript.src = oldScript.src; else newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+            const footerRes = await fetch('components/footer.html');
+            const footerPlaceholder = document.getElementById('footer-placeholder');
+            footerPlaceholder.innerHTML = await footerRes.text();
+            footerPlaceholder.querySelectorAll("script").forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+            const bgmRes = await fetch('components/bgm.html');
+            const bgmPlaceholder = document.getElementById('bgm-placeholder');
+            if (bgmPlaceholder) {
+                bgmPlaceholder.innerHTML = await bgmRes.text();
+                bgmPlaceholder.querySelectorAll("script").forEach(oldScript => {
                     if (oldScript.src) return;
-                    const newScript = document.createElement("script");
-                    let scriptText = oldScript.text;
-                    if (scriptText.includes("admin.html")) scriptText = scriptText.replace(/admin\.html/g, "admin/admin.html");
-                    newScript.text = scriptText;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-                const authRes = await fetch('components/admin-auth.html');
-                let authDiv = document.getElementById('admin-auth-placeholder') || document.createElement('div');
-                authDiv.id = 'admin-auth-placeholder';
-                if (!document.getElementById('admin-auth-placeholder')) document.body.appendChild(authDiv);
-                authDiv.innerHTML = await authRes.text();
-                authDiv.querySelectorAll("script").forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    if (oldScript.src) newScript.src = oldScript.src; else newScript.text = oldScript.text;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-                const footerRes = await fetch('components/footer.html');
-                const footerPlaceholder = document.getElementById('footer-placeholder');
-                footerPlaceholder.innerHTML = await footerRes.text();
-                footerPlaceholder.querySelectorAll("script").forEach(oldScript => {
                     const newScript = document.createElement("script");
                     newScript.text = oldScript.text;
                     document.body.appendChild(newScript).parentNode.removeChild(newScript);
                 });
-                const bgmRes = await fetch('components/bgm.html');
-                const bgmPlaceholder = document.getElementById('bgm-placeholder');
-                if (bgmPlaceholder) {
-                    bgmPlaceholder.innerHTML = await bgmRes.text();
-                    bgmPlaceholder.querySelectorAll("script").forEach(oldScript => {
-                        if (oldScript.src) return;
-                        const newScript = document.createElement("script");
-                        newScript.text = oldScript.text;
-                        document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                    });
-                }
-                initMenuToggle(); initFormHandler(); initEeggTrigger();
-            } catch (err) { console.error("Layout load failed:", err); }
-        }
-        function initEeggTrigger() { const trigger = document.getElementById('triggerOur'); if (trigger) trigger.onclick = () => { window.location.href = 'e-egg.html'; }; }
-        function initMenuToggle() {
-            const menuBtn = document.getElementById("menuToggleBtn"), dropdown = document.getElementById("dropdownMenu"), menuIcon = document.getElementById("menuIcon");
-            if (menuBtn && dropdown) {
-                menuBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    if (!dropdown.classList.contains("opacity-100")) {
-                        dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
-                        dropdown.classList.add("opacity-100", "visible", "translate-y-2");
-                        if (menuIcon) menuIcon.innerText = "✕";
-                    } else { closeMenu(); }
-                };
-                function closeMenu() {
-                    dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
-                    dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
-                    if (menuIcon) menuIcon.innerText = "☰";
-                }
-                document.addEventListener("click", (e) => { if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu(); });
             }
-        }
-        function initFormHandler() {
-            const form = document.getElementById('quoteForm'), formStatus = document.getElementById('formStatus');
-            if (form) {
-                form.onsubmit = async (e) => {
-                    e.preventDefault();
-                    const submitBtn = form.querySelector('button[type="submit"]');
-                    submitBtn.disabled = true; submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                    formStatus.textContent = "Storing Request...";
-                    formStatus.className = 'mt-6 text-center text-lg text-cyan-400 animate-pulse';
-                    try {
-                        const formData = new FormData(form);
-                        const msgData = { timestamp: Date.now(), date: new Date().toLocaleString(), company: formData.get('company'), email: formData.get('email'), phone: formData.get('phone') || 'N/A', product: formData.get('product') || 'None Selected', details: formData.get('details') || '', read: false, status: 'new' };
-                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000));
-                        await Promise.race([database.ref('messages').push(msgData), timeoutPromise]);
-                        formStatus.innerHTML = `✅ Submitted successfully!<br><span class="text-sm font-normal">We will get back to you shortly.</span>`;
-                        formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
-                        form.reset();
-                    } catch (error) {
-                        formStatus.innerHTML = "❌ Error saving data.";
-                        formStatus.className = 'mt-6 text-center text-lg text-red-500 leading-relaxed';
-                    } finally { submitBtn.disabled = false; submitBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
-                };
+            initMenuToggle(); initFormHandler(); initEeggTrigger();
+        } catch (err) { console.error("Layout load failed:", err); }
+    }
+    function initEeggTrigger() { const trigger = document.getElementById('triggerOur'); if (trigger) trigger.onclick = () => { window.location.href = 'e-egg.html'; }; }
+    function initMenuToggle() {
+        const menuBtn = document.getElementById("menuToggleBtn"), dropdown = document.getElementById("dropdownMenu"), menuIcon = document.getElementById("menuIcon");
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (!dropdown.classList.contains("opacity-100")) {
+                    dropdown.classList.remove("opacity-0", "invisible", "translate-y-[-10px]");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-2");
+                    if (menuIcon) menuIcon.innerText = "✕";
+                } else { closeMenu(); }
+            };
+            function closeMenu() {
+                dropdown.classList.remove("opacity-100", "visible", "translate-y-2");
+                dropdown.classList.add("opacity-0", "invisible", "translate-y-[-10px]");
+                if (menuIcon) menuIcon.innerText = "☰";
             }
+            document.addEventListener("click", (e) => { if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) closeMenu(); });
         }
-        document.addEventListener("DOMContentLoaded", loadLayout);
+    }
+    function initFormHandler() {
+        const form = document.getElementById('quoteForm'), formStatus = document.getElementById('formStatus');
+        if (form) {
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.disabled = true; submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                formStatus.textContent = "Storing Request...";
+                formStatus.className = 'mt-6 text-center text-lg text-cyan-400 animate-pulse';
+                try {
+                    const formData = new FormData(form);
+                    const msgData = { timestamp: Date.now(), date: new Date().toLocaleString(), company: formData.get('company'), email: formData.get('email'), phone: formData.get('phone') || 'N/A', product: formData.get('product') || 'None Selected', details: formData.get('details') || '', read: false, status: 'new' };
+                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000));
+                    await Promise.race([database.ref('messages').push(msgData), timeoutPromise]);
+                    formStatus.innerHTML = `✅ Submitted successfully!<br><span class="text-sm font-normal">We will get back to you shortly.</span>`;
+                    formStatus.className = 'mt-6 text-center text-lg text-green-500 font-bold';
+                    form.reset();
+                } catch (error) {
+                    formStatus.innerHTML = "❌ Error saving data.";
+                    formStatus.className = 'mt-6 text-center text-lg text-red-500 leading-relaxed';
+                } finally { submitBtn.disabled = false; submitBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
+            };
+        }
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+        initStars();
+        initConstellation3D();
+        initTdlid3D();
+        initGlobal3DEffect();
+        loadLayout();
+    });
     </script>
 </body>
 </html>
