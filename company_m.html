@@ -6,98 +6,224 @@
     <title>Company Profile | TDL Energy Indonesia</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+    <!-- ════ DAY THEME — set BEFORE paint to avoid FOUC ════
+         ?day=1~7 (1=Mon...7=Sun) forces a theme for testing.
+         Remove the param (or don't use it) to follow the real date. -->
+    <script>
+        (function(){
+            var d = new Date().getDay(); // 0=Sun..6=Sat
+            var map = {0:7,1:1,2:2,3:3,4:4,5:5,6:6}; // Mon=1..Sun=7
+            var params = new URLSearchParams(window.location.search);
+            var forced = parseInt(params.get('day'), 10);
+            var day = (forced >= 1 && forced <= 7) ? forced : map[d];
+            document.documentElement.setAttribute('data-day', day);
+        })();
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --header-logo-font-size: 4rem;
-            --header-subtitle-font-size: 1.1rem;
+    /* ═══════════════════════════════════════════════════════════
+       TDL ENERGY — COMPANY PAGE (MOBILE, Day-of-Week 3D Edition)
+       Mobile-first CPU budget: NO mousemove/parallax JS at all (touch
+       devices don't hover), a smaller star/constellation count than
+       the PC page, and every moving layer is pure compositor-only CSS
+       (transform-only keyframes), so battery/thermal impact stays low.
+       All original mobile functionality preserved (header_m/footer_m
+       loader, admin-link stripping, BGM script exec, menu toggle,
+       active-nav highlighting, tap-to-scale image cards).
+    ═══════════════════════════════════════════════════════════ */
+    :root {
+        --header-logo-font-size: 4rem;
+        --header-subtitle-font-size: 1.1rem;
+        --bg:#000405; --bg-1:#020c10; --bg-2:#061318;
+        --surface: rgba(6,20,26,0.7);
+        --cyan:#22d3ee; --cyan-glow: rgba(34,211,238,0.25);
+        --lime:#a3e635; --chrome:#e2eaf0; --text:#94a3b8;
+        --border: rgba(34,211,238,0.1); --border-2: rgba(34,211,238,0.22);
+        --font-impact: 'Bebas Neue', sans-serif;
+        --font-body: 'Pretendard', sans-serif;
+    }
+    /* ═══════════ DAY-OF-WEEK 3D THEME TOKENS (matches PC pages) ═══════════
+       1 Mon Deep Space/Cyberpunk · 2 Tue Ink Wabi-Sabi · 3 Wed Art Deco ·
+       4 Thu Biophilic · 5 Fri Synthwave · 6 Sat Arctic Glacial · 7 Sun Sunset Ember */
+    [data-day="1"]{--cyan:#22d3ee;--lime:#67e8f9;--bg:#00040a;--bg-1:#020a14;--border-2:rgba(34,211,238,0.24);--cyan-glow:rgba(34,211,238,0.3);--day-name:"CYBERPUNK // MON";--spin-dur:90s;--spin-dir:normal;--tdlid-dur:50s;}
+    [data-day="2"]{--cyan:#d4af6a;--lime:#f3e0b3;--bg:#06050a;--bg-1:#0d0a12;--border-2:rgba(212,175,106,0.24);--cyan-glow:rgba(212,175,106,0.28);--day-name:"INK WABI-SABI // TUE";--spin-dur:130s;--spin-dir:reverse;--tdlid-dur:64s;}
+    [data-day="3"]{--cyan:#c9b06a;--lime:#8a9a5b;--bg:#08070a;--bg-1:#0f0e10;--border-2:rgba(201,176,106,0.24);--cyan-glow:rgba(201,176,106,0.28);--day-name:"ART DECO VAULT // WED";--spin-dur:110s;--spin-dir:normal;--tdlid-dur:56s;}
+    [data-day="4"]{--cyan:#3fae6a;--lime:#9bd66e;--bg:#020907;--bg-1:#06120e;--border-2:rgba(63,174,106,0.24);--cyan-glow:rgba(63,174,106,0.28);--day-name:"BIOPHILIC TERRA // THU";--spin-dur:150s;--spin-dir:reverse;--tdlid-dur:74s;}
+    [data-day="5"]{--cyan:#ff3fb0;--lime:#7df9ff;--bg:#0a0212;--bg-1:#160a22;--border-2:rgba(255,63,176,0.28);--cyan-glow:rgba(255,63,176,0.32);--day-name:"VAPORWAVE // FRI";--spin-dur:64s;--spin-dir:normal;--tdlid-dur:34s;}
+    [data-day="6"]{--cyan:#5aa9e6;--lime:#bfe3ff;--bg:#020608;--bg-1:#040d12;--border-2:rgba(90,169,230,0.24);--cyan-glow:rgba(90,169,230,0.28);--day-name:"ARCTIC GLACIAL // SAT";--spin-dur:170s;--spin-dir:normal;--tdlid-dur:84s;}
+    [data-day="7"]{--cyan:#ff7a45;--lime:#ffd166;--bg:#0a0402;--bg-1:#170a06;--border-2:rgba(255,122,69,0.28);--cyan-glow:rgba(255,122,69,0.32);--day-name:"SUNSET EMBER // SUN";--spin-dur:100s;--spin-dir:reverse;--tdlid-dur:52s;}
+
+    *,*::before,*::after{box-sizing:border-box}
+    @media (prefers-reduced-motion: reduce){
+        *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
+    }
+
+    html{ -webkit-text-size-adjust: 100%; }
+    body{
+        background: var(--bg);
+        transition: background .6s ease;
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+
+    /* ── Page reveal — cheap CSS-only entrance ── */
+    #page-reveal-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#000 0%,var(--bg-1) 100%);z-index:200000;transform-origin:left;will-change:transform;transition:transform 1s cubic-bezier(.7,0,.3,1)}
+    #page-reveal-overlay.active{transform:translateX(-100%)}
+
+    /* ── Static CSS starfield — zero DOM nodes, generated once, GPU-cheap ──
+         (lighter count than the PC page: mobile GPUs/paint budgets are smaller) */
+    #bg-stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+    #bg-stars::before{content:'';position:absolute;inset:0;width:2px;height:2px;border-radius:50%}
+
+    /* ── 3D constellation — static SVG, motion via one CSS 3D rotation only ── */
+    .constellation-3d-wrap{position:fixed;inset:-20%;z-index:0;pointer-events:none;transform-style:preserve-3d;will-change:transform;animation:constellation-spin var(--spin-dur,110s) linear infinite;animation-direction:var(--spin-dir,normal);opacity:.4}
+    @keyframes constellation-spin{0%{transform:rotateX(58deg) rotateZ(0deg)}100%{transform:rotateX(58deg) rotateZ(360deg)}}
+    .constellation-3d-wrap svg{width:100%;height:100%;overflow:visible}
+    .constellation-3d-wrap circle{fill:var(--cyan)}
+    .constellation-3d-wrap line{stroke:var(--cyan);stroke-width:.6;opacity:.28}
+    .constellation-3d-wrap .c-far{opacity:.28}.constellation-3d-wrap .c-mid{opacity:.5}.constellation-3d-wrap .c-near{opacity:.8}
+
+    /* ── 3D floating "TDLiD" monogram — fewer depth layers than PC for battery/thermal headroom ── */
+    .tdlid-3d-stage{position:fixed;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;pointer-events:none;perspective:1200px;overflow:hidden}
+    .tdlid-3d-rotor{position:relative;transform-style:preserve-3d;animation:tdlid-spin var(--tdlid-dur,55s) linear infinite;will-change:transform}
+    @keyframes tdlid-spin{0%{transform:rotateY(0deg) rotateX(8deg)}100%{transform:rotateY(360deg) rotateX(8deg)}}
+    .tdlid-3d-layer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-impact);font-size:clamp(3rem,26vw,6rem);letter-spacing:.04em;color:transparent;-webkit-text-stroke:1px color-mix(in srgb, var(--cyan) 24%, transparent);white-space:nowrap;user-select:none}
+
+    /* ── Day signature pattern — same 7 motifs as the PC page, dialed down for small screens ── */
+    .day-pattern{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.28}
+    [data-day="1"] .day-pattern{background-image:linear-gradient(color-mix(in srgb, var(--cyan) 12%, transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb, var(--cyan) 12%, transparent) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse 80% 45% at 50% 15%,black 0%,transparent 72%)}
+    [data-day="2"] .day-pattern{background-image:radial-gradient(ellipse 40% 16% at 20% 12%,color-mix(in srgb, var(--cyan) 16%, transparent) 0%,transparent 70%),radial-gradient(ellipse 35% 20% at 80% 24%,color-mix(in srgb, var(--cyan) 12%, transparent) 0%,transparent 70%)}
+    [data-day="3"] .day-pattern{background-image:repeating-conic-gradient(from 0deg at 50% 8%,color-mix(in srgb, var(--cyan) 8%, transparent) 0deg 2deg,transparent 2deg 14deg);mask-image:radial-gradient(circle at 50% 8%,black 0%,transparent 55%)}
+    [data-day="4"] .day-pattern{background-image:radial-gradient(ellipse 60% 40% at 10% 8%,color-mix(in srgb, var(--lime) 11%, transparent) 0%,transparent 70%),radial-gradient(ellipse 55% 35% at 90% 20%,color-mix(in srgb, var(--cyan) 9%, transparent) 0%,transparent 70%)}
+    [data-day="5"] .day-pattern{background-image:radial-gradient(circle at 50% 6%,color-mix(in srgb, var(--lime) 16%, transparent) 0%,transparent 16%),repeating-linear-gradient(90deg,color-mix(in srgb, var(--cyan) 10%, transparent) 0 1px,transparent 1px 44px)}
+    [data-day="6"] .day-pattern{background-image:linear-gradient(135deg,color-mix(in srgb, var(--cyan) 6%, transparent) 25%,transparent 25.5%),linear-gradient(225deg,color-mix(in srgb, var(--cyan) 6%, transparent) 25%,transparent 25.5%);background-size:110px 110px;mask-image:radial-gradient(ellipse 85% 45% at 50% 12%,black 0%,transparent 75%)}
+    [data-day="7"] .day-pattern{background-image:repeating-linear-gradient(0deg,color-mix(in srgb, var(--cyan) 6%, transparent) 0 2px,transparent 2px 22px),radial-gradient(circle at 50% 0%,color-mix(in srgb, var(--lime) 13%, transparent) 0%,transparent 38%)}
+
+    .company-bg {
+        position: absolute; inset: 0;
+        background: radial-gradient(circle at 50% 20%, var(--cyan-glow) 0%, transparent 70%),
+            radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--lime) 9%, transparent) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* ── Day badge — small floating theme label ── */
+    .day-badge{display:block;font-family:var(--font-body);font-weight:600;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);opacity:.6;margin-bottom:14px}
+    .day-badge::before{content:var(--day-name)}
+
+    .image-stage {
+        position: relative;
+        z-index: 1;
+    }
+
+    .image-card {
+        position: relative;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--bg-1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 160px;
+        margin-bottom: 1rem;
+        transition: border-color .3s;
+    }
+
+    .image-card img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.6s ease;
+        transform-origin: center center;
+        border-radius: 1.25rem;
+    }
+
+    .image-card.hover-expand:active img {
+        transform: scale(1.1);
+    }
+    .image-card.hover-expand:active {
+        border-color: var(--border-2);
+    }
+
+    .float-in {
+        animation: floatIn 0.8s ease-out both;
+    }
+
+    @keyframes floatIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px)
         }
 
-        .company-bg {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 50% 20%, rgba(34, 211, 238, .15), transparent 70%),
-                radial-gradient(circle at 20% 80%, rgba(124, 58, 237, .1), transparent 70%);
-            pointer-events: none;
-            z-index: 0;
+        to {
+            opacity: 1;
+            transform: translateY(0)
         }
+    }
 
-        .image-stage {
-            position: relative;
-            z-index: 1;
-        }
+    .hero-title-m {
+        font-size: 1.875rem;
+        line-height: 1.3;
+        letter-spacing: -0.02em;
+    }
 
-        .image-card {
-            position: relative;
-            border-radius: 1.25rem;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, .1);
-            background: #020617;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 160px;
-            margin-bottom: 1rem;
-        }
+    .hero-slogan-gradient {
+        display: inline-block !important;
+        font-family: var(--font-impact);
+        font-weight: 400 !important;
+        line-height: 1.15 !important;
+        padding-bottom: 0.1em;
 
-        .image-card img {
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: transform 0.6s ease;
-            transform-origin: center center;
-            border-radius: 1.25rem;
-        }
+        background: linear-gradient(to right, var(--cyan) 0%, var(--lime) 55%, #ffffff 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
 
-        .image-card.hover-expand:active img {
-            transform: scale(1.1);
-        }
+        color: transparent !important;
+        filter: drop-shadow(0 0 30px var(--cyan-glow));
+    }
 
-        .float-in {
-            animation: floatIn 0.8s ease-out both;
-        }
+    /* ── MISSION / TECHNOLOGY / VISION cards — day-reactive borders/accents ── */
+    .mv-card { transition: border-color .3s, transform .3s ease-out; transform-style: preserve-3d; }
+    .mv-card:active { transform: scale(0.98); }
+    .mv-accent-cyan { background: var(--cyan); }
+    .mv-accent-lime { background: var(--lime); }
+    .mv-accent-chrome { background: var(--chrome); }
+    .mv-title-cyan { color: var(--cyan); }
+    .mv-title-lime { color: var(--lime); }
+    .mv-title-chrome { color: var(--chrome); }
 
-        @keyframes floatIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px)
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
-        }
-
-        .hero-title-m {
-            font-size: 1.875rem;
-            line-height: 1.3;
-            letter-spacing: -0.02em;
-        }
-
-        .hero-slogan-gradient {
-            display: inline-block !important;
-            font-weight: 900 !important;
-            /* font-black 효과 */
-            line-height: 1.2 !important;
-            padding-bottom: 0.1em;
-
-            background: linear-gradient(to right, #0891b2 0%, #22d3ee 50%, #ffffff 100%) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            background-clip: text !important;
-
-            color: transparent !important;
-        }
+    /* ── Small phones — trim the heaviest decorative layers first ── */
+    @media (max-width: 380px) {
+        .tdlid-3d-layer { font-size: clamp(2.4rem, 24vw, 4.5rem); }
+        .constellation-3d-wrap { opacity: .28; }
+    }
+    /* ── Larger phones / small tablets in portrait — scale up a touch ── */
+    @media (min-width: 500px) {
+        .tdlid-3d-layer { font-size: clamp(4rem, 20vw, 8rem); }
+    }
     </style>
 </head>
 
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] relative overflow-x-hidden">
+
+    <div id="page-reveal-overlay"></div>
+
+    <div class="day-pattern"></div>
+    <div id="bg-stars"></div>
+    <div class="constellation-3d-wrap" id="constellation3d" aria-hidden="true">
+        <svg viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice"></svg>
+    </div>
+    <div class="tdlid-3d-stage" aria-hidden="true">
+        <div class="tdlid-3d-rotor" id="tdlidRotor"></div>
+    </div>
 
     <div id="header-placeholder"></div>
 
@@ -105,7 +231,8 @@
         <div class="company-bg"></div>
 
         <div class="text-center mb-12 float-in">
-            <h1 class="text-4xl md:text-5xl font-black tracking-tight hero-slogan-gradient mb-16">
+            <span class="day-badge"></span>
+            <h1 class="text-4xl md:text-5xl tracking-tight hero-slogan-gradient mb-16">
                 Designing the Energy<br>Infrastructure of Tomorrow
             </h1>
         </div>
@@ -126,31 +253,28 @@
 
         <section class="space-y-12 text-center">
             <div class="float-in">
-                <h2 class="text-3xl font-bold text-cyan-400 mb-4">Who We Are</h2>
+                <h2 class="text-3xl font-bold text-cyan-400 mb-4" style="color:var(--cyan)">Who We Are</h2>
                 <p class="text-neutral-400 text-base leading-relaxed px-2">
                     Leading the green energy revolution in Indonesia with cutting-edge lithium technology.
                 </p>
             </div>
 
             <div class="flex flex-col gap-6">
-                <div
-                    class="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/40 hover:border-cyan-400/40 transition">
-                    <div class="w-10 h-1 bg-cyan-400 mx-auto mb-4 rounded-full"></div>
-                    <h3 class="text-lg font-bold text-cyan-300 mb-3">MISSION</h3>
-                    <p class="text-sm text-neutral-300 leading-relaxed">“NO MORE CARBON” <br>Deliver the best products
+                <div class="mv-card p-6 rounded-2xl border border-neutral-800 bg-neutral-900/40" style="border-color:var(--border)">
+                    <div class="mv-accent-cyan w-10 h-1 mx-auto mb-4 rounded-full"></div>
+                    <h3 class="text-lg font-bold mv-title-cyan mb-3">MISSION</h3>
+                    <p class="text-sm text-neutral-300 leading-relaxed">"NO MORE CARBON" <br>Deliver the best products
                         and services to our customers. Promote leadership consistently. Create and Innovate value.</p>
                 </div>
-                <div
-                    class="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/40 hover:border-purple-400/40 transition">
-                    <div class="w-10 h-1 bg-purple-400 mx-auto mb-4 rounded-full"></div>
-                    <h3 class="text-lg font-bold text-purple-300 mb-3">TECHNOLOGY</h3>
+                <div class="mv-card p-6 rounded-2xl border border-neutral-800 bg-neutral-900/40" style="border-color:var(--border)">
+                    <div class="mv-accent-lime w-10 h-1 mx-auto mb-4 rounded-full"></div>
+                    <h3 class="text-lg font-bold mv-title-lime mb-3">TECHNOLOGY</h3>
                     <p class="text-sm text-neutral-300 leading-relaxed">High-density lithium-ion batteries with AI-based
                         BMS optimize performance, improve power and range, and maintain thermal stability.</p>
                 </div>
-                <div
-                    class="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/40 hover:border-blue-400/40 transition">
-                    <div class="w-10 h-1 bg-blue-400 mx-auto mb-4 rounded-full"></div>
-                    <h3 class="text-lg font-bold text-blue-300 mb-3">VISION</h3>
+                <div class="mv-card p-6 rounded-2xl border border-neutral-800 bg-neutral-900/40" style="border-color:var(--border)">
+                    <div class="mv-accent-chrome w-10 h-1 mx-auto mb-4 rounded-full"></div>
+                    <h3 class="text-lg font-bold mv-title-chrome mb-3">VISION</h3>
                     <p class="text-sm text-neutral-300 leading-relaxed">To provide EV motors and batteries that enhance
                         lifestyles and contribute to a better environment for future generations.</p>
                 </div>
@@ -161,87 +285,170 @@
     <div id="footer-placeholder"></div>
 
     <script>
-        /**
-         * 1. 메뉴 토글 기능
-         */
-        function initMenuToggle() {
-            const menuBtn = document.getElementById("menuToggleBtn");
-            const dropdown = document.getElementById("dropdownMenu");
-            const menuIcon = document.getElementById("menuIcon");
+    /* ══════════════════════════════════════════════════════════
+       CPU/BATTERY-OPTIMIZED MOBILE JAVASCRIPT
+       - No mousemove/parallax handlers at all (touch devices don't
+         hover, so that entire class of work is simply not run here).
+       - Star field + constellation + TDLiD monogram are all static
+         markup built ONCE at load; all subsequent motion is pure
+         compositor-only CSS animation (GPU, not main-thread JS).
+       - Lower star/line counts than the PC page to protect frame
+         time and battery on phone-class GPUs.
+       All original mobile functionality (header_m/footer_m loader,
+       admin-link stripping, BGM script exec, menu toggle, active-nav
+       highlighting) is preserved 100%.
+    ══════════════════════════════════════════════════════════ */
 
-            if (menuBtn && dropdown) {
-                menuBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    const isHidden = dropdown.classList.contains("invisible");
-                    if (isHidden) {
-                        dropdown.classList.remove("opacity-0", "invisible", "-translate-y-5");
-                        dropdown.classList.add("opacity-100", "visible", "translate-y-0");
-                        if (menuIcon) menuIcon.innerText = "✕";
-                    } else {
-                        dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
-                        dropdown.classList.add("opacity-0", "invisible", "-translate-y-5");
-                        if (menuIcon) menuIcon.innerText = "☰";
-                    }
-                };
-                document.addEventListener('click', (e) => {
-                    if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
-                        dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
-                        dropdown.classList.add("opacity-0", "invisible", "-translate-y-5");
-                        if (menuIcon) menuIcon.innerText = "☰";
-                    }
-                });
+    /* ── Static CSS starfield — generated once, no animation loop ── */
+    function initStars() {
+        const el = document.getElementById('bg-stars');
+        if (!el) return;
+        const n = 45;
+        const shadows = [];
+        for (let i = 0; i < n; i++) {
+            const x = Math.random() * 100, y = Math.random() * 100;
+            shadows.push(`${x}vw ${y}vh 0 ${Math.random() > 0.75 ? '1px' : '0px'} rgba(255,255,255,${(0.12 + Math.random() * 0.22).toFixed(2)})`);
+        }
+        const style = document.createElement('style');
+        style.textContent = `#bg-stars::before{box-shadow:${shadows.join(',')};}`;
+        document.head.appendChild(style);
+    }
+
+    /* ── 3D constellation — build once as static SVG markup, zero ongoing JS cost ── */
+    function initConstellation3D() {
+        const svg = document.querySelector('#constellation3d svg');
+        if (!svg) return;
+        const NUM_STARS = 32;
+        const stars = [];
+        for (let i = 0; i < NUM_STARS; i++) {
+            stars.push({ x: Math.random() * 1000, y: Math.random() * 1000, r: Math.random() * 1.6 + 0.5 });
+        }
+        let linesMarkup = '';
+        for (let i = 0; i < stars.length; i++) {
+            let best = -1, bestDist = Infinity;
+            for (let j = 0; j < stars.length; j++) {
+                if (i === j) continue;
+                const dx = stars[i].x - stars[j].x, dy = stars[i].y - stars[j].y;
+                const d = dx * dx + dy * dy;
+                if (d < bestDist && d < 50000) { bestDist = d; best = j; }
+            }
+            if (best !== -1) {
+                linesMarkup += `<line x1="${stars[i].x.toFixed(1)}" y1="${stars[i].y.toFixed(1)}" x2="${stars[best].x.toFixed(1)}" y2="${stars[best].y.toFixed(1)}"/>`;
             }
         }
+        const starsMarkup = stars.map(s => {
+            const cls = s.r > 1.4 ? 'c-near' : (s.r > 0.9 ? 'c-mid' : 'c-far');
+            return `<circle class="${cls}" cx="${s.x.toFixed(1)}" cy="${s.y.toFixed(1)}" r="${s.r.toFixed(2)}"/>`;
+        }).join('');
+        svg.innerHTML = linesMarkup + starsMarkup;
+    }
 
-        /**
-         * 2. 레이아웃 로드 및 초기화
-         */
-        async function loadLayout() {
-            try {
-                const [headerRes, footerRes] = await Promise.all([
-                    fetch('components/header_m.html'),
-                    fetch('components/footer_m.html')
-                ]);
-
-                // 헤더 처리
-                const headerText = await headerRes.text();
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = headerText;
-                const adminLink = tempDiv.querySelector('a[href="admin.html"]');
-                if (adminLink) adminLink.remove();
-                document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
-
-                // 푸터 처리
-                const footerPlaceholder = document.getElementById('footer-placeholder');
-                footerPlaceholder.innerHTML = await footerRes.text();
-
-                // BGM 스크립트 실행
-                const scripts = footerPlaceholder.querySelectorAll("script");
-                scripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    if (oldScript.src) newScript.src = oldScript.src;
-                    else newScript.text = oldScript.text;
-                    document.body.appendChild(newScript).parentNode.removeChild(newScript);
-                });
-
-                // 기능 초기화
-                initMenuToggle();
-
-                // 현재 페이지 강조
-                const navLinks = document.querySelectorAll('.nav-item-m');
-                navLinks.forEach(link => {
-                    if (link.getAttribute('href') === 'company_m.html') {
-                        link.classList.add('active-m');
-                    }
-                });
-
-            } catch (err) {
-                console.error("Layout Load Error:", err);
-            }
+    /* ── 3D TDLiD monogram — build once as stacked depth layers, zero ongoing JS cost ── */
+    function initTdlid3D() {
+        const rotor = document.getElementById('tdlidRotor');
+        if (!rotor) return;
+        const DEPTH_LAYERS = 8; // fewer than the PC page (14) — smaller GPU/paint budget
+        const SPACING = 12;
+        let markup = '';
+        for (let i = 0; i < DEPTH_LAYERS; i++) {
+            const z = -(i * SPACING);
+            const fade = (0.35 - (i / DEPTH_LAYERS) * 0.28).toFixed(2);
+            markup += `<span class="tdlid-3d-layer" style="transform:translate(-50%,-50%) translateZ(${z}px);opacity:${fade};">TDLiD</span>`;
         }
+        rotor.innerHTML = markup;
+    }
 
-        document.addEventListener("DOMContentLoaded", loadLayout);
-        document.addEventListener('contextmenu', (e) => e.preventDefault());
+    window.addEventListener('load', () => {
+        const overlay = document.getElementById('page-reveal-overlay');
+        if (overlay) setTimeout(() => overlay.classList.add('active'), 250);
+    });
+
+    /**
+     * 1. 메뉴 토글 기능 — 원본 그대로
+     */
+    function initMenuToggle() {
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const dropdown = document.getElementById("dropdownMenu");
+        const menuIcon = document.getElementById("menuIcon");
+
+        if (menuBtn && dropdown) {
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isHidden = dropdown.classList.contains("invisible");
+                if (isHidden) {
+                    dropdown.classList.remove("opacity-0", "invisible", "-translate-y-5");
+                    dropdown.classList.add("opacity-100", "visible", "translate-y-0");
+                    if (menuIcon) menuIcon.innerText = "✕";
+                } else {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
+                    dropdown.classList.add("opacity-0", "invisible", "-translate-y-5");
+                    if (menuIcon) menuIcon.innerText = "☰";
+                }
+            };
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                    dropdown.classList.remove("opacity-100", "visible", "translate-y-0");
+                    dropdown.classList.add("opacity-0", "invisible", "-translate-y-5");
+                    if (menuIcon) menuIcon.innerText = "☰";
+                }
+            });
+        }
+    }
+
+    /**
+     * 2. 레이아웃 로드 및 초기화 — 원본 그대로
+     */
+    async function loadLayout() {
+        try {
+            const [headerRes, footerRes] = await Promise.all([
+                fetch('components/header_m.html'),
+                fetch('components/footer_m.html')
+            ]);
+
+            // 헤더 처리
+            const headerText = await headerRes.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = headerText;
+            const adminLink = tempDiv.querySelector('a[href="admin.html"]');
+            if (adminLink) adminLink.remove();
+            document.getElementById('header-placeholder').innerHTML = tempDiv.innerHTML;
+
+            // 푸터 처리
+            const footerPlaceholder = document.getElementById('footer-placeholder');
+            footerPlaceholder.innerHTML = await footerRes.text();
+
+            // BGM 스크립트 실행
+            const scripts = footerPlaceholder.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                if (oldScript.src) newScript.src = oldScript.src;
+                else newScript.text = oldScript.text;
+                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+            });
+
+            // 기능 초기화
+            initMenuToggle();
+
+            // 현재 페이지 강조
+            const navLinks = document.querySelectorAll('.nav-item-m');
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === 'company_m.html') {
+                    link.classList.add('active-m');
+                }
+            });
+
+        } catch (err) {
+            console.error("Layout Load Error:", err);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        initStars();
+        initConstellation3D();
+        initTdlid3D();
+        loadLayout();
+    });
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
     </script>
 </body>
 
