@@ -5,15 +5,19 @@
     <meta name="description" id="metaDescription" content="">
     <meta name="keywords" id="metaKeywords" content="">
 
-    <!-- ════ DAY THEME — set BEFORE paint to avoid FOUC ════ -->
-    <script>
-        (function(){
-            var d = new Date().getDay(); // 0=Sun..6=Sat
-            var map = {0:7,1:1,2:2,3:3,4:4,5:5,6:6}; // Mon=1..Sun=7
-            document.documentElement.setAttribute('data-day', map[d]);
+<!-- ════ DAY THEME — set BEFORE paint to avoid FOUC ════ -->
+<script>
+    (function(){
+        var date = new Date().getDate(); // 1~31일
+        var bgName = (date % 2 === 0) ? 'bg2.webp' : 'bg1.webp';
+        document.documentElement.setAttribute('data-bg', bgName);
 
-        })();
-    </script>
+        // CSS 요일별 스타일([data-day])이 정상 적용되도록 요일값 추가 (1:월 ~ 7:일)
+        var day = new Date().getDay();
+        var dayNum = (day === 0) ? 7 : day;
+        document.documentElement.setAttribute('data-day', dayNum);
+    })();
+</script>
 
     <!-- ════ MOBILE REDIRECT — 원본 그대로 ════ -->
     <script>
@@ -67,7 +71,7 @@ const ua=navigator.userAgent,now=new Date();database.ref('visits').push({timesta
        All original features preserved.
     ═══════════════════════════════════════════════════════════ */
     :root {
-        --bg:         #000405;
+--bg: transparent;
         --bg-1:       #020c10;
         --bg-2:       #061318;
         --surface:    rgba(6,20,26,0.7);
@@ -105,13 +109,13 @@ const ua=navigator.userAgent,now=new Date();database.ref('visits').push({timesta
        6 Sat — Glacial Cyan / Arctic Dark  (steel blue)
        7 Sun — Sunset Ember                (rose / orange / amber)
     ════════════════════════════════════════════════════ */
-    [data-day="1"]{--cyan:#22d3ee;--lime:#67e8f9;--bg:#00040a;--bg-1:#020a14;--bg-2:#05121f;--border-2:rgba(34,211,238,0.22);--cyan-glow:rgba(34,211,238,0.3);--day-name:"CYBERPUNK // MON";}
-    [data-day="2"]{--cyan:#d4af6a;--lime:#f3e0b3;--bg:#06050a;--bg-1:#0d0a12;--bg-2:#15101a;--border-2:rgba(212,175,106,0.22);--cyan-glow:rgba(212,175,106,0.28);--day-name:"INK WABI-SABI // TUE";}
-    [data-day="3"]{--cyan:#c9b06a;--lime:#8a9a5b;--bg:#08070a;--bg-1:#0f0e10;--bg-2:#17151a;--border-2:rgba(201,176,106,0.22);--cyan-glow:rgba(201,176,106,0.28);--day-name:"ART DECO VAULT // WED";}
-    [data-day="4"]{--cyan:#3fae6a;--lime:#9bd66e;--bg:#020907;--bg-1:#06120e;--bg-2:#0a1c15;--border-2:rgba(63,174,106,0.22);--cyan-glow:rgba(63,174,106,0.28);--day-name:"BIOPHILIC TERRA // THU";}
-    [data-day="5"]{--cyan:#ff3fb0;--lime:#7df9ff;--bg:#0a0212;--bg-1:#160a22;--bg-2:#1f1130;--border-2:rgba(255,63,176,0.26);--cyan-glow:rgba(255,63,176,0.32);--day-name:"VAPORWAVE // FRI";}
-    [data-day="6"]{--cyan:#5aa9e6;--lime:#bfe3ff;--bg:#020608;--bg-1:#040d12;--bg-2:#08151c;--border-2:rgba(90,169,230,0.22);--cyan-glow:rgba(90,169,230,0.28);--day-name:"ARCTIC GLACIAL // SAT";}
-    [data-day="7"]{--cyan:#ff7a45;--lime:#ffd166;--bg:#0a0402;--bg-1:#170a06;--bg-2:#22100a;--border-2:rgba(255,122,69,0.26);--cyan-glow:rgba(255,122,69,0.32);--day-name:"SUNSET EMBER // SUN";}
+[data-day="1"]{--cyan:#22d3ee;--lime:#67e8f9;--bg-1:#020a14;--bg-2:#05121f;--border-2:rgba(34,211,238,0.22);--cyan-glow:rgba(34,211,238,0.3);--day-name:"CYBERPUNK // MON";}
+[data-day="2"]{--cyan:#d4af6a;--lime:#f3e0b3;--bg-1:#0d0a12;--bg-2:#15101a;--border-2:rgba(212,175,106,0.22);--cyan-glow:rgba(212,175,106,0.28);--day-name:"INK WABI-SABI // TUE";}
+[data-day="3"]{--cyan:#c9b06a;--lime:#8a9a5b;--bg-1:#0f0e10;--bg-2:#17151a;--border-2:rgba(201,176,106,0.22);--cyan-glow:rgba(201,176,106,0.28);--day-name:"ART DECO VAULT // WED";}
+[data-day="4"]{--cyan:#3fae6a;--lime:#9bd66e;--bg-1:#06120e;--bg-2:#0a1c15;--border-2:rgba(63,174,106,0.22);--cyan-glow:rgba(63,174,106,0.28);--day-name:"BIOPHILIC TERRA // THU";}
+[data-day="5"]{--cyan:#ff3fb0;--lime:#7df9ff;--bg-1:#160a22;--bg-2:#1f1130;--border-2:rgba(255,63,176,0.26);--cyan-glow:rgba(255,63,176,0.32);--day-name:"VAPORWAVE // FRI";}
+[data-day="6"]{--cyan:#5aa9e6;--lime:#bfe3ff;--bg-1:#040d12;--bg-2:#08151c;--border-2:rgba(90,169,230,0.22);--cyan-glow:rgba(90,169,230,0.28);--day-name:"ARCTIC GLACIAL // SAT";}
+[data-day="7"]{--cyan:#ff7a45;--lime:#ffd166;--bg-1:#170a06;--bg-2:#22100a;--border-2:rgba(255,122,69,0.26);--cyan-glow:rgba(255,122,69,0.32);--day-name:"SUNSET EMBER // SUN";}
 
     /* ═══════════ PER-DAY SIGNATURE ROTATION SPEED / ANGLE ═══════════
        Each day gets its own spin duration + direction for the 3D
@@ -129,23 +133,69 @@ const ua=navigator.userAgent,now=new Date();database.ref('visits').push({timesta
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
-    body {
-        font-family: var(--font-body);
-        background: var(--bg);
-        color: var(--chrome);
-        overflow-x: hidden;
-        -webkit-font-smoothing: antialiased;
-    }
+html {
+  height: 100%;
+  background: #000405 !important;
+  scroll-behavior: smooth;
+}
 
-    /* ── Reduced motion: disable all animations ──────── */
-    @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-        }
-    }
+body {
+  font-family: var(--font-body);
+  color: var(--chrome);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  background: transparent !important;
+  min-height: 100vh;
+  position: relative;
+}
 
+/* 1. 배경 레이어 - 고정 + 가운데 + 반응형 전체 보이기 */
+body::before {
+  content: '' !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -10 !important;
+  pointer-events: none !important;
+  background-color: #000405 !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: contain !important;
+}
+
+html[data-bg="bg1.webp"] body::before {
+  background-image: url('images/bg/bg1.webp') !important;
+}
+html[data-bg="bg2.webp"] body::before {
+  background-image: url('images/bg/bg2.webp') !important;
+}
+
+/* 2. 노이즈 레이어 - body::before 가 아니라 body::after 로 이동 (충돌 방지) */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.025; pointer-events: none;
+}
+
+/* 3. hero가 다시 덮지 못하도록 강제 투명 */
+.hero-section,
+.video-bg-container {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* 4. 반응형 - 가운데 유지하면서 전체 보이기 */
+@media (max-width: 768px) {
+  body::before {
+    background-size: 100% auto !important;
+    background-position: center center !important;
+  }
+}
+@media (min-width: 1920px) {
+  body::before {
+    background-size: cover !important; /* 4K에서는 꽉 차게 */
+  }
+}
     /* ── Page reveal ─────────────────────────────────── */
     #page-reveal-overlay {
         position: fixed; inset: 0;
@@ -157,13 +207,6 @@ const ua=navigator.userAgent,now=new Date();database.ref('visits').push({timesta
     }
     #page-reveal-overlay.active { transform: translateX(-100%); }
 
-    /* ── Noise grain — CSS-only, zero JS ─────────────── */
-    body::before {
-        content: '';
-        position: fixed; inset: 0; z-index: 1;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-        opacity: 0.025; pointer-events: none;
-    }
 
     /* ── Custom dual cursor — event-driven only, NO rAF loop ── */
     .resn-cursor {
@@ -195,7 +238,8 @@ const ua=navigator.userAgent,now=new Date();database.ref('visits').push({timesta
         min-height: 600px;
         overflow: hidden;
         display: flex; align-items: center; justify-content: center;
-        background: var(--bg);
+    background: transparent !important;
+    background-color: transparent !important;
         perspective: 1400px;
     }
 
@@ -859,9 +903,6 @@ const ua=navigator.userAgent,now=new Date();database.ref('visits').push({timesta
                 </p>
             </div>
 
-            <div class="bike-float-container">
-<img id="weekday-bike" src="" alt="Electric Bike" class="bike-float-img">
-            </div>
 
             <div class="hero-scroll-hint">
                 <span class="scroll-label">Scroll</span>
