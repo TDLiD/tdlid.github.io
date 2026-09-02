@@ -7,11 +7,16 @@
 
 <!-- ════ DAY THEME — set BEFORE paint to avoid FOUC ════ -->
 <script>
-    (function(){
-        var d = new Date().getDay();
-        var map = {0:7,1:1,2:2,3:3,4:4,5:5,6:6}; // Mon=1..Sun=7
-        document.documentElement.setAttribute('data-day', map[d]);
-    })();
+(function(){
+    // PC와 동일 - 홀수/짝수 날짜로 bg1/bg2 결정
+    var date = new Date().getDate(); // 1~31
+    var bgName = (date % 2 === 0)? 'bg2.webp' : 'bg1.webp';
+    document.documentElement.setAttribute('data-bg', bgName);
+
+    var d = new Date().getDay();
+    var map = {0:7,1:1,2:2,3:3,4:4,5:5,6:6};
+    document.documentElement.setAttribute('data-day', map[d]);
+})();
 </script>
 
 <title>TDL Energy Indonesia — NextGen Motorcycle Battery Packs</title>
@@ -93,6 +98,43 @@ recordVisit();
     --tiltY: 0deg;
 }
 
+html { height: 100%; background: #030a0d!important; }
+body { min-height: 100svh; position: relative; background: transparent!important; }
+
+/* PC와 동일 - 뷰포트 고정 + 가운데 + 반응형 contain */
+body::before {
+  content: ''!important;
+  position: fixed!important;
+  inset: 0!important;
+  z-index: -10!important;
+  pointer-events: none!important;
+  background-color: #030a0d!important;
+  background-repeat: no-repeat!important;
+  background-position: center center!important;
+  background-size: contain!important;
+}
+html[data-bg="bg1.webp"] body::before {
+  background-image: url('images/bg/bg1.webp')!important;
+}
+html[data-bg="bg2.webp"] body::before {
+  background-image: url('images/bg/bg2.webp')!important;
+}
+
+/* 기존 노이즈는 ::after로 이동 */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.02; pointer-events: none;
+}
+
+/* hero가 배경을 덮지 못하게 */
+.hero-section,.video-bg-container {
+  background: transparent!important;
+  background-color: transparent!important;
+}
+
+
 /* ═══════════ DAY-OF-WEEK 3D THEME TOKENS ═══════════
    1 Mon Deep Space/Cyberpunk(cyan) · 2 Tue Ink Wabi-Sabi(gold)
    3 Wed Art Deco Vault(olive/champagne) · 4 Thu Biophilic Terra(green)
@@ -124,12 +166,6 @@ body {
     overscroll-behavior-y: none;
 }
 
-body::before {
-    content: '';
-    position: fixed; inset: 0; z-index: 1;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.02; pointer-events: none;
-}
 
 #page-reveal-overlay {
     position: fixed; inset: 0;
@@ -582,18 +618,10 @@ function initStars() {
 
 /* ── Image slider (원본 그대로, 요일별 배경) ─ */
 function initImageSlider() {
+    // PC처럼 bg1/bg2.webp만 CSS로 사용하므로 gif 슬라이더는 제거
     const sliderContainer = document.getElementById('heroSlider');
     if (!sliderContainer) return;
-    const day      = new Date().getDay();
-    const bgNumber = day === 0 ? 7 : day;
-    const img      = document.createElement('img');
-    img.src        = `images/bg/bg-${bgNumber}.gif`;
-    img.className  = 'slide active';
-    img.onerror    = () => { img.src = 'images/bg/bg-3.gif'; };
-    const overlay  = sliderContainer.querySelector('.video-overlay');
-    sliderContainer.innerHTML = '';
-    if (overlay) sliderContainer.appendChild(overlay);
-    sliderContainer.appendChild(img);
+    sliderContainer.querySelectorAll('.slide').forEach(el => el.remove());
 }
 
 /* ── AI tag rotation — fade transition ───── */
