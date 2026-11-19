@@ -32,7 +32,6 @@
 </script>
 
 <!-- ════ 3) CONNECTION WARM-UP (non-blocking) ════ -->
-<link rel="preload" as="image" href="images/technology/72V20A-cut.webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
@@ -208,51 +207,67 @@ html.js .rv.in{opacity:1;transform:none}
 @keyframes blink{50%{opacity:.3}}
 #ai-msg{transition:opacity .4s}
 
-/* ═════ BATTERY PACK PHOTO (cut-out) + LED CHARGE EFFECT — mobile/tablet ═════
-   72V20A-cut.webp shown 1:1 (never stretched/rotated). Overlay clipped to the pack silhouette.
-   Gyro/tap only MOVE the photo (translate), never distort it. */
-.stage{position:relative;height:clamp(250px,42svh,380px);margin:8px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    touch-action:pan-y;cursor:pointer;--tx:0px;--ty:0px}
-.float{position:relative;z-index:2;animation:float 5s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(-3px)}50%{transform:translateY(-12px)}}
-.pack-photo{--ph:calc(clamp(250px,42svh,380px) * .84);position:relative;height:var(--ph);aspect-ratio:674/1756;
-    transform:translate(var(--tx),var(--ty));transition:transform .25s ease-out;
-    filter:drop-shadow(0 18px 26px rgba(0,0,0,.65)) drop-shadow(0 0 24px var(--glow))}
-.pack-photo img{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none;user-select:none;pointer-events:none}
-.pack-photo::after,.charge-zone{-webkit-mask:url('images/technology/72V20A-cut.webp') center/100% 100% no-repeat;mask:url('images/technology/72V20A-cut.webp') center/100% 100% no-repeat}
-.pack-photo::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,transparent 38%,rgba(255,255,255,.16) 48%,transparent 58%);
+/* ═════ 3D BATTERY PACK (CSS only, mobile-sized) ═════ */
+.stage{position:relative;height:clamp(220px,40svh,340px);margin:6px 0 2px;display:flex;align-items:center;justify-content:center;
+    perspective:900px;touch-action:pan-y;cursor:grab}
+.float{transform-style:preserve-3d;animation:float 5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(-4px)}50%{transform:translateY(-16px)}}
+.pack{--w:clamp(112px,31vw,160px);--h:calc(var(--w)*1.48);--d:calc(var(--w)*.46);
+    position:relative;width:var(--w);height:var(--h);transform-style:preserve-3d;
+    transform:rotateX(calc(10deg + var(--tx))) rotateY(calc(-36deg + var(--ty) + var(--drag)))}
+.pack.spring{transition:transform .9s var(--ease)}
+.face{position:absolute;left:50%;top:50%;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.f-fr,.f-bk{width:var(--w);height:var(--h);margin:calc(var(--h)/-2) 0 0 calc(var(--w)/-2);border-radius:11px}
+.f-fr{transform:translateZ(calc(var(--d)/2))}.f-bk{transform:rotateY(180deg) translateZ(calc(var(--d)/2))}
+.f-l,.f-r{width:var(--d);height:var(--h);margin:calc(var(--h)/-2) 0 0 calc(var(--d)/-2)}
+.f-r{transform:rotateY(90deg) translateZ(calc(var(--w)/2))}.f-l{transform:rotateY(-90deg) translateZ(calc(var(--w)/2))}
+.f-t,.f-b{width:var(--w);height:var(--d);margin:calc(var(--d)/-2) 0 0 calc(var(--w)/-2)}
+.f-t{transform:rotateX(90deg) translateZ(calc(var(--h)/2))}.f-b{transform:rotateX(-90deg) translateZ(calc(var(--h)/2));background:#05080a}
+.f-fr{background:linear-gradient(115deg,rgba(255,255,255,.1),transparent 32%,transparent 68%,rgba(255,255,255,.05)),linear-gradient(180deg,#1b2530,#0c1218 55%,#070b0f);
+    border:1px solid color-mix(in srgb,var(--cy) 38%,rgba(255,255,255,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 30px rgba(0,0,0,.6),0 0 40px var(--glow);
+    padding:calc(var(--w)*.09);display:flex;flex-direction:column;overflow:hidden;text-align:left}
+.f-fr::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.14) 48%,transparent 60%);
     background-size:260% 100%;animation:sheen 7s ease-in-out infinite}
 @keyframes sheen{0%,30%{background-position:130% 0}70%,100%{background-position:-40% 0}}
-.charge-zone{position:absolute;inset:0;pointer-events:none}
-.cz-face{position:absolute;left:31.8%;top:12%;width:65.3%;height:85%;overflow:hidden;border-radius:2px;animation:cz-edge 6s ease-in-out infinite}
-@keyframes cz-edge{0%,60%{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cy) 30%,transparent)}70%,100%{box-shadow:inset 0 0 0 1px var(--lime),inset 0 0 18px color-mix(in srgb,var(--lime) 45%,transparent)}}
-.cz-fill{position:absolute;left:0;right:0;bottom:0;height:18%;mix-blend-mode:screen;opacity:.8;
-    background:linear-gradient(0deg,color-mix(in srgb,var(--cy) 75%,transparent),color-mix(in srgb,var(--cy) 55%,transparent) 60%,color-mix(in srgb,var(--lime) 60%,transparent));
-    animation:charge 6s cubic-bezier(.5,0,.3,1) infinite}
-.cz-fill::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.35) 0 2px,transparent 2px calc(var(--ph)*.035))}
-.cz-fill::after{content:'';position:absolute;left:-10%;right:-10%;top:-4px;height:8px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,.95),transparent 70%);filter:blur(2px)}
-@keyframes charge{0%{height:18%}68%,100%{height:100%}}
-@property --pct{syntax:'<integer>';inherits:false;initial-value:18}
-.cz-pct{position:absolute;left:0;right:0;top:12%;text-align:center;z-index:2;font-family:var(--f-imp);font-size:calc(var(--ph)*.075);color:#fff;letter-spacing:.02em;
-    text-shadow:0 2px 0 rgba(0,0,0,.4),0 0 14px var(--glow);animation:pct 6s cubic-bezier(.5,0,.3,1) infinite;counter-reset:p var(--pct)}
-.cz-pct::after{content:counter(p) '%'}
-@keyframes pct{0%{--pct:18}68%,100%{--pct:100}}
-.cz-leds{position:absolute;top:3%;left:50%;transform:translateX(-50%);display:flex;gap:3px;z-index:2}
-.cz-leds span{width:5px;height:5px;border-radius:50%;background:#1f2a33}
-.cz-leds span:nth-child(1){animation:l1 6s infinite}.cz-leds span:nth-child(2){animation:l2 6s infinite}.cz-leds span:nth-child(3){animation:l3 6s infinite}.cz-leds span:nth-child(4){animation:l4 6s infinite}
+.pk-top{display:flex;justify-content:space-between;align-items:center}
+.pk-brand{font-family:var(--f-imp);font-size:calc(var(--w)*.17);letter-spacing:.06em;line-height:1}
+.pk-brand i{font-style:normal;color:var(--cy)}
+.pk-leds{display:flex;gap:3px}
+.pk-leds span{width:5px;height:5px;border-radius:50%;background:#1f2a33}
+.pk-leds span:nth-child(1){animation:l1 6s infinite}.pk-leds span:nth-child(2){animation:l2 6s infinite}.pk-leds span:nth-child(3){animation:l3 6s infinite}.pk-leds span:nth-child(4){animation:l4 6s infinite}
 @keyframes l1{0%,100%{background:var(--lime);box-shadow:0 0 6px var(--lime)}}
 @keyframes l2{0%,22%{background:#1f2a33;box-shadow:none}24%,100%{background:var(--lime);box-shadow:0 0 6px var(--lime)}}
 @keyframes l3{0%,44%{background:#1f2a33;box-shadow:none}46%,100%{background:var(--lime);box-shadow:0 0 6px var(--lime)}}
 @keyframes l4{0%,66%{background:#1f2a33;box-shadow:none}68%,100%{background:var(--lime);box-shadow:0 0 6px var(--lime)}}
-.pack-cap{position:relative;z-index:3;margin-top:10px;font:400 8.5px var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--text);white-space:nowrap}
-.pack-cap b{color:var(--chrome)}
-
-.podium{position:absolute;left:50%;bottom:15%;width:0;height:0;pointer-events:none}
+.pk-model{font-family:var(--f-mono);font-size:calc(var(--w)*.05);letter-spacing:.22em;color:var(--text);margin-top:4px}
+.pk-win{position:relative;flex:1;margin:calc(var(--w)*.07) 0;border-radius:8px;overflow:hidden;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.07);box-shadow:inset 0 0 18px rgba(0,0,0,.8)}
+.pk-fill{position:absolute;left:0;right:0;bottom:0;height:18%;background:linear-gradient(0deg,color-mix(in srgb,var(--cy) 85%,#000),var(--cy) 55%,var(--lime));
+    box-shadow:0 0 24px var(--glow),inset 0 2px 0 rgba(255,255,255,.55);animation:charge 6s cubic-bezier(.5,0,.3,1) infinite}
+.pk-fill::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 2px,transparent 2px calc(var(--w)*.07))}
+@keyframes charge{0%{height:18%}68%,100%{height:100%}}
+@property --pct{syntax:'<integer>';inherits:false;initial-value:18}
+.pk-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--f-imp);font-size:calc(var(--w)*.26);color:#fff;
+    text-shadow:0 2px 0 rgba(0,0,0,.35),0 0 18px rgba(0,0,0,.45);animation:pct 6s cubic-bezier(.5,0,.3,1) infinite;counter-reset:p var(--pct)}
+.pk-pct::after{content:counter(p) '%'}
+@keyframes pct{0%{--pct:18}68%,100%{--pct:100}}
+.pk-foot{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:calc(var(--w)*.045);letter-spacing:.14em;color:var(--text);line-height:1.5;text-transform:uppercase}
+.pk-foot b{color:var(--chrome)}
+.f-bk{background:linear-gradient(180deg,#121a22,#070b0f);border:1px solid rgba(255,255,255,.06)}
+.f-l,.f-r{background:repeating-linear-gradient(180deg,#0f171e 0 calc(var(--w)*.05),#18222c calc(var(--w)*.05) calc(var(--w)*.058),#0a1015 calc(var(--w)*.058) calc(var(--w)*.1));
+    box-shadow:inset 6px 0 14px rgba(0,0,0,.55),inset -6px 0 14px rgba(0,0,0,.55)}
+.f-r::before{content:'';position:absolute;left:14%;right:14%;top:18%;bottom:18%;border-radius:5px;border:1px solid color-mix(in srgb,var(--cy) 30%,transparent);
+    background:radial-gradient(circle,color-mix(in srgb,var(--cy) 70%,#fff) 0 18%,#2a3540 20% 34%,color-mix(in srgb,var(--cy) 25%,#0b1218) 36% 46%,transparent 48%) 0 0/calc(var(--d)*.36) calc(var(--d)*.36),#05090c;
+    box-shadow:inset 0 0 12px rgba(0,0,0,.9),0 0 14px var(--glow)}
+.f-t{background:linear-gradient(90deg,#121b23,#1d2833 50%,#121b23);display:flex;align-items:center;justify-content:space-between;padding:0 16%}
+.term{width:calc(var(--d)*.34);height:calc(var(--d)*.34);border-radius:50%;background:radial-gradient(circle at 40% 35%,#f8fafc,#94a3b8 40%,#334155 70%);box-shadow:0 0 0 3px #0a0f13,0 0 0 5px var(--c)}
+.term.pos{--c:#ef4444}.term.neg{--c:#0f172a}
+.handle{width:34%;height:26%;border-radius:999px;background:#080c10}
+.podium{position:absolute;left:50%;bottom:9%;width:0;height:0;pointer-events:none}
 .podium i{position:absolute;left:50%;top:50%;border-radius:50%;border:1px solid color-mix(in srgb,var(--cy) 40%,transparent);transform:translate(-50%,-50%) rotateX(76deg);animation:ring 4s ease-in-out infinite}
 .podium i:nth-child(1){width:min(62vw,250px);height:min(62vw,250px);box-shadow:0 0 30px var(--glow),inset 0 0 30px var(--glow)}
 .podium i:nth-child(2){width:min(92vw,370px);height:min(92vw,370px);border-color:color-mix(in srgb,var(--cy) 15%,transparent);animation-delay:-1.4s}
 @keyframes ring{50%{opacity:.4}}
-.shadow{position:absolute;left:50%;bottom:15%;width:min(52vw,210px);height:34px;transform:translate(-50%,50%);border-radius:50%;
+.shadow{position:absolute;left:50%;bottom:9%;width:min(52vw,210px);height:34px;transform:translate(-50%,50%);border-radius:50%;
     background:radial-gradient(ellipse,var(--glow),rgba(0,0,0,.6) 40%,transparent 70%);filter:blur(6px);animation:sh 5s ease-in-out infinite}
 @keyframes sh{50%{transform:translate(-50%,50%) scale(.8);opacity:.6}}
 .chip{position:absolute;z-index:4;display:flex;align-items:center;gap:7px;padding:7px 11px 7px 8px;border-radius:12px;text-align:left;
@@ -260,13 +275,12 @@ html.js .rv.in{opacity:1;transform:none}
 .chip .ic{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:var(--cy);color:#000;font:700 9px var(--f-mono)}
 .chip b{display:block;font:400 1.05rem/1 var(--f-imp);letter-spacing:.04em}
 .chip small{font:400 7.5px var(--f-mono);letter-spacing:.18em;color:var(--text);text-transform:uppercase}
-.chip-1{top:8%;left:-2%}.chip-2{top:30%;right:-2%;animation-delay:-2s}.chip-3{bottom:34%;left:-2%;animation-delay:-3.5s}.chip-4{bottom:16%;right:-2%;animation-delay:-5s}
-@media (max-width:599px){.chip{gap:6px;padding:6px 9px 6px 6px}.chip .ic{width:20px;height:20px;font-size:8px}.chip b{font-size:.95rem}.chip small{font-size:6.5px}}
+.chip-1{top:4%;left:0}.chip-2{bottom:16%;right:0;animation-delay:-2s}.chip-3,.chip-4{display:none}
 @keyframes bob{50%{transform:translateY(-8px)}}
-.drag-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-family:var(--f-mono);font-size:8.5px;letter-spacing:.24em;color:var(--text);opacity:.6;white-space:nowrap;transition:opacity .5s}
+.drag-hint{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-family:var(--f-mono);font-size:8.5px;letter-spacing:.24em;color:var(--text);opacity:.6;white-space:nowrap;transition:opacity .5s}
 .drag-hint.gone{opacity:0}
 
-.kicker{margin-top:22px;font-family:var(--f-ui);font-weight:700;font-size:9px;letter-spacing:.16em;white-space:nowrap;text-transform:uppercase;color:var(--text);margin-bottom:8px}
+.kicker{margin-top:14px;font-family:var(--f-ui);font-weight:700;font-size:9px;letter-spacing:.16em;white-space:nowrap;text-transform:uppercase;color:var(--text);margin-bottom:8px}
 .kicker b{color:var(--chrome)}
 .h1{font-family:var(--f-imp);font-weight:400;font-size:clamp(3rem,15.5vw,4.6rem);line-height:.86;letter-spacing:.02em;
     text-shadow:0 1px 0 color-mix(in srgb,var(--cy) 40%,transparent),0 2px 0 color-mix(in srgb,var(--cy) 28%,transparent),0 3px 0 color-mix(in srgb,var(--cy) 18%,transparent),0 8px 18px rgba(0,0,0,.55),0 0 50px var(--glow);
@@ -404,22 +418,8 @@ html.js .rv.in{opacity:1;transform:none}
 #triggerWord{color:inherit;font-weight:inherit;text-decoration:none;cursor:pointer;display:inline-block;position:relative;z-index:50;-webkit-tap-highlight-color:transparent;pointer-events:auto}
 .animated-logo-text-m{font-size:clamp(10px,3.5vw,14px)!important;white-space:nowrap}
 
-@media (min-width:600px){.card{flex-basis:56%}.card.feat{flex-basis:62%}.wrap{max-width:640px;margin:0 auto}
-    .chip{padding:9px 14px 9px 10px}.chip b{font-size:1.25rem}.chip small{font-size:8.5px}.chip .ic{width:28px;height:28px}
-    .chip-1{left:4%}.chip-3{left:2%}.chip-2,.chip-4{right:4%}
-    .stage{height:min(50svh,560px)} .pack-photo{--ph:calc(min(50svh,560px) * .84)}}
-/* Tablet landscape (≥900px wide, landscape): copy left · battery right */
-@media (min-width:900px) and (orientation:landscape){
-    .hero-inner{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:1.05fr .95fr;column-gap:28px;align-items:center;text-align:left}
-    .hero-inner > *{grid-column:1}
-    .hero-inner > .stage{grid-column:2;grid-row:1 / span 6;height:min(72svh,600px);margin:0}
-    .hero-inner > .stage .pack-photo{--ph:calc(min(72svh,600px) * .84)}
-    .sys-tag{justify-self:start}
-    .h1{font-size:clamp(3.6rem,8vw,5.6rem)}.slogan{font-size:clamp(1.5rem,3.4vw,2.3rem)}
-    .hero-desc{margin:16px 0 0;max-width:440px;font-size:.95rem}
-    .hero-cta{max-width:440px}
-    .chip-1,.chip-3{left:-4%}.chip-2,.chip-4{right:-4%}
-}
+@media (max-width:340px){.hero-cta{grid-template-columns:1fr}.chip-3,.chip-4{display:none}.interactive-certs{grid-template-columns:repeat(2,1fr)}.cert-link:last-child{grid-column:auto}}
+@media (min-width:600px){.card{flex-basis:56%}.card.feat{flex-basis:62%}.wrap{max-width:640px;margin:0 auto}}
 </style>
 </head>
 
@@ -450,27 +450,27 @@ html.js .rv.in{opacity:1;transform:none}
         <div class="hero-inner wrap">
             <div class="sys-tag"><span class="sys-dot"></span><span id="ai-msg">SYSTEM INITIALIZING...</span></div>
 
-            <div class="stage" id="packStage" aria-label="TDLiD 72V 20Ah rechargeable lithium-ion battery — tap to recharge">
+            <div class="stage" id="packStage" aria-label="TDLiD 72V 20Ah battery pack — drag to rotate">
                 <div class="podium"><i></i><i></i></div>
                 <div class="shadow"></div>
                 <div class="float">
-                    <div class="pack-photo" id="packPhoto">
-                        <img src="images/technology/72V20A-cut.webp" alt="TDLiD 72V 20Ah Rechargeable Lithium-Ion Battery" width="674" height="1756" fetchpriority="high" decoding="async">
-                        <div class="charge-zone" aria-hidden="true">
-                            <div class="cz-face">
-                                <div class="cz-fill"></div>
-                                <div class="cz-leds"><span></span><span></span><span></span><span></span></div>
-                                <div class="cz-pct"></div>
-                            </div>
+                    <div class="pack" id="pack">
+                        <div class="face f-fr">
+                            <div class="pk-top"><div class="pk-brand">TDL<i>i</i>D</div><div class="pk-leds"><span></span><span></span><span></span><span></span></div></div>
+                            <div class="pk-model">POWER PACK · 72V</div>
+                            <div class="pk-win"><div class="pk-fill"></div><div class="pk-pct"></div></div>
+                            <div class="pk-foot"><div><b>72V</b>/<b>20Ah</b><br>Lithium</div><div style="text-align:right">IEC 62619<br>UN38.3</div></div>
                         </div>
+                        <div class="face f-bk"></div><div class="face f-r"></div><div class="face f-l"></div>
+                        <div class="face f-t"><span class="term pos"></span><span class="handle"></span><span class="term neg"></span></div>
+                        <div class="face f-b"></div>
                     </div>
                 </div>
-                <p class="pack-cap"><b>LG NMC</b> Cells · <b>127×118×410</b> mm</p>
-                <div class="chip chip-1"><span class="ic">V</span><div><b>72V/20Ah</b><small>Capacity</small></div></div>
-                <div class="chip chip-2"><span class="ic">km</span><div><b>50–60km</b><small>Range</small></div></div>
-                <div class="chip chip-3"><span class="ic">⚡</span><div><b>3 Hours*</b><small>Charging</small></div></div>
-                <div class="chip chip-4"><span class="ic">kg</span><div><b>7.7 kg</b><small>Weight</small></div></div>
-                <div class="drag-hint" id="dragHint">TAP TO RECHARGE ⚡</div>
+                <div class="chip chip-1"><span class="ic">V</span><div><b>72V</b><small>System</small></div></div>
+                <div class="chip chip-2"><span class="ic">Ah</span><div><b>20Ah</b><small>Capacity</small></div></div>
+                <div class="chip chip-3"><span class="ic">⚡</span><div><b>1.44kWh</b><small>Energy</small></div></div>
+                <div class="chip chip-4"><span class="ic">✓</span><div><b>IEC 62619</b><small>Certified</small></div></div>
+                <div class="drag-hint" id="dragHint">← DRAG TO ROTATE →</div>
             </div>
 
             <p class="kicker"><b>Battery Packs</b> for E-Scooters · Indonesia</p>
@@ -668,29 +668,34 @@ function initAiTag() {
     setInterval(() => { if (document.hidden) return; i = (i + 1) % msgs.length; el.style.opacity = '0'; setTimeout(() => { el.textContent = msgs[i]; el.style.opacity = '1'; }, 420); }, 3000);
 }
 
-/* ── Pack: tap = replay charge, gyro = gentle parallax (translate only, photo never distorted) ── */
+/* ── Pack: touch-drag rotate + gyro tilt (event-driven, rAF-throttled) ── */
 function initPackMotion() {
-    const stage = $('#packStage'), photo = $('#packPhoto'), hint = $('#dragHint');
-    if (!stage || !photo) return;
-    let tx = 0, ty = 0, pending = false;
-    const flush = () => { stage.style.setProperty('--tx', tx.toFixed(1) + 'px'); stage.style.setProperty('--ty', ty.toFixed(1) + 'px'); pending = false; };
+    const hero = $('#hero'), stage = $('#packStage'), pack = $('#pack'), hint = $('#dragHint');
+    let tx = 0, ty = 0, drag = 0, pending = false;
+    const flush = () => { hero.style.setProperty('--tx', tx.toFixed(1) + 'deg'); hero.style.setProperty('--ty', ty.toFixed(1) + 'deg'); hero.style.setProperty('--drag', drag.toFixed(1) + 'deg'); pending = false; };
     const req = () => { if (!pending) { pending = true; raf(flush); } };
 
-    // Tap → restart the charging animation (clone = cheapest way to restart CSS animations)
-    stage.addEventListener('click', () => {
-        const z = photo.querySelector('.charge-zone'); if (z) z.replaceWith(z.cloneNode(true));
-        if (navigator.vibrate) navigator.vibrate(15);
+    // Drag (horizontal only — vertical swipes still scroll the page)
+    let startX = 0, startY = 0, base = 0, active = false, locked = null;
+    stage.addEventListener('pointerdown', e => { active = true; locked = null; startX = e.clientX; startY = e.clientY; base = drag; pack.classList.remove('spring'); askGyro(); }, { passive: true });
+    stage.addEventListener('pointermove', e => {
+        if (!active) return;
+        const dx = e.clientX - startX, dy = e.clientY - startY;
+        if (locked === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) locked = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+        if (locked !== 'x') return;
+        drag = base + dx * 0.6; req();
         if (hint) hint.classList.add('gone');
-        askGyro();
-    });
+    }, { passive: true });
+    const end = () => { if (!active) return; active = false; pack.classList.add('spring'); drag = Math.round(drag / 360) * 360; req(); };
+    stage.addEventListener('pointerup', end); stage.addEventListener('pointercancel', end); stage.addEventListener('pointerleave', end);
 
-    // Gyro parallax relative to the first reading (resting angle = neutral)
+    // Gyro: relative to the first reading so the resting phone angle = neutral
     let b0 = null, gyroOn = false;
     function onOrient(e) {
         if (e.gamma == null || e.beta == null) return;
         if (b0 === null) b0 = e.beta;
-        tx = Math.max(-10, Math.min(10, e.gamma * 0.35));
-        ty = Math.max(-8, Math.min(8, (e.beta - b0) * 0.25));
+        ty = Math.max(-16, Math.min(16, e.gamma * 0.4));
+        tx = Math.max(-10, Math.min(10, -(e.beta - b0) * 0.3));
         req();
     }
     function startGyro() { if (gyroOn) return; gyroOn = true; window.addEventListener('deviceorientation', onOrient, { passive: true }); }
