@@ -196,9 +196,9 @@
 			            <!-- WhatsApp real-time contact -->
             <div class="wa-box">
                 <p class="wa-desc">For a real-time response, please contact us on WhatsApp.</p>
-                <a href="https://wa.me/821077140910" target="_blank" rel="noopener" class="wa-btn">
+                <a id="waLink" href="https://wa.me/821077140910" target="_blank" rel="noopener" class="wa-btn">
                     <img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="WhatsApp" width="22" height="22">
-                    <span>+82 10-7714-0910</span>
+                    <span id="waNum">+82 10-7714-0910</span>
                 </a>
             </div>
 			
@@ -348,6 +348,28 @@
     let database;
     if (typeof firebase !== 'undefined') { if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } database = firebase.database(); }
 
+    /* ── WhatsApp number from admin (siteSettings/whatsapp) ── */
+    function formatWa(n) {
+        const rules = { '82': /^(\d{2})(\d{3,4})(\d{4})$/, '62': /^(\d{3})(\d{3,4})(\d{4,5})$/ };
+        for (const cc in rules) {
+            if (n.startsWith(cc)) {
+                const g = n.slice(cc.length).match(rules[cc]);
+                if (g) return `+${cc} ${g.slice(1).join('-')}`;
+            }
+        }
+        return '+' + n;
+    }
+    function loadWhatsApp() {
+        if (!database) return;
+        database.ref('siteSettings/whatsapp').once('value').then(snap => {
+            const num = String(snap.val() || '').replace(/\D/g, '');
+            if (!num) return;
+            const link = document.getElementById('waLink'), label = document.getElementById('waNum');
+            if (link) link.href = 'https://wa.me/' + num;
+            if (label) label.textContent = formatWa(num);
+        }).catch(err => console.warn('WhatsApp number load failed:', err));
+    }
+	
     async function loadLayout() {
         try {
             const headerRes = await fetch('components/header.html');
@@ -442,6 +464,7 @@
         initConstellation3D();
         initTdlid3D();
         initGlobal3DEffect();
+		        loadWhatsApp();   // ← 추가
         loadLayout();
     });
     </script>

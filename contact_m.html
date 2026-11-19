@@ -85,10 +85,10 @@
         </h2>
 		        <div class="mb-6">
             <p data-i18n="wa_desc" class="text-sm text-neutral-200 mb-3">For a real-time response, please contact us on WhatsApp.</p>
-            <a href="https://wa.me/821077140910" target="_blank" rel="noopener"
+            <a id="waLink" href="https://wa.me/821077140910" target="_blank" rel="noopener"
                class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#25D366] active:brightness-90 text-white font-bold text-sm shadow-lg">
                 <img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="WhatsApp" width="20" height="20">
-                +82 10-7714-0910
+                <span id="waNum">+82 10-7714-0910</span>
             </a>
         </div>
         <p class="text-sm text-neutral-400 mb-8 leading-relaxed">
@@ -221,6 +221,28 @@
         }
     }
 
+
+    function formatWa(n) {
+        const rules = { '82': /^(\d{2})(\d{3,4})(\d{4})$/, '62': /^(\d{3})(\d{3,4})(\d{4,5})$/ };
+        for (const cc in rules) {
+            if (n.startsWith(cc)) {
+                const g = n.slice(cc.length).match(rules[cc]);
+                if (g) return `+${cc} ${g.slice(1).join('-')}`;
+            }
+        }
+        return '+' + n;
+    }
+    function loadWhatsApp() {
+        if (typeof database === 'undefined') return;
+        database.ref('siteSettings/whatsapp').once('value').then(snap => {
+            const num = String(snap.val() || '').replace(/\D/g, '');
+            if (!num) return;
+            const link = document.getElementById('waLink'), label = document.getElementById('waNum');
+            if (link) link.href = 'https://wa.me/' + num;
+            if (label) label.textContent = formatWa(num);
+        }).catch(err => console.warn('WhatsApp number load failed:', err));
+    }
+	
     function initEeggTrigger() {
         const trigger = document.getElementById('triggerOur');
         if (trigger) {
@@ -324,8 +346,9 @@ function initFormHandler() {
     }
 }
 
-    document.addEventListener("DOMContentLoaded", loadLayout);
-</script>
+    document.addEventListener("DOMContentLoaded", () => { loadWhatsApp(); loadLayout(); });
+	
+	</script>
 
 </body>
 </html>
