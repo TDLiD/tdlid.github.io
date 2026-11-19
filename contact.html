@@ -164,6 +164,11 @@
         .form-card{padding:2rem!important}
         .form-card .grid-cols-2{grid-template-columns:1fr}
     }
+	    /* ── WhatsApp real-time contact ── */
+    .wa-box{margin-bottom:1.25rem}
+    .wa-desc{color:var(--chrome);font-size:1rem;margin-bottom:.6rem}
+    .wa-btn{display:inline-flex;align-items:center;gap:10px;padding:.7rem 1.3rem;border-radius:999px;background:#25D366;color:#fff;font-weight:700;font-family:var(--font-mono);letter-spacing:.03em;box-shadow:0 8px 24px rgba(37,211,102,.25);transition:filter .25s,transform .25s}
+    .wa-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
     </style>
 </head>
 <body class="bg-neutral-950 text-neutral-100 font-[Pretendard] overflow-x-hidden">
@@ -188,6 +193,15 @@
         <div class="form-card p-12 rounded-3xl relative">
             <span class="day-badge"></span>
             <div class="ai-badge" id="ai-msg">System: Initializing Secure Uplink...</div>
+			            <!-- WhatsApp real-time contact -->
+            <div class="wa-box">
+                <p class="wa-desc">For a real-time response, please contact us on WhatsApp.</p>
+                <a href="https://wa.me/821077140910" target="_blank" rel="noopener" class="wa-btn">
+                    <img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="WhatsApp" width="22" height="22">
+                    <span>+82 10-7714-0910</span>
+                </a>
+            </div>
+			
             <h2 class="text-5xl tracking-tight hero-slogan-gradient mb-4">Talk to us about your goals</h2>
             <p class="text-neutral-400 text-lg mb-10">
                 <span>Complete the form below and discover how we can help</span>
